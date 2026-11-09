@@ -1,0 +1,16 @@
+name: Feature request
+description: A change or addition you would like
+labels: [enhancement]
+body:
+  - type: textarea
+    id: what
+    attributes:
+      label: What do you want
+      description: What should the page do that it does not do today?
+    validations:
+      required: true
+  - type: textarea
+    id: why
+    attributes:
+      label: Why it matters
+      description: Optional. Who needs it, and what are you trying to do?
