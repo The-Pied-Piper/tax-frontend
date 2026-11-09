@@ -6,7 +6,7 @@ describe('App', () => {
   it('shows the page title', () => {
     render(<App />);
     expect(
-      screen.getByRole('heading', { name: strings.title }),
+      screen.getByRole('heading', { name: strings.title, level: 1 }),
     ).toBeInTheDocument();
   });
 });

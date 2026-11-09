@@ -2,7 +2,6 @@
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 
-// The proxy is wired up in the local development ticket.
 export default defineConfig({
   plugins: [react()],
   test: {
