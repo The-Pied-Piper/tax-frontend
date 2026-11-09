@@ -20,3 +20,25 @@ jobs:
       - run: npm ci
       - run: npm run check
       - run: npm run build
+      - name: Generated API types match the committed spec
+        run: npm run api:check
+  spec-drift:
+    # The committed spec must equal the one tax-service publishes on main.
+    # tax-service is private for now, so this needs the TAX_SERVICE_READ_TOKEN
+    # secret (read-only, contents on tax-service). Pull requests from forks
+    # cannot see secrets, so the check is skipped for them.
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Compare api/openapi.yml with tax-service main
+        env:
+          GH_TOKEN: ${{ secrets.TAX_SERVICE_READ_TOKEN }}
+        run: |
+          if [ -z "$GH_TOKEN" ]; then
+            echo "::warning::TAX_SERVICE_READ_TOKEN is not available; spec drift not checked"
+            exit 0
+          fi
+          gh api repos/The-Pied-Piper/tax-service/contents/openapi/openapi.yml \
+            -H "Accept: application/vnd.github.raw" > /tmp/published.yml
+          diff -u api/openapi.yml /tmp/published.yml \
+            || { echo "::error::api/openapi.yml differs from tax-service. Run: npm run api:sync"; exit 1; }

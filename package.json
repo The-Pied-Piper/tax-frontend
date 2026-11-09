@@ -12,7 +12,10 @@
     "format:check": "prettier --check .",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
-    "check": "npm run lint && npm run format:check && npm run typecheck && npm run test"
+    "check": "npm run lint && npm run format:check && npm run typecheck && npm run test",
+    "api:generate": "openapi-ts",
+    "api:check": "openapi-ts && git diff --exit-code -- src/api/generated",
+    "api:sync": "gh api repos/The-Pied-Piper/tax-service/contents/openapi/openapi.yml -H \"Accept: application/vnd.github.raw\" > api/openapi.yml && npm run api:generate"
   },
   "dependencies": {
     "react": "^19.3.1",
@@ -20,6 +23,7 @@
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
+    "@hey-api/openapi-ts": "^0.99.0",
     "@testing-library/jest-dom": "^7.0.1",
     "@testing-library/react": "^16.3.3",
     "@types/react": "^19.3.0",
@@ -29,6 +33,7 @@
     "eslint-plugin-react-hooks": "^7.1.1",
     "globals": "^17.14.0",
     "jsdom": "^31.0.0",
+    "msw": "^3.0.4",
     "prettier": "^3.9.10",
     "typescript": "^6.0.3",
     "typescript-eslint": "^8.72.2",
