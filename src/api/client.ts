@@ -22,8 +22,8 @@ export class ApiError extends Error {
   readonly status: number;
   readonly problem: Problem | null;
 
-  constructor(status: number, problem: Problem | null) {
-    super(problem?.detail ?? `Request failed with status ${status}`);
+  constructor(status: number, problem: Problem | null, message?: string) {
+    super(message ?? problem?.detail ?? `Request failed with status ${status}`);
     this.name = 'ApiError';
     this.status = status;
     this.problem = problem;
@@ -84,13 +84,22 @@ export function createApiClient(options: ApiClientOptions = {}): ApiClient {
       throw new NetworkError(cause);
     }
     // Parsed from text so decimal strings stay strings; no number ever holds money.
-    const text = await response.text();
+    let text: string;
+    try {
+      text = await response.text();
+    } catch (cause) {
+      throw new NetworkError(cause);
+    }
     const body = parseJson(text);
     if (!response.ok) {
       throw new ApiError(response.status, isProblem(body) ? body : null);
     }
     if (body === null) {
-      throw new ApiError(response.status, null);
+      throw new ApiError(
+        response.status,
+        null,
+        'The service sent an empty or unreadable answer',
+      );
     }
     return body as T;
   }

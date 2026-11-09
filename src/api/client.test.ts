@@ -149,4 +149,38 @@ describe('computeTakeHomeCalculation', () => {
       }),
     ).rejects.toBeInstanceOf(NetworkError);
   });
+
+  it('throws a clear ApiError when a 200 body is empty or not JSON', async () => {
+    server.use(
+      http.post(`${BASE}/take-home-calculations\\:compute`, () =>
+        HttpResponse.text('<html>oops</html>', { status: 200 }),
+      ),
+    );
+    const error = await client
+      .computeTakeHomeCalculation({
+        jurisdiction_code: 'CA-ON',
+        year: 2025,
+        salary: '1',
+      })
+      .catch((e: unknown) => e);
+    expect(error).toBeInstanceOf(ApiError);
+    expect((error as ApiError).message).toBe(
+      'The service sent an empty or unreadable answer',
+    );
+  });
+});
+
+describe('base URL', () => {
+  it('strips trailing slashes and works with a relative base', async () => {
+    const calls: string[] = [];
+    const relative = createApiClient({
+      baseUrl: '/api/v1//',
+      fetch: (input) => {
+        calls.push(String(input));
+        return Promise.resolve(Response.json(jurisdictions));
+      },
+    });
+    await relative.listJurisdictions();
+    expect(calls).toEqual(['/api/v1/jurisdictions']);
+  });
 });
