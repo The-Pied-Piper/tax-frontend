@@ -44,7 +44,7 @@ There is no fake server generated from the spec (it would invent figures, which 
 
 ## Dependency updates
 
-Dependabot opens at most one pull request a month for each of production npm packages, development npm packages and GitHub Actions (`.github/dependabot.yml`). They go through the normal review and merge; nothing merges itself.
+Dependabot version updates (`.github/dependabot.yml`) arrive monthly, as one pull request each for production npm packages, development npm packages and GitHub Actions. Security updates are separate and can arrive at any time. They go through the normal review and merge; nothing merges itself.
 
 ## License
 
