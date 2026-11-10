@@ -1,7 +1,8 @@
 name: Deploy dev
 
-# Builds the site and publishes it to the dev bucket on every merge to main (main
-# only takes pull requests with green CI), using a short-lived OIDC role (no stored
+# Builds the site and publishes it to the dev bucket on every merge to main (main is
+# meant to take only pull requests with green CI: that is a repository setting, and
+# the repository variables below must not be set until it is on), using a short-lived OIDC role (no stored
 # keys). It does nothing until the repository variables AWS_SITE_DEPLOY_ROLE_ARN_DEV,
 # SITE_BUCKET_DEV and SITE_DISTRIBUTION_ID_DEV are set, which happens once tax-infra
 # has created the dev site and the role. Prod is a separate workflow, on release.
@@ -43,7 +44,8 @@ jobs:
           node-version-file: .nvmrc
           cache: npm
 
-      - run: npm ci
+      # No install scripts: this job holds the right to assume the publishing role.
+      - run: npm ci --ignore-scripts
       - run: npm run build
 
       - uses: aws-actions/configure-aws-credentials@e1253824e5c10ff9df46874f81ed3ec929e19cfd # v6.3.0
