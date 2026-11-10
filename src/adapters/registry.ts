@@ -7,6 +7,9 @@ export class AdapterRegistry {
   private readonly adapters = new Map<string, JurisdictionAdapter[]>();
 
   register(input: JurisdictionAdapter): void {
+    if (input.jurisdictionCode.trim() === '') {
+      throw new Error('An adapter needs a jurisdiction code');
+    }
     if (input.years?.length === 0) {
       throw new Error(
         `The adapter for ${input.jurisdictionCode} lists no years; leave years out to cover every year`,

@@ -59,6 +59,13 @@ describe('AdapterRegistry', () => {
     expect(() => registry.register(fake('XX', 'd', [2026, 2027]))).toThrow();
   });
 
+  it('refuses an adapter with a blank jurisdiction code', () => {
+    const registry = new AdapterRegistry();
+    expect(() => registry.register(fake(' ', 'a'))).toThrow(
+      /jurisdiction code/,
+    );
+  });
+
   it('refuses an adapter with an empty list of years', () => {
     const registry = new AdapterRegistry();
     expect(() => registry.register(fake('XX', 'a', []))).toThrow(/no years/);
