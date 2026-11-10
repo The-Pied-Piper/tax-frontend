@@ -35,7 +35,9 @@ const LAYERS = {
   api: { allow: [], types: [], react: false },
   money: { allow: [], types: [], react: false },
   theme: { allow: [], types: [], react: false },
-  adapters: { allow: ['strings'], types: ['api'], react: false },
+  // CSS and the token test only; nothing else belongs here.
+  styles: { allow: [], types: [], react: false },
+  adapters: { allow: ['money', 'strings'], types: ['api'], react: false },
   state: {
     allow: ['api', 'adapters', 'money', 'strings'],
     types: [],

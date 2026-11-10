@@ -149,6 +149,16 @@ describe('layering', () => {
       SYNTAX,
     ],
     [
+      'a non-test file in styles importing a component',
+      'src/styles/a.ts',
+      "import { A } from '../components/A';\nexport const x = A;\n",
+    ],
+    [
+      'a non-test file in styles importing react',
+      'src/styles/a.ts',
+      "import { useState } from 'react';\nexport const x = useState;\n",
+    ],
+    [
       'a template-literal dynamic import in api',
       'src/api/a.ts',
       'export const x = () => import(`../strings`);\n',
@@ -190,6 +200,11 @@ describe('layering', () => {
   });
 
   const allowed = [
+    [
+      'an adapter importing the money helpers',
+      'src/adapters/ca-on.ts',
+      "import { sumAmounts } from '../money/sum';\nexport const x = sumAmounts;\n",
+    ],
     [
       'a component importing api types',
       'src/components/A.tsx',
