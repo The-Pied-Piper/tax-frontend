@@ -1,3 +1,4 @@
+import { StarLink } from './components/StarLink';
 import { strings } from './strings';
 import { ThemeToggle } from './components/ThemeToggle';
 
@@ -11,6 +12,7 @@ export function App() {
         </div>
         <ThemeToggle />
       </header>
+      <StarLink />
     </main>
   );
 }

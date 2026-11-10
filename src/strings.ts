@@ -6,6 +6,7 @@ export const strings = {
   themeLabel: 'Theme',
   themeLight: 'Light',
   themeDark: 'Dark',
+  starLink: 'Star the engine on GitHub',
   payPeriod: {
     legend: 'Show amounts',
     weekly: 'Weekly',
