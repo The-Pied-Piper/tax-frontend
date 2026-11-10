@@ -1,9 +1,4 @@
-import {
-  normalizeSiteUrl,
-  robotsTxt,
-  seo,
-  sitemapXml,
-} from './vite-plugin-seo';
+import { normalizeSiteUrl, robotsTxt, seo, sitemapXml } from './seo';
 
 describe('normalizeSiteUrl', () => {
   it('is null when unset or blank', () => {

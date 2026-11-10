@@ -1,5 +1,5 @@
 import { readFileSync } from 'node:fs';
-import { strings } from './src/strings';
+import { strings } from '../src/strings';
 
 const html = readFileSync('index.html', 'utf8');
 const page = new DOMParser().parseFromString(html, 'text/html');
