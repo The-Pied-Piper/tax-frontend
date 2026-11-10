@@ -197,6 +197,11 @@ export default tseslint.config(
   },
   { ...jsxA11y.flatConfigs.recommended, files: ['**/*.tsx'] },
   { files: ['**/*.js'], extends: [tseslint.configs.disableTypeChecked] },
+  // Plain browser script, loaded by index.html before the app.
+  {
+    files: ['public/theme-init.js'],
+    languageOptions: { globals: globals.browser },
+  },
   { files: ['**/*.{ts,tsx}'], rules: NO_NUMBER_PARSING },
   // src/money does the money arithmetic; src/styles (the token test's colour
   // maths) is not money, so the whole folder is exempt.
