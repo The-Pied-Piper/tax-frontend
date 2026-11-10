@@ -167,7 +167,14 @@ const NO_NUMBER_PARSING = {
 };
 
 export default tseslint.config(
-  { ignores: ['dist', 'node_modules', 'src/api/generated'] },
+  {
+    ignores: [
+      'dist',
+      'node_modules',
+      'src/api/generated',
+      'public/mockServiceWorker.js',
+    ],
+  },
   js.configs.recommended,
   ...tseslint.configs.strictTypeChecked,
   {
