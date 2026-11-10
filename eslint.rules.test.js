@@ -138,6 +138,23 @@ describe('layering', () => {
       IMPORT,
     ],
     [
+      'a .js-suffixed api client import in a mock handler',
+      'src/mocks/handlers.ts',
+      "import { createApiClient } from '../api/client.js';\nexport const x = createApiClient;\n",
+    ],
+    [
+      'a dynamic .js-suffixed api import in a mock handler',
+      'src/mocks/handlers.ts',
+      "export const x = () => import('../api/index.js');\n",
+      SYNTAX,
+    ],
+    [
+      'a template-literal dynamic import in api',
+      'src/api/a.ts',
+      'export const x = () => import(`../strings`);\n',
+      SYNTAX,
+    ],
+    [
       'App importing mocks',
       'src/App.tsx',
       "import { server } from './mocks/server';\nexport const x = server;\n",
@@ -172,6 +189,11 @@ describe('layering', () => {
       'a mock handler importing a fixture and api types',
       'src/mocks/handlers.ts',
       "import fixture from '../api/fixtures/compute-on-2025-70000.json';\nimport type { Problem } from '../api';\nexport const x = [fixture, {} as Problem];\n",
+    ],
+    [
+      'a component importing an npm package whose name ends in a folder name',
+      'src/components/A.tsx',
+      "import s from '@mui/styles';\nimport t from 'some-lib/api';\nexport const x = [s, t];\n",
     ],
     [
       'a test importing mocks',

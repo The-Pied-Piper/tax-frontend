@@ -52,22 +52,22 @@ const LAYERS = {
 
 const isFolder = (part) => FOLDERS.includes(part);
 
-// Written-path globs for a part: a folder (and anything in it), or a root
-// file with or without a script extension.
-function globs(part) {
-  if (isFolder(part)) return [`**/${part}`, `**/${part}/**`];
-  return [
-    `**/${part}`,
-    ...['js', 'jsx', 'ts', 'tsx'].map((ext) => `**/${part}.${ext}`),
-  ];
-}
+// A written path that points into src: relative, absolute, or an alias. Package
+// names such as "@mui/styles" are not matched.
+const SRC_PATH = String.raw`^(\.\.?\/|\/|@\/|src\/)(.*\/)?`;
+const EXT = String.raw`(\.(js|jsx|ts|tsx))?`;
 
-// The same thing as a regular expression source, for dynamic import().
+// Regular expression source for a part: a folder (and anything in it), or a
+// root file with or without a script extension. Used for import statements
+// and for dynamic import().
 function regex(part) {
   return isFolder(part)
-    ? String.raw`(^|\/)${part}(\/|$)`
-    : String.raw`(^|\/)${part}(\.(js|jsx|ts|tsx))?$`;
+    ? `${SRC_PATH}${part}(\\/|$)`
+    : `${SRC_PATH}${part}${EXT}$`;
 }
+
+// The api files a mock handler may not import (fixtures are fine).
+const API_NOT_FIXTURES = `${SRC_PATH}api(\\/(client|config|index|generated)${EXT}(\\/|$)|$)`;
 
 function layerRule(folder, { allow, types, react, fixturesOnly = [] }) {
   const refused = SRC_PARTS.filter(
@@ -77,20 +77,20 @@ function layerRule(folder, { allow, types, react, fixturesOnly = [] }) {
   for (const part of refused) {
     if (fixturesOnly.includes(part)) {
       patterns.push({
-        regex: String.raw`(^|/)api(/(client|config|index|generated)(/|$)|$)`,
+        regex: API_NOT_FIXTURES,
         allowTypeImports: true,
         message:
           'src/mocks may import api fixtures, and types with "import type".',
       });
     } else if (types.includes(part)) {
       patterns.push({
-        group: globs(part),
+        regex: regex(part),
         allowTypeImports: true,
         message: `Only types may come from src/${part} here: use "import type".`,
       });
     } else {
       patterns.push({
-        group: globs(part),
+        regex: regex(part),
         message: `src/${folder} may not import src/${part} (architecture doc, folder table).`,
       });
     }
@@ -111,10 +111,14 @@ function layerRule(folder, { allow, types, react, fixturesOnly = [] }) {
     }));
   if (fixturesOnly.length > 0) {
     dynamic.push({
-      selector: String.raw`ImportExpression[source.value=/(^|\/)api(\/(client|config|index|generated)(\/|$)|$)/]`,
+      selector: `ImportExpression[source.value=/${API_NOT_FIXTURES}/]`,
       message: 'src/mocks may import api fixtures only.',
     });
   }
+  dynamic.push({
+    selector: "ImportExpression[source.type='TemplateLiteral']",
+    message: `src/${folder}: write the import path as a plain string so the layer rules can read it.`,
+  });
   if (!react) {
     dynamic.push({
       selector: `ImportExpression[source.value=/${REACT_REGEX}/]`,
@@ -201,7 +205,7 @@ export default tseslint.config(
         {
           patterns: [
             {
-              group: globs('mocks'),
+              regex: regex('mocks'),
               message: 'Only src/main.tsx and tests import src/mocks.',
             },
           ],
