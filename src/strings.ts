@@ -6,4 +6,11 @@ export const strings = {
   themeLabel: 'Theme',
   themeLight: 'Light',
   themeDark: 'Dark',
+  payPeriod: {
+    legend: 'Show amounts',
+    weekly: 'Weekly',
+    biweekly: 'Bi-weekly',
+    monthly: 'Monthly',
+    annually: 'Annually',
+  },
 };
