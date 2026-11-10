@@ -57,7 +57,9 @@ function run(siteUrl: string | undefined) {
       files[file.fileName] = file.source;
     },
   };
-  (plugin.generateBundle as (this: typeof context) => void).call(context);
+  (plugin.generateBundle as unknown as (this: typeof context) => void).call(
+    context,
+  );
   return { tags, files };
 }
 
