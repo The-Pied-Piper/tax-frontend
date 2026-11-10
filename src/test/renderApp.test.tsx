@@ -4,11 +4,19 @@ import { strings } from '../strings';
 import { renderApp } from './renderApp';
 
 describe('page flow through the shared mock service worker', () => {
-  it('shows the saved take-home for $70,000 in Ontario, 2025', async () => {
+  it('shows the take-home the fixture holds after choosing Ontario, 2025 and a $70,000 salary', async () => {
     const user = userEvent.setup();
     renderApp();
+    await user.selectOptions(
+      await screen.findByRole('combobox', { name: strings.form.place }),
+      'CA-ON',
+    );
+    await user.selectOptions(
+      screen.getByRole('combobox', { name: strings.form.year }),
+      '2025',
+    );
     await user.type(
-      await screen.findByRole('textbox', { name: strings.form.salary }),
+      screen.getByRole('textbox', { name: strings.form.salary }),
       '70000',
     );
     await user.click(
