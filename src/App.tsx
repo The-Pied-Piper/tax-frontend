@@ -1,5 +1,6 @@
 import type { AdapterRegistry } from './adapters';
 import type { ApiClient } from './api';
+import { AdvancedView } from './components/AdvancedView';
 import { AnswerCard } from './components/AnswerCard';
 import { Breakdown } from './components/Breakdown';
 import { SalaryForm } from './components/SalaryForm';
@@ -47,6 +48,7 @@ export function App({ client, registry }: Props) {
             totals={page.request.adapted.totals}
             payPeriod={page.payPeriod}
           />
+          <AdvancedView groups={page.request.adapted.advanced} />
         </>
       )}
       {/* Placeholder until the error display exists. */}
