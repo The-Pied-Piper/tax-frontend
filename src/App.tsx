@@ -1,5 +1,5 @@
 import { strings } from './strings';
-import { ThemeToggle } from './ThemeToggle';
+import { ThemeToggle } from './components/ThemeToggle';
 
 export function App() {
   return (

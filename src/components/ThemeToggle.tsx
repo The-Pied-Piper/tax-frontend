@@ -1,12 +1,13 @@
 import { useEffect, useRef, useState } from 'react';
-import { strings } from './strings';
+import styles from './ThemeToggle.module.css';
+import { strings } from '../strings';
 import {
   applyTheme,
   deviceTheme,
   readStoredTheme,
   storeTheme,
   type Theme,
-} from './theme';
+} from '../theme/theme';
 
 const OPTIONS: { value: Theme; label: string }[] = [
   { value: 'light', label: strings.themeLight },
@@ -40,7 +41,7 @@ export function ThemeToggle() {
   }, []);
 
   return (
-    <div className="seg" role="group" aria-label={strings.themeLabel}>
+    <div className={styles.group} role="group" aria-label={strings.themeLabel}>
       {OPTIONS.map(({ value, label }) => (
         <button
           key={value}

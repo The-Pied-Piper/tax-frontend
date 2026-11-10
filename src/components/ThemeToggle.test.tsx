@@ -1,7 +1,7 @@
-import { act, fireEvent, render, screen } from '@testing-library/react';
-import { App } from './App';
-import { strings } from './strings';
-import { THEME_STORAGE_KEY } from './theme';
+import { act, fireEvent, render, screen, within } from '@testing-library/react';
+import { ThemeToggle } from './ThemeToggle';
+import { strings } from '../strings';
+import { THEME_STORAGE_KEY } from '../theme/theme';
 
 type Listener = () => void;
 const listeners = new Set<Listener>();
@@ -35,14 +35,14 @@ describe('theme toggle', () => {
 
   it('offers only Light and Dark', () => {
     mockDevice(false);
-    render(<App />);
+    render(<ThemeToggle />);
     const group = screen.getByRole('group', { name: strings.themeLabel });
-    expect(group.querySelectorAll('button')).toHaveLength(2);
+    expect(within(group).getAllByRole('button')).toHaveLength(2);
   });
 
   it('starts on a dark device setting', () => {
     mockDevice(true);
-    render(<App />);
+    render(<ThemeToggle />);
     expect(document.documentElement.dataset.theme).toBe('dark');
     expect(button(strings.themeDark)).toHaveAttribute('aria-pressed', 'true');
     expect(button(strings.themeLight)).toHaveAttribute('aria-pressed', 'false');
@@ -50,14 +50,14 @@ describe('theme toggle', () => {
 
   it('starts on a light device setting', () => {
     mockDevice(false);
-    render(<App />);
+    render(<ThemeToggle />);
     expect(document.documentElement.dataset.theme).toBe('light');
     expect(button(strings.themeLight)).toHaveAttribute('aria-pressed', 'true');
   });
 
   it('switches and remembers the choice', () => {
     mockDevice(false);
-    render(<App />);
+    render(<ThemeToggle />);
     fireEvent.click(button(strings.themeDark));
     expect(document.documentElement.dataset.theme).toBe('dark');
     expect(window.localStorage.getItem(THEME_STORAGE_KEY)).toBe('dark');
@@ -69,7 +69,7 @@ describe('theme toggle', () => {
   it('uses the remembered choice over the device setting', () => {
     mockDevice(true);
     window.localStorage.setItem(THEME_STORAGE_KEY, 'light');
-    render(<App />);
+    render(<ThemeToggle />);
     expect(document.documentElement.dataset.theme).toBe('light');
     expect(button(strings.themeLight)).toHaveAttribute('aria-pressed', 'true');
   });
@@ -77,7 +77,7 @@ describe('theme toggle', () => {
   it('ignores an invalid remembered value', () => {
     mockDevice(true);
     window.localStorage.setItem(THEME_STORAGE_KEY, 'system');
-    render(<App />);
+    render(<ThemeToggle />);
     expect(document.documentElement.dataset.theme).toBe('dark');
   });
 
@@ -93,7 +93,7 @@ describe('theme toggle', () => {
       .mockImplementation(() => {
         throw new Error('blocked');
       });
-    render(<App />);
+    render(<ThemeToggle />);
     fireEvent.click(button(strings.themeDark));
     expect(document.documentElement.dataset.theme).toBe('dark');
     get.mockRestore();
@@ -102,7 +102,7 @@ describe('theme toggle', () => {
 
   it('follows the device until a choice is made', () => {
     mockDevice(false);
-    render(<App />);
+    render(<ThemeToggle />);
     changeDevice(true);
     expect(document.documentElement.dataset.theme).toBe('dark');
     fireEvent.click(button(strings.themeLight));
@@ -122,7 +122,7 @@ describe('theme toggle', () => {
       .mockImplementation(() => {
         throw new Error('blocked');
       });
-    render(<App />);
+    render(<ThemeToggle />);
     fireEvent.click(button(strings.themeLight));
     changeDevice(true);
     expect(document.documentElement.dataset.theme).toBe('light');
@@ -132,7 +132,7 @@ describe('theme toggle', () => {
 
   it('stops listening to the device when removed', () => {
     mockDevice(false);
-    const { unmount } = render(<App />);
+    const { unmount } = render(<ThemeToggle />);
     expect(listeners.size).toBe(1);
     unmount();
     expect(listeners.size).toBe(0);
