@@ -6,6 +6,7 @@ import {
   ApiError,
   createApiClient,
   NetworkError,
+  RequestTimeoutError,
   type ApiClient,
   type ComputeTakeHomeCalculationRequest,
 } from './api';
@@ -162,23 +163,109 @@ describe('App form', () => {
     ).toBeEnabled();
   });
 
-  it('shows a placeholder when the service rejects the request', async () => {
-    const user = userEvent.setup();
-    const base = fixtureClient();
-    const client: ApiClient = {
-      listJurisdictions: (query) => base.listJurisdictions(query),
-      computeTakeHomeCalculation: () =>
-        Promise.reject(new ApiError(400, invalidSalary)),
-    };
-    render(<App client={client} />);
-    await user.type(
-      await screen.findByRole('textbox', { name: strings.form.salary }),
-      '70000',
-    );
-    await user.click(
-      screen.getByRole('button', { name: strings.form.calculate }),
-    );
-    expect(await screen.findByText(strings.result.failed)).toBeInTheDocument();
+  describe('when the request fails', () => {
+    async function failWith(error: Error) {
+      const user = userEvent.setup();
+      const base = fixtureClient();
+      let calls = 0;
+      const client: ApiClient = {
+        listJurisdictions: (query) => base.listJurisdictions(query),
+        computeTakeHomeCalculation: (body) => {
+          calls += 1;
+          return calls === 1
+            ? base.computeTakeHomeCalculation(body)
+            : Promise.reject(error);
+        },
+      };
+      render(<App client={client} />);
+      const input = await screen.findByRole('textbox', {
+        name: strings.form.salary,
+      });
+      await user.type(input, '70000');
+      const calculate = () =>
+        user.click(
+          screen.getByRole('button', { name: strings.form.calculate }),
+        );
+      await calculate();
+      await screen.findByRole('heading', { name: strings.answer.heading });
+      await calculate();
+      return { user, input };
+    }
+
+    it('shows a notice and hides the previous answer', async () => {
+      await failWith(new ApiError(400, invalidSalary));
+      expect(
+        await screen.findByText(strings.errors.rejected),
+      ).toBeInTheDocument();
+      expect(screen.getByRole('alert')).toHaveTextContent(
+        strings.errors.rejected,
+      );
+      expect(
+        screen.queryByRole('heading', { name: strings.answer.heading }),
+      ).not.toBeInTheDocument();
+      expect(screen.queryByText('53,468.68')).not.toBeInTheDocument();
+    });
+
+    it('puts a salary problem under the salary box', async () => {
+      const { user, input } = await failWith(
+        new ApiError(400, { ...invalidSalary, field: 'salary' }),
+      );
+      expect(
+        await screen.findByText(strings.errors.salaryRejected),
+      ).toBeInTheDocument();
+      expect(input).toBeInvalid();
+      expect(
+        screen.queryByText(strings.errors.rejected),
+      ).not.toBeInTheDocument();
+      await user.type(input, '1');
+      expect(
+        screen.queryByText(strings.errors.salaryRejected),
+      ).not.toBeInTheDocument();
+    });
+
+    it('says the service could not be reached', async () => {
+      await failWith(new NetworkError('offline'));
+      expect(
+        await screen.findByText(strings.errors.unreachable),
+      ).toBeInTheDocument();
+    });
+
+    it('says the service took too long', async () => {
+      await failWith(new RequestTimeoutError());
+      expect(
+        await screen.findByText(strings.errors.timeout),
+      ).toBeInTheDocument();
+    });
+
+    it('lets the person try again after a failure', async () => {
+      const user = userEvent.setup();
+      let fail = true;
+      const base = fixtureClient();
+      const client: ApiClient = {
+        listJurisdictions: (query) => base.listJurisdictions(query),
+        computeTakeHomeCalculation: (body) =>
+          fail
+            ? Promise.reject(new ApiError(503, null))
+            : base.computeTakeHomeCalculation(body),
+      };
+      render(<App client={client} />);
+      await user.type(
+        await screen.findByRole('textbox', { name: strings.form.salary }),
+        '70000',
+      );
+      const calculate = () =>
+        user.click(
+          screen.getByRole('button', { name: strings.form.calculate }),
+        );
+      await calculate();
+      await screen.findByText(strings.errors.serverProblem);
+      fail = false;
+      await calculate();
+      await screen.findByRole('heading', { name: strings.answer.heading });
+      expect(
+        screen.queryByText(strings.errors.serverProblem),
+      ).not.toBeInTheDocument();
+    });
   });
 
   it('says so when the list of places cannot be loaded', async () => {
@@ -345,7 +432,7 @@ describe('App breakdown', () => {
       screen.getByRole('button', { name: strings.form.calculate }),
     );
     expect(await screen.findByRole('alert')).toHaveTextContent(
-      strings.result.failed,
+      strings.errors.unknown,
     );
     expect(
       screen.getByRole('button', { name: strings.form.calculate }),
