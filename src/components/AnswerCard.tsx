@@ -1,0 +1,57 @@
+import { groupThousands } from '../money/format';
+import { amountForPeriod, type PayPeriod } from '../money/payPeriod';
+import { strings } from '../strings';
+import styles from './AnswerCard.module.css';
+import { PayPeriodSwitch } from './PayPeriodSwitch';
+
+type Props = {
+  salary: string;
+  totalDeductions: string;
+  takeHome: string;
+  provisional: boolean;
+  payPeriod: PayPeriod;
+  onPayPeriodChange: (period: PayPeriod) => void;
+};
+
+// Display only: the yearly amounts arrive as text and are divided into the
+// chosen pay period by money/, never parsed to numbers here.
+export function AnswerCard({
+  salary,
+  totalDeductions,
+  takeHome,
+  provisional,
+  payPeriod,
+  onPayPeriodChange,
+}: Props) {
+  const show = (yearly: string) =>
+    groupThousands(amountForPeriod(yearly, payPeriod));
+  return (
+    <section className={styles.card} aria-labelledby="answer-heading">
+      <h2 id="answer-heading" className={styles.heading}>
+        {strings.answer.heading}
+      </h2>
+      {provisional && (
+        <p role="note" className={styles.notice}>
+          {strings.answer.provisional}
+        </p>
+      )}
+      <PayPeriodSwitch value={payPeriod} onChange={onPayPeriodChange} />
+      <div className={styles.answer}>
+        <p className={styles.label}>{strings.answer.takeHome}</p>
+        <p className={styles.amount}>{show(takeHome)}</p>
+        <p className={styles.unit}>{strings.answer.per[payPeriod]}</p>
+      </div>
+      <dl className={styles.rows}>
+        <div className={styles.row}>
+          <dt>{strings.answer.salary}</dt>
+          <dd>{show(salary)}</dd>
+        </div>
+        <div className={styles.row}>
+          <dt>{strings.answer.takenOff}</dt>
+          <dd>{show(totalDeductions)}</dd>
+        </div>
+      </dl>
+      <p className={styles.estimate}>{strings.answer.estimateNote}</p>
+    </section>
+  );
+}

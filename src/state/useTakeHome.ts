@@ -5,6 +5,7 @@ import {
   type ComputeTakeHomeCalculationResponse,
   type ListJurisdictionsResponse,
 } from '../api';
+import type { PayPeriod } from '../money/payPeriod';
 import { languageCode } from '../strings';
 import { checkSalary, type SalaryCheck } from './salary';
 
@@ -39,6 +40,7 @@ export function useTakeHome(client: ApiClient = defaultClient) {
     salary: '',
   });
   const [salaryCheck, setSalaryCheck] = useState<SalaryCheck>('ok');
+  const [payPeriod, setPayPeriod] = useState<PayPeriod>('annually');
   const [request, setRequest] = useState<RequestState>({ status: 'idle' });
   // Only the latest request may write its answer.
   const latest = useRef(0);
@@ -129,6 +131,8 @@ export function useTakeHome(client: ApiClient = defaultClient) {
     values,
     salaryCheck,
     request,
+    payPeriod,
+    setPayPeriod,
     setJurisdictionCode,
     setYear,
     setSalary,

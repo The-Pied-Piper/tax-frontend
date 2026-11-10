@@ -31,8 +31,23 @@ export const strings = {
       'Enter the salary as a plain number with up to two decimals, like 70000 or 70000.50.',
     salaryZero: 'Enter a salary above zero.',
   },
+  answer: {
+    heading: 'Your estimate',
+    takeHome: 'Estimated take-home pay',
+    salary: 'Salary before tax',
+    takenOff: 'Taken off (tax and contributions)',
+    per: {
+      weekly: 'per week',
+      biweekly: 'every two weeks',
+      monthly: 'per month',
+      annually: 'per year',
+    },
+    provisional:
+      'Provisional: the tax figures for this year are not final, so this estimate may change.',
+    estimateNote:
+      'This is an estimate for a single yearly salary. Your own situation may differ.',
+  },
   result: {
-    arrived: 'Estimate received.',
     failed: 'Something went wrong. Please try again.',
   },
 };

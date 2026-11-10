@@ -17,7 +17,7 @@ describe('PayPeriodSwitch', () => {
   it('offers the four periods with Annually chosen by default', () => {
     render(<Harness />);
     expect(
-      screen.getByRole('group', { name: 'Show amounts' }),
+      screen.getByRole('radiogroup', { name: 'Show amounts' }),
     ).toBeInTheDocument();
     const labels = screen
       .getAllByRole('radio')
