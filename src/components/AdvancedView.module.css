@@ -76,8 +76,8 @@ details[open] > .formSummary::before {
 }
 
 .formName {
-  font-family: var(--font-mono);
   font-weight: 600;
+  overflow-wrap: anywhere;
 }
 
 .count {

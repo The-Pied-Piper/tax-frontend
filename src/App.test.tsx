@@ -282,6 +282,30 @@ describe('App form', () => {
     );
   });
 
+  it('shows the place code when its name is blank', async () => {
+    const client: ApiClient = {
+      listJurisdictions: () =>
+        Promise.resolve({
+          jurisdictions: [
+            {
+              code: 'CA-ON',
+              name: '  ',
+              years: [{ year: 2025, provisional: false }],
+            },
+          ],
+          next_page_token: '',
+        }),
+      computeTakeHomeCalculation: () => Promise.reject(new Error('unused')),
+    };
+    render(<App client={client} />);
+    const place = await screen.findByRole('combobox', {
+      name: strings.form.place,
+    });
+    expect(
+      within(place).getByRole('option', { name: 'CA-ON' }),
+    ).toBeInTheDocument();
+  });
+
   it('keeps Calculate off when no place has a year to choose', async () => {
     const client: ApiClient = {
       listJurisdictions: () =>

@@ -180,9 +180,14 @@ describe('advancedGroups', () => {
           ],
         },
         { form: 'ex/other', name: '', lines: [] },
+        { form: 'ex/blank', name: '  ', lines: [] },
       ],
     });
-    expect(groups.map((g) => g.name)).toEqual(['Example form', 'ex/other']);
+    expect(groups.map((g) => g.name)).toEqual([
+      'Example form',
+      'ex/other',
+      'ex/blank',
+    ]);
     expect(groups[0]?.lines).toEqual([
       { label: 'Named figure', reference: '65', amount: '1.00' },
       { label: 'b step', reference: null, amount: null },
