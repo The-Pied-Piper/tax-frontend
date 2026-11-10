@@ -4,7 +4,7 @@ import { strings } from '../strings';
 import { renderApp } from './renderApp';
 
 describe('page flow through the shared mock service worker', () => {
-  it('shows the take-home the fixture holds after choosing Ontario, 2025 and a $70,000 salary', async () => {
+  it('shows the fixture take-home for Ontario, 2025, $70,000', async () => {
     const user = userEvent.setup();
     renderApp();
     await user.selectOptions(
