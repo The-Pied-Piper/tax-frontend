@@ -30,7 +30,8 @@ jobs:
       id-token: write
     env:
       # The dev API, set at build time (see README, "API client"). VITE_SITE_URL stays
-      # unset: dev has no canonical address, no sitemap, and tells search engines to stay away.
+      # unset: dev has no canonical address and no sitemap. (Search engines are kept away by
+      # the X-Robots-Tag header that tax-infra's site sends for dev, not by this build.)
       VITE_API_BASE_URL: https://api-dev.aftertaxlens.com/api/v1
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -54,15 +55,17 @@ jobs:
 
       # Files under assets/ have a hash in their name, so they never change and can be
       # cached for a year. Everything else (index.html, theme-init.js, the share image)
-      # keeps its name from build to build, so browsers must ask each time. Assets go up
-      # first, so a page never points at a file that is not there yet. --delete removes
-      # files that are gone from the build (the bucket keeps their old versions).
+      # keeps its name from build to build, so browsers must ask each time. Order matters
+      # while the old page is still live: new assets go up first, the page files second,
+      # and only then are the old assets removed (the bucket keeps their old versions).
+      # mockServiceWorker.js is a development file and is not published.
       - name: Upload the site
         env:
           BUCKET: ${{ vars.SITE_BUCKET_DEV }}
         run: |
+          aws s3 sync dist/assets "s3://$BUCKET/assets" --cache-control "public,max-age=31536000,immutable"
+          aws s3 sync dist "s3://$BUCKET" --delete --exclude "assets/*" --exclude "mockServiceWorker.js" --cache-control "no-cache"
           aws s3 sync dist/assets "s3://$BUCKET/assets" --delete --cache-control "public,max-age=31536000,immutable"
-          aws s3 sync dist "s3://$BUCKET" --delete --exclude "assets/*" --cache-control "no-cache"
 
       - name: Refresh the CDN
         env:
