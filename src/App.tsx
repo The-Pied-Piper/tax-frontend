@@ -1,4 +1,4 @@
-import { StarLink } from './StarLink';
+import { StarLink } from './components/StarLink';
 import { strings } from './strings';
 
 export function App() {

@@ -1,4 +1,4 @@
-import { strings } from './strings';
+import { strings } from '../strings';
 
 const ENGINE_URL = 'https://github.com/The-Pied-Piper/tax-engine';
 
