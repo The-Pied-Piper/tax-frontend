@@ -26,8 +26,10 @@ function find(
   response: ComputeTakeHomeCalculationResponse,
   wanted: Wanted,
 ): string | undefined {
-  const form = response.trace?.find((f) => f.form === wanted.form);
-  return form?.lines.find((l) => l.label === wanted.label)?.amount;
+  return response.trace
+    ?.filter((f) => f.form === wanted.form)
+    .flatMap((f) => f.lines)
+    .find((l) => l.label === wanted.label)?.amount;
 }
 
 function row(
@@ -56,10 +58,17 @@ function adapt(response: ComputeTakeHomeCalculationResponse): AdaptedResult {
     // A label we rely on is missing: show nothing half-right, keep the advanced view.
     return fallbackResult(response);
   }
+  let cpp: string;
+  try {
+    cpp = sumAmounts([cppBase, cppEnhanced]);
+  } catch {
+    // An amount we cannot add exactly: same rule, show nothing half-right.
+    return fallbackResult(response);
+  }
   const text = strings.adapters.caOn;
   return {
     rows: [
-      row('cpp', text.cpp, sumAmounts([cppBase, cppEnhanced])),
+      row('cpp', text.cpp, cpp),
       row('ei', text.ei, ei),
       row('federal-tax', text.federalTax, federalTax),
       row('ontario-tax', text.ontarioTax, ontarioTax),

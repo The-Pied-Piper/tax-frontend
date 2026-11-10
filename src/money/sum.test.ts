@@ -8,6 +8,8 @@ describe('sumAmounts', () => {
     [['5'], '5.00'],
     [[], '0.00'],
     [['10.00', '-2.50'], '7.50'],
+    [['1.00', '-1.00'], '0.00'],
+    [['99999999999.99', '0.01'], '100000000000.00'],
   ])('adds %j to %s', (amounts, expected) => {
     expect(sumAmounts(amounts)).toBe(expected);
   });

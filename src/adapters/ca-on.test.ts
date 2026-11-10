@@ -10,7 +10,7 @@ const r2026 = fixture2026 as ComputeTakeHomeCalculationResponse;
 
 function figures(response: ComputeTakeHomeCalculationResponse) {
   const result = caOnAdapter.adapt(response);
-  return [...result.rows, ...result.totals].map((r) => [r.name, r.amount]);
+  return [...result.rows, ...result.totals].map((r) => [r.id, r.amount]);
 }
 
 describe('Ontario adapter', () => {
@@ -21,23 +21,23 @@ describe('Ontario adapter', () => {
 
   it('shows the engine figures for $70,000 in 2025', () => {
     expect(figures(r2025)).toEqual([
-      ['Canada Pension Plan', '3956.75'],
-      ['Employment Insurance', '1077.48'],
-      ['Federal income tax', '7585.64'],
-      ['Ontario income tax', '3911.45'],
-      ['Total income tax', '11497.09'],
-      ['Total taken off', '16531.32'],
+      ['cpp', '3956.75'],
+      ['ei', '1077.48'],
+      ['federal-tax', '7585.64'],
+      ['ontario-tax', '3911.45'],
+      ['total-tax', '11497.09'],
+      ['total-taken-off', '16531.32'],
     ]);
   });
 
   it('shows the engine figures for $70,000 in 2026', () => {
     expect(figures(r2026)).toEqual([
-      ['Canada Pension Plan', '3956.75'],
-      ['Employment Insurance', '1123.07'],
-      ['Federal income tax', '7278.19'],
-      ['Ontario income tax', '3855.74'],
-      ['Total income tax', '11133.93'],
-      ['Total taken off', '16213.75'],
+      ['cpp', '3956.75'],
+      ['ei', '1123.07'],
+      ['federal-tax', '7278.19'],
+      ['ontario-tax', '3855.74'],
+      ['total-tax', '11133.93'],
+      ['total-taken-off', '16213.75'],
     ]);
   });
 
@@ -58,17 +58,41 @@ describe('Ontario adapter', () => {
     );
   });
 
-  it('falls back to the advanced view when a needed label is missing', () => {
+  it.each([
+    'schedule_8_cpp_base_contributions_on_return',
+    'schedule_8_cpp_enhanced_contributions_on_return',
+    'ei_premiums_line_88',
+    'net_federal_tax',
+    'on428_ontario_tax_line_90',
+    'total_payable',
+  ])('falls back to the advanced view when %s is missing', (missing) => {
     const trimmed: ComputeTakeHomeCalculationResponse = {
       ...r2025,
       trace: (r2025.trace ?? []).map((f) => ({
         ...f,
-        lines: f.lines.filter((l) => l.label !== 'net_federal_tax'),
+        lines: f.lines.filter((l) => l.label !== missing),
       })),
     };
     const result = caOnAdapter.adapt(trimmed);
     expect(result.rows).toEqual([]);
     expect(result.totals).toEqual([]);
+    expect(result.advanced.length).toBeGreaterThan(0);
+  });
+
+  it('falls back instead of throwing when a CPP amount is not a money amount', () => {
+    const odd: ComputeTakeHomeCalculationResponse = {
+      ...r2025,
+      trace: (r2025.trace ?? []).map((f) => ({
+        ...f,
+        lines: f.lines.map((l) =>
+          l.label === 'schedule_8_cpp_base_contributions_on_return'
+            ? { ...l, amount: '3291.755' }
+            : l,
+        ),
+      })),
+    };
+    const result = caOnAdapter.adapt(odd);
+    expect(result.rows).toEqual([]);
     expect(result.advanced.length).toBeGreaterThan(0);
   });
 
@@ -96,8 +120,10 @@ describe('Ontario adapter', () => {
   });
 
   it('shows readable labels when the API sends no names', () => {
-    const [group] = caOnAdapter.adapt(r2025).advanced;
-    expect(group?.name).toBeUndefined();
-    expect(group?.lines[0]?.label).not.toContain('_');
+    const groups = caOnAdapter.adapt(r2025).advanced;
+    expect(groups.every((g) => g.name === undefined)).toBe(true);
+    expect(
+      groups.flatMap((g) => g.lines).every((l) => !l.label.includes('_')),
+    ).toBe(true);
   });
 });

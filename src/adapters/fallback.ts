@@ -13,7 +13,7 @@ function apiName(item: object): string | undefined {
     typeof item.name === 'string' &&
     item.name.trim() !== ''
   ) {
-    return item.name;
+    return item.name.trim();
   }
   return undefined;
 }
