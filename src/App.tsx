@@ -24,7 +24,7 @@ export function App({ client }: Props) {
         jurisdictionsState={page.jurisdictionsState}
         values={page.values}
         salaryCheck={page.salaryCheck}
-        serviceSalaryMessage={
+        salaryProblem={
           page.failure?.kind === 'salary' ? page.failure.message : null
         }
         canSubmit={page.canSubmit}

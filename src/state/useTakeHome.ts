@@ -92,7 +92,7 @@ export function useTakeHome(client: ApiClient = defaultClient) {
   function setSalary(salary: string) {
     setValues((v) => ({ ...v, salary }));
     setSalaryCheck('ok');
-    // An old error about the salary no longer applies once it is edited.
+    // Editing starts afresh: any old error (salary problem or notice) is dropped.
     setRequest((r) => (r.status === 'error' ? { status: 'idle' } : r));
   }
 

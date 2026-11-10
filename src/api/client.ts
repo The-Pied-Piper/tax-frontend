@@ -93,26 +93,31 @@ export function createApiClient(options: ApiClientOptions = {}): ApiClient {
 
   async function request<T>(path: string, init?: RequestInit): Promise<T> {
     const controller = new AbortController();
-    const timeout = { fired: false };
-    const timer = setTimeout(() => {
-      timeout.fired = true;
-      controller.abort();
-    }, timeoutMs);
-    let response: Response;
-    let text: string;
-    try {
+    let timer: ReturnType<typeof setTimeout> | undefined;
+    // Raced against the request so a fetch that ignores the abort signal
+    // still cannot hang the page; whichever settles first decides the error.
+    const expired = new Promise<never>((_resolve, reject) => {
+      timer = setTimeout(() => {
+        controller.abort();
+        reject(new RequestTimeoutError());
+      }, timeoutMs);
+    });
+    const exchange = async () => {
       try {
-        response = await doFetch(`${baseUrl}${path}`, {
+        const answer = await doFetch(`${baseUrl}${path}`, {
           ...init,
           signal: controller.signal,
         });
         // Parsed from text so decimal strings stay strings; no number ever holds money.
-        text = await response.text();
+        return { response: answer, text: await answer.text() };
       } catch (cause) {
-        throw timeout.fired
-          ? new RequestTimeoutError()
-          : new NetworkError(cause);
+        throw new NetworkError(cause);
       }
+    };
+    let response: Response;
+    let text: string;
+    try {
+      ({ response, text } = await Promise.race([exchange(), expired]));
     } finally {
       clearTimeout(timer);
     }

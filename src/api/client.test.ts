@@ -1,6 +1,6 @@
 import { http, HttpResponse } from 'msw';
 import { setupServer } from 'msw/node';
-import { afterAll, afterEach, beforeAll } from 'vitest';
+import { afterAll, afterEach, beforeAll, vi } from 'vitest';
 import {
   ApiError,
   NetworkError,
@@ -159,6 +159,27 @@ describe('computeTakeHomeCalculation', () => {
         salary: '1',
       }),
     ).rejects.toBeInstanceOf(NetworkError);
+  });
+
+  it('times out even when fetch ignores the abort signal', async () => {
+    const stuck = createApiClient({
+      baseUrl: BASE,
+      timeoutMs: 20,
+      fetch: () => new Promise<Response>(() => {}),
+    });
+    await expect(stuck.listJurisdictions()).rejects.toBeInstanceOf(
+      RequestTimeoutError,
+    );
+  });
+
+  it('clears its timer after an answer', async () => {
+    server.use(
+      http.get(`${BASE}/jurisdictions`, () => HttpResponse.json(jurisdictions)),
+    );
+    const spy = vi.spyOn(globalThis, 'clearTimeout');
+    await client.listJurisdictions();
+    expect(spy).toHaveBeenCalled();
+    spy.mockRestore();
   });
 
   it('throws RequestTimeoutError when no answer arrives in time', async () => {
