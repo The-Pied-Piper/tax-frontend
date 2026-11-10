@@ -13,7 +13,7 @@ export const PERIODS_PER_YEAR: Record<PayPeriod, bigint> = {
 
 const AMOUNT = /^(-?)(0|[1-9]\d*)(?:\.(\d{1,2}))?$/;
 
-function toCents(amount: string): bigint {
+export function toCents(amount: string): bigint {
   const match = AMOUNT.exec(amount);
   if (!match) {
     throw new Error(`Not a money amount: "${amount}"`);
@@ -23,7 +23,7 @@ function toCents(amount: string): bigint {
   return sign === '-' ? -cents : cents;
 }
 
-function formatCents(cents: bigint): string {
+export function formatCents(cents: bigint): string {
   const negative = cents < 0n;
   const abs = negative ? -cents : cents;
   const whole = abs / 100n;

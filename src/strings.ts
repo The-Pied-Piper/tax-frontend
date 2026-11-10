@@ -54,4 +54,32 @@ export const strings = {
   result: {
     failed: 'Something went wrong. Please try again.',
   },
+  adapters: {
+    caOn: {
+      cpp: {
+        name: 'Canada Pension Plan',
+        help: 'Your contribution to the Canada Pension Plan (base and enhanced), taken off your pay for a pension when you retire.',
+      },
+      ei: {
+        name: 'Employment Insurance',
+        help: 'Your Employment Insurance premium, taken off your pay to cover benefits if you lose your job.',
+      },
+      federalTax: {
+        name: 'Federal income tax',
+        help: 'Income tax owed to the federal government after the federal credits that apply to you.',
+      },
+      ontarioTax: {
+        name: 'Ontario income tax',
+        help: 'Income tax owed to Ontario, including the Ontario Health Premium, after the Ontario credits that apply to you.',
+      },
+      totalTax: {
+        name: 'Total income tax',
+        help: 'Federal and Ontario income tax added together.',
+      },
+      totalTakenOff: {
+        name: 'Total taken off',
+        help: 'Income tax, Canada Pension Plan and Employment Insurance added together. Your salary minus this is your estimated take-home pay.',
+      },
+    },
+  },
 };
