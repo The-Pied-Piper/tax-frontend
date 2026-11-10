@@ -1,0 +1,70 @@
+name: Deploy dev
+
+# Builds the site and publishes it to the dev bucket on every merge to main (main
+# only takes pull requests with green CI), using a short-lived OIDC role (no stored
+# keys). It does nothing until the repository variables AWS_SITE_DEPLOY_ROLE_ARN_DEV,
+# SITE_BUCKET_DEV and SITE_DISTRIBUTION_ID_DEV are set, which happens once tax-infra
+# has created the dev site and the role. Prod is a separate workflow, on release.
+# Actions are pinned by commit; Dependabot (github-actions) keeps the tags in the comments current.
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    # Variables, not secrets: role ARNs, bucket names and distribution ids are not secret.
+    # main only, also for a manual run: the role trusts nothing else.
+    if: ${{ github.ref == 'refs/heads/main' && vars.AWS_SITE_DEPLOY_ROLE_ARN_DEV != '' && vars.SITE_BUCKET_DEV != '' && vars.SITE_DISTRIBUTION_ID_DEV != '' }}
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+    env:
+      # The dev API, set at build time (see README, "API client"). VITE_SITE_URL stays
+      # unset: dev has no canonical address, no sitemap, and tells search engines to stay away.
+      VITE_API_BASE_URL: https://api-dev.aftertaxlens.com/api/v1
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+
+      - run: npm ci
+      - run: npm run build
+
+      - uses: aws-actions/configure-aws-credentials@e1253824e5c10ff9df46874f81ed3ec929e19cfd # v6.3.0
+        with:
+          role-to-assume: ${{ vars.AWS_SITE_DEPLOY_ROLE_ARN_DEV }}
+          role-session-name: tax-frontend-deploy-${{ github.run_id }}
+          role-duration-seconds: 1800
+          aws-region: ca-central-1
+
+      # Files under assets/ have a hash in their name, so they never change and can be
+      # cached for a year. Everything else (index.html, theme-init.js, the share image)
+      # keeps its name from build to build, so browsers must ask each time. Assets go up
+      # first, so a page never points at a file that is not there yet. --delete removes
+      # files that are gone from the build (the bucket keeps their old versions).
+      - name: Upload the site
+        env:
+          BUCKET: ${{ vars.SITE_BUCKET_DEV }}
+        run: |
+          aws s3 sync dist/assets "s3://$BUCKET/assets" --delete --cache-control "public,max-age=31536000,immutable"
+          aws s3 sync dist "s3://$BUCKET" --delete --exclude "assets/*" --cache-control "no-cache"
+
+      - name: Refresh the CDN
+        env:
+          DISTRIBUTION_ID: ${{ vars.SITE_DISTRIBUTION_ID_DEV }}
+        run: aws cloudfront create-invalidation --distribution-id "$DISTRIBUTION_ID" --paths "/*"
