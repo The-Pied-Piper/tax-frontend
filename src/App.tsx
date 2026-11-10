@@ -1,5 +1,7 @@
-import { SalaryForm } from './components/SalaryForm';
 import type { ApiClient } from './api';
+import { SalaryForm } from './components/SalaryForm';
+import { StarLink } from './components/StarLink';
+import { ThemeToggle } from './components/ThemeToggle';
 import { useTakeHome } from './state/useTakeHome';
 import { strings } from './strings';
 
@@ -9,8 +11,13 @@ export function App({ client }: Props) {
   const page = useTakeHome(client);
   return (
     <main>
-      <h1>{strings.title}</h1>
-      <p>{strings.intro}</p>
+      <header className="page-header">
+        <div>
+          <h1>{strings.title}</h1>
+          <p className="lede">{strings.intro}</p>
+        </div>
+        <ThemeToggle />
+      </header>
       <SalaryForm
         jurisdictionsState={page.jurisdictionsState}
         values={page.values}
@@ -29,6 +36,7 @@ export function App({ client }: Props) {
       {page.request.status === 'error' && (
         <p role="alert">{strings.result.failed}</p>
       )}
+      <StarLink />
     </main>
   );
 }

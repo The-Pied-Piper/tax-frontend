@@ -1,0 +1,28 @@
+/* Light/Dark segmented control. Colours come only from styles/tokens.css. */
+.group {
+  display: inline-flex;
+  border: 1px solid var(--edge);
+  border-radius: var(--radius-control);
+  overflow: hidden;
+  background: var(--surface);
+}
+
+.group button {
+  font: inherit;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--muted);
+  background: transparent;
+  border: 0;
+  padding: 6px 12px;
+  cursor: pointer;
+}
+
+.group button + button {
+  border-left: 1px solid var(--edge);
+}
+
+.group button[aria-pressed='true'] {
+  background: var(--btn);
+  color: var(--btn-fg);
+}
