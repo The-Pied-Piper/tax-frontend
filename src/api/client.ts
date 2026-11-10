@@ -23,7 +23,11 @@ export class ApiError extends Error {
   readonly problem: Problem | null;
 
   constructor(status: number, problem: Problem | null, message?: string) {
-    super(message ?? problem?.detail ?? `Request failed with status ${status}`);
+    super(
+      message ??
+        problem?.detail ??
+        `Request failed with status ${status.toString()}`,
+    );
     this.name = 'ApiError';
     this.status = status;
     this.problem = problem;

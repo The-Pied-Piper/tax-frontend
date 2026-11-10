@@ -1,11 +1,49 @@
+import type { ApiClient } from './api';
+import { AnswerCard } from './components/AnswerCard';
+import { SalaryForm } from './components/SalaryForm';
 import { StarLink } from './components/StarLink';
+import { ThemeToggle } from './components/ThemeToggle';
+import { useTakeHome } from './state/useTakeHome';
 import { strings } from './strings';
 
-export function App() {
+type Props = { client?: ApiClient };
+
+export function App({ client }: Props) {
+  const page = useTakeHome(client);
   return (
     <main>
-      <h1>{strings.title}</h1>
-      <p>{strings.intro}</p>
+      <header className="page-header">
+        <div>
+          <h1>{strings.title}</h1>
+          <p className="lede">{strings.intro}</p>
+        </div>
+        <ThemeToggle />
+      </header>
+      <SalaryForm
+        jurisdictionsState={page.jurisdictionsState}
+        values={page.values}
+        salaryCheck={page.salaryCheck}
+        canSubmit={page.canSubmit}
+        loading={page.request.status === 'loading'}
+        onJurisdictionChange={page.setJurisdictionCode}
+        onYearChange={page.setYear}
+        onSalaryChange={page.setSalary}
+        onSubmit={page.submit}
+      />
+      {page.request.status === 'success' && (
+        <AnswerCard
+          salary={page.request.response.salary}
+          totalDeductions={page.request.response.total_deductions}
+          takeHome={page.request.response.take_home}
+          provisional={page.request.response.provisional}
+          payPeriod={page.payPeriod}
+          onPayPeriodChange={page.setPayPeriod}
+        />
+      )}
+      {/* Placeholder until the error display exists. */}
+      {page.request.status === 'error' && (
+        <p role="alert">{strings.result.failed}</p>
+      )}
       <StarLink />
     </main>
   );

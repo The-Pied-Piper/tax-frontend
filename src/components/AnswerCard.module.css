@@ -1,0 +1,80 @@
+.card {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-card);
+  padding: 20px;
+}
+
+.heading {
+  font-size: 18px;
+  font-weight: 600;
+  margin: 0;
+}
+
+.notice {
+  margin: 0;
+  padding: 10px 12px;
+  font-size: 14px;
+  background: var(--warn-bg);
+  color: var(--warn-fg);
+  border: 1px solid var(--warn-line);
+  border-radius: var(--radius-control);
+}
+
+.answer {
+  background: var(--accent);
+  color: var(--btn-fg);
+  border-radius: var(--radius-card);
+  padding: 20px;
+}
+
+.label {
+  margin: 0;
+  font-size: 14px;
+}
+
+.amount {
+  margin: 4px 0 0;
+  font-family: var(--font-mono);
+  font-size: 36px;
+  font-weight: 600;
+  line-height: 1.1;
+  overflow-wrap: anywhere;
+}
+
+.unit {
+  margin: 4px 0 0;
+  font-size: 13px;
+}
+
+.rows {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+}
+
+.row {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--rule);
+}
+
+.row dt {
+  color: var(--muted);
+}
+
+.row dd {
+  margin: 0;
+  font-family: var(--font-mono);
+}
+
+.estimate {
+  margin: 0;
+  font-size: 13px;
+  color: var(--faint);
+}

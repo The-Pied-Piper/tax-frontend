@@ -169,7 +169,13 @@ describe('base URL', () => {
     const relative = createApiClient({
       baseUrl: '/api/v1//',
       fetch: (input) => {
-        calls.push(String(input));
+        calls.push(
+          typeof input === 'string'
+            ? input
+            : input instanceof URL
+              ? input.href
+              : input.url,
+        );
         return Promise.resolve(Response.json(jurisdictions));
       },
     });
