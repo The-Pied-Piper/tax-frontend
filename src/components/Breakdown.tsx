@@ -18,7 +18,7 @@ export function Breakdown({ rows, totals, payPeriod }: Props) {
   if (rows.length === 0 && totals.length === 0) return null;
   return (
     <section className={styles.card} aria-labelledby={headingId}>
-      <details className={styles.details}>
+      <details>
         <summary className={styles.summary}>
           <h2 id={headingId} className={styles.heading}>
             {strings.breakdown.toggle}
