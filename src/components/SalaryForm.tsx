@@ -9,6 +9,7 @@ type Props = {
   values: FormValues;
   salaryCheck: SalaryCheck;
   loading: boolean;
+  canSubmit: boolean;
   onJurisdictionChange: (code: string) => void;
   onYearChange: (year: number) => void;
   onSalaryChange: (salary: string) => void;
@@ -26,6 +27,7 @@ export function SalaryForm({
   values,
   salaryCheck,
   loading,
+  canSubmit,
   onJurisdictionChange,
   onYearChange,
   onSalaryChange,
@@ -107,12 +109,12 @@ export function SalaryForm({
           {strings.form.salaryHint}
         </span>
         {salaryMessage && (
-          <p id={errorId} className={styles.error}>
+          <p id={errorId} className={styles.error} role="alert">
             {salaryMessage}
           </p>
         )}
       </div>
-      <button type="submit" disabled={loading}>
+      <button type="submit" disabled={loading || !canSubmit}>
         {loading ? strings.form.calculating : strings.form.calculate}
       </button>
     </form>

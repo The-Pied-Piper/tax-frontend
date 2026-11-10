@@ -1,4 +1,6 @@
 // All user-facing text lives here (English only for now).
+export const languageCode = 'en';
+
 export const strings = {
   title: 'Take-home pay estimate',
   intro:

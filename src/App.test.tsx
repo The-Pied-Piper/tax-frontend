@@ -47,7 +47,7 @@ describe('App form', () => {
     expect(screen.getByRole('option', { name: '2025' })).toBeInTheDocument();
   });
 
-  it('sends the salary text unchanged with the trace requested', async () => {
+  it('sends the trimmed salary text with the trace requested', async () => {
     const sent: ComputeTakeHomeCalculationRequest[] = [];
     const user = userEvent.setup();
     render(<App client={fixtureClient((b) => sent.push(b))} />);
@@ -57,7 +57,7 @@ describe('App form', () => {
     );
     await user.type(
       screen.getByRole('textbox', { name: strings.form.salary }),
-      '70000.00',
+      ' 70000.00 ',
     );
     await user.click(
       screen.getByRole('button', { name: strings.form.calculate }),
@@ -79,6 +79,7 @@ describe('App form', () => {
     ['70,000', strings.form.salaryInvalid],
     ['70000.123', strings.form.salaryInvalid],
     ['0.00', strings.form.salaryZero],
+    ['0', strings.form.salaryZero],
   ])('refuses %j before sending', async (text, message) => {
     const sent: ComputeTakeHomeCalculationRequest[] = [];
     const user = userEvent.setup();
@@ -164,5 +165,20 @@ describe('App form', () => {
     await waitFor(() =>
       expect(screen.getByText(strings.form.placesFailed)).toBeInTheDocument(),
     );
+  });
+
+  it('keeps Calculate off when no place has a year to choose', async () => {
+    const client: ApiClient = {
+      listJurisdictions: () =>
+        Promise.resolve({
+          jurisdictions: [{ code: 'CA-ON', years: [] }],
+          next_page_token: '',
+        }),
+      computeTakeHomeCalculation: () => Promise.reject(new Error('unused')),
+    };
+    render(<App client={client} />);
+    expect(
+      await screen.findByRole('button', { name: strings.form.calculate }),
+    ).toBeDisabled();
   });
 });

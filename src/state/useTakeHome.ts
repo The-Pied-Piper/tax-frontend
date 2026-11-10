@@ -1,10 +1,11 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import {
   createApiClient,
   type ApiClient,
   type ComputeTakeHomeCalculationResponse,
   type ListJurisdictionsResponse,
 } from '../api';
+import { languageCode } from '../strings';
 import { checkSalary, type SalaryCheck } from './salary';
 
 type Jurisdictions = ListJurisdictionsResponse['jurisdictions'];
@@ -39,6 +40,8 @@ export function useTakeHome(client: ApiClient = defaultClient) {
   });
   const [salaryCheck, setSalaryCheck] = useState<SalaryCheck>('ok');
   const [request, setRequest] = useState<RequestState>({ status: 'idle' });
+  // Only the latest request may write its answer.
+  const latest = useRef(0);
 
   // The one effect: the list of places and years is needed to draw the form.
   // Calculating is triggered by submit, never by an effect.
@@ -98,22 +101,30 @@ export function useTakeHome(client: ApiClient = defaultClient) {
     ) {
       return;
     }
+    latest.current += 1;
+    const mine = latest.current;
     setRequest({ status: 'loading' });
     client
       .computeTakeHomeCalculation({
         jurisdiction_code: values.jurisdictionCode,
         year: values.year,
         salary: values.salary.trim(),
-        language_code: 'en',
+        language_code: languageCode,
         include_trace: true,
       })
       .then(
-        (response) => setRequest({ status: 'success', response }),
-        (error: unknown) => setRequest({ status: 'error', error }),
+        (response) => {
+          if (latest.current === mine)
+            setRequest({ status: 'success', response });
+        },
+        (error: unknown) => {
+          if (latest.current === mine) setRequest({ status: 'error', error });
+        },
       );
   }
 
   return {
+    canSubmit: values.year !== null,
     jurisdictionsState,
     values,
     salaryCheck,

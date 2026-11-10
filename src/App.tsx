@@ -15,13 +15,14 @@ export function App({ client }: Props) {
         jurisdictionsState={page.jurisdictionsState}
         values={page.values}
         salaryCheck={page.salaryCheck}
+        canSubmit={page.canSubmit}
         loading={page.request.status === 'loading'}
         onJurisdictionChange={page.setJurisdictionCode}
         onYearChange={page.setYear}
         onSalaryChange={page.setSalary}
         onSubmit={page.submit}
       />
-      {/* Placeholder: the answer card (#5) and error display (#10) replace this. */}
+      {/* Placeholders until the answer card and the error display exist. */}
       {page.request.status === 'success' && (
         <p role="status">{strings.result.arrived}</p>
       )}

@@ -18,9 +18,9 @@ describe('checkSalary', () => {
     ['-5', 'invalid'],
     ['1e5', 'invalid'],
     ['abc', 'invalid'],
-    ['0', 'invalid'],
+    ['0', 'zero'],
     ['0.00', 'zero'],
-    ['000', 'invalid'],
+    ['000', 'zero'],
     ['0.0', 'zero'],
   ])('%j is %s', (text, expected) => {
     expect(checkSalary(text)).toBe(expected);
