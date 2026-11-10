@@ -49,7 +49,7 @@ describe('index.html (what a crawler sees without JavaScript)', () => {
   });
 
   it('has the heading and intro as static text matching strings.ts', () => {
-    expect(text('#root > main > h1')).toBe(strings.title);
-    expect(text('#root > main > p')).toBe(strings.intro);
+    expect(text('#root main h1')).toBe(strings.title);
+    expect(text('#root main .lede')).toBe(strings.intro);
   });
 });

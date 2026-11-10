@@ -2,6 +2,7 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
+    <meta name="color-scheme" content="light dark" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Take-home pay estimate for a yearly salary</title>
     <meta
@@ -37,15 +38,30 @@
       name="twitter:description"
       content="Estimate your take-home pay from a yearly salary in Ontario: income tax, CPP and EI taken off. It is an estimate, not tax advice."
     />
+    <script>
+      (function () {
+        // Apply a saved theme before first paint so there is no flash.
+        try {
+          var t = localStorage.getItem('theme');
+          if (t === 'light' || t === 'dark') {
+            document.documentElement.dataset.theme = t;
+          }
+        } catch (e) {}
+      })();
+    </script>
   </head>
   <body>
     <div id="root">
       <main>
-        <h1>Take-home pay estimate</h1>
-        <p>
-          Coming soon: enter a yearly salary and see an estimate of your
-          take-home pay.
-        </p>
+        <header class="page-header">
+          <div>
+            <h1>Take-home pay estimate</h1>
+            <p class="lede">
+              Coming soon: enter a yearly salary and see an estimate of your
+              take-home pay.
+            </p>
+          </div>
+        </header>
       </main>
     </div>
     <script type="module" src="/src/main.tsx"></script>
