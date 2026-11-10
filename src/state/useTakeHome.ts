@@ -130,12 +130,16 @@ export function useTakeHome(
       })
       .then(
         (response) => {
-          if (latest.current === mine) {
+          if (latest.current !== mine) return;
+          try {
             setRequest({
               status: 'success',
               response,
               adapted: registry.adapt(jurisdictionCode, year, response),
             });
+          } catch (error: unknown) {
+            // An adapter that cannot read a trace must not leave the page loading.
+            setRequest({ status: 'error', error });
           }
         },
         (error: unknown) => {

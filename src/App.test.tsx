@@ -314,4 +314,29 @@ describe('App breakdown', () => {
       screen.queryByText(strings.breakdown.toggle),
     ).not.toBeInTheDocument();
   });
+
+  it('shows the error notice and stays usable when an adapter throws', async () => {
+    const broken = new AdapterRegistry();
+    broken.register({
+      jurisdictionCode: code,
+      adapt: () => {
+        throw new Error('unreadable trace');
+      },
+    });
+    const user = userEvent.setup();
+    render(<App client={fixtureClient()} registry={broken} />);
+    await user.type(
+      await screen.findByRole('textbox', { name: strings.form.salary }),
+      '70000',
+    );
+    await user.click(
+      screen.getByRole('button', { name: strings.form.calculate }),
+    );
+    expect(await screen.findByRole('alert')).toHaveTextContent(
+      strings.result.failed,
+    );
+    expect(
+      screen.getByRole('button', { name: strings.form.calculate }),
+    ).toBeEnabled();
+  });
 });

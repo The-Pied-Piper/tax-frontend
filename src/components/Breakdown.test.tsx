@@ -88,4 +88,13 @@ describe('Breakdown', () => {
     );
     expect(container).toBeEmptyDOMElement();
   });
+
+  it('shows an amount it cannot divide as the engine sent it', async () => {
+    const odd: DisplayRow[] = [
+      { id: 'odd', name: 'Odd', help: 'x', amount: '3956.755' },
+    ];
+    render(<Breakdown rows={odd} totals={[]} payPeriod="monthly" />);
+    await open();
+    expect(screen.getByText('3956.755')).toBeVisible();
+  });
 });
