@@ -1,3 +1,4 @@
+import { useId } from 'react';
 import { displayAmount } from '../money/format';
 import type { PayPeriod } from '../money/payPeriod';
 import { strings } from '../strings';
@@ -23,10 +24,11 @@ export function AnswerCard({
   payPeriod,
   onPayPeriodChange,
 }: Props) {
+  const headingId = useId();
   const show = (yearly: string) => displayAmount(yearly, payPeriod);
   return (
-    <section className={styles.card} aria-labelledby="answer-heading">
-      <h2 id="answer-heading" className={styles.heading}>
+    <section className={styles.card} aria-labelledby={headingId}>
+      <h2 id={headingId} className={styles.heading}>
         {strings.answer.heading}
       </h2>
       {provisional && (
