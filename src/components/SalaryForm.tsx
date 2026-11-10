@@ -8,6 +8,8 @@ type Props = {
   jurisdictionsState: JurisdictionsState;
   values: FormValues;
   salaryCheck: SalaryCheck;
+  /** A problem the service reported about the salary. */
+  serviceSalaryMessage: string | null;
   loading: boolean;
   canSubmit: boolean;
   onJurisdictionChange: (code: string) => void;
@@ -26,6 +28,7 @@ export function SalaryForm({
   jurisdictionsState,
   values,
   salaryCheck,
+  serviceSalaryMessage,
   loading,
   canSubmit,
   onJurisdictionChange,
@@ -51,7 +54,7 @@ export function SalaryForm({
   const years =
     jurisdictions.find((j) => j.code === values.jurisdictionCode)?.years ?? [];
   const salaryMessage =
-    salaryCheck === 'ok' ? null : SALARY_MESSAGES[salaryCheck];
+    salaryCheck === 'ok' ? serviceSalaryMessage : SALARY_MESSAGES[salaryCheck];
 
   function handleSubmit(event: SubmitEvent<HTMLFormElement>) {
     event.preventDefault();

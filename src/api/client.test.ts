@@ -1,7 +1,12 @@
 import { http, HttpResponse } from 'msw';
 import { setupServer } from 'msw/node';
 import { afterAll, afterEach, beforeAll } from 'vitest';
-import { ApiError, NetworkError, createApiClient } from './client';
+import {
+  ApiError,
+  NetworkError,
+  RequestTimeoutError,
+  createApiClient,
+} from './client';
 import compute2025 from './fixtures/compute-on-2025-70000.json';
 import compute2026 from './fixtures/compute-on-2026-70000.json';
 import invalidSalary from './fixtures/error-invalid-salary.json';
@@ -154,6 +159,27 @@ describe('computeTakeHomeCalculation', () => {
         salary: '1',
       }),
     ).rejects.toBeInstanceOf(NetworkError);
+  });
+
+  it('throws RequestTimeoutError when no answer arrives in time', async () => {
+    const slow = createApiClient({
+      baseUrl: BASE,
+      timeoutMs: 20,
+      // Never answers; only the abort signal ends it.
+      fetch: (_input, init) =>
+        new Promise((_resolve, reject) => {
+          init?.signal?.addEventListener('abort', () => {
+            reject(new DOMException('aborted', 'AbortError'));
+          });
+        }),
+    });
+    await expect(
+      slow.computeTakeHomeCalculation({
+        jurisdiction_code: 'CA-ON',
+        year: 2025,
+        salary: '1',
+      }),
+    ).rejects.toBeInstanceOf(RequestTimeoutError);
   });
 
   it('throws a clear ApiError when a 200 body is empty or not JSON', async () => {

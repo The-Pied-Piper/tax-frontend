@@ -1,5 +1,6 @@
 import type { ApiClient } from './api';
 import { AnswerCard } from './components/AnswerCard';
+import { ErrorNotice } from './components/ErrorNotice';
 import { SalaryForm } from './components/SalaryForm';
 import { StarLink } from './components/StarLink';
 import { ThemeToggle } from './components/ThemeToggle';
@@ -23,6 +24,9 @@ export function App({ client }: Props) {
         jurisdictionsState={page.jurisdictionsState}
         values={page.values}
         salaryCheck={page.salaryCheck}
+        serviceSalaryMessage={
+          page.failure?.kind === 'salary' ? page.failure.message : null
+        }
         canSubmit={page.canSubmit}
         loading={page.request.status === 'loading'}
         onJurisdictionChange={page.setJurisdictionCode}
@@ -40,9 +44,8 @@ export function App({ client }: Props) {
           onPayPeriodChange={page.setPayPeriod}
         />
       )}
-      {/* Placeholder until the error display exists. */}
-      {page.request.status === 'error' && (
-        <p role="alert">{strings.result.failed}</p>
+      {page.failure?.kind === 'notice' && (
+        <ErrorNotice message={page.failure.message} />
       )}
       <StarLink />
     </main>
