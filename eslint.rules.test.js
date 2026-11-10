@@ -90,13 +90,61 @@ describe('layering', () => {
       "import { server } from '../mocks/server';\nexport const x = server;\n",
     ],
     [
+      'a dynamic import of the api client in a component',
+      'src/components/A.tsx',
+      "export const x = () => import('../api/client');\n",
+      SYNTAX,
+    ],
+    [
+      'a dynamic import of mocks in App',
+      'src/App.tsx',
+      "export const x = () => import('./mocks/browser');\n",
+      SYNTAX,
+    ],
+    [
+      'a dynamic import of react in money',
+      'src/money/a.ts',
+      "export const x = () => import('react');\n",
+      SYNTAX,
+    ],
+    [
+      'a .js-suffixed import of strings in api',
+      'src/api/a.ts',
+      "import { strings } from '../strings.js';\nexport const x = strings;\n",
+      IMPORT,
+    ],
+    [
+      'react-dom/client in an adapter',
+      'src/adapters/ca-on.ts',
+      "import { createRoot } from 'react-dom/client';\nexport const x = createRoot;\n",
+      IMPORT,
+    ],
+    [
+      'a mock handler importing the api client',
+      'src/mocks/handlers.ts',
+      "import { createApiClient } from '../api/client';\nexport const x = createApiClient;\n",
+      IMPORT,
+    ],
+    [
+      'an inline type specifier in a component',
+      'src/components/A.tsx',
+      "import { type Problem } from '../api';\nexport type X = Problem;\n",
+      '@typescript-eslint/no-import-type-side-effects',
+    ],
+    [
+      'a folder outside the table importing mocks',
+      'src/test-utils/render.tsx',
+      "import { server } from '../mocks/server';\nexport const x = server;\n",
+      IMPORT,
+    ],
+    [
       'App importing mocks',
       'src/App.tsx',
       "import { server } from './mocks/server';\nexport const x = server;\n",
     ],
   ];
-  it.each(cases)('flags %s', async (_name, path, code) => {
-    expect(await ruleIds(path, code)).toContain(IMPORT);
+  it.each(cases)('flags %s', async (_name, path, code, rule = IMPORT) => {
+    expect(await ruleIds(path, code)).toContain(rule);
   });
 
   const allowed = [
@@ -119,6 +167,11 @@ describe('layering', () => {
       'state importing the api client',
       'src/state/useX.ts',
       "import { createApiClient } from '../api';\nexport const x = createApiClient;\n",
+    ],
+    [
+      'a mock handler importing a fixture and api types',
+      'src/mocks/handlers.ts',
+      "import fixture from '../api/fixtures/compute-on-2025-70000.json';\nimport type { Problem } from '../api';\nexport const x = [fixture, {} as Problem];\n",
     ],
     [
       'a test importing mocks',
@@ -157,6 +210,42 @@ describe('money is text', () => {
       "export const x = new Intl.NumberFormat('en-CA');\n",
       SYNTAX,
     ],
+    [
+      'bracket access globalThis["parseFloat"]',
+      'export const x = globalThis["parseFloat"]("1");\n',
+      SYNTAX,
+    ],
+    ['window["Number"]', 'export const x = window["Number"]("1");\n', SYNTAX],
+    ['global.parseFloat', 'export const x = global.parseFloat("1");\n', SYNTAX],
+    [
+      'destructured parseFloat',
+      'const { parseFloat: pf } = globalThis;\nexport const x = pf;\n',
+      SYNTAX,
+    ],
+    [
+      'destructured Number from window',
+      'const { Number: N } = window;\nexport const x = N;\n',
+      SYNTAX,
+    ],
+    ['a["toFixed"](2)', 'export const x = (1.5)["toFixed"](2);\n', SYNTAX],
+    ['toFixed without a call', 'export const x = (1.5).toFixed;\n', SYNTAX],
+    [
+      'Intl["NumberFormat"]',
+      'export const x = Intl["NumberFormat"];\n',
+      SYNTAX,
+    ],
+    [
+      'globalThis.Intl.NumberFormat',
+      'export const x = globalThis.Intl.NumberFormat;\n',
+      SYNTAX,
+    ],
+    [
+      'destructured NumberFormat',
+      'const { NumberFormat } = Intl;\nexport const x = NumberFormat;\n',
+      SYNTAX,
+    ],
+    ['unary plus', 'export const x = +"1.5";\n', SYNTAX],
+    ['a template-literal key', 'export const x = (1.5)[`toFixed`];\n', SYNTAX],
   ];
   it.each(cases)('flags %s outside src/money', async (_name, code, rule) => {
     expect(await ruleIds('src/components/A.tsx', code)).toContain(rule);
