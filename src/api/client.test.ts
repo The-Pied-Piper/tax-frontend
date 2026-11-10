@@ -10,9 +10,15 @@ import jurisdictions from './fixtures/jurisdictions.json';
 const BASE = 'http://localhost:8000/api/v1';
 const server = setupServer();
 
-beforeAll(() => server.listen({ onUnhandledFrame: 'error' }));
-afterEach(() => server.resetHandlers());
-afterAll(() => server.close());
+beforeAll(() => {
+  server.listen({ onUnhandledFrame: 'error' });
+});
+afterEach(() => {
+  server.resetHandlers();
+});
+afterAll(() => {
+  server.close();
+});
 
 const client = createApiClient({ baseUrl: BASE });
 
@@ -176,7 +182,13 @@ describe('base URL', () => {
     const relative = createApiClient({
       baseUrl: '/api/v1//',
       fetch: (input) => {
-        calls.push(String(input));
+        calls.push(
+          typeof input === 'string'
+            ? input
+            : input instanceof URL
+              ? input.href
+              : input.url,
+        );
         return Promise.resolve(Response.json(jurisdictions));
       },
     });

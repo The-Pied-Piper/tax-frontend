@@ -37,7 +37,9 @@ export function ThemeToggle() {
         setTheme(deviceTheme());
     };
     query.addEventListener('change', onChange);
-    return () => query.removeEventListener('change', onChange);
+    return () => {
+      query.removeEventListener('change', onChange);
+    };
   }, []);
 
   return (
