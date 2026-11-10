@@ -3,10 +3,12 @@ on:
   pull_request:
   push:
     branches: [main]
+  schedule:
+    - cron: '17 6 * * *'
 permissions:
   contents: read
 concurrency:
-  group: ci-${{ github.ref }}
+  group: ci-${{ github.event_name }}-${{ github.ref }}
   cancel-in-progress: true
 jobs:
   check:
@@ -18,5 +20,33 @@ jobs:
           node-version: 22
           cache: npm
       - run: npm ci
+      - name: Generated API types match the committed spec
+        run: npm run api:check
       - run: npm run check
       - run: npm run build
+  spec-drift:
+    # The committed spec must equal the one tax-service publishes on main.
+    # tax-service is private for now, so this needs the repository secret
+    # TAX_SERVICE_READ_TOKEN (read-only contents access to tax-service).
+    # Pull requests cannot see secrets when they come from forks or
+    # Dependabot, so the check is skipped (with a warning) for them only;
+    # on pushes to main and the daily schedule a missing secret fails the job.
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Compare api/openapi.yml with tax-service main
+        env:
+          GH_TOKEN: ${{ secrets.TAX_SERVICE_READ_TOKEN }}
+        run: |
+          if [ -z "$GH_TOKEN" ]; then
+            if [ "${{ github.event_name }}" = "pull_request" ]; then
+              echo "::warning::TAX_SERVICE_READ_TOKEN is not available to this pull request; spec drift not checked"
+              exit 0
+            fi
+            echo "::error::TAX_SERVICE_READ_TOKEN secret is missing; spec drift cannot be checked"
+            exit 1
+          fi
+          gh api repos/The-Pied-Piper/tax-service/contents/openapi/openapi.yml \
+            -H "Accept: application/vnd.github.raw" > /tmp/published.yml
+          diff -u api/openapi.yml /tmp/published.yml \
+            || { echo "::error::api/openapi.yml differs from tax-service. Run: npm run api:sync"; exit 1; }

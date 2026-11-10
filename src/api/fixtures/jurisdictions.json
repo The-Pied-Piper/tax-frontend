@@ -1,0 +1,18 @@
+{
+  "jurisdictions": [
+    {
+      "code": "CA-ON",
+      "years": [
+        {
+          "year": 2025,
+          "provisional": false
+        },
+        {
+          "year": 2026,
+          "provisional": true
+        }
+      ]
+    }
+  ],
+  "next_page_token": ""
+}
