@@ -4,7 +4,7 @@
 import { ESLint } from 'eslint';
 import tseslint from 'typescript-eslint';
 import { describe, expect, it } from 'vitest';
-import config from './eslint.config.js';
+import config from '../eslint.config.js';
 
 const eslint = new ESLint({
   overrideConfigFile: true,
@@ -297,6 +297,12 @@ describe('money is text', () => {
   it.each(cases)('flags %s outside src/money', async (_name, code, rule) => {
     expect(await ruleIds('src/components/A.tsx', code)).toContain(rule);
     expect(await ruleIds('src/state/useX.ts', code)).toContain(rule);
+  });
+  it('allows number parsing in src/styles (colour maths is not money)', async () => {
+    const code = 'export const x = parseInt("ff", 16) + Number("1");\n';
+    expect(await ruleIds('src/styles/tokens.test.ts', code)).not.toContain(
+      GLOBALS,
+    );
   });
   it.each(cases)('allows %s inside src/money', async (_name, code, rule) => {
     expect(await ruleIds('src/money/a.ts', code)).not.toContain(rule);

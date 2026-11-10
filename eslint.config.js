@@ -189,8 +189,10 @@ export default tseslint.config(
   { ...jsxA11y.flatConfigs.recommended, files: ['**/*.tsx'] },
   { files: ['**/*.js'], extends: [tseslint.configs.disableTypeChecked] },
   { files: ['**/*.{ts,tsx}'], rules: NO_NUMBER_PARSING },
+  // src/money does the money arithmetic; src/styles holds the colour maths of
+  // the token test, which is not money.
   {
-    files: ['src/money/**'],
+    files: ['src/money/**', 'src/styles/**'],
     rules: { 'no-restricted-globals': 'off', 'no-restricted-syntax': 'off' },
   },
 
