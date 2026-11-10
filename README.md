@@ -28,3 +28,7 @@ The API location is `VITE_API_BASE_URL` at build time: the full prefix in front 
 ## License
 
 Apache 2.0, see [LICENSE](LICENSE).
+
+## Search and sharing (SEO)
+
+The title, description, Open Graph and Twitter card tags, theme colours and the static heading and intro inside `#root` are plain text in `index.html`; a test (`index.test.ts`) checks them against `src/strings.ts`. Values that differ per environment come from `VITE_SITE_URL` (the public address, for example `https://aftertaxlens.com`) through `vite-plugin-seo.ts`: at build time it adds the canonical link, `og:url` and the absolute share-image address, and writes `robots.txt` and `sitemap.xml`. Unset, as in local development, those are left out and the sitemap is not written. The share image is `public/share-card.png` (1200 by 630, no figures). Keeping the dev hostname out of search results is done at the CDN, not here.
