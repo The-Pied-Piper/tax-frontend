@@ -200,7 +200,8 @@ describe('App form', () => {
 describe('App answer card', () => {
   async function calculate(client: ApiClient) {
     const user = userEvent.setup();
-    render(<App client={client} />);
+    // No adapter, so only the answer card shows these figures.
+    render(<App client={client} registry={new AdapterRegistry()} />);
     await user.type(
       await screen.findByRole('textbox', { name: strings.form.salary }),
       '70000',
