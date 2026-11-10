@@ -1,6 +1,6 @@
 import { amountForPeriod } from './payPeriod';
 
-// 2025 Ontario take-home at $70,000 (real engine figure).
+// 2025 Ontario take-home at $70,000 (the engine's figure for the fixtures).
 const TAKE_HOME = '53468.68';
 
 describe('amountForPeriod', () => {
@@ -36,6 +36,18 @@ describe('amountForPeriod', () => {
     expect(amountForPeriod('-53468.68', 'monthly')).toBe('-4455.72');
   });
 
+  it('never returns a negative zero', () => {
+    expect(amountForPeriod('-0', 'monthly')).toBe('0.00');
+    expect(amountForPeriod('-0.00', 'weekly')).toBe('0.00');
+  });
+
+  it('rejects an unknown period', () => {
+    // @ts-expect-error a period outside the type
+    expect(() => amountForPeriod('1.00', 'daily')).toThrow(
+      'Unknown pay period',
+    );
+  });
+
   it('is exact for amounts too large for a float', () => {
     expect(amountForPeriod('9007199254740993.00', 'annually')).toBe(
       '9007199254740993.00',
@@ -46,7 +58,17 @@ describe('amountForPeriod', () => {
   });
 
   it('rejects text that is not a money amount', () => {
-    for (const bad of ['', 'abc', '1,000.00', '1.234', '.5', '1e3', ' 5']) {
+    for (const bad of [
+      '',
+      'abc',
+      '1,000.00',
+      '1.234',
+      '.5',
+      '1e3',
+      ' 5',
+      '007',
+      '00.5',
+    ]) {
       expect(() => amountForPeriod(bad, 'monthly')).toThrow();
     }
   });

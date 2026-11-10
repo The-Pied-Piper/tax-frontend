@@ -11,7 +11,7 @@ export const PERIODS_PER_YEAR: Record<PayPeriod, bigint> = {
   annually: 1n,
 };
 
-const AMOUNT = /^(-?)(\d+)(?:\.(\d{1,2}))?$/;
+const AMOUNT = /^(-?)(0|[1-9]\d*)(?:\.(\d{1,2}))?$/;
 
 function toCents(amount: string): bigint {
   const match = AMOUNT.exec(amount);
@@ -36,6 +36,9 @@ function formatCents(cents: bigint): string {
 export function amountForPeriod(yearly: string, period: PayPeriod): string {
   const cents = toCents(yearly);
   const divisor = PERIODS_PER_YEAR[period];
+  if (divisor === undefined) {
+    throw new Error(`Unknown pay period: "${String(period)}"`);
+  }
   const abs = cents < 0n ? -cents : cents;
   const rounded = (abs * 2n + divisor) / (divisor * 2n);
   return formatCents(cents < 0n ? -rounded : rounded);
