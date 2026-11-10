@@ -1,0 +1,86 @@
+/*
+ * Design tokens: the only place colours, fonts and radii are defined.
+ * Taken from the design mock (pale grey-green ground, white cards, deep green
+ * answer, dark buttons, monospace amounts). Other styles use var(--name) only.
+ *
+ * Theme selection:
+ *  - data-theme="light" or "dark" on <html> is an explicit choice (the toggle).
+ *  - With no data-theme, the device setting (prefers-color-scheme) decides.
+ * The dark values appear twice (media query and explicit); keep them identical.
+ * src/styles/tokens.test.ts checks that and the text contrast of both themes.
+ */
+:root {
+  --bg: #f4f5f3;
+  --surface: #ffffff;
+  --fg: #16181d;
+  --muted: #565b63;
+  --faint: #6b7078;
+  --line: #e1e3df;
+  --rule: #eef0ec;
+  --edge: #c9cdc7;
+  --accent: #1f5f4a;
+  --accent-soft: rgba(31, 95, 74, 0.15);
+  --btn: #16181d;
+  --btn-fg: #ffffff;
+  --warn-bg: #fbf0dc;
+  --warn-fg: #7a4a00;
+  --warn-line: #e8c777;
+  --err-bg: #fbebe4;
+  --err-fg: #a3461a;
+  --err-line: #e9b9a3;
+
+  --font-body:
+    'IBM Plex Sans', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-mono:
+    'IBM Plex Mono', ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
+  --radius-card: 12px;
+  --radius-control: 8px;
+
+  color-scheme: light;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) {
+    --bg: #121614;
+    --surface: #1a201d;
+    --fg: #e8ece9;
+    --muted: #a3ada8;
+    --faint: #8c9791;
+    --line: #2a332f;
+    --rule: #242c28;
+    --edge: #3a4540;
+    --accent: #5fcfa8;
+    --accent-soft: rgba(95, 207, 168, 0.2);
+    --btn: #e8ece9;
+    --btn-fg: #121614;
+    --warn-bg: #352a10;
+    --warn-fg: #f1d596;
+    --warn-line: #6b5420;
+    --err-bg: #361c14;
+    --err-fg: #f0b093;
+    --err-line: #7a3f2a;
+    color-scheme: dark;
+  }
+}
+
+:root[data-theme='dark'] {
+  --bg: #121614;
+  --surface: #1a201d;
+  --fg: #e8ece9;
+  --muted: #a3ada8;
+  --faint: #8c9791;
+  --line: #2a332f;
+  --rule: #242c28;
+  --edge: #3a4540;
+  --accent: #5fcfa8;
+  --accent-soft: rgba(95, 207, 168, 0.2);
+  --btn: #e8ece9;
+  --btn-fg: #121614;
+  --warn-bg: #352a10;
+  --warn-fg: #f1d596;
+  --warn-line: #6b5420;
+  --err-bg: #361c14;
+  --err-fg: #f0b093;
+  --err-line: #7a3f2a;
+  color-scheme: dark;
+}

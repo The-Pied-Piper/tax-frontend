@@ -1,10 +1,16 @@
 import { strings } from './strings';
+import { ThemeToggle } from './ThemeToggle';
 
 export function App() {
   return (
     <main>
-      <h1>{strings.title}</h1>
-      <p>{strings.intro}</p>
+      <header className="page-header">
+        <div>
+          <h1>{strings.title}</h1>
+          <p className="lede">{strings.intro}</p>
+        </div>
+        <ThemeToggle />
+      </header>
     </main>
   );
 }
