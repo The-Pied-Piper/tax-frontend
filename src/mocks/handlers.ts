@@ -28,13 +28,15 @@ export const handlers = [
   http.post(
     '*/api/v1/take-home-calculations\\:compute',
     async ({ request }) => {
-      let body: { salary?: unknown; year?: unknown };
+      let body: { salary?: unknown; year?: unknown } | null;
       try {
         body = (await request.json()) as typeof body;
       } catch {
         return badRequest();
       }
       if (
+        body === null ||
+        typeof body !== 'object' ||
         typeof body.salary !== 'string' ||
         !SALARY_PATTERN.test(body.salary)
       ) {

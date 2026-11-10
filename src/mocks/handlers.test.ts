@@ -51,4 +51,12 @@ describe('default mock handlers', () => {
     );
     expect(response.status).toBe(400);
   });
+
+  it('answer a JSON body that is not an object with the validation error', async () => {
+    const response = await fetch(
+      'http://localhost:8000/api/v1/take-home-calculations:compute',
+      { method: 'POST', body: 'null' },
+    );
+    expect(response.status).toBe(400);
+  });
 });
