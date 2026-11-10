@@ -1,6 +1,5 @@
 version: 2
 updates:
-  # One pull request a month per group, so updates stay one review each.
   - package-ecosystem: npm
     directory: /
     schedule:
