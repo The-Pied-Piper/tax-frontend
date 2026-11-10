@@ -12,6 +12,7 @@ import {
 } from '../api';
 import type { PayPeriod } from '../money/payPeriod';
 import { languageCode } from '../strings';
+import { describeFailure } from './failure';
 import { checkSalary, type SalaryCheck } from './salary';
 
 type Jurisdictions = ListJurisdictionsResponse['jurisdictions'];
@@ -103,6 +104,8 @@ export function useTakeHome(
   function setSalary(salary: string) {
     setValues((v) => ({ ...v, salary }));
     setSalaryCheck('ok');
+    // Editing starts afresh: any old error (salary problem or notice) is dropped.
+    setRequest((r) => (r.status === 'error' ? { status: 'idle' } : r));
   }
 
   function submit() {
@@ -148,7 +151,11 @@ export function useTakeHome(
       );
   }
 
+  const failure =
+    request.status === 'error' ? describeFailure(request.error) : null;
+
   return {
+    failure,
     canSubmit: values.year !== null,
     jurisdictionsState,
     values,

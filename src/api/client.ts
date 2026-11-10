@@ -42,6 +42,14 @@ export class NetworkError extends Error {
   }
 }
 
+/** The service did not answer within the time limit. */
+export class RequestTimeoutError extends Error {
+  constructor() {
+    super('The service took too long to answer');
+    this.name = 'RequestTimeoutError';
+  }
+}
+
 export interface ApiClient {
   listJurisdictions(
     query?: ListJurisdictionsQuery,
@@ -54,6 +62,8 @@ export interface ApiClient {
 export interface ApiClientOptions {
   baseUrl?: string;
   fetch?: typeof fetch;
+  /** Give up on a request after this many milliseconds. Default 15000. */
+  timeoutMs?: number;
 }
 
 function isProblem(value: unknown): value is Problem {
@@ -78,21 +88,38 @@ function parseJson(text: string): unknown {
 
 export function createApiClient(options: ApiClientOptions = {}): ApiClient {
   const baseUrl = (options.baseUrl ?? apiBaseUrl()).replace(/\/+$/, '');
+  const timeoutMs = options.timeoutMs ?? 15000;
   const doFetch = options.fetch ?? ((input, init) => fetch(input, init));
 
   async function request<T>(path: string, init?: RequestInit): Promise<T> {
+    const controller = new AbortController();
+    let timer: ReturnType<typeof setTimeout> | undefined;
+    // Raced against the request so a fetch that ignores the abort signal
+    // still cannot hang the page; whichever settles first decides the error.
+    const expired = new Promise<never>((_resolve, reject) => {
+      timer = setTimeout(() => {
+        controller.abort();
+        reject(new RequestTimeoutError());
+      }, timeoutMs);
+    });
+    const exchange = async () => {
+      try {
+        const answer = await doFetch(`${baseUrl}${path}`, {
+          ...init,
+          signal: controller.signal,
+        });
+        // Parsed from text so decimal strings stay strings; no number ever holds money.
+        return { response: answer, text: await answer.text() };
+      } catch (cause) {
+        throw new NetworkError(cause);
+      }
+    };
     let response: Response;
-    try {
-      response = await doFetch(`${baseUrl}${path}`, init);
-    } catch (cause) {
-      throw new NetworkError(cause);
-    }
-    // Parsed from text so decimal strings stay strings; no number ever holds money.
     let text: string;
     try {
-      text = await response.text();
-    } catch (cause) {
-      throw new NetworkError(cause);
+      ({ response, text } = await Promise.race([exchange(), expired]));
+    } finally {
+      clearTimeout(timer);
     }
     const body = parseJson(text);
     if (!response.ok) {

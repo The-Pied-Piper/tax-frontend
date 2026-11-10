@@ -59,8 +59,19 @@ export const strings = {
     noAmount: '—',
     noAmountSpoken: 'No amount',
   },
-  result: {
-    failed: 'Something went wrong. Please try again.',
+  errors: {
+    salaryRejected:
+      'The service did not accept this salary. Enter it as a plain number, like 70000 or 70000.50.',
+    rejected:
+      'The service could not calculate an estimate for these details. Please check them and try again.',
+    tooManyRequests:
+      'Too many requests right now. Please wait a moment and try again.',
+    serverProblem:
+      'The service had a problem and could not calculate your estimate. Please try again in a moment.',
+    unreachable:
+      'Could not reach the service. Please check your connection and try again.',
+    timeout: 'The service took too long to answer. Please try again.',
+    unknown: 'Something went wrong. Please try again.',
   },
   adapters: {
     caOn: {
