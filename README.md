@@ -32,7 +32,7 @@ Two ways to run the page, both with `npm run` from this folder.
 
 **Real figures** (`npm run dev`): start tax-service in its own checkout with `./dev.sh` (it listens on `http://localhost:8000`). The dev server forwards every `/api` request to it, so there is no CORS setup and the answers are the engine's own. If tax-service runs somewhere else, set `DEV_API_TARGET`, for example `DEV_API_TARGET=http://localhost:9000 npm run dev`.
 
-**No backend** (`npm run dev:mock`): Mock Service Worker answers in the browser from `src/api/fixtures/`, the saved engine output for $70,000 in Ontario (2025 gives take-home 53,468.68; 2026 is provisional). Any valid salary gets those same figures; a salary the API would reject gets the saved validation error. This mode is not used in builds.
+**No backend** (`npm run dev:mock`): Mock Service Worker answers in the browser from `src/api/fixtures/`, the saved engine output for $70,000 in Ontario (2025 gives take-home 53,468.68; 2026 is provisional). Any valid salary gets those same figures (the jurisdiction and language are ignored; year 2026 gets the 2026 answer, every other year the 2025 one); a salary the API would reject gets the saved validation error, whose text is fixed. The mock layer is not part of the built JavaScript.
 
 **Tests** use the same handlers: `import { server } from './mocks/server'` (path relative to the test), call `server.listen()` before the tests, `server.resetHandlers()` after each and `server.close()` at the end (see `src/mocks/handlers.test.ts`), and override a response with `server.use(...)`.
 

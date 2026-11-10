@@ -17,7 +17,7 @@ const request = (year: number, salary: string) => ({
 });
 
 describe('default mock handlers', () => {
-  it('list Ontario with 2026 provisional', async () => {
+  it('list Ontario', async () => {
     const result = await client.listJurisdictions();
     expect(result.jurisdictions[0]?.code).toBe('CA-ON');
   });
@@ -42,5 +42,13 @@ describe('default mock handlers', () => {
     await expect(
       client.computeTakeHomeCalculation(request(2025, 'abc')),
     ).rejects.toBeInstanceOf(ApiError);
+  });
+
+  it('answer a body that is not JSON with the validation error', async () => {
+    const response = await fetch(
+      'http://localhost:8000/api/v1/take-home-calculations:compute',
+      { method: 'POST', body: 'not json' },
+    );
+    expect(response.status).toBe(400);
   });
 });
