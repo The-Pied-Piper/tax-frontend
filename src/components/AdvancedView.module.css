@@ -108,3 +108,14 @@ details[open] > .formSummary::before {
   text-align: right;
   overflow-wrap: anywhere;
 }
+
+.reference {
+  margin-left: 8px;
+  padding: 0 6px;
+  border: 1px solid var(--rule);
+  border-radius: var(--radius-control);
+  color: var(--muted);
+  font-family: var(--font-mono);
+  font-size: 12px;
+  white-space: nowrap;
+}

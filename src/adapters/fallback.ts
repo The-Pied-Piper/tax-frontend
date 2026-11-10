@@ -12,8 +12,13 @@ export function advancedGroups(
 ): AdvancedGroup[] {
   return (response.trace ?? []).map((form) => ({
     form: form.form,
+    name: form.name.trim() || form.form,
     lines: form.lines.map((line) => ({
-      label: fallbackLabel(line.label) || fallbackLabel(line.text),
+      label:
+        line.name?.trim() ||
+        fallbackLabel(line.label) ||
+        fallbackLabel(line.text),
+      reference: line.reference?.trim() || null,
       amount: line.amount ?? null,
     })),
   }));
