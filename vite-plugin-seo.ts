@@ -10,16 +10,33 @@ import type { Plugin } from 'vite';
  */
 export const SHARE_IMAGE_PATH = '/share-card.png';
 
+// Only meaningful next to og:image, so they are added with it.
+const IMAGE_DETAILS = [
+  ['og:image:width', '1200'],
+  ['og:image:height', '630'],
+  [
+    'og:image:alt',
+    'Take-home pay estimate. An estimate of what you keep from a yearly salary.',
+  ],
+] as const;
+
 export function normalizeSiteUrl(value: string | undefined): string | null {
   const trimmed = (value ?? '').trim();
   if (trimmed === '') return null;
-  const url = new URL(trimmed);
-  if (url.protocol !== 'https:' && url.protocol !== 'http:') {
-    throw new Error(
-      `VITE_SITE_URL must start with http:// or https://: ${trimmed}`,
-    );
+  const message = `VITE_SITE_URL must be a site address such as https://example.com (http or https, no path): ${trimmed}`;
+  let url: URL;
+  try {
+    url = new URL(trimmed);
+  } catch {
+    throw new Error(message);
   }
-  return url.origin + url.pathname.replace(/\/+$/, '');
+  if (
+    (url.protocol !== 'https:' && url.protocol !== 'http:') ||
+    url.pathname.replace(/\/+$/, '') !== ''
+  ) {
+    throw new Error(message);
+  }
+  return url.origin;
 }
 
 export function robotsTxt(siteUrl: string | null): string {
@@ -65,6 +82,11 @@ export function seo(siteUrlValue: string | undefined): Plugin {
           attrs: { name: 'twitter:image', content: image },
           injectTo: 'head',
         },
+        ...IMAGE_DETAILS.map(([property, content]) => ({
+          tag: 'meta',
+          attrs: { property, content },
+          injectTo: 'head' as const,
+        })),
       ];
     },
     generateBundle() {
