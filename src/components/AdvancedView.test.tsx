@@ -7,16 +7,22 @@ import { strings } from '../strings';
 const groups: AdvancedGroup[] = [
   {
     form: 'ca/schedule_8',
+    name: 'ca/schedule_8',
     lines: [
-      { label: 'cpp basic exemption', amount: '3500.00' },
-      { label: 'cpp base contribution', amount: '3867.50' },
+      { label: 'cpp basic exemption', reference: null, amount: '3500.00' },
+      { label: 'cpp base contribution', reference: null, amount: '3867.50' },
     ],
   },
   {
     form: 'ca-on/return',
-    lines: [{ label: 'take home', amount: '53468.68' }],
+    name: 'ca-on/return',
+    lines: [{ label: 'take home', reference: null, amount: '53468.68' }],
   },
-  { form: 'ca/t2204', lines: [{ label: 'note only', amount: null }] },
+  {
+    form: 'ca/t2204',
+    name: 'ca/t2204',
+    lines: [{ label: 'note only', reference: null, amount: null }],
+  },
 ];
 
 function section() {
@@ -80,14 +86,15 @@ describe('AdvancedView', () => {
         groups={[
           {
             form: 'ex/form',
+            name: 'ex/form',
             lines: [
-              { label: 'same', amount: '-1234.50' },
-              { label: 'same', amount: '99.00' },
-              { label: 'rate', amount: '0.0505' },
-              { label: 'odd', amount: 'n/a' },
+              { label: 'same', reference: null, amount: '-1234.50' },
+              { label: 'same', reference: null, amount: '99.00' },
+              { label: 'rate', reference: null, amount: '0.0505' },
+              { label: 'odd', reference: null, amount: 'n/a' },
             ],
           },
-          { form: 'ex/empty', lines: [] },
+          { form: 'ex/empty', name: 'ex/empty', lines: [] },
         ]}
       />,
     );
@@ -99,6 +106,30 @@ describe('AdvancedView', () => {
     expect(screen.getByText('0.0505')).toBeVisible();
     expect(screen.getByText('n/a')).toBeVisible();
     expect(screen.getByText('0 lines')).toBeVisible();
+  });
+
+  it('shows the form name and the printed reference beside a line', async () => {
+    render(
+      <AdvancedView
+        groups={[
+          {
+            form: 'ex/form',
+            name: 'Example form',
+            lines: [
+              { label: 'Printed figure', reference: '65', amount: '1.00' },
+              { label: 'Engine step', reference: null, amount: '2.00' },
+            ],
+          },
+        ]}
+      />,
+    );
+    await open();
+    await userEvent.click(screen.getByText('Example form'));
+    expect(screen.queryByText('ex/form')).not.toBeInTheDocument();
+    const printed = screen.getByText('Printed figure').closest('div');
+    expect(printed).toHaveTextContent(`${strings.advanced.reference} 65`);
+    const step = screen.getByText('Engine step').closest('div');
+    expect(step).not.toHaveTextContent(strings.advanced.reference);
   });
 
   it('shows nothing when there are no forms', () => {

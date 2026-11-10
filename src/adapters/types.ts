@@ -15,13 +15,19 @@ export interface DisplayRow {
 
 /** One line of the advanced view, as the engine returned it. */
 export interface AdvancedLine {
+  /** The API's display name when it has one, otherwise a readable label. */
   label: string;
+  /** What the form prints beside the figure; null for a step the form does not print. */
+  reference: string | null;
   amount: Amount | null;
 }
 
 /** All lines of one form, in the order the API returned them. */
 export interface AdvancedGroup {
+  /** Form identifier, as the API sent it. */
   form: string;
+  /** The API's display name of the form. */
+  name: string;
   lines: AdvancedLine[];
 }
 

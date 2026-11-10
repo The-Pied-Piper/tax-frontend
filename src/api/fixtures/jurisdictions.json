@@ -2,6 +2,7 @@
   "jurisdictions": [
     {
       "code": "CA-ON",
+      "name": "Ontario",
       "years": [
         {
           "year": 2025,

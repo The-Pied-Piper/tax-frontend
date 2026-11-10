@@ -1,6 +1,6 @@
 import { http, HttpResponse } from 'msw';
-import { setupServer } from 'msw/node';
-import { afterAll, afterEach, beforeAll, vi } from 'vitest';
+import { vi } from 'vitest';
+import { server } from '../mocks/server';
 import {
   ApiError,
   NetworkError,
@@ -13,18 +13,6 @@ import invalidSalary from './fixtures/error-invalid-salary.json';
 import jurisdictions from './fixtures/jurisdictions.json';
 
 const BASE = 'http://localhost:8000/api/v1';
-const server = setupServer();
-
-beforeAll(() => {
-  server.listen({ onUnhandledFrame: 'error' });
-});
-afterEach(() => {
-  server.resetHandlers();
-});
-afterAll(() => {
-  server.close();
-});
-
 const client = createApiClient({ baseUrl: BASE });
 
 describe('listJurisdictions', () => {

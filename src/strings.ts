@@ -56,6 +56,7 @@ export const strings = {
     note: 'Every line the calculation produced, grouped by form. Always yearly amounts.',
     lineCount: (count: number) =>
       count === 1 ? '1 line' : `${String(count)} lines`,
+    reference: 'Form reference',
     noAmount: '—',
     noAmountSpoken: 'No amount',
   },

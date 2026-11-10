@@ -57,6 +57,9 @@ describe('App form', () => {
       name: strings.form.place,
     });
     expect(place).toHaveValue('CA-ON');
+    expect(
+      within(place).getByRole('option', { name: 'Ontario' }),
+    ).toBeInTheDocument();
     const year = screen.getByRole('combobox', { name: strings.form.year });
     expect(year).toHaveValue('2025');
     expect(
@@ -279,11 +282,35 @@ describe('App form', () => {
     );
   });
 
+  it('shows the place code when its name is blank', async () => {
+    const client: ApiClient = {
+      listJurisdictions: () =>
+        Promise.resolve({
+          jurisdictions: [
+            {
+              code: 'CA-ON',
+              name: '  ',
+              years: [{ year: 2025, provisional: false }],
+            },
+          ],
+          next_page_token: '',
+        }),
+      computeTakeHomeCalculation: () => Promise.reject(new Error('unused')),
+    };
+    render(<App client={client} />);
+    const place = await screen.findByRole('combobox', {
+      name: strings.form.place,
+    });
+    expect(
+      within(place).getByRole('option', { name: 'CA-ON' }),
+    ).toBeInTheDocument();
+  });
+
   it('keeps Calculate off when no place has a year to choose', async () => {
     const client: ApiClient = {
       listJurisdictions: () =>
         Promise.resolve({
-          jurisdictions: [{ code: 'CA-ON', years: [] }],
+          jurisdictions: [{ code: 'CA-ON', name: 'Ontario', years: [] }],
           next_page_token: '',
         }),
       computeTakeHomeCalculation: () => Promise.reject(new Error('unused')),
@@ -464,7 +491,7 @@ describe('App advanced view', () => {
     expect(details).not.toHaveAttribute('open');
     await user.click(screen.getByText(strings.advanced.toggle));
     for (const form of compute2025.trace) {
-      expect(screen.getByText(form.form)).toBeVisible();
+      expect(screen.getByText(form.name)).toBeVisible();
     }
   });
 
@@ -472,7 +499,7 @@ describe('App advanced view', () => {
     const user = await calculate();
     await user.click(screen.getByText(strings.advanced.toggle));
     for (const form of compute2025.trace) {
-      await user.click(screen.getByText(form.form));
+      await user.click(screen.getByText(form.name));
     }
     const lines = within(
       screen.getByRole('region', { name: strings.advanced.toggle }),
@@ -488,8 +515,8 @@ describe('App advanced view', () => {
   it('shows the yearly figures from the engine whatever the pay period', async () => {
     const user = await calculate(strings.payPeriod.monthly);
     await user.click(screen.getByText(strings.advanced.toggle));
-    await user.click(screen.getByText('ca-on/return'));
-    const form = screen.getByText('ca-on/return').closest('details');
+    await user.click(screen.getByText('Return summary'));
+    const form = screen.getByText('Return summary').closest('details');
     expect(form).not.toBeNull();
     expect(within(form as HTMLElement).getByText('11,497.09')).toBeVisible();
   });

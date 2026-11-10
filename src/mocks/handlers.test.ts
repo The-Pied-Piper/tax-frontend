@@ -1,18 +1,6 @@
-import { afterAll, afterEach, beforeAll } from 'vitest';
 import { ApiError, createApiClient } from '../api/client';
-import { server } from './server';
 
 const client = createApiClient({ baseUrl: 'http://localhost:8000/api/v1' });
-
-beforeAll(() => {
-  server.listen({ onUnhandledFrame: 'error' });
-});
-afterEach(() => {
-  server.resetHandlers();
-});
-afterAll(() => {
-  server.close();
-});
 
 const request = (year: number, salary: string) => ({
   jurisdiction_code: 'CA-ON',

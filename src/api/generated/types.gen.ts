@@ -56,6 +56,10 @@ export type FormTrace = {
    * Identifier of the form; opaque, to be compared and not parsed.
    */
   form: string;
+  /**
+   * Display name of the form, in English; the identifier when the calculator gives none.
+   */
+  name: string;
   lines: Array<TraceLine>;
 };
 
@@ -64,6 +68,14 @@ export type TraceLine = {
    * The figure's label, unique per figure in a form; null if none.
    */
   label?: string | null;
+  /**
+   * Display name of the figure, in English; null if none is known.
+   */
+  name?: string | null;
+  /**
+   * What the form prints beside the figure (for example its line number); null for a step the form does not print.
+   */
+  reference?: string | null;
   amount?: string;
   /**
    * Explanation in the requested language.
@@ -81,6 +93,10 @@ export type ListJurisdictionsResponse = {
 
 export type Jurisdiction = {
   code: string;
+  /**
+   * Display name of the jurisdiction, in English.
+   */
+  name: string;
   years: Array<JurisdictionYear>;
 };
 

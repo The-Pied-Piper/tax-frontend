@@ -123,7 +123,8 @@ describe('advancedGroups', () => {
       (response.trace ?? []).map((f) => f.form),
     );
     expect(groups[0]?.lines[0]).toEqual({
-      label: 'cpp additional maximum pensionable earnings',
+      label: 'Additional maximum pensionable earnings',
+      reference: 'D',
       amount: '81200.00',
     });
   });
@@ -134,9 +135,13 @@ describe('advancedGroups', () => {
       total_deductions: '0.00',
       take_home: '1.00',
       provisional: false,
-      trace: [{ form: 'f', lines: [{ label: null, text: 'a_note' }] }],
+      trace: [
+        { form: 'f', name: 'f', lines: [{ label: null, text: 'a_note' }] },
+      ],
     });
-    expect(groups[0]?.lines).toEqual([{ label: 'a note', amount: null }]);
+    expect(groups[0]?.lines).toEqual([
+      { label: 'a note', reference: null, amount: null },
+    ]);
   });
 
   it('gives an empty label when both label and text are empty', () => {
@@ -145,9 +150,49 @@ describe('advancedGroups', () => {
       total_deductions: '0.00',
       take_home: '1.00',
       provisional: false,
-      trace: [{ form: 'f', lines: [{ text: '' }] }],
+      trace: [{ form: 'f', name: 'f', lines: [{ text: '' }] }],
     });
-    expect(groups[0]?.lines).toEqual([{ label: '', amount: null }]);
+    expect(groups[0]?.lines).toEqual([
+      { label: '', reference: null, amount: null },
+    ]);
+  });
+
+  it('prefers the API names, keeps the reference, and falls back to the form id', () => {
+    const groups = advancedGroups({
+      salary: '1.00',
+      total_deductions: '0.00',
+      take_home: '1.00',
+      provisional: false,
+      trace: [
+        {
+          form: 'ex/form',
+          name: 'Example form',
+          lines: [
+            {
+              label: 'a_step',
+              name: 'Named figure',
+              reference: '65',
+              text: 't',
+              amount: '1.00',
+            },
+            { label: 'b_step', name: null, reference: null, text: 't' },
+            { label: 'c_step', name: '  ', reference: ' ', text: 't' },
+          ],
+        },
+        { form: 'ex/other', name: '', lines: [] },
+        { form: 'ex/blank', name: '  ', lines: [] },
+      ],
+    });
+    expect(groups.map((g) => g.name)).toEqual([
+      'Example form',
+      'ex/other',
+      'ex/blank',
+    ]);
+    expect(groups[0]?.lines).toEqual([
+      { label: 'Named figure', reference: '65', amount: '1.00' },
+      { label: 'b step', reference: null, amount: null },
+      { label: 'c step', reference: null, amount: null },
+    ]);
   });
 
   it('returns no groups when the response has no trace', () => {
