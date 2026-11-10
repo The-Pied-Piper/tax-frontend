@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { strings } from './strings';
 import {
   applyTheme,
@@ -18,6 +18,9 @@ export function ThemeToggle() {
     () => readStoredTheme() ?? deviceTheme(),
   );
 
+  // True once the person has clicked, even if storage refused to save it.
+  const chosen = useRef(false);
+
   useEffect(() => {
     applyTheme(theme);
   }, [theme]);
@@ -29,7 +32,8 @@ export function ThemeToggle() {
     }
     const query = window.matchMedia('(prefers-color-scheme: dark)');
     const onChange = () => {
-      if (readStoredTheme() === null) setTheme(deviceTheme());
+      if (!chosen.current && readStoredTheme() === null)
+        setTheme(deviceTheme());
     };
     query.addEventListener('change', onChange);
     return () => query.removeEventListener('change', onChange);
@@ -43,6 +47,7 @@ export function ThemeToggle() {
           type="button"
           aria-pressed={theme === value}
           onClick={() => {
+            chosen.current = true;
             storeTheme(value);
             setTheme(value);
           }}

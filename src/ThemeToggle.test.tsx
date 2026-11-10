@@ -1,15 +1,28 @@
-import { fireEvent, render, screen } from '@testing-library/react';
+import { act, fireEvent, render, screen } from '@testing-library/react';
 import { App } from './App';
 import { strings } from './strings';
 import { THEME_STORAGE_KEY } from './theme';
 
+type Listener = () => void;
+const listeners = new Set<Listener>();
+let deviceDark = false;
+
 function mockDevice(dark: boolean) {
+  deviceDark = dark;
+  listeners.clear();
   window.matchMedia = ((query: string) => ({
-    matches: dark && query === '(prefers-color-scheme: dark)',
+    get matches() {
+      return deviceDark && query === '(prefers-color-scheme: dark)';
+    },
     media: query,
-    addEventListener: () => {},
-    removeEventListener: () => {},
+    addEventListener: (_type: string, fn: Listener) => listeners.add(fn),
+    removeEventListener: (_type: string, fn: Listener) => listeners.delete(fn),
   })) as unknown as typeof window.matchMedia;
+}
+
+function changeDevice(dark: boolean) {
+  deviceDark = dark;
+  act(() => listeners.forEach((fn) => fn()));
 }
 
 const button = (name: string) => screen.getByRole('button', { name });
@@ -85,5 +98,43 @@ describe('theme toggle', () => {
     expect(document.documentElement.dataset.theme).toBe('dark');
     get.mockRestore();
     set.mockRestore();
+  });
+
+  it('follows the device until a choice is made', () => {
+    mockDevice(false);
+    render(<App />);
+    changeDevice(true);
+    expect(document.documentElement.dataset.theme).toBe('dark');
+    fireEvent.click(button(strings.themeLight));
+    changeDevice(true);
+    expect(document.documentElement.dataset.theme).toBe('light');
+  });
+
+  it('keeps a click over the device even when storage is blocked', () => {
+    mockDevice(false);
+    const get = vi
+      .spyOn(Storage.prototype, 'getItem')
+      .mockImplementation(() => {
+        throw new Error('blocked');
+      });
+    const set = vi
+      .spyOn(Storage.prototype, 'setItem')
+      .mockImplementation(() => {
+        throw new Error('blocked');
+      });
+    render(<App />);
+    fireEvent.click(button(strings.themeLight));
+    changeDevice(true);
+    expect(document.documentElement.dataset.theme).toBe('light');
+    get.mockRestore();
+    set.mockRestore();
+  });
+
+  it('stops listening to the device when removed', () => {
+    mockDevice(false);
+    const { unmount } = render(<App />);
+    expect(listeners.size).toBe(1);
+    unmount();
+    expect(listeners.size).toBe(0);
   });
 });
