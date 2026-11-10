@@ -304,6 +304,15 @@ describe('money is text', () => {
       GLOBALS,
     );
   });
+  it('allows the selector bans too in src/styles, but keeps the mocks rule', async () => {
+    const code = 'export const x = +"1.5" + (2.5).toFixed(1);\n';
+    expect(await ruleIds('src/styles/tokens.test.ts', code)).not.toContain(
+      SYNTAX,
+    );
+    const mocks =
+      "import { server } from '../mocks/server';\nexport const x = server;\n";
+    expect(await ruleIds('src/styles/a.ts', mocks)).toContain(IMPORT);
+  });
   it.each(cases)('allows %s inside src/money', async (_name, code, rule) => {
     expect(await ruleIds('src/money/a.ts', code)).not.toContain(rule);
   });
