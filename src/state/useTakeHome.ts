@@ -1,5 +1,10 @@
 import { useEffect, useRef, useState } from 'react';
 import {
+  adapters,
+  type AdaptedResult,
+  type AdapterRegistry,
+} from '../adapters';
+import {
   createApiClient,
   type ApiClient,
   type ComputeTakeHomeCalculationResponse,
@@ -20,7 +25,11 @@ export type JurisdictionsState =
 export type RequestState =
   | { status: 'idle' }
   | { status: 'loading' }
-  | { status: 'success'; response: ComputeTakeHomeCalculationResponse }
+  | {
+      status: 'success';
+      response: ComputeTakeHomeCalculationResponse;
+      adapted: AdaptedResult;
+    }
   | { status: 'error'; error: unknown };
 
 export type FormValues = {
@@ -31,7 +40,10 @@ export type FormValues = {
 
 const defaultClient = createApiClient();
 
-export function useTakeHome(client: ApiClient = defaultClient) {
+export function useTakeHome(
+  client: ApiClient = defaultClient,
+  registry: AdapterRegistry = adapters,
+) {
   const [jurisdictionsState, setJurisdictionsState] =
     useState<JurisdictionsState>({ status: 'loading' });
   const [values, setValues] = useState<FormValues>({
@@ -103,21 +115,28 @@ export function useTakeHome(client: ApiClient = defaultClient) {
     ) {
       return;
     }
+    const jurisdictionCode = values.jurisdictionCode;
+    const year = values.year;
     latest.current += 1;
     const mine = latest.current;
     setRequest({ status: 'loading' });
     client
       .computeTakeHomeCalculation({
-        jurisdiction_code: values.jurisdictionCode,
-        year: values.year,
+        jurisdiction_code: jurisdictionCode,
+        year,
         salary: values.salary.trim(),
         language_code: languageCode,
         include_trace: true,
       })
       .then(
         (response) => {
-          if (latest.current === mine)
-            setRequest({ status: 'success', response });
+          if (latest.current === mine) {
+            setRequest({
+              status: 'success',
+              response,
+              adapted: registry.adapt(jurisdictionCode, year, response),
+            });
+          }
         },
         (error: unknown) => {
           if (latest.current === mine) setRequest({ status: 'error', error });

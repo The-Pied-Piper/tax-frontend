@@ -47,6 +47,12 @@ export const strings = {
     estimateNote:
       'This is an estimate for a single yearly salary. Your own situation may differ.',
   },
+  breakdown: {
+    heading: 'How this was worked out',
+    toggle: 'Show how this was worked out',
+    totalsLabel: 'Totals',
+    helpButton: (name: string) => `What is ${name}?`,
+  },
   result: {
     failed: 'Something went wrong. Please try again.',
   },

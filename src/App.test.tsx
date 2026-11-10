@@ -1,6 +1,7 @@
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { App } from './App';
+import { AdapterRegistry, advancedGroups } from './adapters';
 import {
   ApiError,
   createApiClient,
@@ -252,5 +253,65 @@ describe('App answer card', () => {
       screen.getByRole('radio', { name: strings.payPeriod.monthly }),
     ).toBeChecked();
     expect(screen.getByText('4,455.72')).toBeInTheDocument();
+  });
+});
+
+describe('App breakdown', () => {
+  const code = jurisdictions.jurisdictions[0]?.code ?? '';
+  const registry = new AdapterRegistry();
+  registry.register({
+    jurisdictionCode: code,
+    adapt: (response) => ({
+      rows: [
+        {
+          id: 'salary',
+          name: 'Salary before tax',
+          help: 'What you earn before anything is taken off.',
+          amount: response.salary,
+        },
+      ],
+      totals: [
+        {
+          id: 'taken-off',
+          name: 'Total taken off',
+          help: 'Tax and contributions together.',
+          amount: response.total_deductions,
+        },
+      ],
+      advanced: advancedGroups(response),
+    }),
+  });
+
+  async function calculate(reg: AdapterRegistry) {
+    const user = userEvent.setup();
+    render(<App client={fixtureClient()} registry={reg} />);
+    await user.type(
+      await screen.findByRole('textbox', { name: strings.form.salary }),
+      '70000',
+    );
+    await user.click(
+      screen.getByRole('button', { name: strings.form.calculate }),
+    );
+    await screen.findByRole('heading', { name: strings.answer.heading });
+    return user;
+  }
+
+  it('shows a folded breakdown from the adapter under the answer', async () => {
+    const user = await calculate(registry);
+    const details = screen
+      .getByText(strings.breakdown.toggle)
+      .closest('details');
+    expect(details).not.toHaveAttribute('open');
+    await user.click(screen.getByText(strings.breakdown.toggle));
+    expect(details).toHaveAttribute('open');
+    expect(screen.getByText('Total taken off')).toBeVisible();
+    expect(screen.getAllByText('16,531.32').length).toBeGreaterThan(1);
+  });
+
+  it('shows no breakdown when no adapter is registered', async () => {
+    await calculate(new AdapterRegistry());
+    expect(
+      screen.queryByText(strings.breakdown.toggle),
+    ).not.toBeInTheDocument();
   });
 });
