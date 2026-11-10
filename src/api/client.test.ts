@@ -1,6 +1,5 @@
 import { http, HttpResponse } from 'msw';
-import { setupServer } from 'msw/node';
-import { afterAll, afterEach, beforeAll } from 'vitest';
+import { server } from '../mocks/server';
 import { ApiError, NetworkError, createApiClient } from './client';
 import compute2025 from './fixtures/compute-on-2025-70000.json';
 import compute2026 from './fixtures/compute-on-2026-70000.json';
@@ -8,12 +7,6 @@ import invalidSalary from './fixtures/error-invalid-salary.json';
 import jurisdictions from './fixtures/jurisdictions.json';
 
 const BASE = 'http://localhost:8000/api/v1';
-const server = setupServer();
-
-beforeAll(() => server.listen({ onUnhandledFrame: 'error' }));
-afterEach(() => server.resetHandlers());
-afterAll(() => server.close());
-
 const client = createApiClient({ baseUrl: BASE });
 
 describe('listJurisdictions', () => {
