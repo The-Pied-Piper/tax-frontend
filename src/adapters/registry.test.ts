@@ -53,6 +53,20 @@ describe('AdapterRegistry', () => {
     expect(() => registry.register(fake('XX', 'd', [2026, 2027]))).toThrow();
   });
 
+  it('refuses an adapter with an empty list of years', () => {
+    const registry = new AdapterRegistry();
+    expect(() => registry.register(fake('XX', 'a', []))).toThrow(/no years/);
+  });
+
+  it('is not affected by later changes to the years array', () => {
+    const registry = new AdapterRegistry();
+    const years = [2026];
+    registry.register(fake('XX', 'a', years));
+    years[0] = 2025;
+    expect(registry.find('XX', 2026)).toBeDefined();
+    expect(registry.find('XX', 2025)).toBeUndefined();
+  });
+
   it('adapts through the matching adapter', () => {
     const registry = new AdapterRegistry();
     registry.register(fake('XX', 'a'));
@@ -77,6 +91,10 @@ describe('fallbackLabel', () => {
     expect(fallbackLabel(null)).toBe('');
     expect(fallbackLabel(undefined)).toBe('');
   });
+
+  it('handles repeated underscores and surrounding space', () => {
+    expect(fallbackLabel('_a__b_ ')).toBe('a  b');
+  });
 });
 
 describe('advancedGroups', () => {
@@ -100,6 +118,17 @@ describe('advancedGroups', () => {
       trace: [{ form: 'f', lines: [{ label: null, text: 'a_note' }] }],
     });
     expect(groups[0]?.lines).toEqual([{ label: 'a note', amount: null }]);
+  });
+
+  it('gives an empty label when both label and text are empty', () => {
+    const groups = advancedGroups({
+      salary: '1.00',
+      total_deductions: '0.00',
+      take_home: '1.00',
+      provisional: false,
+      trace: [{ form: 'f', lines: [{ text: '' }] }],
+    });
+    expect(groups[0]?.lines).toEqual([{ label: '', amount: null }]);
   });
 
   it('returns no groups when the response has no trace', () => {

@@ -6,7 +6,18 @@ import type { AdaptedResult, JurisdictionAdapter } from './types';
 export class AdapterRegistry {
   private readonly adapters = new Map<string, JurisdictionAdapter[]>();
 
-  register(adapter: JurisdictionAdapter): void {
+  register(input: JurisdictionAdapter): void {
+    if (input.years?.length === 0) {
+      throw new Error(
+        `The adapter for ${input.jurisdictionCode} lists no years; leave years out to cover every year`,
+      );
+    }
+    // Copy the years so later changes by the caller cannot bypass the overlap check.
+    const adapter: JurisdictionAdapter = {
+      jurisdictionCode: input.jurisdictionCode,
+      years: input.years && [...input.years],
+      adapt: (response) => input.adapt(response),
+    };
     const existing = this.adapters.get(adapter.jurisdictionCode) ?? [];
     for (const other of existing) {
       if (overlaps(other, adapter)) {
