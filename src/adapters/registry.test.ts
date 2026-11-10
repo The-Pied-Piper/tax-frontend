@@ -25,7 +25,9 @@ describe('AdapterRegistry', () => {
     const registry = new AdapterRegistry();
     const adapter = fake('XX', 'a');
     registry.register(adapter);
-    expect(registry.find('XX', 2025)).toBe(adapter);
+    expect(registry.find('XX', 2025)?.adapt(response)).toBe(
+      adapter.adapt(response),
+    );
     expect(registry.find('YY', 2025)).toBeUndefined();
   });
 
@@ -35,8 +37,12 @@ describe('AdapterRegistry', () => {
     const y2026 = fake('XX', 'y2026', [2026]);
     registry.register(every);
     registry.register(y2026);
-    expect(registry.find('XX', 2026)).toBe(y2026);
-    expect(registry.find('XX', 2025)).toBe(every);
+    expect(registry.find('XX', 2026)?.adapt(response)).toBe(
+      y2026.adapt(response),
+    );
+    expect(registry.find('XX', 2025)?.adapt(response)).toBe(
+      every.adapt(response),
+    );
   });
 
   it('returns nothing for a year no adapter covers', () => {
