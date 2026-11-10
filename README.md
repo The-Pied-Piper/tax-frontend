@@ -42,6 +42,10 @@ There is no fake server generated from the spec (it would invent figures, which 
 
 `npm run lint` enforces the architecture doc's layering. Each folder under `src/` may import only what the folder table allows: `api`, `money` and `theme` import nothing else in `src`; `adapters`, `money`, `theme` and `api` never import React; components may use `api` and `adapters` for types only (`import type`) and never `mocks`; only `src/main.tsx` and tests import `src/mocks`. Money stays text: `Number`, `parseFloat`, `parseInt`, `.toFixed(` and `Intl.NumberFormat` are banned everywhere except `src/money/` (and `src/styles/`, which holds the colour maths of the token test). Dynamic `import()` is held to the same layer rules. Components also get `eslint-plugin-jsx-a11y` (its recommended set does not flag a bare `<input>` with no label, only a `<label>` tied to nothing or an image without alt text, so Testing Library's by-role queries remain the check for unlabelled inputs), and all code gets typescript-eslint `strictTypeChecked` with `noUncheckedIndexedAccess` and `verbatimModuleSyntax` in `tsconfig.json`. `build/eslint-rules.test.js` lints a small example for each rule, so a rule that stops firing fails the tests. Node 22 is pinned in `.nvmrc`. `package.json` has an `overrides` entry for `eslint-plugin-jsx-a11y` because its declared ESLint peer range lags ESLint 10; the plugin works with it, so do not remove the entry without checking.
 
+## Dependency updates
+
+Dependabot version updates (`.github/dependabot.yml`) arrive monthly, as one pull request each for production npm packages, development npm packages and GitHub Actions. Security updates are separate and can arrive at any time. They go through the normal review and merge; nothing merges itself.
+
 ## License
 
 Apache 2.0, see [LICENSE](LICENSE).
