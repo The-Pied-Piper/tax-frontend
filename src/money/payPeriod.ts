@@ -36,7 +36,7 @@ function formatCents(cents: bigint): string {
 export function amountForPeriod(yearly: string, period: PayPeriod): string {
   const cents = toCents(yearly);
   const divisor = PERIODS_PER_YEAR[period];
-  if (divisor === undefined) {
+  if (!Object.hasOwn(PERIODS_PER_YEAR, period)) {
     throw new Error(`Unknown pay period: "${String(period)}"`);
   }
   const abs = cents < 0n ? -cents : cents;
