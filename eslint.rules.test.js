@@ -155,6 +155,31 @@ describe('layering', () => {
       SYNTAX,
     ],
     [
+      'a ./api import from App-level code in a component folder',
+      'src/components/A.tsx',
+      "import { apiBaseUrl } from './api';\nexport const x = apiBaseUrl;\n",
+    ],
+    [
+      'an @/ alias import of mocks',
+      'src/state/useX.ts',
+      "import { server } from '@/mocks/server';\nexport const x = server;\n",
+    ],
+    [
+      'a bare src/ path import of mocks',
+      'src/state/useX.ts',
+      "import { server } from 'src/mocks/server';\nexport const x = server;\n",
+    ],
+    [
+      'an absolute /src path import of mocks',
+      'src/state/useX.ts',
+      "import { server } from '/src/mocks/server';\nexport const x = server;\n",
+    ],
+    [
+      'a re-export from a refused folder',
+      'src/components/A.tsx',
+      "export { createApiClient } from '../api/client';\n",
+    ],
+    [
       'App importing mocks',
       'src/App.tsx',
       "import { server } from './mocks/server';\nexport const x = server;\n",
