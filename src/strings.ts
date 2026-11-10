@@ -51,6 +51,14 @@ export const strings = {
     toggle: 'Show how this was worked out',
     helpButton: (name: string) => `What is ${name}?`,
   },
+  advanced: {
+    toggle: 'Advanced view: every line',
+    note: 'Every line the calculation produced, grouped by form. Always yearly amounts.',
+    lineCount: (count: number) =>
+      count === 1 ? '1 line' : `${String(count)} lines`,
+    noAmount: '—',
+    noAmountSpoken: 'No amount',
+  },
   result: {
     failed: 'Something went wrong. Please try again.',
   },
