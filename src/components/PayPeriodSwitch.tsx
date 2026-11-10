@@ -25,7 +25,9 @@ export function PayPeriodSwitch({ value, onChange }: Props) {
             name="pay-period"
             value={period}
             checked={value === period}
-            onChange={() => onChange(period)}
+            onChange={() => {
+              onChange(period);
+            }}
           />
           {strings.payPeriod[period]}
         </label>
