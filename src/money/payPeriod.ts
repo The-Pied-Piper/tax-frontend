@@ -35,10 +35,10 @@ function formatCents(cents: bigint): string {
 // (half away from zero for negatives), and returns text with two decimals.
 export function amountForPeriod(yearly: string, period: PayPeriod): string {
   const cents = toCents(yearly);
-  const divisor = PERIODS_PER_YEAR[period];
   if (!Object.hasOwn(PERIODS_PER_YEAR, period)) {
     throw new Error(`Unknown pay period: "${period}"`);
   }
+  const divisor = PERIODS_PER_YEAR[period];
   const abs = cents < 0n ? -cents : cents;
   const rounded = (abs * 2n + divisor) / (divisor * 2n);
   return formatCents(cents < 0n ? -rounded : rounded);
