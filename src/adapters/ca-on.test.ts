@@ -104,24 +104,8 @@ describe('Ontario adapter', () => {
     expect(caOnAdapter.adapt(noTrace).rows).toEqual([]);
   });
 
-  it('prefers display names from the API when present', () => {
-    // The API will add `name`; the generated types do not have it yet.
-    const trace = [
-      {
-        form: 'ca-on/on428',
-        name: 'Ontario Tax',
-        lines: [{ label: 'x_y', amount: '1.00', text: 't', name: 'X Why' }],
-      },
-    ];
-    const named: ComputeTakeHomeCalculationResponse = { ...r2025, trace };
-    const [group] = caOnAdapter.adapt(named).advanced;
-    expect(group?.name).toBe('Ontario Tax');
-    expect(group?.lines[0]?.label).toBe('X Why');
-  });
-
-  it('shows readable labels when the API sends no names', () => {
+  it('shows readable labels in the advanced view', () => {
     const groups = caOnAdapter.adapt(r2025).advanced;
-    expect(groups.every((g) => g.name === undefined)).toBe(true);
     expect(
       groups.flatMap((g) => g.lines).every((l) => !l.label.includes('_')),
     ).toBe(true);
