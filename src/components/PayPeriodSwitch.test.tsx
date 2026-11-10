@@ -1,6 +1,8 @@
 import { useState } from 'react';
-import { fireEvent, render, screen } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import { PayPeriodSwitch } from './PayPeriodSwitch';
+import { strings } from '../strings';
 import { amountForPeriod, type PayPeriod } from '../money/payPeriod';
 
 function Harness() {
@@ -17,7 +19,7 @@ describe('PayPeriodSwitch', () => {
   it('offers the four periods with Annually chosen by default', () => {
     render(<Harness />);
     expect(
-      screen.getByRole('radiogroup', { name: 'Show amounts' }),
+      screen.getByRole('group', { name: 'Show amounts' }),
     ).toBeInTheDocument();
     const labels = screen
       .getAllByRole('radio')
@@ -27,12 +29,18 @@ describe('PayPeriodSwitch', () => {
     expect(screen.getByRole('status')).toHaveTextContent('53468.68');
   });
 
-  it('reports the chosen period', () => {
+  it('reports the chosen period', async () => {
     render(<Harness />);
-    fireEvent.click(screen.getByRole('radio', { name: 'Monthly' }));
-    expect(screen.getByRole('radio', { name: 'Monthly' })).toBeChecked();
+    await userEvent.click(
+      screen.getByRole('radio', { name: strings.payPeriod.monthly }),
+    );
+    expect(
+      screen.getByRole('radio', { name: strings.payPeriod.monthly }),
+    ).toBeChecked();
     expect(screen.getByRole('status')).toHaveTextContent('4455.72');
-    fireEvent.click(screen.getByRole('radio', { name: 'Weekly' }));
+    await userEvent.click(
+      screen.getByRole('radio', { name: strings.payPeriod.weekly }),
+    );
     expect(screen.getByRole('status')).toHaveTextContent('1028.24');
   });
 });

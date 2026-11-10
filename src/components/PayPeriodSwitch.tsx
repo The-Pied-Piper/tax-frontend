@@ -17,15 +17,9 @@ type Props = {
 // Controlled switch: the page keeps the chosen period (Annually by default).
 export function PayPeriodSwitch({ value, onChange }: Props) {
   return (
-    <div>
-      <div className={styles.legend} id="pay-period-legend">
-        {strings.payPeriod.legend}
-      </div>
-      <div
-        className={styles.group}
-        role="radiogroup"
-        aria-labelledby="pay-period-legend"
-      >
+    <fieldset className={styles.fieldset}>
+      <legend className={styles.legend}>{strings.payPeriod.legend}</legend>
+      <div className={styles.group}>
         {OPTIONS.map((period) => (
           <label key={period} className={styles.option}>
             <input
@@ -39,6 +33,6 @@ export function PayPeriodSwitch({ value, onChange }: Props) {
           </label>
         ))}
       </div>
-    </div>
+    </fieldset>
   );
 }

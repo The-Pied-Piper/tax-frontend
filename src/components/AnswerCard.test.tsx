@@ -1,4 +1,5 @@
-import { fireEvent, render, screen } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import { AnswerCard } from './AnswerCard';
 import { strings } from '../strings';
 
@@ -29,6 +30,11 @@ describe('AnswerCard', () => {
     expect(document.body.textContent).not.toMatch(/CRA|checked/i);
   });
 
+  it('shows an amount it cannot divide as sent instead of failing', () => {
+    render(<AnswerCard {...base} payPeriod="monthly" takeHome="53468.555" />);
+    expect(screen.getByText('53468.555')).toBeInTheDocument();
+  });
+
   it('shows the notice only when provisional is true', () => {
     const { rerender } = render(<AnswerCard {...base} />);
     expect(screen.queryByRole('note')).not.toBeInTheDocument();
@@ -38,7 +44,7 @@ describe('AnswerCard', () => {
     );
   });
 
-  it('shows weekly amounts and reports a period change', () => {
+  it('shows weekly amounts and reports a period change', async () => {
     const changed: string[] = [];
     render(
       <AnswerCard
@@ -50,7 +56,9 @@ describe('AnswerCard', () => {
     expect(screen.getByText('1,028.24')).toBeInTheDocument();
     expect(screen.getByText('1,346.15')).toBeInTheDocument();
     expect(screen.getByText('317.91')).toBeInTheDocument();
-    fireEvent.click(screen.getByRole('radio', { name: 'Monthly' }));
+    await userEvent.click(
+      screen.getByRole('radio', { name: strings.payPeriod.monthly }),
+    );
     expect(changed).toEqual(['monthly']);
   });
 });

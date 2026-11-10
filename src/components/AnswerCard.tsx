@@ -1,5 +1,5 @@
-import { groupThousands } from '../money/format';
-import { amountForPeriod, type PayPeriod } from '../money/payPeriod';
+import { displayAmount } from '../money/format';
+import type { PayPeriod } from '../money/payPeriod';
 import { strings } from '../strings';
 import styles from './AnswerCard.module.css';
 import { PayPeriodSwitch } from './PayPeriodSwitch';
@@ -23,8 +23,7 @@ export function AnswerCard({
   payPeriod,
   onPayPeriodChange,
 }: Props) {
-  const show = (yearly: string) =>
-    groupThousands(amountForPeriod(yearly, payPeriod));
+  const show = (yearly: string) => displayAmount(yearly, payPeriod);
   return (
     <section className={styles.card} aria-labelledby="answer-heading">
       <h2 id="answer-heading" className={styles.heading}>

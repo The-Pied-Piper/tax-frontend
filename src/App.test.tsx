@@ -230,7 +230,9 @@ describe('App answer card', () => {
 
   it('divides all three amounts when the pay period changes', async () => {
     const user = await calculate(fixtureClient());
-    await user.click(screen.getByRole('radio', { name: 'Monthly' }));
+    await user.click(
+      screen.getByRole('radio', { name: strings.payPeriod.monthly }),
+    );
     expect(screen.getByText('4,455.72')).toBeInTheDocument();
     expect(screen.getByText('5,833.33')).toBeInTheDocument();
     expect(screen.getByText('1,377.61')).toBeInTheDocument();
@@ -239,12 +241,16 @@ describe('App answer card', () => {
 
   it('keeps the chosen pay period for the next answer', async () => {
     const user = await calculate(fixtureClient());
-    await user.click(screen.getByRole('radio', { name: 'Monthly' }));
+    await user.click(
+      screen.getByRole('radio', { name: strings.payPeriod.monthly }),
+    );
     await user.click(
       screen.getByRole('button', { name: strings.form.calculate }),
     );
     await screen.findByRole('heading', { name: strings.answer.heading });
-    expect(screen.getByRole('radio', { name: 'Monthly' })).toBeChecked();
+    expect(
+      screen.getByRole('radio', { name: strings.payPeriod.monthly }),
+    ).toBeChecked();
     expect(screen.getByText('4,455.72')).toBeInTheDocument();
   });
 });

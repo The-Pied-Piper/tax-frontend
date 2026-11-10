@@ -1,4 +1,11 @@
 /* Pay-period switch: a segmented control built from radio buttons. */
+.fieldset {
+  border: 0;
+  margin: 0;
+  padding: 0;
+  min-width: 0;
+}
+
 .group {
   display: inline-flex;
   flex-wrap: wrap;
@@ -6,9 +13,6 @@
   border-radius: var(--radius-control);
   overflow: hidden;
   background: var(--surface);
-  margin: 0;
-  padding: 0;
-  min-width: 0;
 }
 
 .legend {
@@ -44,7 +48,7 @@
   color: var(--btn-fg);
 }
 
-.option:has(input:focus-visible) {
+.group:has(input:focus-visible) {
   outline: 2px solid var(--accent);
-  outline-offset: -2px;
+  outline-offset: 2px;
 }
