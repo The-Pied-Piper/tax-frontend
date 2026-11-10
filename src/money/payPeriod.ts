@@ -18,7 +18,7 @@ export function toCents(amount: string): bigint {
   if (!match) {
     throw new Error(`Not a money amount: "${amount}"`);
   }
-  const [, sign, whole, fraction = ''] = match;
+  const [, sign, whole = '0', fraction = ''] = match;
   const cents = BigInt(whole) * 100n + BigInt(fraction.padEnd(2, '0'));
   return sign === '-' ? -cents : cents;
 }
@@ -28,7 +28,7 @@ export function formatCents(cents: bigint): string {
   const abs = negative ? -cents : cents;
   const whole = abs / 100n;
   const fraction = (abs % 100n).toString().padStart(2, '0');
-  return `${negative && abs !== 0n ? '-' : ''}${whole}.${fraction}`;
+  return `${negative && abs !== 0n ? '-' : ''}${whole.toString()}.${fraction}`;
 }
 
 // Divides a yearly amount by the number of pay periods, rounding half up
@@ -36,7 +36,7 @@ export function formatCents(cents: bigint): string {
 export function amountForPeriod(yearly: string, period: PayPeriod): string {
   const cents = toCents(yearly);
   if (!Object.hasOwn(PERIODS_PER_YEAR, period)) {
-    throw new Error(`Unknown pay period: "${String(period)}"`);
+    throw new Error(`Unknown pay period: "${period}"`);
   }
   const divisor = PERIODS_PER_YEAR[period];
   const abs = cents < 0n ? -cents : cents;

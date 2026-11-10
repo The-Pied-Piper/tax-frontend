@@ -54,21 +54,27 @@ describe('AdapterRegistry', () => {
   it('refuses two adapters for the same code and year', () => {
     const registry = new AdapterRegistry();
     registry.register(fake('XX', 'a'));
-    expect(() => registry.register(fake('XX', 'b'))).toThrow(/already covers/);
+    expect(() => {
+      registry.register(fake('XX', 'b'));
+    }).toThrow(/already covers/);
     registry.register(fake('XX', 'c', [2026]));
-    expect(() => registry.register(fake('XX', 'd', [2026, 2027]))).toThrow();
+    expect(() => {
+      registry.register(fake('XX', 'd', [2026, 2027]));
+    }).toThrow();
   });
 
   it('refuses an adapter with a blank jurisdiction code', () => {
     const registry = new AdapterRegistry();
-    expect(() => registry.register(fake(' ', 'a'))).toThrow(
-      /jurisdiction code/,
-    );
+    expect(() => {
+      registry.register(fake(' ', 'a'));
+    }).toThrow(/jurisdiction code/);
   });
 
   it('refuses an adapter with an empty list of years', () => {
     const registry = new AdapterRegistry();
-    expect(() => registry.register(fake('XX', 'a', []))).toThrow(/no years/);
+    expect(() => {
+      registry.register(fake('XX', 'a', []));
+    }).toThrow(/no years/);
   });
 
   it('is not affected by later changes to the years array', () => {

@@ -22,7 +22,11 @@ function mockDevice(dark: boolean) {
 
 function changeDevice(dark: boolean) {
   deviceDark = dark;
-  act(() => listeners.forEach((fn) => fn()));
+  act(() => {
+    listeners.forEach((fn) => {
+      fn();
+    });
+  });
 }
 
 const button = (name: string) => screen.getByRole('button', { name });

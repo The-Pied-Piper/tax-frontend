@@ -1,4 +1,4 @@
-import { useId, type FormEvent } from 'react';
+import { useId, type SubmitEvent } from 'react';
 import type { SalaryCheck } from '../state/salary';
 import type { FormValues, JurisdictionsState } from '../state/useTakeHome';
 import { strings } from '../strings';
@@ -53,7 +53,7 @@ export function SalaryForm({
   const salaryMessage =
     salaryCheck === 'ok' ? null : SALARY_MESSAGES[salaryCheck];
 
-  function handleSubmit(event: FormEvent<HTMLFormElement>) {
+  function handleSubmit(event: SubmitEvent<HTMLFormElement>) {
     event.preventDefault();
     onSubmit();
   }
@@ -65,7 +65,9 @@ export function SalaryForm({
         <select
           id={placeId}
           value={values.jurisdictionCode}
-          onChange={(e) => onJurisdictionChange(e.target.value)}
+          onChange={(e) => {
+            onJurisdictionChange(e.target.value);
+          }}
         >
           {jurisdictions.map((j) => (
             <option key={j.code} value={j.code}>
@@ -87,7 +89,7 @@ export function SalaryForm({
           {years.map((y) => (
             <option key={y.year} value={y.year}>
               {y.provisional
-                ? `${y.year} (${strings.form.provisionalYear})`
+                ? `${y.year.toString()} (${strings.form.provisionalYear})`
                 : y.year}
             </option>
           ))}
@@ -101,7 +103,9 @@ export function SalaryForm({
           inputMode="decimal"
           autoComplete="off"
           value={values.salary}
-          onChange={(e) => onSalaryChange(e.target.value)}
+          onChange={(e) => {
+            onSalaryChange(e.target.value);
+          }}
           aria-invalid={salaryMessage !== null}
           aria-describedby={salaryMessage ? `${hintId} ${errorId}` : hintId}
         />

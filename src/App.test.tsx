@@ -23,11 +23,20 @@ function fixtureClient(
   return createApiClient({
     baseUrl: 'http://test/api/v1',
     fetch: (input, init) => {
-      const url = String(input);
+      const url =
+        typeof input === 'string'
+          ? input
+          : input instanceof URL
+            ? input.href
+            : input.url;
       if (url.endsWith('/jurisdictions')) {
         return Promise.resolve(new Response(JSON.stringify(jurisdictions)));
       }
-      onCompute(JSON.parse(String(init?.body)));
+      onCompute(
+        JSON.parse(
+          typeof init?.body === 'string' ? init.body : '',
+        ) as ComputeTakeHomeCalculationRequest,
+      );
       return Promise.resolve(new Response(JSON.stringify(answer)));
     },
   });
@@ -116,12 +125,14 @@ describe('App form', () => {
     const base = fixtureClient();
     let calls = 0;
     const client: ApiClient = {
-      listJurisdictions: base.listJurisdictions,
+      listJurisdictions: (query) => base.listJurisdictions(query),
       computeTakeHomeCalculation: (body) => {
         calls += 1;
         if (calls === 1) return base.computeTakeHomeCalculation(body);
         return new Promise((resolve) => {
-          release = () => resolve(compute2025);
+          release = () => {
+            resolve(compute2025);
+          };
         });
       },
     };
@@ -155,7 +166,7 @@ describe('App form', () => {
     const user = userEvent.setup();
     const base = fixtureClient();
     const client: ApiClient = {
-      listJurisdictions: base.listJurisdictions,
+      listJurisdictions: (query) => base.listJurisdictions(query),
       computeTakeHomeCalculation: () =>
         Promise.reject(new ApiError(400, invalidSalary)),
     };
