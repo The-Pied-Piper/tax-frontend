@@ -8,6 +8,7 @@ import {
   type ApiClient,
   type ComputeTakeHomeCalculationRequest,
 } from './api';
+import compute2026 from './api/fixtures/compute-on-2026-70000.json';
 import compute2025 from './api/fixtures/compute-on-2025-70000.json';
 import invalidSalary from './api/fixtures/error-invalid-salary.json';
 import jurisdictions from './api/fixtures/jurisdictions.json';
@@ -16,6 +17,7 @@ import { strings } from './strings';
 // Real client, fake network: the saved engine responses are served as text.
 function fixtureClient(
   onCompute: (body: ComputeTakeHomeCalculationRequest) => void = () => {},
+  answer: unknown = compute2025,
 ): ApiClient {
   return createApiClient({
     baseUrl: 'http://test/api/v1',
@@ -25,7 +27,7 @@ function fixtureClient(
         return Promise.resolve(new Response(JSON.stringify(jurisdictions)));
       }
       onCompute(JSON.parse(String(init?.body)));
-      return Promise.resolve(new Response(JSON.stringify(compute2025)));
+      return Promise.resolve(new Response(JSON.stringify(answer)));
     },
   });
 }
@@ -69,7 +71,9 @@ describe('App form', () => {
     await user.click(
       screen.getByRole('button', { name: strings.form.calculate }),
     );
-    expect(await screen.findByText(strings.result.arrived)).toBeInTheDocument();
+    expect(
+      await screen.findByRole('heading', { name: strings.answer.heading }),
+    ).toBeInTheDocument();
     expect(sent).toEqual([
       {
         jurisdiction_code: 'CA-ON',
@@ -128,17 +132,19 @@ describe('App form', () => {
     await user.click(
       screen.getByRole('button', { name: strings.form.calculate }),
     );
-    await screen.findByText(strings.result.arrived);
+    await screen.findByRole('heading', { name: strings.answer.heading });
 
     await user.click(
       screen.getByRole('button', { name: strings.form.calculate }),
     );
     const busy = screen.getByRole('button', { name: strings.form.calculating });
     expect(busy).toBeDisabled();
-    expect(screen.queryByText(strings.result.arrived)).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole('heading', { name: strings.answer.heading }),
+    ).not.toBeInTheDocument();
     expect(input).toBeEnabled();
     release();
-    await screen.findByText(strings.result.arrived);
+    await screen.findByRole('heading', { name: strings.answer.heading });
     expect(
       screen.getByRole('button', { name: strings.form.calculate }),
     ).toBeEnabled();
@@ -187,5 +193,64 @@ describe('App form', () => {
     expect(
       await screen.findByRole('button', { name: strings.form.calculate }),
     ).toBeDisabled();
+  });
+});
+
+describe('App answer card', () => {
+  async function calculate(client: ApiClient) {
+    const user = userEvent.setup();
+    render(<App client={client} />);
+    await user.type(
+      await screen.findByRole('textbox', { name: strings.form.salary }),
+      '70000',
+    );
+    await user.click(
+      screen.getByRole('button', { name: strings.form.calculate }),
+    );
+    await screen.findByRole('heading', { name: strings.answer.heading });
+    return user;
+  }
+
+  it('shows the 2025 figures with no provisional notice', async () => {
+    await calculate(fixtureClient());
+    expect(screen.getByText('53,468.68')).toBeInTheDocument();
+    expect(screen.getByText('70,000.00')).toBeInTheDocument();
+    expect(screen.getByText('16,531.32')).toBeInTheDocument();
+    expect(screen.queryByRole('note')).not.toBeInTheDocument();
+  });
+
+  it('shows the 2026 figures with the provisional notice', async () => {
+    await calculate(fixtureClient(undefined, compute2026));
+    expect(screen.getByText('53,786.25')).toBeInTheDocument();
+    expect(screen.getByText('16,213.75')).toBeInTheDocument();
+    expect(screen.getByRole('note')).toHaveTextContent(
+      strings.answer.provisional,
+    );
+  });
+
+  it('divides all three amounts when the pay period changes', async () => {
+    const user = await calculate(fixtureClient());
+    await user.click(
+      screen.getByRole('radio', { name: strings.payPeriod.monthly }),
+    );
+    expect(screen.getByText('4,455.72')).toBeInTheDocument();
+    expect(screen.getByText('5,833.33')).toBeInTheDocument();
+    expect(screen.getByText('1,377.61')).toBeInTheDocument();
+    expect(screen.getByText(strings.answer.per.monthly)).toBeInTheDocument();
+  });
+
+  it('keeps the chosen pay period for the next answer', async () => {
+    const user = await calculate(fixtureClient());
+    await user.click(
+      screen.getByRole('radio', { name: strings.payPeriod.monthly }),
+    );
+    await user.click(
+      screen.getByRole('button', { name: strings.form.calculate }),
+    );
+    await screen.findByRole('heading', { name: strings.answer.heading });
+    expect(
+      screen.getByRole('radio', { name: strings.payPeriod.monthly }),
+    ).toBeChecked();
+    expect(screen.getByText('4,455.72')).toBeInTheDocument();
   });
 });

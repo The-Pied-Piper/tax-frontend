@@ -1,4 +1,5 @@
 import type { ApiClient } from './api';
+import { AnswerCard } from './components/AnswerCard';
 import { SalaryForm } from './components/SalaryForm';
 import { StarLink } from './components/StarLink';
 import { ThemeToggle } from './components/ThemeToggle';
@@ -29,10 +30,17 @@ export function App({ client }: Props) {
         onSalaryChange={page.setSalary}
         onSubmit={page.submit}
       />
-      {/* Placeholders until the answer card and the error display exist. */}
       {page.request.status === 'success' && (
-        <p role="status">{strings.result.arrived}</p>
+        <AnswerCard
+          salary={page.request.response.salary}
+          totalDeductions={page.request.response.total_deductions}
+          takeHome={page.request.response.take_home}
+          provisional={page.request.response.provisional}
+          payPeriod={page.payPeriod}
+          onPayPeriodChange={page.setPayPeriod}
+        />
       )}
+      {/* Placeholder until the error display exists. */}
       {page.request.status === 'error' && (
         <p role="alert">{strings.result.failed}</p>
       )}
