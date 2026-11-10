@@ -14,8 +14,8 @@ jobs:
   check:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
         with:
           node-version: 22
           cache: npm
@@ -33,7 +33,7 @@ jobs:
     # on pushes to main and the daily schedule a missing secret fails the job.
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - name: Compare api/openapi.yml with tax-service main
         env:
           GH_TOKEN: ${{ secrets.TAX_SERVICE_READ_TOKEN }}
