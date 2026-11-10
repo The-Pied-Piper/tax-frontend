@@ -47,6 +47,18 @@ export const strings = {
     estimateNote:
       'This is an estimate for a single yearly salary. Your own situation may differ.',
   },
+  breakdown: {
+    toggle: 'Show how this was worked out',
+    helpButton: (name: string) => `What is ${name}?`,
+  },
+  advanced: {
+    toggle: 'Advanced view: every line',
+    note: 'Every line the calculation produced, grouped by form. Always yearly amounts.',
+    lineCount: (count: number) =>
+      count === 1 ? '1 line' : `${String(count)} lines`,
+    noAmount: '—',
+    noAmountSpoken: 'No amount',
+  },
   errors: {
     salaryRejected:
       'The service did not accept this salary. Enter it as a plain number, like 70000 or 70000.50.',
