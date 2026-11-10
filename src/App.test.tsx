@@ -1,6 +1,7 @@
-import { render, screen, waitFor } from '@testing-library/react';
+import { render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { App } from './App';
+import { AdapterRegistry, advancedGroups } from './adapters';
 import {
   ApiError,
   createApiClient,
@@ -210,7 +211,8 @@ describe('App form', () => {
 describe('App answer card', () => {
   async function calculate(client: ApiClient) {
     const user = userEvent.setup();
-    render(<App client={client} />);
+    // No adapter, so only the answer card shows these figures.
+    render(<App client={client} registry={new AdapterRegistry()} />);
     await user.type(
       await screen.findByRole('textbox', { name: strings.form.salary }),
       '70000',
@@ -225,7 +227,7 @@ describe('App answer card', () => {
   it('shows the 2025 figures with no provisional notice', async () => {
     await calculate(fixtureClient());
     expect(screen.getByText('53,468.68')).toBeInTheDocument();
-    expect(screen.getByText('70,000.00')).toBeInTheDocument();
+    expect(screen.getAllByText('70,000.00')[0]).toBeVisible();
     expect(screen.getByText('16,531.32')).toBeInTheDocument();
     expect(screen.queryByRole('note')).not.toBeInTheDocument();
   });
@@ -263,5 +265,145 @@ describe('App answer card', () => {
       screen.getByRole('radio', { name: strings.payPeriod.monthly }),
     ).toBeChecked();
     expect(screen.getByText('4,455.72')).toBeInTheDocument();
+  });
+});
+
+describe('App breakdown', () => {
+  const code = jurisdictions.jurisdictions[0]?.code ?? '';
+  const registry = new AdapterRegistry();
+  registry.register({
+    jurisdictionCode: code,
+    adapt: (response) => ({
+      rows: [
+        {
+          id: 'salary',
+          name: 'Salary before tax',
+          help: 'What you earn before anything is taken off.',
+          amount: response.salary,
+        },
+      ],
+      totals: [
+        {
+          id: 'taken-off',
+          name: 'Total taken off',
+          help: 'Tax and contributions together.',
+          amount: response.total_deductions,
+        },
+      ],
+      advanced: advancedGroups(response),
+    }),
+  });
+
+  async function calculate(reg: AdapterRegistry) {
+    const user = userEvent.setup();
+    render(<App client={fixtureClient()} registry={reg} />);
+    await user.type(
+      await screen.findByRole('textbox', { name: strings.form.salary }),
+      '70000',
+    );
+    await user.click(
+      screen.getByRole('button', { name: strings.form.calculate }),
+    );
+    await screen.findByRole('heading', { name: strings.answer.heading });
+    return user;
+  }
+
+  it('shows a folded breakdown from the adapter under the answer', async () => {
+    const user = await calculate(registry);
+    const details = screen
+      .getByText(strings.breakdown.toggle)
+      .closest('details');
+    expect(details).not.toHaveAttribute('open');
+    await user.click(screen.getByText(strings.breakdown.toggle));
+    expect(details).toHaveAttribute('open');
+    expect(screen.getByText('Total taken off')).toBeVisible();
+    expect(screen.getAllByText('16,531.32').length).toBeGreaterThan(1);
+  });
+
+  it('shows no breakdown when no adapter is registered', async () => {
+    await calculate(new AdapterRegistry());
+    expect(
+      screen.queryByText(strings.breakdown.toggle),
+    ).not.toBeInTheDocument();
+  });
+
+  it('shows the error notice and stays usable when an adapter throws', async () => {
+    const broken = new AdapterRegistry();
+    broken.register({
+      jurisdictionCode: code,
+      adapt: () => {
+        throw new Error('unreadable trace');
+      },
+    });
+    const user = userEvent.setup();
+    render(<App client={fixtureClient()} registry={broken} />);
+    await user.type(
+      await screen.findByRole('textbox', { name: strings.form.salary }),
+      '70000',
+    );
+    await user.click(
+      screen.getByRole('button', { name: strings.form.calculate }),
+    );
+    expect(await screen.findByRole('alert')).toHaveTextContent(
+      strings.result.failed,
+    );
+    expect(
+      screen.getByRole('button', { name: strings.form.calculate }),
+    ).toBeEnabled();
+  });
+});
+
+describe('App advanced view', () => {
+  async function calculate(period?: string) {
+    const user = userEvent.setup();
+    render(<App client={fixtureClient()} registry={new AdapterRegistry()} />);
+    await user.type(
+      await screen.findByRole('textbox', { name: strings.form.salary }),
+      '70000',
+    );
+    await user.click(
+      screen.getByRole('button', { name: strings.form.calculate }),
+    );
+    await screen.findByRole('heading', { name: strings.answer.heading });
+    if (period) await user.click(screen.getByLabelText(period));
+    return user;
+  }
+
+  it('is folded under the answer and lists every form from the trace', async () => {
+    const user = await calculate();
+    const details = screen
+      .getByText(strings.advanced.toggle)
+      .closest('details');
+    expect(details).not.toHaveAttribute('open');
+    await user.click(screen.getByText(strings.advanced.toggle));
+    for (const form of compute2025.trace) {
+      expect(screen.getByText(form.form)).toBeVisible();
+    }
+  });
+
+  it('puts every trace line in the page once all forms are opened', async () => {
+    const user = await calculate();
+    await user.click(screen.getByText(strings.advanced.toggle));
+    for (const form of compute2025.trace) {
+      await user.click(screen.getByText(form.form));
+    }
+    const lines = within(
+      screen.getByRole('region', { name: strings.advanced.toggle }),
+    ).getAllByRole('term');
+    const expected = compute2025.trace.reduce(
+      (count, form) => count + form.lines.length,
+      0,
+    );
+    expect(lines).toHaveLength(expected);
+    expect(expected).toBe(171);
+  });
+
+  it('shows the yearly figures from the engine whatever the pay period', async () => {
+    const user = await calculate(strings.payPeriod.monthly);
+    await user.click(screen.getByText(strings.advanced.toggle));
+    await user.click(screen.getByText('ca-on/return'));
+    const form = screen.getByText('ca-on/return').closest('details');
+    expect(form).not.toBeNull();
+    expect(within(form as HTMLElement).getByText('11,497.09')).toBeVisible();
   });
 });

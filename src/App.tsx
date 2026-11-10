@@ -1,15 +1,18 @@
+import type { AdapterRegistry } from './adapters';
 import type { ApiClient } from './api';
+import { AdvancedView } from './components/AdvancedView';
 import { AnswerCard } from './components/AnswerCard';
+import { Breakdown } from './components/Breakdown';
 import { SalaryForm } from './components/SalaryForm';
 import { StarLink } from './components/StarLink';
 import { ThemeToggle } from './components/ThemeToggle';
 import { useTakeHome } from './state/useTakeHome';
 import { strings } from './strings';
 
-type Props = { client?: ApiClient };
+type Props = { client?: ApiClient; registry?: AdapterRegistry };
 
-export function App({ client }: Props) {
-  const page = useTakeHome(client);
+export function App({ client, registry }: Props) {
+  const page = useTakeHome(client, registry);
   return (
     <main>
       <header className="page-header">
@@ -31,14 +34,22 @@ export function App({ client }: Props) {
         onSubmit={page.submit}
       />
       {page.request.status === 'success' && (
-        <AnswerCard
-          salary={page.request.response.salary}
-          totalDeductions={page.request.response.total_deductions}
-          takeHome={page.request.response.take_home}
-          provisional={page.request.response.provisional}
-          payPeriod={page.payPeriod}
-          onPayPeriodChange={page.setPayPeriod}
-        />
+        <>
+          <AnswerCard
+            salary={page.request.response.salary}
+            totalDeductions={page.request.response.total_deductions}
+            takeHome={page.request.response.take_home}
+            provisional={page.request.response.provisional}
+            payPeriod={page.payPeriod}
+            onPayPeriodChange={page.setPayPeriod}
+          />
+          <Breakdown
+            rows={page.request.adapted.rows}
+            totals={page.request.adapted.totals}
+            payPeriod={page.payPeriod}
+          />
+          <AdvancedView groups={page.request.adapted.advanced} />
+        </>
       )}
       {/* Placeholder until the error display exists. */}
       {page.request.status === 'error' && (
