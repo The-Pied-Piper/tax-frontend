@@ -2,8 +2,6 @@
   display: grid;
   gap: 1rem;
   max-width: 28rem;
-  border: 0;
-  padding: 0;
 }
 
 .field {

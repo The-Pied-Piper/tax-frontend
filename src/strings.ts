@@ -17,7 +17,6 @@ export const strings = {
     annually: 'Annually',
   },
   form: {
-    legend: 'Your details',
     place: 'Where do you work?',
     year: 'Tax year',
     provisionalYear: 'provisional',

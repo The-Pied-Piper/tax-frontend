@@ -31,6 +31,13 @@ function fixtureClient(
 }
 
 describe('App form', () => {
+  it('shows the page title', () => {
+    render(<App client={fixtureClient()} />);
+    expect(
+      screen.getByRole('heading', { name: strings.title, level: 1 }),
+    ).toBeInTheDocument();
+  });
+
   it('fills places and years from the API', async () => {
     render(<App client={fixtureClient()} />);
     const place = await screen.findByRole('combobox', {
