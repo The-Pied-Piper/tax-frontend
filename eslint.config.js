@@ -77,14 +77,7 @@ function layerRule(folder, { allow, types, react, fixturesOnly = [] }) {
   for (const part of refused) {
     if (fixturesOnly.includes(part)) {
       patterns.push({
-        group: [
-          '**/api',
-          '**/api/client',
-          '**/api/config',
-          '**/api/index',
-          '**/api/generated',
-          '**/api/generated/**',
-        ],
+        regex: String.raw`(^|/)api(/(client|config|index|generated)(/|$)|$)`,
         allowTypeImports: true,
         message:
           'src/mocks may import api fixtures, and types with "import type".',
