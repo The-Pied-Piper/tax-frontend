@@ -37,7 +37,7 @@ function FormGroup({ group }: { group: AdvancedGroup }) {
       <summary className={styles.formSummary}>
         <span className={styles.formHead}>
           <span id={nameId} className={styles.formName}>
-            {group.form}
+            {group.name}
           </span>
           <span className={styles.count}>
             {strings.advanced.lineCount(group.lines.length)}
@@ -47,7 +47,17 @@ function FormGroup({ group }: { group: AdvancedGroup }) {
       <dl className={styles.lines}>
         {group.lines.map((line, index) => (
           <div className={styles.line} key={`${line.label}-${String(index)}`}>
-            <dt>{line.label}</dt>
+            <dt>
+              {line.label}
+              {line.reference !== null && (
+                <span className={styles.reference}>
+                  <span className={styles.hidden}>
+                    {strings.advanced.reference}{' '}
+                  </span>
+                  {line.reference}
+                </span>
+              )}
+            </dt>
             <dd>
               {line.amount === null ? (
                 <>

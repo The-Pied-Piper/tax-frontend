@@ -74,7 +74,7 @@ export function SalaryForm({
         >
           {jurisdictions.map((j) => (
             <option key={j.code} value={j.code}>
-              {j.code}
+              {j.name.trim() || j.code}
             </option>
           ))}
         </select>
