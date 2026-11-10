@@ -1,8 +1,14 @@
+import type { ApiClient } from './api';
+import { SalaryForm } from './components/SalaryForm';
 import { StarLink } from './components/StarLink';
-import { strings } from './strings';
 import { ThemeToggle } from './components/ThemeToggle';
+import { useTakeHome } from './state/useTakeHome';
+import { strings } from './strings';
 
-export function App() {
+type Props = { client?: ApiClient };
+
+export function App({ client }: Props) {
+  const page = useTakeHome(client);
   return (
     <main>
       <header className="page-header">
@@ -12,6 +18,24 @@ export function App() {
         </div>
         <ThemeToggle />
       </header>
+      <SalaryForm
+        jurisdictionsState={page.jurisdictionsState}
+        values={page.values}
+        salaryCheck={page.salaryCheck}
+        canSubmit={page.canSubmit}
+        loading={page.request.status === 'loading'}
+        onJurisdictionChange={page.setJurisdictionCode}
+        onYearChange={page.setYear}
+        onSalaryChange={page.setSalary}
+        onSubmit={page.submit}
+      />
+      {/* Placeholders until the answer card and the error display exist. */}
+      {page.request.status === 'success' && (
+        <p role="status">{strings.result.arrived}</p>
+      )}
+      {page.request.status === 'error' && (
+        <p role="alert">{strings.result.failed}</p>
+      )}
       <StarLink />
     </main>
   );

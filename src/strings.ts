@@ -1,4 +1,6 @@
 // All user-facing text lives here (English only for now).
+export const languageCode = 'en';
+
 export const strings = {
   title: 'Take-home pay estimate',
   intro:
@@ -13,5 +15,24 @@ export const strings = {
     biweekly: 'Bi-weekly',
     monthly: 'Monthly',
     annually: 'Annually',
+  },
+  form: {
+    place: 'Where do you work?',
+    year: 'Tax year',
+    provisionalYear: 'provisional',
+    salary: 'Yearly salary (before tax)',
+    salaryHint: 'For example 70000 or 70000.50',
+    calculate: 'Calculate',
+    calculating: 'Calculating…',
+    loadingPlaces: 'Loading places…',
+    placesFailed: 'Could not load the list of places. Please reload the page.',
+    salaryEmpty: 'Enter your yearly salary.',
+    salaryInvalid:
+      'Enter the salary as a plain number with up to two decimals, like 70000 or 70000.50.',
+    salaryZero: 'Enter a salary above zero.',
+  },
+  result: {
+    arrived: 'Estimate received.',
+    failed: 'Something went wrong. Please try again.',
   },
 };
