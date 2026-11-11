@@ -11,7 +11,35 @@ type Props = {
   payPeriod: PayPeriod;
 };
 
-// Display only: names, help text and yearly amounts come from the adapter.
+type Line = { row: DisplayRow; strong: boolean };
+type Section = { heading: string | undefined; lines: Line[] };
+
+// Rows and totals that share a heading sit together, in the order the adapter
+// gave them; rows with no heading come last, unheaded.
+function sections(
+  rows: readonly DisplayRow[],
+  totals: readonly DisplayRow[],
+): Section[] {
+  const lines: Line[] = [
+    ...rows.map((row) => ({ row, strong: false })),
+    ...totals.map((row) => ({ row, strong: true })),
+  ];
+  const headed = new Map<string, Section>();
+  const unheaded: Section = { heading: undefined, lines: [] };
+  for (const line of lines) {
+    const heading = line.row.group;
+    if (heading === undefined || heading.trim() === '') {
+      unheaded.lines.push(line);
+      continue;
+    }
+    const section = headed.get(heading) ?? { heading, lines: [] };
+    section.lines.push(line);
+    headed.set(heading, section);
+  }
+  return [...headed.values(), ...(unheaded.lines.length > 0 ? [unheaded] : [])];
+}
+
+// Display only: names, help text, headings and yearly amounts come from the adapter.
 // The page shows nothing when the adapter gave no simple rows.
 export function Breakdown({ rows, totals, payPeriod }: Props) {
   const headingId = useId();
@@ -24,36 +52,46 @@ export function Breakdown({ rows, totals, payPeriod }: Props) {
             {strings.breakdown.toggle}
           </h2>
         </summary>
-        <RowList rows={rows} payPeriod={payPeriod} />
-        {totals.length > 0 && (
-          <RowList rows={totals} payPeriod={payPeriod} strong />
-        )}
+        {sections(rows, totals).map((section) => (
+          <SectionBlock
+            key={section.heading ?? ''}
+            section={section}
+            payPeriod={payPeriod}
+          />
+        ))}
       </details>
     </section>
   );
 }
 
-function RowList({
-  rows,
+function SectionBlock({
+  section,
   payPeriod,
-  strong = false,
 }: {
-  rows: readonly DisplayRow[];
+  section: Section;
   payPeriod: PayPeriod;
-  strong?: boolean;
 }) {
-  if (rows.length === 0) return null;
   return (
-    <dl className={strong ? styles.totals : styles.rows}>
-      {rows.map((row) => (
-        <div className={styles.row} key={row.id}>
-          <dt>
-            <HelpTerm name={row.name} help={row.help} />
-          </dt>
-          <dd>{displayAmount(row.amount, payPeriod)}</dd>
-        </div>
-      ))}
-    </dl>
+    <div className={styles.block}>
+      {section.heading !== undefined && (
+        <h3 className={styles.groupHeading}>{section.heading}</h3>
+      )}
+      <dl className={styles.rows}>
+        {section.lines.map(({ row, strong }) => (
+          <div
+            className={
+              strong ? [styles.row, styles.strong].join(' ') : styles.row
+            }
+            key={row.id}
+          >
+            <dt>
+              <HelpTerm name={row.name} help={row.help} />
+            </dt>
+            <dd>{displayAmount(row.amount, payPeriod)}</dd>
+          </div>
+        ))}
+      </dl>
+    </div>
   );
 }
 

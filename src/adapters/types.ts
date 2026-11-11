@@ -11,6 +11,8 @@ export interface DisplayRow {
   /** Explanation shown in the "?" bubble. */
   help: string;
   amount: Amount;
+  /** Heading the row is listed under (for example "Pension"). Rows without one are listed last, unheaded. */
+  group?: string;
 }
 
 /** One line of the advanced view, as the engine returned it. */

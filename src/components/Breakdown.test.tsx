@@ -10,12 +10,14 @@ const rows: DisplayRow[] = [
     name: 'Canada Pension Plan',
     help: 'Pension contributions taken from each paycheque.',
     amount: '3956.75',
+    group: 'Pension',
   },
   {
     id: 'ei',
     name: 'Employment Insurance',
     help: 'Insurance against losing your job.',
     amount: '1077.48',
+    group: 'Employment Insurance',
   },
 ];
 const totals: DisplayRow[] = [
@@ -46,6 +48,61 @@ describe('Breakdown', () => {
     expect(screen.getByText('1,077.48')).toBeVisible();
     expect(screen.getByText('Total taken off')).toBeVisible();
     expect(screen.getByText('16,531.32')).toBeVisible();
+  });
+
+  it('lists rows under their headings, grouped totals after the rows', async () => {
+    const mixed: DisplayRow[] = [
+      ...rows,
+      {
+        id: 'fed',
+        name: 'Federal',
+        help: 'h',
+        amount: '7585.64',
+        group: 'Income tax',
+      },
+    ];
+    const mixedTotals: DisplayRow[] = [
+      {
+        id: 'tt',
+        name: 'Total tax',
+        help: 'h',
+        amount: '11497.09',
+        group: 'Income tax',
+      },
+      ...totals,
+    ];
+    render(
+      <Breakdown rows={mixed} totals={mixedTotals} payPeriod="annually" />,
+    );
+    await open();
+    const headings = screen.getAllByRole('heading', { level: 3 });
+    expect(headings.map((h) => h.textContent)).toEqual([
+      'Pension',
+      'Employment Insurance',
+      'Income tax',
+    ]);
+    const names = (heading: HTMLElement | undefined) =>
+      Array.from(heading?.nextElementSibling?.querySelectorAll('dt') ?? []).map(
+        (dt) => dt.textContent,
+      );
+    expect(names(headings[2])).toEqual(['Federal?h', 'Total tax?h']);
+    // A row with no heading is listed last, in a section without a heading.
+    const last = screen.getByText('Total taken off').closest('dl');
+    expect(last?.previousElementSibling).toBeNull();
+    expect(last?.parentElement?.nextElementSibling).toBeNull();
+    expect(last?.parentElement).toContainElement(
+      screen.getByText('Total taken off'),
+    );
+  });
+
+  it('treats an empty heading as no heading', async () => {
+    const blank: DisplayRow[] = [
+      { id: 'b', name: 'Blank', help: 'h', amount: '1.00', group: '  ' },
+    ];
+    render(<Breakdown rows={blank} totals={[]} payPeriod="annually" />);
+    await open();
+    expect(screen.queryAllByRole('heading', { level: 3 })).toHaveLength(0);
+    expect(screen.getByText('Blank')).toBeVisible();
   });
 
   it('follows the pay period', async () => {
