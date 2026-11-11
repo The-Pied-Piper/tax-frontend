@@ -28,8 +28,8 @@ export type RequestState =
   | { status: 'loading' }
   | {
       status: 'success';
-      /** The year this answer was calculated for, not the form's current year. */
-      year: number;
+      /** What was asked, kept so the card names the place and year it answers. */
+      asked: { jurisdictionName: string; year: number };
       response: ComputeTakeHomeCalculationResponse;
       adapted: AdaptedResult;
     }
@@ -122,6 +122,9 @@ export function useTakeHome(
     }
     const jurisdictionCode = values.jurisdictionCode;
     const year = values.year;
+    const jurisdictionName =
+      jurisdictions.find((j) => j.code === jurisdictionCode)?.name ??
+      jurisdictionCode;
     latest.current += 1;
     const mine = latest.current;
     setRequest({ status: 'loading' });
@@ -139,7 +142,7 @@ export function useTakeHome(
           try {
             setRequest({
               status: 'success',
-              year,
+              asked: { jurisdictionName, year },
               response,
               adapted: registry.adapt(jurisdictionCode, year, response),
             });

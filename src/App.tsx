@@ -43,7 +43,7 @@ export function App({ client, registry }: Props) {
       )}
       {page.request.status === 'success' &&
         page.request.response.provisional && (
-          <ProvisionalNotice year={page.request.year} />
+          <ProvisionalNotice year={page.request.asked.year} />
         )}
       {page.request.status === 'success' && (
         <>
@@ -51,6 +51,8 @@ export function App({ client, registry }: Props) {
             salary={page.request.response.salary}
             totalDeductions={page.request.response.total_deductions}
             takeHome={page.request.response.take_home}
+            place={page.request.asked.jurisdictionName}
+            year={page.request.asked.year}
             payPeriod={page.payPeriod}
             onPayPeriodChange={page.setPayPeriod}
           />
