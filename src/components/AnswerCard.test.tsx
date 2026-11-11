@@ -50,6 +50,9 @@ describe('AnswerCard', () => {
     );
     expect(screen.getAllByText('$1,028.24')).toHaveLength(2);
     expect(screen.getByText('$1,346.15')).toBeInTheDocument();
+    expect(
+      screen.getByText('out of $1,346.15, Ontario, 2025'),
+    ).toBeInTheDocument();
     expect(screen.getByText('$317.91')).toBeInTheDocument();
     expect(screen.getByText(strings.answer.label.weekly)).toBeInTheDocument();
     await userEvent.click(
