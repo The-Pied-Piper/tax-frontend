@@ -453,7 +453,19 @@ describe('App breakdown', () => {
     await user.click(screen.getByText(strings.breakdown.toggle));
     expect(details).toHaveAttribute('open');
     expect(screen.getByText('Total taken off')).toBeVisible();
-    expect(screen.getByText('16,531.32')).toBeVisible();
+    expect(
+      within(details as HTMLElement).getByText('$16,531.32'),
+    ).toBeVisible();
+  });
+
+  it('keeps the breakdown inside the answer panel', async () => {
+    await calculate(registry);
+    const panel = screen
+      .getByRole('heading', { name: strings.answer.heading })
+      .closest('section');
+    expect(
+      within(panel as HTMLElement).getByText(strings.breakdown.toggle),
+    ).toBeInTheDocument();
   });
 
   it('shows no breakdown when no adapter is registered', async () => {
@@ -527,7 +539,7 @@ describe('App advanced view', () => {
       await user.click(screen.getByText(form.name));
     }
     const lines = within(
-      screen.getByRole('region', { name: strings.advanced.heading }),
+      screen.getByRole('group', { name: strings.advanced.heading }),
     ).getAllByRole('term');
     const expected = compute2025.trace.reduce(
       (count, form) => count + form.lines.length,

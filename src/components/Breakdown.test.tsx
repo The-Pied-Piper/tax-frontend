@@ -44,10 +44,10 @@ describe('Breakdown', () => {
     await open();
     expect(screen.getByRole('group')).toHaveAttribute('open');
     expect(screen.getByText('Canada Pension Plan')).toBeVisible();
-    expect(screen.getByText('3,956.75')).toBeVisible();
-    expect(screen.getByText('1,077.48')).toBeVisible();
+    expect(screen.getByText('$3,956.75')).toBeVisible();
+    expect(screen.getByText('$1,077.48')).toBeVisible();
     expect(screen.getByText('Total taken off')).toBeVisible();
-    expect(screen.getByText('16,531.32')).toBeVisible();
+    expect(screen.getByText('$16,531.32')).toBeVisible();
   });
 
   it('lists rows under their headings, grouped totals after the rows', async () => {
@@ -75,7 +75,7 @@ describe('Breakdown', () => {
       <Breakdown rows={mixed} totals={mixedTotals} payPeriod="annually" />,
     );
     await open();
-    const headings = screen.getAllByRole('heading', { level: 3 });
+    const headings = screen.getAllByRole('heading', { level: 4 });
     expect(headings.map((h) => h.textContent)).toEqual([
       'Pension',
       'Employment Insurance',
@@ -101,14 +101,14 @@ describe('Breakdown', () => {
     ];
     render(<Breakdown rows={blank} totals={[]} payPeriod="annually" />);
     await open();
-    expect(screen.queryAllByRole('heading', { level: 3 })).toHaveLength(0);
+    expect(screen.queryAllByRole('heading', { level: 4 })).toHaveLength(0);
     expect(screen.getByText('Blank')).toBeVisible();
   });
 
   it('follows the pay period', async () => {
     render(<Breakdown rows={rows} totals={totals} payPeriod="monthly" />);
     await open();
-    expect(screen.getByText('329.73')).toBeVisible();
+    expect(screen.getByText('$329.73')).toBeVisible();
   });
 
   it('shows the help text only after the ? button is pressed', async () => {

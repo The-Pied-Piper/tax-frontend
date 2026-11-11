@@ -1,9 +1,4 @@
-import {
-  displayAmount,
-  displayMoney,
-  groupThousands,
-  withSymbol,
-} from './format';
+import { displayMoney, groupThousands, withSymbol } from './format';
 
 describe('groupThousands', () => {
   it.each([
@@ -23,24 +18,6 @@ describe('groupThousands', () => {
   ])('writes %s as %s', (input, expected) => {
     expect(groupThousands(input)).toBe(expected);
   });
-});
-
-describe('displayAmount', () => {
-  it.each([
-    ['53468.68', 'annually', '53,468.68'],
-    ['53468.68', 'monthly', '4,455.72'],
-    ['70000.00', 'weekly', '1,346.15'],
-    ['70000.00', 'biweekly', '2,692.31'],
-  ] as const)('shows %s %s as %s', (yearly, period, expected) => {
-    expect(displayAmount(yearly, period)).toBe(expected);
-  });
-
-  it.each(['70000.555', '1e3', ''])(
-    'shows %j as sent when it cannot be divided',
-    (odd) => {
-      expect(displayAmount(odd, 'monthly')).toBe(odd);
-    },
-  );
 });
 
 describe('displayMoney', () => {

@@ -13,16 +13,6 @@ export function groupThousands(amount: string): string {
   return `${sign}${whole.replace(/\B(?=(\d{3})+$)/g, ',')}${fraction}`;
 }
 
-// The figure shown for one pay period. An amount the division cannot read is
-// shown as the API sent it, so one odd value never blanks the page.
-export function displayAmount(yearly: string, period: PayPeriod): string {
-  try {
-    return groupThousands(amountForPeriod(yearly, period));
-  } catch {
-    return yearly;
-  }
-}
-
 // "53,468.68" -> "$53,468.68"; a minus sign stays in front of the symbol.
 export function withSymbol(amount: string, symbol: string): string {
   return amount.startsWith('-')

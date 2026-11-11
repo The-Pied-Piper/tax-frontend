@@ -1,4 +1,4 @@
-import { useId } from 'react';
+import { useId, type ReactNode } from 'react';
 import { displayMoney } from '../money/format';
 import type { PayPeriod } from '../money/payPeriod';
 import { strings } from '../strings';
@@ -14,6 +14,8 @@ type Props = {
   year: number;
   payPeriod: PayPeriod;
   onPayPeriodChange: (period: PayPeriod) => void;
+  /** The disclosures that sit under the split, inside this panel. */
+  children?: ReactNode;
 };
 
 // Display only: the yearly amounts arrive as text and are divided into the
@@ -26,6 +28,7 @@ export function AnswerCard({
   year,
   payPeriod,
   onPayPeriodChange,
+  children,
 }: Props) {
   const headingId = useId();
   const show = (yearly: string) =>
@@ -62,6 +65,7 @@ export function AnswerCard({
         </div>
       </dl>
       <p className={styles.estimate}>{strings.answer.estimateNote}</p>
+      <div className={styles.extras}>{children}</div>
     </section>
   );
 }

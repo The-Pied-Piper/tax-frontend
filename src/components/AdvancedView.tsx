@@ -16,10 +16,10 @@ export function AdvancedView({ groups }: Props) {
   const [on, setOn] = useState(false);
   if (groups.length === 0) return null;
   return (
-    <section className={styles.card} aria-labelledby={headingId}>
-      <h2 id={headingId} className={styles.hidden}>
+    <div role="group" aria-labelledby={headingId}>
+      <h3 id={headingId} className={styles.hidden}>
         {strings.advanced.heading}
-      </h2>
+      </h3>
       <label className={styles.toggle}>
         <input
           type="checkbox"
@@ -42,7 +42,7 @@ export function AdvancedView({ groups }: Props) {
           </>
         )}
       </div>
-    </section>
+    </div>
   );
 }
 
