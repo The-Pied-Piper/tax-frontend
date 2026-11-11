@@ -9,7 +9,7 @@ export function ProvisionalNotice({ year }: Props) {
       <strong className={styles.title}>
         {strings.notices.provisionalTitle(year)}
       </strong>{' '}
-      {strings.notices.provisionalBody}
+      {strings.notices.provisionalBody(year)}
     </div>
   );
 }

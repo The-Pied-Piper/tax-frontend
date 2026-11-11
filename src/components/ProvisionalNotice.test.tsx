@@ -7,7 +7,7 @@ describe('ProvisionalNotice', () => {
     render(<ProvisionalNotice year={2026} />);
     const note = screen.getByRole('note');
     expect(note).toHaveTextContent('2026 figures are provisional.');
-    expect(note).toHaveTextContent(strings.notices.provisionalBody);
+    expect(note).toHaveTextContent(strings.notices.provisionalBody(2026));
   });
 
   it('is worded as an estimate, never as checked', () => {

@@ -48,8 +48,8 @@ export const strings = {
   notices: {
     provisionalTitle: (year: number) =>
       `${String(year)} figures are provisional.`,
-    provisionalBody:
-      'The government has not finished publishing the rates for this year. We used the figures available today and will update them when they are final.',
+    provisionalBody: (year: number) =>
+      `The government has not finished publishing the ${String(year)} rates. We used the figures available today and will update them when they are final.`,
   },
   breakdown: {
     toggle: 'Show how this was worked out',
