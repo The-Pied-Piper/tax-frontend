@@ -530,23 +530,34 @@ describe('App advanced view', () => {
     }
   });
 
-  it('puts every trace line in the page once all forms are opened', async () => {
+  it('puts every numbered trace line in the page once all forms are opened', async () => {
     const user = await calculate();
     await user.click(
       screen.getByRole('checkbox', { name: strings.advanced.toggle }),
     );
-    for (const form of compute2025.trace) {
+    const numbered = compute2025.trace
+      .map((form) => ({
+        ...form,
+        lines: form.lines.filter((l) => (l.reference ?? '').trim() !== ''),
+      }))
+      .filter((form) => form.lines.length > 0);
+    for (const form of numbered) {
       await user.click(screen.getByText(form.name));
     }
     const lines = within(
       screen.getByRole('group', { name: strings.advanced.heading }),
     ).getAllByRole('term');
-    const expected = compute2025.trace.reduce(
+    const expected = numbered.reduce(
       (count, form) => count + form.lines.length,
       0,
     );
     expect(lines).toHaveLength(expected);
-    expect(expected).toBe(171);
+    expect(expected).toBe(131);
+    expect(
+      screen.getByRole('button', {
+        name: strings.breakdown.helpButton('Line 2'),
+      }),
+    ).toBeInTheDocument();
   });
 
   it('shows the yearly figures from the engine whatever the pay period', async () => {

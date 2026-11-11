@@ -80,13 +80,19 @@ describe('Ontario adapter', () => {
     expect(new Set(all.map((r) => r.id)).size).toBe(all.length);
   });
 
-  it('keeps every trace line in the advanced view', () => {
+  it('keeps every numbered trace line in the advanced view', () => {
     const result = caOnAdapter.adapt(r2025);
+    const numbered = (r2025.trace ?? [])
+      .map((f) => ({
+        form: f.form,
+        lines: f.lines.filter((l) => (l.reference ?? '').trim() !== ''),
+      }))
+      .filter((f) => f.lines.length > 0);
     expect(result.advanced.map((g) => g.form)).toEqual(
-      (r2025.trace ?? []).map((f) => f.form),
+      numbered.map((f) => f.form),
     );
     expect(result.advanced.flatMap((g) => g.lines)).toHaveLength(
-      (r2025.trace ?? []).flatMap((f) => f.lines).length,
+      numbered.flatMap((f) => f.lines).length,
     );
   });
 
@@ -170,10 +176,16 @@ describe('Ontario adapter', () => {
     expect(caOnAdapter.adapt(noTrace).rows).toEqual([]);
   });
 
-  it('shows readable labels in the advanced view', () => {
+  it('shows only numbered lines in the advanced view, none with an id as label', () => {
     const groups = caOnAdapter.adapt(r2025).advanced;
-    expect(
-      groups.flatMap((g) => g.lines).every((l) => !l.label.includes('_')),
-    ).toBe(true);
+    const lines = groups.flatMap((g) => g.lines);
+    expect(lines.every((l) => l.reference !== null)).toBe(true);
+    expect(lines.every((l) => !l.label.includes('_'))).toBe(true);
+    expect(groups.every((g) => g.lines.length > 0)).toBe(true);
+    const line2 = groups
+      .find((g) => g.form === 'ca/schedule_8')
+      ?.lines.find((l) => l.reference === '2');
+    expect(line2?.label).toBe('Line 2');
+    expect(line2?.detail).toMatch(/^cpp_part_3_line_2:/);
   });
 });

@@ -1,27 +1,29 @@
 import type { ComputeTakeHomeCalculationResponse } from '../api';
+import { strings } from '../strings';
 import type { AdaptedResult, AdvancedGroup } from './types';
-
-/** Shows an unknown label readably: underscores become spaces. */
-export function fallbackLabel(label: string | null | undefined): string {
-  return (label ?? '').replaceAll('_', ' ').trim();
-}
 
 /** Groups every trace line by form for the advanced view. Same for every jurisdiction. */
 export function advancedGroups(
   response: ComputeTakeHomeCalculationResponse,
 ): AdvancedGroup[] {
-  return (response.trace ?? []).map((form) => ({
-    form: form.form,
-    name: form.name.trim() || form.form,
-    lines: form.lines.map((line) => ({
-      label:
-        line.name?.trim() ||
-        fallbackLabel(line.label) ||
-        fallbackLabel(line.text),
-      reference: line.reference?.trim() || null,
-      amount: line.amount ?? null,
-    })),
-  }));
+  return (response.trace ?? []).flatMap((form) => {
+    // Only lines the form prints a number for are shown.
+    const lines = form.lines.flatMap((line) => {
+      const reference = line.reference?.trim();
+      if (!reference) return [];
+      return [
+        {
+          label: line.name?.trim() || strings.advanced.lineNumber(reference),
+          named: Boolean(line.name?.trim()),
+          reference,
+          amount: line.amount ?? null,
+          detail: line.text.trim() ? line.text : strings.advanced.noDetail,
+        },
+      ];
+    });
+    if (lines.length === 0) return [];
+    return [{ form: form.form, name: form.name.trim() || form.form, lines }];
+  });
 }
 
 /**

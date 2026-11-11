@@ -1,7 +1,8 @@
 import { useId, useState } from 'react';
-import type { AdvancedGroup } from '../adapters';
+import type { AdvancedGroup, AdvancedLine } from '../adapters';
 import { groupThousands } from '../money/format';
 import { strings } from '../strings';
+import { HelpTerm } from './HelpTerm';
 import styles from './AdvancedView.module.css';
 
 type Props = {
@@ -64,15 +65,11 @@ function FormGroup({ group }: { group: AdvancedGroup }) {
         {group.lines.map((line, index) => (
           <div className={styles.line} key={`${line.label}-${String(index)}`}>
             <dt>
-              {line.label}
-              {line.reference !== null && (
-                <span className={styles.reference}>
-                  <span className={styles.hidden}>
-                    {strings.advanced.reference}{' '}
-                  </span>
-                  {line.reference}
-                </span>
-              )}
+              <HelpTerm
+                name={line.label}
+                help={line.detail}
+                extra={reference(line)}
+              />
             </dt>
             <dd>
               {line.amount === null ? (
@@ -90,5 +87,16 @@ function FormGroup({ group }: { group: AdvancedGroup }) {
         ))}
       </dl>
     </details>
+  );
+}
+
+function reference(line: AdvancedLine) {
+  // "Line 2" already says the number; a second badge would repeat it.
+  if (line.reference === null || !line.named) return null;
+  return (
+    <span className={styles.reference}>
+      <span className={styles.hidden}>{strings.advanced.reference} </span>
+      {line.reference}
+    </span>
   );
 }
