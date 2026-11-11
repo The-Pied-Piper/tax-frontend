@@ -156,6 +156,30 @@ describe('App form', () => {
     expect(input).toHaveValue('70,000.50');
   });
 
+  it('a one-digit paste into the middle stays a digit', async () => {
+    const user = userEvent.setup();
+    render(<App client={fixtureClient()} />);
+    const input = await screen.findByRole('textbox', {
+      name: strings.form.salary,
+    });
+    await user.type(input, '12345');
+    if (!(input instanceof HTMLInputElement)) throw new Error('not an input');
+    input.setSelectionRange(4, 6);
+    await user.paste('6');
+    expect(input).toHaveValue('1,236');
+  });
+
+  it('puts the caret after a pasted decimal number', async () => {
+    const user = userEvent.setup();
+    render(<App client={fixtureClient()} />);
+    const input = await screen.findByRole('textbox', {
+      name: strings.form.salary,
+    });
+    await user.click(input);
+    await user.paste('70 000,50');
+    expect(input).toHaveProperty('selectionStart', 9);
+  });
+
   it('backspace next to a separator moves the caret before it', async () => {
     const user = userEvent.setup();
     render(<App client={fixtureClient()} />);

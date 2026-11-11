@@ -37,10 +37,6 @@ const SALARY_MESSAGES = {
   zero: strings.form.salaryZero,
 } as const;
 
-function isPaste(event: Event): boolean {
-  return 'inputType' in event && event.inputType === 'insertFromPaste';
-}
-
 export function SalaryForm({
   jurisdictionsState,
   values,
@@ -149,6 +145,26 @@ export function SalaryForm({
             inputMode="decimal"
             autoComplete="off"
             ref={salaryInput}
+            onPaste={(e) => {
+              // The pasted text is read on its own ("70 000,50" -> 70000.50),
+              // then put into the box where the selection was.
+              e.preventDefault();
+              const box = e.currentTarget;
+              const clip = toPlainSalary(
+                e.clipboardData.getData('text'),
+                sep,
+                true,
+              );
+              const start = box.selectionStart ?? box.value.length;
+              const end = box.selectionEnd ?? start;
+              const before = box.value.slice(0, start) + clip;
+              caretCount.current = significantBefore(
+                before,
+                before.length,
+                sep,
+              );
+              onSalaryChange(toPlainSalary(before + box.value.slice(end), sep));
+            }}
             value={shownSalary}
             onChange={(e) => {
               caretCount.current = significantBefore(
@@ -156,9 +172,7 @@ export function SalaryForm({
                 e.target.selectionStart ?? e.target.value.length,
                 sep,
               );
-              onSalaryChange(
-                toPlainSalary(e.target.value, sep, isPaste(e.nativeEvent)),
-              );
+              onSalaryChange(toPlainSalary(e.target.value, sep));
             }}
             aria-invalid={salaryMessage !== null}
             aria-describedby={salaryMessage ? `${hintId} ${errorId}` : hintId}
