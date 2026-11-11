@@ -44,10 +44,18 @@ export function SalaryForm({
   const errorId = `${id}-error`;
 
   if (jurisdictionsState.status === 'loading') {
-    return <p role="status">{strings.form.loadingPlaces}</p>;
+    return (
+      <p role="status" className={styles.panel}>
+        {strings.form.loadingPlaces}
+      </p>
+    );
   }
   if (jurisdictionsState.status === 'failed') {
-    return <p role="alert">{strings.form.placesFailed}</p>;
+    return (
+      <p role="alert" className={styles.panel}>
+        {strings.form.placesFailed}
+      </p>
+    );
   }
 
   const { jurisdictions } = jurisdictionsState;
@@ -98,20 +106,23 @@ export function SalaryForm({
           ))}
         </select>
       </div>
-      <div className={styles.field}>
+      <div className={styles.fieldWide}>
         <label htmlFor={salaryId}>{strings.form.salary}</label>
-        <input
-          id={salaryId}
-          type="text"
-          inputMode="decimal"
-          autoComplete="off"
-          value={values.salary}
-          onChange={(e) => {
-            onSalaryChange(e.target.value);
-          }}
-          aria-invalid={salaryMessage !== null}
-          aria-describedby={salaryMessage ? `${hintId} ${errorId}` : hintId}
-        />
+        <div className={salaryMessage ? styles.boxBad : styles.box}>
+          <span aria-hidden="true">$</span>
+          <input
+            id={salaryId}
+            type="text"
+            inputMode="decimal"
+            autoComplete="off"
+            value={values.salary}
+            onChange={(e) => {
+              onSalaryChange(e.target.value);
+            }}
+            aria-invalid={salaryMessage !== null}
+            aria-describedby={salaryMessage ? `${hintId} ${errorId}` : hintId}
+          />
+        </div>
         <span id={hintId} className={styles.hint}>
           {strings.form.salaryHint}
         </span>
@@ -121,7 +132,12 @@ export function SalaryForm({
           </p>
         )}
       </div>
-      <button type="submit" disabled={loading || !canSubmit}>
+      <button
+        type="submit"
+        className={styles.primary}
+        aria-busy={loading}
+        disabled={loading || !canSubmit}
+      >
         {loading ? strings.form.calculating : strings.form.calculate}
       </button>
     </form>
