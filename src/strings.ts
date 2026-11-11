@@ -63,8 +63,9 @@ export const strings = {
     helpButton: (name: string) => `What is ${name}?`,
   },
   advanced: {
-    toggle: 'Advanced view: every line',
-    note: 'Every line the calculation produced, grouped by form. Always yearly amounts.',
+    heading: 'Advanced view',
+    toggle: 'Advanced view: every line from the tax forms',
+    note: 'Advanced view shows yearly amounts, as printed on the forms.',
     lineCount: (count: number) =>
       count === 1 ? '1 line' : `${String(count)} lines`,
     reference: 'Form reference',
