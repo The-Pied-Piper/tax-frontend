@@ -59,6 +59,7 @@ export function App({ client, registry }: Props) {
         <ErrorNotice message={page.failure.message} />
       )}
       <StarLink />
+      <footer className="page-footer">{strings.footer}</footer>
     </main>
   );
 }
