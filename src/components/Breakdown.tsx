@@ -28,7 +28,7 @@ function sections(
   const unheaded: Section = { heading: undefined, lines: [] };
   for (const line of lines) {
     const heading = line.row.group;
-    if (heading === undefined) {
+    if (heading === undefined || heading.trim() === '') {
       unheaded.lines.push(line);
       continue;
     }

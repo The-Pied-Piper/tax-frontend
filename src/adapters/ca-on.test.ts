@@ -41,6 +41,20 @@ describe('Ontario adapter', () => {
     ]);
   });
 
+  it('lists rows under Pension, Employment Insurance and Income tax', () => {
+    const result = caOnAdapter.adapt(r2025);
+    expect(
+      [...result.rows, ...result.totals].map((r) => [r.id, r.group]),
+    ).toEqual([
+      ['cpp', 'Pension'],
+      ['ei', 'Employment Insurance'],
+      ['federal-tax', 'Income tax'],
+      ['ontario-tax', 'Income tax'],
+      ['total-tax', 'Income tax'],
+      ['total-taken-off', undefined],
+    ]);
+  });
+
   it('gives every row help text and a unique id', () => {
     const result = caOnAdapter.adapt(r2025);
     const all = [...result.rows, ...result.totals];
