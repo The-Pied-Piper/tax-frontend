@@ -323,10 +323,16 @@ describe('App form', () => {
 });
 
 describe('App answer card', () => {
-  async function calculate(client: ApiClient) {
+  async function calculate(client: ApiClient, year?: string) {
     const user = userEvent.setup();
     // No adapter, so only the answer card shows these figures.
     render(<App client={client} registry={new AdapterRegistry()} />);
+    if (year) {
+      await user.selectOptions(
+        await screen.findByRole('combobox', { name: strings.form.year }),
+        year,
+      );
+    }
     await user.type(
       await screen.findByRole('textbox', { name: strings.form.salary }),
       '70000',
@@ -347,11 +353,11 @@ describe('App answer card', () => {
   });
 
   it('shows the 2026 figures with the provisional notice', async () => {
-    await calculate(fixtureClient(undefined, compute2026));
+    await calculate(fixtureClient(undefined, compute2026), '2026');
     expect(screen.getByText('53,786.25')).toBeInTheDocument();
     expect(screen.getByText('16,213.75')).toBeInTheDocument();
     expect(screen.getByRole('note')).toHaveTextContent(
-      strings.answer.provisional,
+      strings.notices.provisionalTitle(2026),
     );
   });
 

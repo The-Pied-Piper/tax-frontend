@@ -7,7 +7,6 @@ const base = {
   salary: '70000.00',
   totalDeductions: '16531.32',
   takeHome: '53468.68',
-  provisional: false,
   payPeriod: 'annually' as const,
   onPayPeriodChange: () => {},
 };
@@ -33,15 +32,6 @@ describe('AnswerCard', () => {
   it('shows an amount it cannot divide as sent instead of failing', () => {
     render(<AnswerCard {...base} payPeriod="monthly" takeHome="53468.555" />);
     expect(screen.getByText('53468.555')).toBeInTheDocument();
-  });
-
-  it('shows the notice only when provisional is true', () => {
-    const { rerender } = render(<AnswerCard {...base} />);
-    expect(screen.queryByRole('note')).not.toBeInTheDocument();
-    rerender(<AnswerCard {...base} provisional />);
-    expect(screen.getByRole('note')).toHaveTextContent(
-      strings.answer.provisional,
-    );
   });
 
   it('shows weekly amounts and reports a period change', async () => {

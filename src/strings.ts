@@ -42,10 +42,14 @@ export const strings = {
       monthly: 'per month',
       annually: 'per year',
     },
-    provisional:
-      'Provisional: the tax figures for this year are not final, so this estimate may change.',
     estimateNote:
       'This is an estimate for a single yearly salary. Your own situation may differ.',
+  },
+  notices: {
+    provisionalTitle: (year: number) =>
+      `${String(year)} figures are provisional.`,
+    provisionalBody:
+      'The government has not finished publishing the rates for this year. We used the figures available today and will update them when they are final.',
   },
   breakdown: {
     toggle: 'Show how this was worked out',

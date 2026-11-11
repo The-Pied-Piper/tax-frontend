@@ -9,7 +9,6 @@ type Props = {
   salary: string;
   totalDeductions: string;
   takeHome: string;
-  provisional: boolean;
   payPeriod: PayPeriod;
   onPayPeriodChange: (period: PayPeriod) => void;
 };
@@ -20,7 +19,6 @@ export function AnswerCard({
   salary,
   totalDeductions,
   takeHome,
-  provisional,
   payPeriod,
   onPayPeriodChange,
 }: Props) {
@@ -31,11 +29,6 @@ export function AnswerCard({
       <h2 id={headingId} className={styles.heading}>
         {strings.answer.heading}
       </h2>
-      {provisional && (
-        <p role="note" className={styles.notice}>
-          {strings.answer.provisional}
-        </p>
-      )}
       <PayPeriodSwitch value={payPeriod} onChange={onPayPeriodChange} />
       <div className={styles.answer}>
         <p className={styles.label}>{strings.answer.takeHome}</p>

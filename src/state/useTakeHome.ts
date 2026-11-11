@@ -28,6 +28,8 @@ export type RequestState =
   | { status: 'loading' }
   | {
       status: 'success';
+      /** The year this answer was calculated for, not the form's current year. */
+      year: number;
       response: ComputeTakeHomeCalculationResponse;
       adapted: AdaptedResult;
     }
@@ -137,6 +139,7 @@ export function useTakeHome(
           try {
             setRequest({
               status: 'success',
+              year,
               response,
               adapted: registry.adapt(jurisdictionCode, year, response),
             });
