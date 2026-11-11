@@ -552,7 +552,7 @@ describe('App advanced view', () => {
       0,
     );
     expect(lines).toHaveLength(expected);
-    expect(expected).toBeLessThan(171);
+    expect(expected).toBe(131);
     expect(
       screen.getByRole('button', {
         name: strings.breakdown.helpButton('Line 2'),

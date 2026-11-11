@@ -65,18 +65,11 @@ function FormGroup({ group }: { group: AdvancedGroup }) {
         {group.lines.map((line, index) => (
           <div className={styles.line} key={`${line.label}-${String(index)}`}>
             <dt>
-              {line.detail === null ? (
-                <>
-                  {line.label}
-                  {reference(line)}
-                </>
-              ) : (
-                <HelpTerm
-                  name={line.label}
-                  help={line.detail}
-                  extra={reference(line)}
-                />
-              )}
+              <HelpTerm
+                name={line.label}
+                help={line.detail}
+                extra={reference(line)}
+              />
             </dt>
             <dd>
               {line.amount === null ? (
@@ -99,8 +92,7 @@ function FormGroup({ group }: { group: AdvancedGroup }) {
 
 function reference(line: AdvancedLine) {
   // "Line 2" already says the number; a second badge would repeat it.
-  if (line.reference === null) return null;
-  if (line.label === strings.advanced.lineNumber(line.reference)) return null;
+  if (line.reference === null || !line.named) return null;
   return (
     <span className={styles.reference}>
       <span className={styles.hidden}>{strings.advanced.reference} </span>

@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import type { ComputeTakeHomeCalculationResponse } from '../api';
 import fixture from '../api/fixtures/compute-on-2025-70000.json';
+import { strings } from '../strings';
 import { advancedGroups } from './fallback';
 import { AdapterRegistry } from './registry';
 import type { AdaptedResult, JurisdictionAdapter } from './types';
@@ -113,6 +114,7 @@ describe('advancedGroups', () => {
       amount: '81200.00',
       detail:
         'cpp_additional_maximum_pensionable_earnings: 81200.00 for cpp_months 12 (half-up to 0.01)',
+      named: true,
     });
   });
 
@@ -137,7 +139,7 @@ describe('advancedGroups', () => {
             { label: 'b_step', name: null, reference: null, text: 't' },
             { label: 'c_step', name: '  ', reference: ' ', text: 't' },
             { label: 'd_step', name: null, reference: ' 2 ', text: 'x = 2' },
-            { label: 'e_step', name: null, reference: null, text: '  ' },
+            { label: 'e_step', name: null, reference: '3', text: '  ' },
           ],
         },
         { form: 'ex/other', name: '', lines: [{ text: 't', reference: '1' }] },
@@ -156,8 +158,27 @@ describe('advancedGroups', () => {
       'ex/blank',
     ]);
     expect(groups[0]?.lines).toEqual([
-      { label: 'Named figure', reference: '65', amount: '1.00', detail: 't' },
-      { label: 'Line 2', reference: '2', amount: null, detail: 'x = 2' },
+      {
+        label: 'Named figure',
+        reference: '65',
+        amount: '1.00',
+        detail: 't',
+        named: true,
+      },
+      {
+        label: 'Line 2',
+        reference: '2',
+        amount: null,
+        detail: 'x = 2',
+        named: false,
+      },
+      {
+        label: 'Line 3',
+        reference: '3',
+        amount: null,
+        detail: strings.advanced.noDetail,
+        named: false,
+      },
     ]);
   });
 

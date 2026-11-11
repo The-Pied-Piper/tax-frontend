@@ -13,13 +13,15 @@ const groups: AdvancedGroup[] = [
         label: 'cpp basic exemption',
         reference: null,
         amount: '3500.00',
-        detail: null,
+        detail: 'd',
+        named: true,
       },
       {
         label: 'cpp base contribution',
         reference: null,
         amount: '3867.50',
-        detail: null,
+        detail: 'd',
+        named: true,
       },
     ],
   },
@@ -27,14 +29,26 @@ const groups: AdvancedGroup[] = [
     form: 'ca-on/return',
     name: 'ca-on/return',
     lines: [
-      { label: 'take home', reference: null, amount: '53468.68', detail: null },
+      {
+        label: 'take home',
+        reference: null,
+        amount: '53468.68',
+        detail: 'd',
+        named: true,
+      },
     ],
   },
   {
     form: 'ca/t2204',
     name: 'ca/t2204',
     lines: [
-      { label: 'note only', reference: null, amount: null, detail: null },
+      {
+        label: 'note only',
+        reference: null,
+        amount: null,
+        detail: 'd',
+        named: true,
+      },
     ],
   },
 ];
@@ -130,16 +144,30 @@ describe('AdvancedView', () => {
                 label: 'same',
                 reference: null,
                 amount: '-1234.50',
-                detail: null,
+                detail: 'd',
+                named: true,
               },
-              { label: 'same', reference: null, amount: '99.00', detail: null },
+              {
+                label: 'same',
+                reference: null,
+                amount: '99.00',
+                detail: 'd',
+                named: true,
+              },
               {
                 label: 'rate',
                 reference: null,
                 amount: '0.0505',
-                detail: null,
+                detail: 'd',
+                named: true,
               },
-              { label: 'odd', reference: null, amount: 'n/a', detail: null },
+              {
+                label: 'odd',
+                reference: null,
+                amount: 'n/a',
+                detail: 'd',
+                named: true,
+              },
             ],
           },
           { form: 'ex/empty', name: 'ex/empty', lines: [] },
@@ -168,13 +196,15 @@ describe('AdvancedView', () => {
                 label: 'Printed figure',
                 reference: '65',
                 amount: '1.00',
-                detail: null,
+                detail: 'd',
+                named: true,
               },
               {
                 label: 'Engine step',
                 reference: null,
                 amount: '2.00',
-                detail: null,
+                detail: 'd',
+                named: true,
               },
             ],
           },
@@ -204,7 +234,13 @@ describe('AdvancedView', () => {
             form: 'ex/form',
             name: 'Example form',
             lines: [
-              { label: 'Line 2', reference: '2', amount: '70000.00', detail },
+              {
+                label: 'Line 2',
+                reference: '2',
+                amount: '70000.00',
+                detail,
+                named: false,
+              },
             ],
           },
         ]}
@@ -226,9 +262,52 @@ describe('AdvancedView', () => {
     expect(screen.getByText(detail)).toBeVisible();
   });
 
-  it('has no ? button for a line with no detail', async () => {
+  it('opens the detail with the Space key and gives every line a ? button', async () => {
     render(<AdvancedView groups={groups} />);
     await open();
-    expect(screen.queryByRole('button', { name: /What is/ })).toBeNull();
+    await userEvent.click(screen.getByText('ca/schedule_8'));
+    expect(
+      within(form('ca/schedule_8')).getAllByRole('button', { name: /What is/ }),
+    ).toHaveLength(2);
+    const button = screen.getByRole('button', {
+      name: strings.breakdown.helpButton('cpp basic exemption'),
+    });
+    button.focus();
+    await userEvent.keyboard(' ');
+    expect(button).toHaveAttribute('aria-expanded', 'true');
+  });
+
+  it('keeps the reference badge for named lines only', async () => {
+    render(
+      <AdvancedView
+        groups={[
+          {
+            form: 'ex/form',
+            name: 'Example form',
+            lines: [
+              {
+                label: 'Printed',
+                reference: '65',
+                amount: '1',
+                detail: 'd',
+                named: true,
+              },
+              {
+                label: 'Line 66',
+                reference: '66',
+                amount: '2',
+                detail: 'd',
+                named: false,
+              },
+            ],
+          },
+        ]}
+      />,
+    );
+    await open();
+    await userEvent.click(screen.getByText('Example form'));
+    expect(
+      screen.getAllByText(strings.advanced.reference, { exact: false }),
+    ).toHaveLength(1);
   });
 });

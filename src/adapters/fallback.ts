@@ -14,9 +14,10 @@ export function advancedGroups(
       return [
         {
           label: line.name?.trim() || strings.advanced.lineNumber(reference),
+          named: Boolean(line.name?.trim()),
           reference,
           amount: line.amount ?? null,
-          detail: line.text.trim() ? line.text : null,
+          detail: line.text.trim() ? line.text : strings.advanced.noDetail,
         },
       ];
     });
