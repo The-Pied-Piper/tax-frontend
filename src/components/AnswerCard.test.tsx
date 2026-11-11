@@ -60,4 +60,16 @@ describe('AnswerCard', () => {
     );
     expect(changed).toEqual(['monthly']);
   });
+
+  it.each([
+    ['annually', '$70,000.00'],
+    ['monthly', '$5,833.33'],
+    ['biweekly', '$2,692.31'],
+    ['weekly', '$1,346.15'],
+  ] as const)('shows the %s gross in the "out of" line', (payPeriod, gross) => {
+    render(<AnswerCard {...base} payPeriod={payPeriod} />);
+    expect(
+      screen.getByText(`out of ${gross}, Ontario, 2025`),
+    ).toBeInTheDocument();
+  });
 });
