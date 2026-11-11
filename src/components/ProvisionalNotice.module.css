@@ -1,0 +1,12 @@
+.notice {
+  padding: 14px 16px;
+  font-size: 14px;
+  background: var(--warn-bg);
+  color: var(--warn-fg);
+  border: 1px solid var(--warn-line);
+  border-radius: var(--radius-card);
+}
+
+.title {
+  display: block;
+}

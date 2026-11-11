@@ -4,6 +4,7 @@ import { AdvancedView } from './components/AdvancedView';
 import { AnswerCard } from './components/AnswerCard';
 import { Breakdown } from './components/Breakdown';
 import { ErrorNotice } from './components/ErrorNotice';
+import { ProvisionalNotice } from './components/ProvisionalNotice';
 import { SalaryForm } from './components/SalaryForm';
 import { StarLink } from './components/StarLink';
 import { ThemeToggle } from './components/ThemeToggle';
@@ -37,13 +38,19 @@ export function App({ client, registry }: Props) {
         onSalaryChange={page.setSalary}
         onSubmit={page.submit}
       />
+      {page.failure?.kind === 'notice' && (
+        <ErrorNotice message={page.failure.message} />
+      )}
+      {page.request.status === 'success' &&
+        page.request.response.provisional && (
+          <ProvisionalNotice year={page.request.asked.year} />
+        )}
       {page.request.status === 'success' && (
         <>
           <AnswerCard
             salary={page.request.response.salary}
             totalDeductions={page.request.response.total_deductions}
             takeHome={page.request.response.take_home}
-            provisional={page.request.response.provisional}
             place={page.request.asked.jurisdictionName}
             year={page.request.asked.year}
             payPeriod={page.payPeriod}
@@ -56,9 +63,6 @@ export function App({ client, registry }: Props) {
           />
           <AdvancedView groups={page.request.adapted.advanced} />
         </>
-      )}
-      {page.failure?.kind === 'notice' && (
-        <ErrorNotice message={page.failure.message} />
       )}
       <StarLink />
     </main>
