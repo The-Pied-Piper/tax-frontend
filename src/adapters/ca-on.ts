@@ -10,10 +10,11 @@ const LABELS = {
     form: 'ca/schedule_8',
     label: 'schedule_8_cpp_base_contributions_on_return',
   },
-  cppEnhanced: {
-    form: 'ca/schedule_8',
-    label: 'schedule_8_cpp_enhanced_contributions_on_return',
-  },
+  // Enhanced contributions on the first earnings ceiling (line 12). The
+  // "enhanced on return" total also holds CPP2, so it is not used here.
+  cppEnhanced: { form: 'ca/schedule_8', label: 'cpp_part_3_line_12' },
+  // Second additional contribution on earnings above the first ceiling (line 22).
+  cpp2: { form: 'ca/schedule_8', label: 'cpp_part_3_line_22' },
   ei: { form: 'ca/t1_tax_and_credits', label: 'ei_premiums_line_88' },
   federalTax: { form: 'ca/t1_tax_and_credits', label: 'net_federal_tax' },
   ontarioTax: { form: 'ca-on/on428', label: 'on428_ontario_tax_line_90' },
@@ -46,6 +47,7 @@ function row(
 function adapt(response: ComputeTakeHomeCalculationResponse): AdaptedResult {
   const cppBase = find(response, LABELS.cppBase);
   const cppEnhanced = find(response, LABELS.cppEnhanced);
+  const cpp2 = find(response, LABELS.cpp2);
   const ei = find(response, LABELS.ei);
   const federalTax = find(response, LABELS.federalTax);
   const ontarioTax = find(response, LABELS.ontarioTax);
@@ -53,6 +55,7 @@ function adapt(response: ComputeTakeHomeCalculationResponse): AdaptedResult {
   if (
     cppBase === undefined ||
     cppEnhanced === undefined ||
+    cpp2 === undefined ||
     ei === undefined ||
     federalTax === undefined ||
     ontarioTax === undefined ||
@@ -72,6 +75,7 @@ function adapt(response: ComputeTakeHomeCalculationResponse): AdaptedResult {
   return {
     rows: [
       row('cpp', text.cpp, cpp, text.groups.pension),
+      row('cpp2', text.cpp2, cpp2, text.groups.pension),
       row('ei', text.ei, ei, text.groups.ei),
       row('federal-tax', text.federalTax, federalTax, text.groups.incomeTax),
       row('ontario-tax', text.ontarioTax, ontarioTax, text.groups.incomeTax),
