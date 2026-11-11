@@ -346,6 +346,13 @@ describe('App answer card', () => {
     expect(screen.queryByRole('note')).not.toBeInTheDocument();
   });
 
+  it('names the place and year that were asked', async () => {
+    await calculate(fixtureClient());
+    expect(
+      screen.getByText('out of $70,000.00, Ontario, 2025'),
+    ).toBeInTheDocument();
+  });
+
   it('shows the 2026 figures with the provisional notice', async () => {
     await calculate(fixtureClient(undefined, compute2026));
     expect(screen.getAllByText('$53,786.25')).toHaveLength(2);

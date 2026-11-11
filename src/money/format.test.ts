@@ -49,6 +49,10 @@ describe('displayMoney', () => {
     expect(displayMoney('53468.68', 'monthly', '$')).toBe('$4,455.72');
   });
 
+  it('shows an unreadable amount as sent, without the symbol', () => {
+    expect(displayMoney('53468.555', 'monthly', '$')).toBe('53468.555');
+  });
+
   it('keeps a minus sign in front of the symbol', () => {
     expect(withSymbol('-1,000.00', '$')).toBe('-$1,000.00');
   });

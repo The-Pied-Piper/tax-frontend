@@ -30,11 +30,16 @@ export function withSymbol(amount: string, symbol: string): string {
     : `${symbol}${amount}`;
 }
 
-// Amount for one pay period with the currency symbol, ready to show.
+// Amount for one pay period with the currency symbol, ready to show. An amount
+// the division cannot read is shown as sent, with no symbol in front of it.
 export function displayMoney(
   yearly: string,
   period: PayPeriod,
   symbol: string,
 ): string {
-  return withSymbol(displayAmount(yearly, period), symbol);
+  try {
+    return withSymbol(groupThousands(amountForPeriod(yearly, period)), symbol);
+  } catch {
+    return yearly;
+  }
 }

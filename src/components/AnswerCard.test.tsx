@@ -37,7 +37,7 @@ describe('AnswerCard', () => {
 
   it('shows an amount it cannot divide as sent instead of failing', () => {
     render(<AnswerCard {...base} payPeriod="monthly" takeHome="53468.555" />);
-    expect(screen.getAllByText('$53468.555')[0]).toBeInTheDocument();
+    expect(screen.getAllByText('53468.555')[0]).toBeInTheDocument();
   });
 
   it('shows the notice only when provisional is true', () => {

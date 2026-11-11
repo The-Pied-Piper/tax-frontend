@@ -11,7 +11,7 @@ export const strings = {
   starLink: 'Star the engine on GitHub',
   currencySymbol: '$',
   payPeriod: {
-    legend: 'Show amounts per',
+    legend: 'Show amounts',
     weekly: 'Weekly',
     biweekly: 'Bi-weekly',
     monthly: 'Monthly',
