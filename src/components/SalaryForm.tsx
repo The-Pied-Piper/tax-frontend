@@ -70,7 +70,7 @@ export function SalaryForm({
       input.setSelectionRange(at, at);
     }
     caretCount.current = null;
-  }, [shownSalary, sep]);
+  });
 
   if (jurisdictionsState.status === 'loading') {
     return (

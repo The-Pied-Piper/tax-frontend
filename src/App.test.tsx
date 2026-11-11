@@ -135,6 +135,21 @@ describe('App form', () => {
     ).toBeInTheDocument();
   });
 
+  it('backspace next to a separator moves the caret before it', async () => {
+    const user = userEvent.setup();
+    render(<App client={fixtureClient()} />);
+    const input = await screen.findByRole('textbox', {
+      name: strings.form.salary,
+    });
+    await user.type(input, '70000');
+    await user.type(input, '{Backspace}', {
+      initialSelectionStart: 3,
+      initialSelectionEnd: 3,
+    });
+    expect(input).toHaveValue('70,000');
+    expect(input).toHaveProperty('selectionStart', 2);
+  });
+
   it('keeps the caret in place when typing in the middle', async () => {
     const user = userEvent.setup();
     render(<App client={fixtureClient()} />);

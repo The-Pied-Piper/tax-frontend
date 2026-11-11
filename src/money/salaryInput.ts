@@ -28,6 +28,11 @@ export function separatorsFor(languageCode: string): Separators {
 // check to refuse.
 export function toPlainSalary(typed: string, sep: Separators): string {
   let text = typed.replace(SPACE, '');
+  // "70 000,50" pasted into an English box: a comma with one or two digits
+  // after it and no "." anywhere is a decimal mark, never a group mark.
+  if (sep.group === ',' && !text.includes('.') && /,\d{1,2}$/.test(text)) {
+    text = `${text.slice(0, text.lastIndexOf(','))}.${text.slice(text.lastIndexOf(',') + 1)}`;
+  }
   if (!/^\s*$/.test(sep.group) && sep.group !== '.') {
     text = text.split(sep.group).join('');
   }
@@ -70,7 +75,7 @@ export function caretFor(
   let seen = 0;
   for (let i = 0; i < display.length; i += 1) {
     const ch = display.charAt(i);
-    if (/\d/.test(ch) || ch === sep.decimal) seen += 1;
+    if (/\d/.test(ch) || ch === sep.decimal || ch === '.') seen += 1;
     if (seen === count) return i + 1;
   }
   return display.length;
