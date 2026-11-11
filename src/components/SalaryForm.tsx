@@ -1,7 +1,20 @@
-import { useId, type SubmitEvent } from 'react';
+import {
+  useId,
+  useLayoutEffect,
+  useMemo,
+  useRef,
+  type SubmitEvent,
+} from 'react';
+import {
+  caretFor,
+  separatorsFor,
+  significantBefore,
+  toDisplaySalary,
+  toPlainSalary,
+} from '../money/salaryInput';
 import type { SalaryCheck } from '../state/salary';
 import type { FormValues, JurisdictionsState } from '../state/useTakeHome';
-import { strings } from '../strings';
+import { languageCode, strings } from '../strings';
 import styles from './SalaryForm.module.css';
 
 type Props = {
@@ -42,6 +55,22 @@ export function SalaryForm({
   const salaryId = `${id}-salary`;
   const hintId = `${id}-hint`;
   const errorId = `${id}-error`;
+  const sep = useMemo(() => separatorsFor(languageCode), []);
+  const salaryInput = useRef<HTMLInputElement>(null);
+  // Digits before the caret after the last edit; put back once the box has
+  // been rewritten with separators, so typing in the middle stays in place.
+  const caretCount = useRef<number | null>(null);
+  const shownSalary = toDisplaySalary(values.salary, sep);
+
+  useLayoutEffect(() => {
+    const input = salaryInput.current;
+    if (caretCount.current === null || !input) return;
+    if (document.activeElement === input) {
+      const at = caretFor(input.value, caretCount.current, sep);
+      input.setSelectionRange(at, at);
+    }
+    caretCount.current = null;
+  });
 
   if (jurisdictionsState.status === 'loading') {
     return (
@@ -115,16 +144,45 @@ export function SalaryForm({
             type="text"
             inputMode="decimal"
             autoComplete="off"
-            value={values.salary}
+            ref={salaryInput}
+            onPaste={(e) => {
+              // The pasted text is read on its own ("70 000,50" -> 70000.50),
+              // then put into the box where the selection was.
+              e.preventDefault();
+              const box = e.currentTarget;
+              const clip = toPlainSalary(
+                e.clipboardData.getData('text'),
+                sep,
+                true,
+              );
+              const start = box.selectionStart ?? box.value.length;
+              const end = box.selectionEnd ?? start;
+              const before = box.value.slice(0, start) + clip;
+              caretCount.current = significantBefore(
+                before,
+                before.length,
+                sep,
+              );
+              onSalaryChange(toPlainSalary(before + box.value.slice(end), sep));
+            }}
+            value={shownSalary}
             onChange={(e) => {
-              onSalaryChange(e.target.value);
+              caretCount.current = significantBefore(
+                e.target.value,
+                e.target.selectionStart ?? e.target.value.length,
+                sep,
+              );
+              onSalaryChange(toPlainSalary(e.target.value, sep));
             }}
             aria-invalid={salaryMessage !== null}
             aria-describedby={salaryMessage ? `${hintId} ${errorId}` : hintId}
           />
         </div>
         <span id={hintId} className={styles.hint}>
-          {strings.form.salaryHint}
+          {strings.form.salaryHint(
+            toDisplaySalary('70000', sep),
+            toDisplaySalary('70000.50', sep),
+          )}
         </span>
         {salaryMessage && (
           <p id={errorId} className={styles.error} role="alert">

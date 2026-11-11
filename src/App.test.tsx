@@ -106,8 +106,114 @@ describe('App form', () => {
   });
 
   it.each([
+    ['70000', '70,000', '70000'],
+    ['70000.50', '70,000.50', '70000.50'],
+    ['70,000.50', '70,000.50', '70000.50'],
+  ])(
+    'shows %s as %s in the box and sends the plain text',
+    async (typed, shown, plain) => {
+      const sent: ComputeTakeHomeCalculationRequest[] = [];
+      const user = userEvent.setup();
+      render(<App client={fixtureClient((b) => sent.push(b))} />);
+      const input = await screen.findByRole('textbox', {
+        name: strings.form.salary,
+      });
+      await user.type(input, typed);
+      expect(input).toHaveValue(shown);
+      await user.click(
+        screen.getByRole('button', { name: strings.form.calculate }),
+      );
+      await screen.findByRole('heading', { name: strings.answer.heading });
+      expect(sent.map((r) => r.salary)).toEqual([plain]);
+    },
+  );
+
+  it('writes the hint example with the same separators', async () => {
+    render(<App client={fixtureClient()} />);
+    expect(
+      await screen.findByText('For example 70,000 or 70,000.50'),
+    ).toBeInTheDocument();
+  });
+
+  it('deleting the last digit of 1,000 gives 100', async () => {
+    const user = userEvent.setup();
+    render(<App client={fixtureClient()} />);
+    const input = await screen.findByRole('textbox', {
+      name: strings.form.salary,
+    });
+    await user.type(input, '1000{Backspace}');
+    expect(input).toHaveValue('100');
+  });
+
+  it('reads a pasted 70 000,50 as 70,000.50', async () => {
+    const user = userEvent.setup();
+    render(<App client={fixtureClient()} />);
+    const input = await screen.findByRole('textbox', {
+      name: strings.form.salary,
+    });
+    await user.click(input);
+    await user.paste('70 000,50');
+    expect(input).toHaveValue('70,000.50');
+  });
+
+  it('a one-digit paste into the middle stays a digit', async () => {
+    const user = userEvent.setup();
+    render(<App client={fixtureClient()} />);
+    const input = await screen.findByRole('textbox', {
+      name: strings.form.salary,
+    });
+    await user.type(input, '12345');
+    if (!(input instanceof HTMLInputElement)) throw new Error('not an input');
+    input.setSelectionRange(4, 6);
+    await user.paste('6');
+    expect(input).toHaveValue('1,236');
+  });
+
+  it('puts the caret after a pasted decimal number', async () => {
+    const user = userEvent.setup();
+    render(<App client={fixtureClient()} />);
+    const input = await screen.findByRole('textbox', {
+      name: strings.form.salary,
+    });
+    await user.click(input);
+    await user.paste('70 000,50');
+    expect(input).toHaveProperty('selectionStart', 9);
+  });
+
+  it('backspace next to a separator moves the caret before it', async () => {
+    const user = userEvent.setup();
+    render(<App client={fixtureClient()} />);
+    const input = await screen.findByRole('textbox', {
+      name: strings.form.salary,
+    });
+    await user.type(input, '70000');
+    await user.type(input, '{Backspace}', {
+      initialSelectionStart: 3,
+      initialSelectionEnd: 3,
+    });
+    expect(input).toHaveValue('70,000');
+    expect(input).toHaveProperty('selectionStart', 2);
+  });
+
+  it('keeps the caret in place when typing in the middle', async () => {
+    const user = userEvent.setup();
+    render(<App client={fixtureClient()} />);
+    const input = await screen.findByRole('textbox', {
+      name: strings.form.salary,
+    });
+    await user.type(input, '7000');
+    expect(input).toHaveValue('7,000');
+    await user.type(input, '9', {
+      initialSelectionStart: 1,
+      initialSelectionEnd: 1,
+    });
+    expect(input).toHaveValue('79,000');
+    expect(input).toHaveProperty('selectionStart', 2);
+  });
+
+  it.each([
     ['', strings.form.salaryEmpty],
-    ['70,000', strings.form.salaryInvalid],
+    ['70,0,00x', strings.form.salaryInvalid],
     ['70000.123', strings.form.salaryInvalid],
     ['0.00', strings.form.salaryZero],
     ['0', strings.form.salaryZero],

@@ -26,7 +26,8 @@ export const strings = {
     year: 'Tax year',
     provisionalYear: 'provisional',
     salary: 'Yearly salary (before tax)',
-    salaryHint: 'For example 70000 or 70000.50',
+    salaryHint: (whole: string, cents: string) =>
+      `For example ${whole} or ${cents}`,
     calculate: 'Calculate',
     calculating: 'Calculating…',
     loadingPlaces: 'Loading places…',
