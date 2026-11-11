@@ -49,10 +49,14 @@ export const strings = {
     salary: 'Salary before tax',
     takeHomeRow: 'Take-home',
     takenOff: 'Taken off (tax and contributions)',
-    provisional:
-      'Provisional: the tax figures for this year are not final, so this estimate may change.',
     estimateNote:
       'This is an estimate for a single yearly salary. Your own situation may differ.',
+  },
+  notices: {
+    provisionalTitle: (year: number) =>
+      `${String(year)} figures are provisional.`,
+    provisionalBody: (year: number) =>
+      `The government has not finished publishing the ${String(year)} rates. We used the figures available today and will update them when they are final.`,
   },
   breakdown: {
     toggle: 'Show how this was worked out',

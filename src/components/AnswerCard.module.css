@@ -19,16 +19,6 @@
   border: 0;
 }
 
-.notice {
-  margin: 0 0 16px;
-  padding: 10px 12px;
-  font-size: 14px;
-  background: var(--warn-bg);
-  color: var(--warn-fg);
-  border: 1px solid var(--warn-line);
-  border-radius: var(--radius-control);
-}
-
 .topRow {
   display: flex;
   flex-wrap: wrap;
