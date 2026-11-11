@@ -3,6 +3,7 @@ import type { ComputeTakeHomeCalculationResponse } from '../api';
 import fixture2025 from '../api/fixtures/compute-on-2025-70000.json';
 import fixture2025High from '../api/fixtures/compute-on-2025-90000.json';
 import fixture2026 from '../api/fixtures/compute-on-2026-70000.json';
+import { sumAmounts } from '../money/sum';
 import { adapters } from './index';
 import { caOnAdapter } from './ca-on';
 
@@ -126,6 +127,39 @@ describe('Ontario adapter', () => {
     const result = caOnAdapter.adapt(odd);
     expect(result.rows).toEqual([]);
     expect(result.advanced.length).toBeGreaterThan(0);
+  });
+
+  it.each(['cpp_part_3_line_12', 'cpp_part_3_line_22'])(
+    'falls back when %s is not a money amount',
+    (label) => {
+      const odd: ComputeTakeHomeCalculationResponse = {
+        ...r2025High,
+        trace: (r2025High.trace ?? []).map((f) => ({
+          ...f,
+          lines: f.lines.map((l) =>
+            l.label === label ? { ...l, amount: '396.005' } : l,
+          ),
+        })),
+      };
+      const result = caOnAdapter.adapt(odd);
+      expect(result.rows).toEqual([]);
+      expect(result.advanced.length).toBeGreaterThan(0);
+    },
+  );
+
+  it.each([
+    ['2025 at $70,000', r2025],
+    ['2025 at $90,000', r2025High],
+    ['2026 at $70,000', r2026],
+  ])('rows add up to Total taken off, %s', (_name, response) => {
+    const result = caOnAdapter.adapt(response);
+    const parts = result.rows
+      .filter((r) => r.id !== 'federal-tax' && r.id !== 'ontario-tax')
+      .map((r) => r.amount);
+    const totalTax = result.totals.find((r) => r.id === 'total-tax');
+    expect(sumAmounts([...parts, totalTax?.amount ?? 'missing'])).toBe(
+      response.total_deductions,
+    );
   });
 
   it('falls back when the response has no trace', () => {
