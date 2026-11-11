@@ -359,6 +359,9 @@ describe('App answer card', () => {
     expect(screen.getByRole('note')).toHaveTextContent(
       strings.notices.provisionalTitle(2026),
     );
+    expect(screen.getByRole('note')).toHaveTextContent(
+      strings.notices.provisionalBody(2026),
+    );
   });
 
   it('divides all three amounts when the pay period changes', async () => {

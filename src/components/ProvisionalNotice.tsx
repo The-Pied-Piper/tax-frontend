@@ -8,7 +8,7 @@ export function ProvisionalNotice({ year }: Props) {
     <div className={styles.notice} role="note">
       <strong className={styles.title}>
         {strings.notices.provisionalTitle(year)}
-      </strong>{' '}
+      </strong>
       {strings.notices.provisionalBody(year)}
     </div>
   );
