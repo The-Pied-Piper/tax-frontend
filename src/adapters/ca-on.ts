@@ -4,16 +4,17 @@ import { strings } from '../strings';
 import { advancedGroups, fallbackResult } from './fallback';
 import type { AdaptedResult, DisplayRow, JurisdictionAdapter } from './types';
 
-/** Exact trace labels read from the real $70,000 responses for 2025 and 2026. */
+/** Exact trace labels read from the real $70,000 and $90,000 responses for 2025 and 2026. */
 const LABELS = {
   cppBase: {
     form: 'ca/schedule_8',
     label: 'schedule_8_cpp_base_contributions_on_return',
   },
-  cppEnhanced: {
-    form: 'ca/schedule_8',
-    label: 'schedule_8_cpp_enhanced_contributions_on_return',
-  },
+  // Enhanced contributions on the first earnings ceiling (line 12). The
+  // "enhanced on return" total also holds CPP2, so it is not used here.
+  cppEnhancedFirst: { form: 'ca/schedule_8', label: 'cpp_part_3_line_12' },
+  // Second additional contribution on earnings above the first ceiling (line 22).
+  cpp2: { form: 'ca/schedule_8', label: 'cpp_part_3_line_22' },
   ei: { form: 'ca/t1_tax_and_credits', label: 'ei_premiums_line_88' },
   federalTax: { form: 'ca/t1_tax_and_credits', label: 'net_federal_tax' },
   ontarioTax: { form: 'ca-on/on428', label: 'on428_ontario_tax_line_90' },
@@ -45,14 +46,16 @@ function row(
 
 function adapt(response: ComputeTakeHomeCalculationResponse): AdaptedResult {
   const cppBase = find(response, LABELS.cppBase);
-  const cppEnhanced = find(response, LABELS.cppEnhanced);
+  const cppEnhancedFirst = find(response, LABELS.cppEnhancedFirst);
+  const cpp2 = find(response, LABELS.cpp2);
   const ei = find(response, LABELS.ei);
   const federalTax = find(response, LABELS.federalTax);
   const ontarioTax = find(response, LABELS.ontarioTax);
   const totalTax = find(response, LABELS.totalTax);
   if (
     cppBase === undefined ||
-    cppEnhanced === undefined ||
+    cppEnhancedFirst === undefined ||
+    cpp2 === undefined ||
     ei === undefined ||
     federalTax === undefined ||
     ontarioTax === undefined ||
@@ -62,8 +65,10 @@ function adapt(response: ComputeTakeHomeCalculationResponse): AdaptedResult {
     return fallbackResult(response);
   }
   let cpp: string;
+  let cpp2Exact: string;
   try {
-    cpp = sumAmounts([cppBase, cppEnhanced]);
+    cpp = sumAmounts([cppBase, cppEnhancedFirst]);
+    cpp2Exact = sumAmounts([cpp2]);
   } catch {
     // An amount we cannot add exactly: same rule, show nothing half-right.
     return fallbackResult(response);
@@ -72,6 +77,7 @@ function adapt(response: ComputeTakeHomeCalculationResponse): AdaptedResult {
   return {
     rows: [
       row('cpp', text.cpp, cpp, text.groups.pension),
+      row('cpp2', text.cpp2, cpp2Exact, text.groups.pension),
       row('ei', text.ei, ei, text.groups.ei),
       row('federal-tax', text.federalTax, federalTax, text.groups.incomeTax),
       row('ontario-tax', text.ontarioTax, ontarioTax, text.groups.incomeTax),

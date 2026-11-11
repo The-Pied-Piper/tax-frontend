@@ -95,7 +95,11 @@ export const strings = {
       },
       cpp: {
         name: 'Canada Pension Plan',
-        help: 'Your contribution to the Canada Pension Plan (base and enhanced), taken off your pay for a pension when you retire.',
+        help: 'Your contribution to the Canada Pension Plan (the regular contribution, plus the extra enhanced part up to the first yearly ceiling), taken off your pay for a pension when you retire.',
+      },
+      cpp2: {
+        name: 'Canada Pension Plan, second additional contribution',
+        help: 'An extra Canada Pension Plan contribution on earnings above the first yearly ceiling. It is $0.00 if your pay is below that ceiling.',
       },
       ei: {
         name: 'Employment Insurance',
