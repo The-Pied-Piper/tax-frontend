@@ -45,6 +45,8 @@ export function App({ client, registry }: Props) {
               totalDeductions={page.request.response.total_deductions}
               takeHome={page.request.response.take_home}
               provisional={page.request.response.provisional}
+              place={page.request.asked.jurisdictionName}
+              year={page.request.asked.year}
               payPeriod={page.payPeriod}
               onPayPeriodChange={page.setPayPeriod}
             />
