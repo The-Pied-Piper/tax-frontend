@@ -69,7 +69,7 @@
 
 .boxBad:focus-within {
   border-color: var(--err-fg);
-  box-shadow: 0 0 0 3px var(--err-bg);
+  box-shadow: 0 0 0 3px var(--err-line);
 }
 
 .box span {
