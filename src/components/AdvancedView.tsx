@@ -11,30 +11,37 @@ type Props = {
 // Display only: every trace line, grouped by form, exactly as the engine
 // returned it. Always yearly, so there is no pay period here.
 export function AdvancedView({ groups }: Props) {
-  const labelId = useId();
+  const headingId = useId();
+  const bodyId = useId();
   const [on, setOn] = useState(false);
   if (groups.length === 0) return null;
   return (
-    <section className={styles.card} aria-labelledby={labelId}>
+    <section className={styles.card} aria-labelledby={headingId}>
+      <h2 id={headingId} className={styles.hidden}>
+        {strings.advanced.heading}
+      </h2>
       <label className={styles.toggle}>
         <input
           type="checkbox"
           className={styles.checkbox}
+          aria-controls={bodyId}
           checked={on}
           onChange={(event) => {
             setOn(event.target.checked);
           }}
         />
-        <span id={labelId}>{strings.advanced.toggle}</span>
+        <span>{strings.advanced.toggle}</span>
       </label>
-      {on && (
-        <>
-          <p className={styles.note}>{strings.advanced.note}</p>
-          {groups.map((group, index) => (
-            <FormGroup group={group} key={`${group.form}-${String(index)}`} />
-          ))}
-        </>
-      )}
+      <div id={bodyId}>
+        {on && (
+          <>
+            <p className={styles.note}>{strings.advanced.note}</p>
+            {groups.map((group, index) => (
+              <FormGroup group={group} key={`${group.form}-${String(index)}`} />
+            ))}
+          </>
+        )}
+      </div>
     </section>
   );
 }

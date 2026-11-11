@@ -47,6 +47,18 @@
   opacity: 1;
 }
 
+@media (forced-colors: active) {
+  .checkbox:checked {
+    forced-color-adjust: none;
+    background: Highlight;
+    border-color: Highlight;
+  }
+
+  .checkbox::after {
+    border-color: HighlightText;
+  }
+}
+
 .checkbox:focus-visible,
 .formSummary:focus-visible {
   outline: 2px solid var(--accent);
