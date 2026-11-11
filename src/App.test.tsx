@@ -206,7 +206,7 @@ describe('App form', () => {
       expect(
         screen.queryByRole('heading', { name: strings.answer.heading }),
       ).not.toBeInTheDocument();
-      expect(screen.queryByText('53,468.68')).not.toBeInTheDocument();
+      expect(screen.queryByText('$53,468.68')).not.toBeInTheDocument();
     });
 
     it('puts a salary problem under the salary box', async () => {
@@ -340,16 +340,23 @@ describe('App answer card', () => {
 
   it('shows the 2025 figures with no provisional notice', async () => {
     await calculate(fixtureClient());
-    expect(screen.getByText('53,468.68')).toBeInTheDocument();
-    expect(screen.getAllByText('70,000.00')[0]).toBeVisible();
-    expect(screen.getByText('16,531.32')).toBeInTheDocument();
+    expect(screen.getAllByText('$53,468.68')).toHaveLength(2);
+    expect(screen.getAllByText('$70,000.00')[0]).toBeVisible();
+    expect(screen.getByText('$16,531.32')).toBeInTheDocument();
     expect(screen.queryByRole('note')).not.toBeInTheDocument();
+  });
+
+  it('names the place and year that were asked', async () => {
+    await calculate(fixtureClient());
+    expect(
+      screen.getByText('out of $70,000.00, Ontario, 2025'),
+    ).toBeInTheDocument();
   });
 
   it('shows the 2026 figures with the provisional notice', async () => {
     await calculate(fixtureClient(undefined, compute2026));
-    expect(screen.getByText('53,786.25')).toBeInTheDocument();
-    expect(screen.getByText('16,213.75')).toBeInTheDocument();
+    expect(screen.getAllByText('$53,786.25')).toHaveLength(2);
+    expect(screen.getByText('$16,213.75')).toBeInTheDocument();
     expect(screen.getByRole('note')).toHaveTextContent(
       strings.answer.provisional,
     );
@@ -360,10 +367,10 @@ describe('App answer card', () => {
     await user.click(
       screen.getByRole('radio', { name: strings.payPeriod.monthly }),
     );
-    expect(screen.getByText('4,455.72')).toBeInTheDocument();
-    expect(screen.getByText('5,833.33')).toBeInTheDocument();
-    expect(screen.getByText('1,377.61')).toBeInTheDocument();
-    expect(screen.getByText(strings.answer.per.monthly)).toBeInTheDocument();
+    expect(screen.getAllByText('$4,455.72')).toHaveLength(2);
+    expect(screen.getByText('$5,833.33')).toBeInTheDocument();
+    expect(screen.getByText('$1,377.61')).toBeInTheDocument();
+    expect(screen.getByText(strings.answer.label.monthly)).toBeInTheDocument();
   });
 
   it('keeps the chosen pay period for the next answer', async () => {
@@ -378,7 +385,7 @@ describe('App answer card', () => {
     expect(
       screen.getByRole('radio', { name: strings.payPeriod.monthly }),
     ).toBeChecked();
-    expect(screen.getByText('4,455.72')).toBeInTheDocument();
+    expect(screen.getAllByText('$4,455.72')).toHaveLength(2);
   });
 });
 
@@ -431,7 +438,7 @@ describe('App breakdown', () => {
     await user.click(screen.getByText(strings.breakdown.toggle));
     expect(details).toHaveAttribute('open');
     expect(screen.getByText('Total taken off')).toBeVisible();
-    expect(screen.getAllByText('16,531.32').length).toBeGreaterThan(1);
+    expect(screen.getByText('16,531.32')).toBeVisible();
   });
 
   it('shows no breakdown when no adapter is registered', async () => {
