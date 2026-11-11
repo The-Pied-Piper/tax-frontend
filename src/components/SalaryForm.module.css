@@ -44,6 +44,7 @@
 }
 
 .field select {
+  font-size: 16px;
   padding: 0 12px;
 }
 
@@ -58,12 +59,17 @@
 .box:focus-within {
   border-color: var(--accent);
   box-shadow: 0 0 0 3px var(--accent-soft);
-  outline: none;
+  outline: 2px solid transparent;
 }
 
 .boxBad {
   composes: box;
   border-color: var(--err-fg);
+}
+
+.boxBad:focus-within {
+  border-color: var(--err-fg);
+  box-shadow: 0 0 0 3px var(--err-bg);
 }
 
 .box span {
@@ -79,7 +85,7 @@
   background: transparent;
   color: var(--fg);
   font-family: var(--font-mono);
-  font-size: 15px;
+  font-size: 16px;
   text-align: right;
   height: 40px;
 }
@@ -112,11 +118,7 @@
   cursor: not-allowed;
 }
 
-.primary[aria-busy='true'] {
-  cursor: progress;
-}
-
-@media (max-width: 480px) {
+@media (max-width: 479.98px) {
   .form {
     grid-template-columns: 1fr;
   }

@@ -135,7 +135,6 @@ export function SalaryForm({
       <button
         type="submit"
         className={styles.primary}
-        aria-busy={loading}
         disabled={loading || !canSubmit}
       >
         {loading ? strings.form.calculating : strings.form.calculate}
