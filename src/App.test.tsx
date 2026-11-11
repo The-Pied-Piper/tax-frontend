@@ -51,6 +51,12 @@ describe('App form', () => {
     ).toBeInTheDocument();
   });
 
+  it('shows the intro and the estimate footer', () => {
+    render(<App client={fixtureClient()} />);
+    expect(screen.getByText(strings.intro)).toBeInTheDocument();
+    expect(screen.getByRole('contentinfo')).toHaveTextContent(strings.footer);
+  });
+
   it('fills places and years from the API', async () => {
     render(<App client={fixtureClient()} />);
     const place = await screen.findByRole('combobox', {
@@ -323,10 +329,16 @@ describe('App form', () => {
 });
 
 describe('App answer card', () => {
-  async function calculate(client: ApiClient) {
+  async function calculate(client: ApiClient, year?: string) {
     const user = userEvent.setup();
     // No adapter, so only the answer card shows these figures.
     render(<App client={client} registry={new AdapterRegistry()} />);
+    if (year) {
+      await user.selectOptions(
+        await screen.findByRole('combobox', { name: strings.form.year }),
+        year,
+      );
+    }
     await user.type(
       await screen.findByRole('textbox', { name: strings.form.salary }),
       '70000',
@@ -354,11 +366,14 @@ describe('App answer card', () => {
   });
 
   it('shows the 2026 figures with the provisional notice', async () => {
-    await calculate(fixtureClient(undefined, compute2026));
+    await calculate(fixtureClient(undefined, compute2026), '2026');
     expect(screen.getAllByText('$53,786.25')).toHaveLength(2);
     expect(screen.getByText('$16,213.75')).toBeInTheDocument();
     expect(screen.getByRole('note')).toHaveTextContent(
-      strings.answer.provisional,
+      strings.notices.provisionalTitle(2026),
+    );
+    expect(screen.getByRole('note')).toHaveTextContent(
+      strings.notices.provisionalBody(2026),
     );
   });
 
