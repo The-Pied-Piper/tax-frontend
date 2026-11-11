@@ -44,11 +44,7 @@ export function AnswerCard({
       </div>
       <p className={styles.amount}>{show(takeHome)}</p>
       <p className={styles.sub}>
-        {strings.answer.outOf(
-          displayMoney(salary, 'annually', strings.currencySymbol),
-          place,
-          year,
-        )}
+        {strings.answer.outOf(show(salary), place, year)}
       </p>
       <dl className={styles.rows}>
         <div className={styles.row}>

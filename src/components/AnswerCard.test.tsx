@@ -50,11 +50,26 @@ describe('AnswerCard', () => {
     );
     expect(screen.getAllByText('$1,028.24')).toHaveLength(2);
     expect(screen.getByText('$1,346.15')).toBeInTheDocument();
+    expect(
+      screen.getByText('out of $1,346.15, Ontario, 2025'),
+    ).toBeInTheDocument();
     expect(screen.getByText('$317.91')).toBeInTheDocument();
     expect(screen.getByText(strings.answer.label.weekly)).toBeInTheDocument();
     await userEvent.click(
       screen.getByRole('radio', { name: strings.payPeriod.monthly }),
     );
     expect(changed).toEqual(['monthly']);
+  });
+
+  it.each([
+    ['annually', '$70,000.00'],
+    ['monthly', '$5,833.33'],
+    ['biweekly', '$2,692.31'],
+    ['weekly', '$1,346.15'],
+  ] as const)('shows the %s gross in the "out of" line', (payPeriod, gross) => {
+    render(<AnswerCard {...base} payPeriod={payPeriod} />);
+    expect(
+      screen.getByText(`out of ${gross}, Ontario, 2025`),
+    ).toBeInTheDocument();
   });
 });
