@@ -51,6 +51,12 @@ describe('App form', () => {
     ).toBeInTheDocument();
   });
 
+  it('shows the intro and the estimate footer', () => {
+    render(<App client={fixtureClient()} />);
+    expect(screen.getByText(strings.intro)).toBeInTheDocument();
+    expect(screen.getByRole('contentinfo')).toHaveTextContent(strings.footer);
+  });
+
   it('fills places and years from the API', async () => {
     render(<App client={fixtureClient()} />);
     const place = await screen.findByRole('combobox', {
@@ -501,11 +507,12 @@ describe('App advanced view', () => {
 
   it('is folded under the answer and lists every form from the trace', async () => {
     const user = await calculate();
-    const details = screen
-      .getByText(strings.advanced.toggle)
-      .closest('details');
-    expect(details).not.toHaveAttribute('open');
-    await user.click(screen.getByText(strings.advanced.toggle));
+    expect(
+      screen.getByRole('checkbox', { name: strings.advanced.toggle }),
+    ).not.toBeChecked();
+    await user.click(
+      screen.getByRole('checkbox', { name: strings.advanced.toggle }),
+    );
     for (const form of compute2025.trace) {
       expect(screen.getByText(form.name)).toBeVisible();
     }
@@ -513,12 +520,14 @@ describe('App advanced view', () => {
 
   it('puts every trace line in the page once all forms are opened', async () => {
     const user = await calculate();
-    await user.click(screen.getByText(strings.advanced.toggle));
+    await user.click(
+      screen.getByRole('checkbox', { name: strings.advanced.toggle }),
+    );
     for (const form of compute2025.trace) {
       await user.click(screen.getByText(form.name));
     }
     const lines = within(
-      screen.getByRole('region', { name: strings.advanced.toggle }),
+      screen.getByRole('region', { name: strings.advanced.heading }),
     ).getAllByRole('term');
     const expected = compute2025.trace.reduce(
       (count, form) => count + form.lines.length,
@@ -530,7 +539,9 @@ describe('App advanced view', () => {
 
   it('shows the yearly figures from the engine whatever the pay period', async () => {
     const user = await calculate(strings.payPeriod.monthly);
-    await user.click(screen.getByText(strings.advanced.toggle));
+    await user.click(
+      screen.getByRole('checkbox', { name: strings.advanced.toggle }),
+    );
     await user.click(screen.getByText('Return summary'));
     const form = screen.getByText('Return summary').closest('details');
     expect(form).not.toBeNull();
