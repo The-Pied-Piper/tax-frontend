@@ -9,19 +9,33 @@ const groups: AdvancedGroup[] = [
     form: 'ca/schedule_8',
     name: 'ca/schedule_8',
     lines: [
-      { label: 'cpp basic exemption', reference: null, amount: '3500.00' },
-      { label: 'cpp base contribution', reference: null, amount: '3867.50' },
+      {
+        label: 'cpp basic exemption',
+        reference: null,
+        amount: '3500.00',
+        detail: null,
+      },
+      {
+        label: 'cpp base contribution',
+        reference: null,
+        amount: '3867.50',
+        detail: null,
+      },
     ],
   },
   {
     form: 'ca-on/return',
     name: 'ca-on/return',
-    lines: [{ label: 'take home', reference: null, amount: '53468.68' }],
+    lines: [
+      { label: 'take home', reference: null, amount: '53468.68', detail: null },
+    ],
   },
   {
     form: 'ca/t2204',
     name: 'ca/t2204',
-    lines: [{ label: 'note only', reference: null, amount: null }],
+    lines: [
+      { label: 'note only', reference: null, amount: null, detail: null },
+    ],
   },
 ];
 
@@ -112,10 +126,20 @@ describe('AdvancedView', () => {
             form: 'ex/form',
             name: 'ex/form',
             lines: [
-              { label: 'same', reference: null, amount: '-1234.50' },
-              { label: 'same', reference: null, amount: '99.00' },
-              { label: 'rate', reference: null, amount: '0.0505' },
-              { label: 'odd', reference: null, amount: 'n/a' },
+              {
+                label: 'same',
+                reference: null,
+                amount: '-1234.50',
+                detail: null,
+              },
+              { label: 'same', reference: null, amount: '99.00', detail: null },
+              {
+                label: 'rate',
+                reference: null,
+                amount: '0.0505',
+                detail: null,
+              },
+              { label: 'odd', reference: null, amount: 'n/a', detail: null },
             ],
           },
           { form: 'ex/empty', name: 'ex/empty', lines: [] },
@@ -140,8 +164,18 @@ describe('AdvancedView', () => {
             form: 'ex/form',
             name: 'Example form',
             lines: [
-              { label: 'Printed figure', reference: '65', amount: '1.00' },
-              { label: 'Engine step', reference: null, amount: '2.00' },
+              {
+                label: 'Printed figure',
+                reference: '65',
+                amount: '1.00',
+                detail: null,
+              },
+              {
+                label: 'Engine step',
+                reference: null,
+                amount: '2.00',
+                detail: null,
+              },
             ],
           },
         ]}
@@ -159,5 +193,42 @@ describe('AdvancedView', () => {
   it('shows nothing when there are no forms', () => {
     const { container } = render(<AdvancedView groups={[]} />);
     expect(container).toBeEmptyDOMElement();
+  });
+
+  it('shows a line detail only after its ? button is pressed, by mouse or keyboard', async () => {
+    const detail = 'lesser of a 81200.00 and b 70000.00 = 70000.00';
+    render(
+      <AdvancedView
+        groups={[
+          {
+            form: 'ex/form',
+            name: 'Example form',
+            lines: [
+              { label: 'Line 2', reference: '2', amount: '70000.00', detail },
+            ],
+          },
+        ]}
+      />,
+    );
+    await open();
+    await userEvent.click(screen.getByText('Example form'));
+    expect(screen.queryByText(strings.advanced.reference)).toBeNull();
+    const button = screen.getByRole('button', {
+      name: strings.breakdown.helpButton('Line 2'),
+    });
+    expect(screen.getByText(detail)).not.toBeVisible();
+    await userEvent.click(button);
+    expect(screen.getByText(detail)).toBeVisible();
+    await userEvent.keyboard('{Escape}');
+    expect(screen.getByText(detail)).not.toBeVisible();
+    button.focus();
+    await userEvent.keyboard('{Enter}');
+    expect(screen.getByText(detail)).toBeVisible();
+  });
+
+  it('has no ? button for a line with no detail', async () => {
+    render(<AdvancedView groups={groups} />);
+    await open();
+    expect(screen.queryByRole('button', { name: /What is/ })).toBeNull();
   });
 });

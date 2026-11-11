@@ -22,6 +22,8 @@ export interface AdvancedLine {
   /** What the form prints beside the figure; null for a step the form does not print. */
   reference: string | null;
   amount: Amount | null;
+  /** The API's explanation of how the figure was worked out, as sent; null when it sent none. */
+  detail: string | null;
 }
 
 /** All lines of one form, in the order the API returned them. */

@@ -69,6 +69,7 @@ export const strings = {
     lineCount: (count: number) =>
       count === 1 ? '1 line' : `${String(count)} lines`,
     reference: 'Form reference',
+    lineNumber: (reference: string) => `Line ${reference}`,
     noAmount: '—',
     noAmountSpoken: 'No amount',
   },

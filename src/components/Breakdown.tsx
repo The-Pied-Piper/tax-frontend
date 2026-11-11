@@ -1,8 +1,8 @@
-import { useId, useState } from 'react';
 import type { DisplayRow } from '../adapters';
 import { displayMoney } from '../money/format';
 import type { PayPeriod } from '../money/payPeriod';
 import { strings } from '../strings';
+import { HelpTerm } from './HelpTerm';
 import styles from './Breakdown.module.css';
 
 type Props = {
@@ -91,34 +91,5 @@ function SectionBlock({
         ))}
       </dl>
     </div>
-  );
-}
-
-// A name followed by a "?" button that shows or hides its explanation.
-function HelpTerm({ name, help }: { name: string; help: string }) {
-  const helpId = useId();
-  const [open, setOpen] = useState(false);
-  return (
-    <span className={styles.term}>
-      <span className={styles.name}>{name}</span>
-      <button
-        type="button"
-        className={styles.help}
-        aria-label={strings.breakdown.helpButton(name)}
-        aria-expanded={open}
-        aria-controls={helpId}
-        onClick={() => {
-          setOpen((o) => !o);
-        }}
-        onKeyDown={(event) => {
-          if (event.key === 'Escape') setOpen(false);
-        }}
-      >
-        ?
-      </button>
-      <span id={helpId} className={styles.bubble} hidden={!open}>
-        {help}
-      </span>
-    </span>
   );
 }

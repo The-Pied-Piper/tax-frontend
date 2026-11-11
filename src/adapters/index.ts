@@ -2,7 +2,7 @@ import { caOnAdapter } from './ca-on';
 import { AdapterRegistry } from './registry';
 
 export * from './types';
-export { advancedGroups, fallbackLabel, fallbackResult } from './fallback';
+export { advancedGroups, fallbackResult } from './fallback';
 export { AdapterRegistry } from './registry';
 
 /** The registry the page uses. Adding a jurisdiction means registering one adapter here. */

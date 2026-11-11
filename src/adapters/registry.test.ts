@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import type { ComputeTakeHomeCalculationResponse } from '../api';
 import fixture from '../api/fixtures/compute-on-2025-70000.json';
-import { advancedGroups, fallbackLabel } from './fallback';
+import { advancedGroups } from './fallback';
 import { AdapterRegistry } from './registry';
 import type { AdaptedResult, JurisdictionAdapter } from './types';
 
@@ -101,21 +101,6 @@ describe('AdapterRegistry', () => {
   });
 });
 
-describe('fallbackLabel', () => {
-  it('replaces underscores with spaces', () => {
-    expect(fallbackLabel('cpp_basic_exemption')).toBe('cpp basic exemption');
-  });
-
-  it('copes with missing labels', () => {
-    expect(fallbackLabel(null)).toBe('');
-    expect(fallbackLabel(undefined)).toBe('');
-  });
-
-  it('handles repeated underscores and surrounding space', () => {
-    expect(fallbackLabel('_a__b_ ')).toBe('a  b');
-  });
-});
-
 describe('advancedGroups', () => {
   it('groups lines by form in API order and keeps amounts as text', () => {
     const groups = advancedGroups(response);
@@ -126,38 +111,12 @@ describe('advancedGroups', () => {
       label: 'Additional maximum pensionable earnings',
       reference: 'D',
       amount: '81200.00',
+      detail:
+        'cpp_additional_maximum_pensionable_earnings: 81200.00 for cpp_months 12 (half-up to 0.01)',
     });
   });
 
-  it('uses the text when a line has no label, and null when it has no amount', () => {
-    const groups = advancedGroups({
-      salary: '1.00',
-      total_deductions: '0.00',
-      take_home: '1.00',
-      provisional: false,
-      trace: [
-        { form: 'f', name: 'f', lines: [{ label: null, text: 'a_note' }] },
-      ],
-    });
-    expect(groups[0]?.lines).toEqual([
-      { label: 'a note', reference: null, amount: null },
-    ]);
-  });
-
-  it('gives an empty label when both label and text are empty', () => {
-    const groups = advancedGroups({
-      salary: '1.00',
-      total_deductions: '0.00',
-      take_home: '1.00',
-      provisional: false,
-      trace: [{ form: 'f', name: 'f', lines: [{ text: '' }] }],
-    });
-    expect(groups[0]?.lines).toEqual([
-      { label: '', reference: null, amount: null },
-    ]);
-  });
-
-  it('prefers the API names, keeps the reference, and falls back to the form id', () => {
+  it('shows only numbered lines: the API name or "Line N", with the text as detail; falls back to the form id', () => {
     const groups = advancedGroups({
       salary: '1.00',
       total_deductions: '0.00',
@@ -177,10 +136,18 @@ describe('advancedGroups', () => {
             },
             { label: 'b_step', name: null, reference: null, text: 't' },
             { label: 'c_step', name: '  ', reference: ' ', text: 't' },
+            { label: 'd_step', name: null, reference: ' 2 ', text: 'x = 2' },
+            { label: 'e_step', name: null, reference: null, text: '  ' },
           ],
         },
-        { form: 'ex/other', name: '', lines: [] },
-        { form: 'ex/blank', name: '  ', lines: [] },
+        { form: 'ex/other', name: '', lines: [{ text: 't', reference: '1' }] },
+        {
+          form: 'ex/blank',
+          name: '  ',
+          lines: [{ text: 't', reference: '1' }],
+        },
+        { form: 'ex/unnumbered', name: 'No numbers', lines: [{ text: 't' }] },
+        { form: 'ex/empty', name: 'Empty', lines: [] },
       ],
     });
     expect(groups.map((g) => g.name)).toEqual([
@@ -189,9 +156,8 @@ describe('advancedGroups', () => {
       'ex/blank',
     ]);
     expect(groups[0]?.lines).toEqual([
-      { label: 'Named figure', reference: '65', amount: '1.00' },
-      { label: 'b step', reference: null, amount: null },
-      { label: 'c step', reference: null, amount: null },
+      { label: 'Named figure', reference: '65', amount: '1.00', detail: 't' },
+      { label: 'Line 2', reference: '2', amount: null, detail: 'x = 2' },
     ]);
   });
 
