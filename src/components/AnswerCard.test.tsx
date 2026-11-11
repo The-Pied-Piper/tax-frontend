@@ -8,6 +8,8 @@ const base = {
   totalDeductions: '16531.32',
   takeHome: '53468.68',
   provisional: false,
+  place: 'Ontario',
+  year: 2025,
   payPeriod: 'annually' as const,
   onPayPeriodChange: () => {},
 };
@@ -18,10 +20,13 @@ describe('AnswerCard', () => {
     expect(
       screen.getByRole('region', { name: strings.answer.heading }),
     ).toBeInTheDocument();
-    expect(screen.getByText('53,468.68')).toBeInTheDocument();
-    expect(screen.getByText('70,000.00')).toBeInTheDocument();
-    expect(screen.getByText('16,531.32')).toBeInTheDocument();
-    expect(screen.getByText(strings.answer.per.annually)).toBeInTheDocument();
+    expect(screen.getAllByText('$53,468.68')).toHaveLength(2);
+    expect(screen.getByText('$70,000.00')).toBeInTheDocument();
+    expect(screen.getByText('$16,531.32')).toBeInTheDocument();
+    expect(screen.getByText(strings.answer.label.annually)).toBeInTheDocument();
+    expect(
+      screen.getByText('out of $70,000.00, Ontario, 2025'),
+    ).toBeInTheDocument();
   });
 
   it('words the card as an estimate, never as checked', () => {
@@ -32,7 +37,7 @@ describe('AnswerCard', () => {
 
   it('shows an amount it cannot divide as sent instead of failing', () => {
     render(<AnswerCard {...base} payPeriod="monthly" takeHome="53468.555" />);
-    expect(screen.getByText('53468.555')).toBeInTheDocument();
+    expect(screen.getAllByText('$53468.555')[0]).toBeInTheDocument();
   });
 
   it('shows the notice only when provisional is true', () => {
@@ -53,9 +58,10 @@ describe('AnswerCard', () => {
         onPayPeriodChange={(p) => changed.push(p)}
       />,
     );
-    expect(screen.getByText('1,028.24')).toBeInTheDocument();
-    expect(screen.getByText('1,346.15')).toBeInTheDocument();
-    expect(screen.getByText('317.91')).toBeInTheDocument();
+    expect(screen.getAllByText('$1,028.24')).toHaveLength(2);
+    expect(screen.getByText('$1,346.15')).toBeInTheDocument();
+    expect(screen.getByText('$317.91')).toBeInTheDocument();
+    expect(screen.getByText(strings.answer.label.weekly)).toBeInTheDocument();
     await userEvent.click(
       screen.getByRole('radio', { name: strings.payPeriod.monthly }),
     );

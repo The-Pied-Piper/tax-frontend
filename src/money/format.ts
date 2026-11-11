@@ -22,3 +22,19 @@ export function displayAmount(yearly: string, period: PayPeriod): string {
     return yearly;
   }
 }
+
+// "53,468.68" -> "$53,468.68"; a minus sign stays in front of the symbol.
+export function withSymbol(amount: string, symbol: string): string {
+  return amount.startsWith('-')
+    ? `-${symbol}${amount.slice(1)}`
+    : `${symbol}${amount}`;
+}
+
+// Amount for one pay period with the currency symbol, ready to show.
+export function displayMoney(
+  yearly: string,
+  period: PayPeriod,
+  symbol: string,
+): string {
+  return withSymbol(displayAmount(yearly, period), symbol);
+}

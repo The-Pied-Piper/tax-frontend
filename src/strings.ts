@@ -9,8 +9,9 @@ export const strings = {
   themeLight: 'Light',
   themeDark: 'Dark',
   starLink: 'Star the engine on GitHub',
+  currencySymbol: '$',
   payPeriod: {
-    legend: 'Show amounts',
+    legend: 'Show amounts per',
     weekly: 'Weekly',
     biweekly: 'Bi-weekly',
     monthly: 'Monthly',
@@ -33,15 +34,17 @@ export const strings = {
   },
   answer: {
     heading: 'Your estimate',
-    takeHome: 'Estimated take-home pay',
-    salary: 'Salary before tax',
-    takenOff: 'Taken off (tax and contributions)',
-    per: {
-      weekly: 'per week',
-      biweekly: 'every two weeks',
-      monthly: 'per month',
-      annually: 'per year',
+    label: {
+      weekly: 'Estimated take-home each week',
+      biweekly: 'Estimated take-home every two weeks',
+      monthly: 'Estimated take-home each month',
+      annually: 'Estimated take-home each year',
     },
+    outOf: (salary: string, place: string, year: number) =>
+      `out of ${salary}, ${place}, ${String(year)}`,
+    salary: 'Salary before tax',
+    takeHomeRow: 'Take-home',
+    takenOff: 'Taken off (tax and contributions)',
     provisional:
       'Provisional: the tax figures for this year are not final, so this estimate may change.',
     estimateNote:

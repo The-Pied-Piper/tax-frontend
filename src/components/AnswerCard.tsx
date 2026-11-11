@@ -1,5 +1,5 @@
 import { useId } from 'react';
-import { displayAmount } from '../money/format';
+import { displayMoney } from '../money/format';
 import type { PayPeriod } from '../money/payPeriod';
 import { strings } from '../strings';
 import styles from './AnswerCard.module.css';
@@ -10,6 +10,9 @@ type Props = {
   totalDeductions: string;
   takeHome: string;
   provisional: boolean;
+  /** The place and year the answer is for, as asked. */
+  place: string;
+  year: number;
   payPeriod: PayPeriod;
   onPayPeriodChange: (period: PayPeriod) => void;
 };
@@ -21,14 +24,17 @@ export function AnswerCard({
   totalDeductions,
   takeHome,
   provisional,
+  place,
+  year,
   payPeriod,
   onPayPeriodChange,
 }: Props) {
   const headingId = useId();
-  const show = (yearly: string) => displayAmount(yearly, payPeriod);
+  const show = (yearly: string) =>
+    displayMoney(yearly, payPeriod, strings.currencySymbol);
   return (
     <section className={styles.card} aria-labelledby={headingId}>
-      <h2 id={headingId} className={styles.heading}>
+      <h2 id={headingId} className={styles.visuallyHidden}>
         {strings.answer.heading}
       </h2>
       {provisional && (
@@ -36,12 +42,18 @@ export function AnswerCard({
           {strings.answer.provisional}
         </p>
       )}
-      <PayPeriodSwitch value={payPeriod} onChange={onPayPeriodChange} />
-      <div className={styles.answer}>
-        <p className={styles.label}>{strings.answer.takeHome}</p>
-        <p className={styles.amount}>{show(takeHome)}</p>
-        <p className={styles.unit}>{strings.answer.per[payPeriod]}</p>
+      <div className={styles.topRow}>
+        <p className={styles.label}>{strings.answer.label[payPeriod]}</p>
+        <PayPeriodSwitch value={payPeriod} onChange={onPayPeriodChange} />
       </div>
+      <p className={styles.amount}>{show(takeHome)}</p>
+      <p className={styles.sub}>
+        {strings.answer.outOf(
+          displayMoney(salary, 'annually', strings.currencySymbol),
+          place,
+          year,
+        )}
+      </p>
       <dl className={styles.rows}>
         <div className={styles.row}>
           <dt>{strings.answer.salary}</dt>
@@ -50,6 +62,10 @@ export function AnswerCard({
         <div className={styles.row}>
           <dt>{strings.answer.takenOff}</dt>
           <dd>{show(totalDeductions)}</dd>
+        </div>
+        <div className={styles.totalRow}>
+          <dt>{strings.answer.takeHomeRow}</dt>
+          <dd>{show(takeHome)}</dd>
         </div>
       </dl>
       <p className={styles.estimate}>{strings.answer.estimateNote}</p>
