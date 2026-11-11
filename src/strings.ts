@@ -76,6 +76,11 @@ export const strings = {
   },
   adapters: {
     caOn: {
+      groups: {
+        pension: 'Pension',
+        ei: 'Employment Insurance',
+        incomeTax: 'Income tax',
+      },
       cpp: {
         name: 'Canada Pension Plan',
         help: 'Your contribution to the Canada Pension Plan (base and enhanced), taken off your pay for a pension when you retire.',

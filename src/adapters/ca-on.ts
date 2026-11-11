@@ -36,8 +36,11 @@ function row(
   id: string,
   text: { name: string; help: string },
   amount: string,
+  group?: string,
 ): DisplayRow {
-  return { id, name: text.name, help: text.help, amount };
+  return group === undefined
+    ? { id, name: text.name, help: text.help, amount }
+    : { id, name: text.name, help: text.help, amount, group };
 }
 
 function adapt(response: ComputeTakeHomeCalculationResponse): AdaptedResult {
@@ -68,13 +71,13 @@ function adapt(response: ComputeTakeHomeCalculationResponse): AdaptedResult {
   const text = strings.adapters.caOn;
   return {
     rows: [
-      row('cpp', text.cpp, cpp),
-      row('ei', text.ei, ei),
-      row('federal-tax', text.federalTax, federalTax),
-      row('ontario-tax', text.ontarioTax, ontarioTax),
+      row('cpp', text.cpp, cpp, text.groups.pension),
+      row('ei', text.ei, ei, text.groups.ei),
+      row('federal-tax', text.federalTax, federalTax, text.groups.incomeTax),
+      row('ontario-tax', text.ontarioTax, ontarioTax, text.groups.incomeTax),
     ],
     totals: [
-      row('total-tax', text.totalTax, totalTax),
+      row('total-tax', text.totalTax, totalTax, text.groups.incomeTax),
       row('total-taken-off', text.totalTakenOff, response.total_deductions),
     ],
     advanced: advancedGroups(response),

@@ -10,12 +10,14 @@ const rows: DisplayRow[] = [
     name: 'Canada Pension Plan',
     help: 'Pension contributions taken from each paycheque.',
     amount: '3956.75',
+    group: 'Pension',
   },
   {
     id: 'ei',
     name: 'Employment Insurance',
     help: 'Insurance against losing your job.',
     amount: '1077.48',
+    group: 'Employment Insurance',
   },
 ];
 const totals: DisplayRow[] = [
@@ -46,6 +48,44 @@ describe('Breakdown', () => {
     expect(screen.getByText('1,077.48')).toBeVisible();
     expect(screen.getByText('Total taken off')).toBeVisible();
     expect(screen.getByText('16,531.32')).toBeVisible();
+  });
+
+  it('lists rows under their headings, with grouped totals bold in place', async () => {
+    const taxRows: DisplayRow[] = [
+      {
+        id: 'fed',
+        name: 'Federal',
+        help: 'h',
+        amount: '7585.64',
+        group: 'Income tax',
+      },
+    ];
+    const taxTotals: DisplayRow[] = [
+      {
+        id: 'tt',
+        name: 'Total tax',
+        help: 'h',
+        amount: '11497.09',
+        group: 'Income tax',
+      },
+      ...totals,
+    ];
+    render(
+      <Breakdown
+        rows={[...rows, ...taxRows]}
+        totals={taxTotals}
+        payPeriod="annually"
+      />,
+    );
+    await open();
+    expect(
+      screen.getAllByRole('heading', { level: 3 }).map((h) => h.textContent),
+    ).toEqual(['Pension', 'Employment Insurance', 'Income tax']);
+    const tax = screen
+      .getByText('Federal')
+      .closest('div[class]')?.parentElement;
+    expect(tax).toHaveTextContent('Total tax');
+    expect(screen.getByText('Total taken off')).toBeVisible();
   });
 
   it('follows the pay period', async () => {
