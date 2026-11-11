@@ -42,15 +42,12 @@ function sections(
 // Display only: names, help text, headings and yearly amounts come from the adapter.
 // The page shows nothing when the adapter gave no simple rows.
 export function Breakdown({ rows, totals, payPeriod }: Props) {
-  const headingId = useId();
   if (rows.length === 0 && totals.length === 0) return null;
   return (
-    <section aria-labelledby={headingId}>
+    <div>
       <details>
         <summary className={styles.summary}>
-          <h2 id={headingId} className={styles.heading}>
-            {strings.breakdown.toggle}
-          </h2>
+          <h3 className={styles.heading}>{strings.breakdown.toggle}</h3>
         </summary>
         {sections(rows, totals).map((section) => (
           <SectionBlock
@@ -60,7 +57,7 @@ export function Breakdown({ rows, totals, payPeriod }: Props) {
           />
         ))}
       </details>
-    </section>
+    </div>
   );
 }
 
@@ -74,7 +71,7 @@ function SectionBlock({
   return (
     <div className={styles.block}>
       {section.heading !== undefined && (
-        <h3 className={styles.groupHeading}>{section.heading}</h3>
+        <h4 className={styles.groupHeading}>{section.heading}</h4>
       )}
       <dl className={styles.rows}>
         {section.lines.map(({ row, strong }) => (

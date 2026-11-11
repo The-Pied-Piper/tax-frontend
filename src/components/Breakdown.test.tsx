@@ -75,7 +75,7 @@ describe('Breakdown', () => {
       <Breakdown rows={mixed} totals={mixedTotals} payPeriod="annually" />,
     );
     await open();
-    const headings = screen.getAllByRole('heading', { level: 3 });
+    const headings = screen.getAllByRole('heading', { level: 4 });
     expect(headings.map((h) => h.textContent)).toEqual([
       'Pension',
       'Employment Insurance',
@@ -101,7 +101,7 @@ describe('Breakdown', () => {
     ];
     render(<Breakdown rows={blank} totals={[]} payPeriod="annually" />);
     await open();
-    expect(screen.queryAllByRole('heading', { level: 3 })).toHaveLength(0);
+    expect(screen.queryAllByRole('heading', { level: 4 })).toHaveLength(0);
     expect(screen.getByText('Blank')).toBeVisible();
   });
 

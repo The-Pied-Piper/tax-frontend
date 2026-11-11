@@ -26,7 +26,7 @@ const groups: AdvancedGroup[] = [
 ];
 
 function section() {
-  return screen.getByRole('region', { name: strings.advanced.heading });
+  return screen.getByRole('group', { name: strings.advanced.heading });
 }
 
 function open() {

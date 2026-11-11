@@ -539,7 +539,7 @@ describe('App advanced view', () => {
       await user.click(screen.getByText(form.name));
     }
     const lines = within(
-      screen.getByRole('region', { name: strings.advanced.heading }),
+      screen.getByRole('group', { name: strings.advanced.heading }),
     ).getAllByRole('term');
     const expected = compute2025.trace.reduce(
       (count, form) => count + form.lines.length,
