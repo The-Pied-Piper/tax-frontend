@@ -47,11 +47,3 @@
 .bubble[hidden] {
   display: none;
 }
-
-/* Where a mouse is available, pointing at the name or the "?" also shows the
-   explanation. Touch and keyboard use the button. */
-@media (hover: hover) {
-  .term:hover .bubble[hidden] {
-    display: block;
-  }
-}
