@@ -51,6 +51,12 @@ describe('App form', () => {
     ).toBeInTheDocument();
   });
 
+  it('shows the intro and the estimate footer', () => {
+    render(<App client={fixtureClient()} />);
+    expect(screen.getByText(strings.intro)).toBeInTheDocument();
+    expect(screen.getByRole('contentinfo')).toHaveTextContent(strings.footer);
+  });
+
   it('fills places and years from the API', async () => {
     render(<App client={fixtureClient()} />);
     const place = await screen.findByRole('combobox', {

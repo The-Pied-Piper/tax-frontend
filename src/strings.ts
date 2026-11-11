@@ -2,13 +2,17 @@
 export const languageCode = 'en';
 
 export const strings = {
-  title: 'Take-home pay estimate',
+  title: 'What will I take home?',
   intro:
-    'Coming soon: enter a yearly salary and see an estimate of your take-home pay.',
+    'Estimate your yearly take-home from a salary before tax. We work out the pension, EI and income tax for a single person and show every step.',
+  footer:
+    'This is an estimate, not tax advice. Your actual take-home depends on your own situation and what your employer withholds. Nothing you enter is saved.',
   themeLabel: 'Theme',
   themeLight: 'Light',
   themeDark: 'Dark',
   starLink: 'Star the engine on GitHub',
+  starNote:
+    'The calculations are open source. A star helps other people find it.',
   currencySymbol: '$',
   payPeriod: {
     legend: 'Show amounts',
