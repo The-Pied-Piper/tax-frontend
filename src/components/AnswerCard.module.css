@@ -28,6 +28,8 @@
 }
 
 .label {
+  /* Let a long label wrap inside its own space so the switch stays beside it. */
+  flex: 1 1 160px;
   margin: 0;
   font-size: 13px;
   font-weight: 500;
