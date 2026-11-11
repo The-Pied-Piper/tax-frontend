@@ -9,7 +9,6 @@ type Props = {
   salary: string;
   totalDeductions: string;
   takeHome: string;
-  provisional: boolean;
   /** The place and year the answer is for, as asked. */
   place: string;
   year: number;
@@ -23,7 +22,6 @@ export function AnswerCard({
   salary,
   totalDeductions,
   takeHome,
-  provisional,
   place,
   year,
   payPeriod,
@@ -37,11 +35,6 @@ export function AnswerCard({
       <h2 id={headingId} className={styles.visuallyHidden}>
         {strings.answer.heading}
       </h2>
-      {provisional && (
-        <p role="note" className={styles.notice}>
-          {strings.answer.provisional}
-        </p>
-      )}
       <div className={styles.topRow}>
         <p className={styles.label}>{strings.answer.label[payPeriod]}</p>
         <PayPeriodSwitch value={payPeriod} onChange={onPayPeriodChange} />
