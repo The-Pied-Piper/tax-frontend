@@ -26,11 +26,21 @@ export function separatorsFor(languageCode: string): Separators {
 // dropped, the language's decimal mark becomes ".". A "." is also accepted as
 // the decimal mark in every language. Anything else is kept for the salary
 // check to refuse.
-export function toPlainSalary(typed: string, sep: Separators): string {
+export function toPlainSalary(
+  typed: string,
+  sep: Separators,
+  pasted = false,
+): string {
   let text = typed.replace(SPACE, '');
   // "70 000,50" pasted into an English box: a comma with one or two digits
-  // after it and no "." anywhere is a decimal mark, never a group mark.
-  if (sep.group === ',' && !text.includes('.') && /,\d{1,2}$/.test(text)) {
+  // after it and no "." anywhere is a decimal mark. Only for a paste: while
+  // typing, deleting a digit from "1,000" leaves "1,00", which is a group.
+  if (
+    pasted &&
+    sep.group === ',' &&
+    !text.includes('.') &&
+    /,\d{1,2}$/.test(text)
+  ) {
     text = `${text.slice(0, text.lastIndexOf(','))}.${text.slice(text.lastIndexOf(',') + 1)}`;
   }
   if (!/^\s*$/.test(sep.group) && sep.group !== '.') {

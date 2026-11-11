@@ -37,6 +37,10 @@ const SALARY_MESSAGES = {
   zero: strings.form.salaryZero,
 } as const;
 
+function isPaste(event: Event): boolean {
+  return 'inputType' in event && event.inputType === 'insertFromPaste';
+}
+
 export function SalaryForm({
   jurisdictionsState,
   values,
@@ -152,7 +156,9 @@ export function SalaryForm({
                 e.target.selectionStart ?? e.target.value.length,
                 sep,
               );
-              onSalaryChange(toPlainSalary(e.target.value, sep));
+              onSalaryChange(
+                toPlainSalary(e.target.value, sep, isPaste(e.nativeEvent)),
+              );
             }}
             aria-invalid={salaryMessage !== null}
             aria-describedby={salaryMessage ? `${hintId} ${errorId}` : hintId}

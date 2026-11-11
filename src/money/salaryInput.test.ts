@@ -42,13 +42,19 @@ describe('toPlainSalary', () => {
     [' 70 000 ', '70000'],
     ['70,000.123', '70000.123'],
     ['7a', '7a'],
-    ['70 000,50', '70000.50'],
-    ['1,5', '1.5'],
-    ['1,000', '1000'],
-    ['1,000,50', '1000.50'],
+    ['1,00', '100'],
+    ['10,00', '1000'],
+    ['1,234,56', '123456'],
     ['1,000.5', '1000.5'],
   ])('reads %s in English as %s', (typed, plain) => {
     expect(toPlainSalary(typed, en)).toBe(plain);
+  });
+
+  it('reads a pasted comma with one or two digits after it as decimal', () => {
+    expect(toPlainSalary('70 000,50', en, true)).toBe('70000.50');
+    expect(toPlainSalary('1,5', en, true)).toBe('1.5');
+    expect(toPlainSalary('1,000', en, true)).toBe('1000');
+    expect(toPlainSalary('1,000.5', en, true)).toBe('1000.5');
   });
 
   it('reads French and plain input', () => {

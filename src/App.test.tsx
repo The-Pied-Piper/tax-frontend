@@ -135,6 +135,27 @@ describe('App form', () => {
     ).toBeInTheDocument();
   });
 
+  it('deleting the last digit of 1,000 gives 100', async () => {
+    const user = userEvent.setup();
+    render(<App client={fixtureClient()} />);
+    const input = await screen.findByRole('textbox', {
+      name: strings.form.salary,
+    });
+    await user.type(input, '1000{Backspace}');
+    expect(input).toHaveValue('100');
+  });
+
+  it('reads a pasted 70 000,50 as 70,000.50', async () => {
+    const user = userEvent.setup();
+    render(<App client={fixtureClient()} />);
+    const input = await screen.findByRole('textbox', {
+      name: strings.form.salary,
+    });
+    await user.click(input);
+    await user.paste('70 000,50');
+    expect(input).toHaveValue('70,000.50');
+  });
+
   it('backspace next to a separator moves the caret before it', async () => {
     const user = userEvent.setup();
     render(<App client={fixtureClient()} />);
