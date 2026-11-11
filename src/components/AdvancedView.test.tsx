@@ -38,9 +38,22 @@ function form(name: string) {
 }
 
 describe('AdvancedView', () => {
-  it('is folded by default', () => {
+  it('is off by default and shows no forms', () => {
     render(<AdvancedView groups={groups} />);
-    expect(section().querySelector('details')).not.toHaveAttribute('open');
+    expect(
+      screen.getByRole('checkbox', { name: strings.advanced.toggle }),
+    ).not.toBeChecked();
+    expect(screen.queryByText(strings.advanced.note)).not.toBeInTheDocument();
+    expect(screen.queryByText('ca/schedule_8')).not.toBeInTheDocument();
+    expect(section()).toBeInTheDocument();
+  });
+
+  it('shows the yearly note and hides the forms again when switched off', async () => {
+    render(<AdvancedView groups={groups} />);
+    await open();
+    expect(screen.getByText(strings.advanced.note)).toBeVisible();
+    await userEvent.click(screen.getByRole('checkbox'));
+    expect(screen.queryByText('ca/schedule_8')).not.toBeInTheDocument();
   });
 
   it('lists every form with its line count once opened', async () => {

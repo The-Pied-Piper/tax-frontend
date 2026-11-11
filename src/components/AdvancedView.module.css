@@ -5,48 +5,77 @@
   padding: 16px 20px;
 }
 
-.summary,
-.formSummary {
+.toggle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  font-weight: 500;
   cursor: pointer;
-  border-radius: var(--radius-control);
 }
 
-.summary:focus-visible,
+.checkbox {
+  appearance: none;
+  margin: 0;
+  flex: none;
+  width: 18px;
+  height: 18px;
+  display: grid;
+  place-content: center;
+  border: 1px solid var(--edge);
+  border-radius: 4px;
+  background: var(--surface);
+  cursor: pointer;
+}
+
+.checkbox::after {
+  content: '';
+  width: 10px;
+  height: 6px;
+  border-left: 2px solid var(--btn-fg);
+  border-bottom: 2px solid var(--btn-fg);
+  transform: rotate(-45deg) translate(1px, -1px);
+  opacity: 0;
+}
+
+.checkbox:checked {
+  background: var(--accent);
+  border-color: var(--accent);
+}
+
+.checkbox:checked::after {
+  opacity: 1;
+}
+
+.checkbox:focus-visible,
 .formSummary:focus-visible {
   outline: 2px solid var(--accent);
   outline-offset: 2px;
 }
 
-.heading {
-  display: inline;
-  font-size: 16px;
-  font-weight: 600;
-  margin: 0;
-}
-
 .note {
   margin: 12px 0 0;
   font-size: 13px;
-  color: var(--muted);
+  color: var(--faint);
 }
 
 .form {
   margin-top: 12px;
-  padding-top: 12px;
-  border-top: 1px solid var(--rule);
+  padding-top: 10px;
+  border-top: 1px solid var(--line);
 }
 
-.summary,
 .formSummary {
+  cursor: pointer;
+  border-radius: var(--radius-control);
   list-style: none;
+  font-size: 14px;
 }
 
-.summary::-webkit-details-marker,
 .formSummary::-webkit-details-marker {
   display: none;
 }
 
-.summary::before,
 .formSummary::before {
   content: '▸';
   display: inline-block;
@@ -54,7 +83,6 @@
   color: var(--muted);
 }
 
-details[open] > .summary::before,
 details[open] > .formSummary::before {
   content: '▾';
 }
@@ -77,34 +105,39 @@ details[open] > .formSummary::before {
 
 .formName {
   font-weight: 600;
+  color: var(--fg);
   overflow-wrap: anywhere;
 }
 
 .count {
-  color: var(--muted);
+  flex: none;
+  color: var(--faint);
   font-size: 13px;
 }
 
 .lines {
-  display: grid;
-  gap: 6px;
-  margin: 10px 0 0;
+  margin: 6px 0 0;
 }
 
 .line {
-  display: flex;
-  justify-content: space-between;
-  gap: 12px;
-  font-size: 14px;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: center;
+  gap: 2px 16px;
+  padding: 6px 0;
+  border-top: 1px solid var(--rule);
 }
 
 .line dt {
+  font-size: 13px;
+  color: var(--muted);
   overflow-wrap: anywhere;
 }
 
 .line dd {
   margin: 0;
   font-family: var(--font-mono);
+  font-size: 14px;
   text-align: right;
   overflow-wrap: anywhere;
 }

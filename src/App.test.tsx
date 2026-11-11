@@ -485,10 +485,9 @@ describe('App advanced view', () => {
 
   it('is folded under the answer and lists every form from the trace', async () => {
     const user = await calculate();
-    const details = screen
-      .getByText(strings.advanced.toggle)
-      .closest('details');
-    expect(details).not.toHaveAttribute('open');
+    expect(
+      screen.getByRole('checkbox', { name: strings.advanced.toggle }),
+    ).not.toBeChecked();
     await user.click(screen.getByText(strings.advanced.toggle));
     for (const form of compute2025.trace) {
       expect(screen.getByText(form.name)).toBeVisible();
