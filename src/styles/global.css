@@ -29,7 +29,7 @@ main {
 
 /* The text block takes the free width so the toggle sits on the right; on a
    phone there is not room for both, so the toggle wraps below. */
-.page-header > div:first-child {
+.page-header-text {
   flex: 1 1 320px;
   min-width: 0;
 }
@@ -54,6 +54,8 @@ button:focus-visible {
 }
 
 .page-footer {
+  max-width: 640px;
+  margin: 16px auto 0;
   font-size: 12px;
   line-height: 1.5;
   color: var(--faint);
