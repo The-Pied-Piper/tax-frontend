@@ -1,6 +1,6 @@
 import { useId, useState } from 'react';
 import type { DisplayRow } from '../adapters';
-import { displayAmount } from '../money/format';
+import { displayMoney } from '../money/format';
 import type { PayPeriod } from '../money/payPeriod';
 import { strings } from '../strings';
 import styles from './Breakdown.module.css';
@@ -45,7 +45,7 @@ export function Breakdown({ rows, totals, payPeriod }: Props) {
   const headingId = useId();
   if (rows.length === 0 && totals.length === 0) return null;
   return (
-    <section className={styles.card} aria-labelledby={headingId}>
+    <section aria-labelledby={headingId}>
       <details>
         <summary className={styles.summary}>
           <h2 id={headingId} className={styles.heading}>
@@ -87,7 +87,9 @@ function SectionBlock({
             <dt>
               <HelpTerm name={row.name} help={row.help} />
             </dt>
-            <dd>{displayAmount(row.amount, payPeriod)}</dd>
+            <dd>
+              {displayMoney(row.amount, payPeriod, strings.currencySymbol)}
+            </dd>
           </div>
         ))}
       </dl>

@@ -44,10 +44,10 @@ describe('Breakdown', () => {
     await open();
     expect(screen.getByRole('group')).toHaveAttribute('open');
     expect(screen.getByText('Canada Pension Plan')).toBeVisible();
-    expect(screen.getByText('3,956.75')).toBeVisible();
-    expect(screen.getByText('1,077.48')).toBeVisible();
+    expect(screen.getByText('$3,956.75')).toBeVisible();
+    expect(screen.getByText('$1,077.48')).toBeVisible();
     expect(screen.getByText('Total taken off')).toBeVisible();
-    expect(screen.getByText('16,531.32')).toBeVisible();
+    expect(screen.getByText('$16,531.32')).toBeVisible();
   });
 
   it('lists rows under their headings, grouped totals after the rows', async () => {
@@ -108,7 +108,7 @@ describe('Breakdown', () => {
   it('follows the pay period', async () => {
     render(<Breakdown rows={rows} totals={totals} payPeriod="monthly" />);
     await open();
-    expect(screen.getByText('329.73')).toBeVisible();
+    expect(screen.getByText('$329.73')).toBeVisible();
   });
 
   it('shows the help text only after the ? button is pressed', async () => {

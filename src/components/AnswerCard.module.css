@@ -93,6 +93,17 @@
   color: var(--faint);
 }
 
+.extras {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 20px;
+}
+
+.extras:empty {
+  display: none;
+}
+
 @media (max-width: 480px) {
   .amount {
     font-size: 32px;

@@ -16,7 +16,7 @@ export function AdvancedView({ groups }: Props) {
   const [on, setOn] = useState(false);
   if (groups.length === 0) return null;
   return (
-    <section className={styles.card} aria-labelledby={headingId}>
+    <section aria-labelledby={headingId}>
       <h2 id={headingId} className={styles.hidden}>
         {strings.advanced.heading}
       </h2>

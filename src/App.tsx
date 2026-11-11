@@ -56,13 +56,14 @@ export function App({ client, registry }: Props) {
               year={page.request.asked.year}
               payPeriod={page.payPeriod}
               onPayPeriodChange={page.setPayPeriod}
-            />
-            <Breakdown
-              rows={page.request.adapted.rows}
-              totals={page.request.adapted.totals}
-              payPeriod={page.payPeriod}
-            />
-            <AdvancedView groups={page.request.adapted.advanced} />
+            >
+              <Breakdown
+                rows={page.request.adapted.rows}
+                totals={page.request.adapted.totals}
+                payPeriod={page.payPeriod}
+              />
+              <AdvancedView groups={page.request.adapted.advanced} />
+            </AnswerCard>
           </>
         )}
         <StarLink />
