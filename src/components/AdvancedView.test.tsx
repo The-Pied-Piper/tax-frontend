@@ -3,6 +3,7 @@ import userEvent from '@testing-library/user-event';
 import type { AdvancedGroup } from '../adapters';
 import { AdvancedView } from './AdvancedView';
 import { strings } from '../strings';
+import { cad, months } from '../test/units';
 
 const groups: AdvancedGroup[] = [
   {
@@ -15,6 +16,7 @@ const groups: AdvancedGroup[] = [
         amount: '3500.00',
         detail: 'd',
         named: true,
+        unit: null,
       },
       {
         label: 'cpp base contribution',
@@ -22,6 +24,7 @@ const groups: AdvancedGroup[] = [
         amount: '3867.50',
         detail: 'd',
         named: true,
+        unit: null,
       },
     ],
   },
@@ -35,6 +38,7 @@ const groups: AdvancedGroup[] = [
         amount: '53468.68',
         detail: 'd',
         named: true,
+        unit: null,
       },
     ],
   },
@@ -48,6 +52,7 @@ const groups: AdvancedGroup[] = [
         amount: null,
         detail: 'd',
         named: true,
+        unit: null,
       },
     ],
   },
@@ -146,6 +151,7 @@ describe('AdvancedView', () => {
                 amount: '-1234.50',
                 detail: 'd',
                 named: true,
+                unit: null,
               },
               {
                 label: 'same',
@@ -153,6 +159,7 @@ describe('AdvancedView', () => {
                 amount: '99.00',
                 detail: 'd',
                 named: true,
+                unit: null,
               },
               {
                 label: 'rate',
@@ -160,6 +167,7 @@ describe('AdvancedView', () => {
                 amount: '0.0505',
                 detail: 'd',
                 named: true,
+                unit: null,
               },
               {
                 label: 'odd',
@@ -167,6 +175,7 @@ describe('AdvancedView', () => {
                 amount: 'n/a',
                 detail: 'd',
                 named: true,
+                unit: null,
               },
             ],
           },
@@ -198,6 +207,7 @@ describe('AdvancedView', () => {
                 amount: '1.00',
                 detail: 'd',
                 named: true,
+                unit: null,
               },
               {
                 label: 'Engine step',
@@ -205,6 +215,7 @@ describe('AdvancedView', () => {
                 amount: '2.00',
                 detail: 'd',
                 named: true,
+                unit: null,
               },
             ],
           },
@@ -240,6 +251,7 @@ describe('AdvancedView', () => {
                 amount: '70000.00',
                 detail,
                 named: false,
+                unit: null,
               },
             ],
           },
@@ -291,6 +303,7 @@ describe('AdvancedView', () => {
                 amount: '1',
                 detail: 'd',
                 named: true,
+                unit: null,
               },
               {
                 label: 'Line 66',
@@ -298,6 +311,7 @@ describe('AdvancedView', () => {
                 amount: '2',
                 detail: 'd',
                 named: false,
+                unit: null,
               },
             ],
           },
@@ -309,5 +323,79 @@ describe('AdvancedView', () => {
     expect(
       screen.getAllByText(strings.advanced.reference, { exact: false }),
     ).toHaveLength(1);
+  });
+
+  describe('units', () => {
+    const unitGroups: AdvancedGroup[] = [
+      {
+        form: 'ex/form',
+        name: 'Example form',
+        lines: [
+          {
+            label: 'EI premiums',
+            reference: '88',
+            amount: '1077.48',
+            detail: 'd',
+            named: true,
+            unit: cad,
+          },
+          {
+            label: 'Months of CPP',
+            reference: '9',
+            amount: '12',
+            detail: 'd',
+            named: true,
+            unit: months,
+          },
+          {
+            label: 'One month',
+            reference: '10',
+            amount: '1',
+            detail: 'd',
+            named: true,
+            unit: months,
+          },
+          {
+            label: 'Owed back',
+            reference: '11',
+            amount: '-1234.50',
+            detail: 'd',
+            named: true,
+            unit: cad,
+          },
+          {
+            label: 'Ontario rate',
+            reference: '12',
+            amount: '0.0915',
+            detail: 'd',
+            named: true,
+            unit: null,
+          },
+        ],
+      },
+    ];
+
+    async function openForm() {
+      render(<AdvancedView groups={unitGroups} />);
+      await open();
+      await userEvent.click(screen.getByText('Example form'));
+    }
+
+    it('shows the unit before the grouped amount of a line that has one', async () => {
+      await openForm();
+      expect(screen.getByText('CA$1,077.48')).toBeVisible();
+      expect(screen.getByText('-CA$1,234.50')).toBeVisible();
+    });
+
+    it('shows a unit that goes after the amount, singular only for 1', async () => {
+      await openForm();
+      expect(screen.getByText('12 months')).toBeVisible();
+      expect(screen.getByText('1 month')).toBeVisible();
+    });
+
+    it('shows a bare amount for a line with no unit', async () => {
+      await openForm();
+      expect(screen.getByText('0.0915')).toBeVisible();
+    });
   });
 });

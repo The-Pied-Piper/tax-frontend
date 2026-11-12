@@ -4,6 +4,7 @@ import fixture2025 from '../api/fixtures/compute-on-2025-70000.json';
 import fixture2025High from '../api/fixtures/compute-on-2025-90000.json';
 import fixture2026 from '../api/fixtures/compute-on-2026-70000.json';
 import { sumAmounts } from '../money/sum';
+import { cad, months } from '../test/units';
 import { adapters } from './index';
 import { caOnAdapter } from './ca-on';
 
@@ -187,5 +188,124 @@ describe('Ontario adapter', () => {
       ?.lines.find((l) => l.reference === '2');
     expect(line2?.label).toBe('Line 2');
     expect(line2?.detail).toMatch(/^cpp_part_3_line_2:/);
+  });
+
+  describe('units', () => {
+    function withLineUnit(
+      response: ComputeTakeHomeCalculationResponse,
+      label: string,
+      unit: ComputeTakeHomeCalculationResponse['unit'] | null | undefined,
+    ): ComputeTakeHomeCalculationResponse {
+      return {
+        ...response,
+        trace: (response.trace ?? []).map((f) => ({
+          ...f,
+          lines: f.lines.map((l) => (l.label === label ? { ...l, unit } : l)),
+        })),
+      };
+    }
+
+    it('gives every row the unit of the line it was read from', () => {
+      const result = caOnAdapter.adapt(r2025);
+      const rows = [...result.rows, ...result.totals];
+      expect(rows.map((r) => [r.id, r.unit?.name, r.unit?.singular])).toEqual(
+        rows.map((r) => [r.id, 'ca/cad', 'CA$']),
+      );
+    });
+
+    it('carries the response unit on the result', () => {
+      expect(caOnAdapter.adapt(r2025).unit).toEqual(r2025.unit);
+      expect(caOnAdapter.adapt({ ...r2025, unit: months }).unit).toEqual(
+        months,
+      );
+    });
+
+    it('takes the unit of Total taken off from the response, not from a line', () => {
+      const result = caOnAdapter.adapt({ ...r2025, unit: months });
+      const total = result.totals.find((r) => r.id === 'total-taken-off');
+      expect(total?.unit).toEqual(months);
+      expect(result.rows.find((r) => r.id === 'ei')?.unit).toEqual(cad);
+    });
+
+    it('gives a row the unit of its own line', () => {
+      const result = caOnAdapter.adapt(
+        withLineUnit(r2025, 'ei_premiums_line_88', months),
+      );
+      expect(result.rows.find((r) => r.id === 'ei')?.unit).toEqual(months);
+      expect(result.rows.find((r) => r.id === 'cpp')?.unit).toEqual(cad);
+    });
+
+    it('gives a row null when its line has no unit', () => {
+      const result = caOnAdapter.adapt(
+        withLineUnit(r2025, 'ei_premiums_line_88', null),
+      );
+      expect(result.rows.find((r) => r.id === 'ei')?.unit).toBeNull();
+      const absent = caOnAdapter.adapt(
+        withLineUnit(r2025, 'net_federal_tax', undefined),
+      );
+      expect(absent.rows.find((r) => r.id === 'federal-tax')?.unit).toBeNull();
+    });
+
+    it('sums the two CPP lines when they share a unit', () => {
+      const result = caOnAdapter.adapt(r2025);
+      const cpp = result.rows.find((r) => r.id === 'cpp');
+      expect(cpp?.amount).toBe('3956.75');
+      expect(cpp?.unit).toEqual(cad);
+    });
+
+    it.each([
+      'schedule_8_cpp_base_contributions_on_return',
+      'cpp_part_3_line_12',
+    ])(
+      'falls back when the CPP lines have different unit names (%s changed)',
+      (label) => {
+        const result = caOnAdapter.adapt(
+          withLineUnit(r2025, label, { ...cad, name: 'other/unit' }),
+        );
+        expect(result.rows).toEqual([]);
+        expect(result.totals).toEqual([]);
+        expect(result.advanced.length).toBeGreaterThan(0);
+        expect(result.unit).toEqual(r2025.unit);
+      },
+    );
+
+    it('keeps the unit of every advanced line, null where the API sent none', () => {
+      const result = caOnAdapter.adapt(
+        withLineUnit(r2025, 'cpp_part_3_line_2', null),
+      );
+      const lines = result.advanced.flatMap((g) => g.lines);
+      const line2 = result.advanced
+        .find((g) => g.form === 'ca/schedule_8')
+        ?.lines.find((l) => l.reference === '2');
+      expect(line2?.unit).toBeNull();
+      expect(lines.filter((l) => l.unit === null)).toHaveLength(1);
+      expect(lines.filter((l) => l.unit?.name === 'ca/cad')).toHaveLength(
+        lines.length - 1,
+      );
+    });
+
+    it('still adapts a response with no unit on any line', () => {
+      const bare: ComputeTakeHomeCalculationResponse = {
+        ...r2025,
+        trace: (r2025.trace ?? []).map((f) => ({
+          ...f,
+          lines: f.lines.map((l) => ({ ...l, unit: undefined })),
+        })),
+      };
+      const result = caOnAdapter.adapt(bare);
+      expect(result.rows.map((r) => r.unit)).toEqual([
+        null,
+        null,
+        null,
+        null,
+        null,
+      ]);
+      expect(
+        result.advanced.flatMap((g) => g.lines).every((l) => l.unit === null),
+      ).toBe(true);
+      expect(
+        result.totals.find((r) => r.id === 'total-taken-off')?.unit,
+      ).toEqual(cad);
+    });
   });
 });
