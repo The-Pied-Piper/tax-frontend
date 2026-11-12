@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import type { ComputeTakeHomeCalculationResponse } from '../api';
 import fixture from '../api/fixtures/compute-on-2025-70000.json';
 import { strings } from '../strings';
-import { cad, months } from '../test/units';
+import { cad, months, percent } from '../test/units';
 import { advancedGroups } from './fallback';
 import { AdapterRegistry } from './registry';
 import type { AdaptedResult, JurisdictionAdapter } from './types';
@@ -133,6 +133,8 @@ describe('advancedGroups', () => {
     const groups = advancedGroups({
       salary: '1.00',
       total_deductions: '0.00',
+      average_income_tax_rate: { amount: '0.1642', unit: percent },
+      marginal_income_tax_rate: { amount: '0.2965', unit: percent },
       take_home: '1.00',
       unit: cad,
       provisional: false,
@@ -203,6 +205,8 @@ describe('advancedGroups', () => {
       advancedGroups({
         salary: '1.00',
         total_deductions: '0.00',
+        average_income_tax_rate: { amount: '0.1642', unit: percent },
+        marginal_income_tax_rate: { amount: '0.2965', unit: percent },
         take_home: '1.00',
         unit: cad,
         provisional: false,

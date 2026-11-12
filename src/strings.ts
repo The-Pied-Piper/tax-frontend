@@ -20,6 +20,7 @@ export const strings = {
     singular: '$',
     plural: '$',
     spaced: false,
+    as_percentage: false,
   } as const,
   payPeriod: {
     legend: 'Show amounts',

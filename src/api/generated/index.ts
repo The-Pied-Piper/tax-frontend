@@ -25,6 +25,7 @@ export type {
   ListJurisdictionsResponse,
   ListJurisdictionsResponse2,
   ListJurisdictionsResponses,
+  Rate,
   StatusOutput,
   TraceLine,
   Unit,

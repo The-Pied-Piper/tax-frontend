@@ -13,8 +13,8 @@ const base = {
   payPeriod: 'annually' as const,
   onPayPeriodChange: () => {},
   unit: cad,
-  averageRate: { amount: '16.42', unit: percent },
-  marginalRate: { amount: '29.65', unit: percent },
+  averageRate: { amount: '0.1642', unit: percent },
+  marginalRate: { amount: '0.2965', unit: percent },
 };
 
 describe('AnswerCard', () => {
@@ -101,9 +101,7 @@ describe('AnswerCard', () => {
 
   it('shows the two income tax rates directly under take-home, as sent', () => {
     render(<AnswerCard {...base} />);
-    const labels = screen
-      .getAllByRole('term')
-      .map((term) => term.textContent ?? '');
+    const labels = screen.getAllByRole('term').map((term) => term.textContent);
     const takeHome = labels.findIndex((t) =>
       t.startsWith(strings.answer.takeHomeRow),
     );

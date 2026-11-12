@@ -7,6 +7,7 @@ export const cad: Unit = {
   singular: 'CA$',
   plural: 'CA$',
   spaced: false,
+  as_percentage: false,
 };
 
 export const months: Unit = {
@@ -15,6 +16,7 @@ export const months: Unit = {
   singular: 'month',
   plural: 'months',
   spaced: true,
+  as_percentage: false,
 };
 
 export const percent: Unit = {

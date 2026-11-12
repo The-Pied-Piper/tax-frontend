@@ -53,6 +53,8 @@ export function App({ client, registry }: Props) {
               totalDeductions={page.request.response.total_deductions}
               takeHome={page.request.response.take_home}
               unit={page.request.adapted.unit}
+              averageRate={page.request.response.average_income_tax_rate}
+              marginalRate={page.request.response.marginal_income_tax_rate}
               place={page.request.asked.jurisdictionName}
               year={page.request.asked.year}
               payPeriod={page.payPeriod}

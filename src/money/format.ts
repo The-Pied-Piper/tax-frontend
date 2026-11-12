@@ -69,9 +69,9 @@ export function displayMoney(
 // Moves the decimal point two places right in the text, so no digit is lost
 // and nothing is rounded: "0.2965" -> "29.65", "0.1" -> "10". Text that is not
 // a plain non-negative decimal is returned as is.
-function timesHundred(amount: string): string {
+function timesHundred(amount: string): string | null {
   const match = /^(0|[1-9]\d*)(?:\.(\d+))?$/.exec(amount);
-  if (!match) return amount;
+  if (!match) return null;
   const [, whole = '', fraction = ''] = match;
   const padded = fraction.padEnd(2, '0');
   const digits = `${whole}${padded.slice(0, 2)}`.replace(/^0+(?=\d)/, '');
@@ -85,5 +85,5 @@ export function displayRate(amount: string, unit: MoneyUnit): string {
   if (unit.as_percentage !== true)
     return withUnit(groupThousands(amount), unit);
   const shifted = timesHundred(amount);
-  return shifted === amount ? amount : withUnit(shifted, unit);
+  return shifted === null ? amount : withUnit(shifted, unit);
 }

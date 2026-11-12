@@ -21,6 +21,7 @@ export function readUnit(raw: unknown): Unit | null {
     singular: raw.singular,
     plural: raw.plural,
     spaced: raw.spaced,
+    as_percentage: 'as_percentage' in raw && raw.as_percentage === true,
   };
 }
 
