@@ -7,7 +7,30 @@
     "placement": "before",
     "singular": "CA$",
     "plural": "CA$",
-    "spaced": false
+    "spaced": false,
+    "as_percentage": false
+  },
+  "average_income_tax_rate": {
+    "amount": "0.1642",
+    "unit": {
+      "name": "core/percent",
+      "placement": "after",
+      "singular": "%",
+      "plural": "%",
+      "spaced": false,
+      "as_percentage": true
+    }
+  },
+  "marginal_income_tax_rate": {
+    "amount": "0.2965",
+    "unit": {
+      "name": "core/percent",
+      "placement": "after",
+      "singular": "%",
+      "plural": "%",
+      "spaced": false,
+      "as_percentage": true
+    }
   },
   "provisional": false,
   "trace": [
@@ -25,7 +48,8 @@
             "placement": "after",
             "singular": "month",
             "plural": "months",
-            "spaced": true
+            "spaced": true,
+            "as_percentage": false
           },
           "text": "No value given, so the form's default gives 12 months."
         },
@@ -39,9 +63,10 @@
             "placement": "before",
             "singular": "CA$",
             "plural": "CA$",
-            "spaced": false
+            "spaced": false,
+            "as_percentage": false
           },
-          "text": "The table amount for line A (12 months) is CA$81200.00 (rounded to the nearest cent)."
+          "text": "Looking up line A (12 months) in the table gives CA$81200.00 for line D (rounded to the nearest cent)."
         },
         {
           "label": "cpp_basic_exemption",
@@ -53,9 +78,10 @@
             "placement": "before",
             "singular": "CA$",
             "plural": "CA$",
-            "spaced": false
+            "spaced": false,
+            "as_percentage": false
           },
-          "text": "The table amount for line A (12 months) is CA$3500.00 (rounded to the nearest cent)."
+          "text": "Looking up line A (12 months) in the table gives CA$3500.00 for line E (rounded to the nearest cent)."
         },
         {
           "label": "cpp_maximum_pensionable_earnings",
@@ -67,9 +93,10 @@
             "placement": "before",
             "singular": "CA$",
             "plural": "CA$",
-            "spaced": false
+            "spaced": false,
+            "as_percentage": false
           },
-          "text": "The table amount for line A (12 months) is CA$71300.00 (rounded to the nearest cent)."
+          "text": "Looking up line A (12 months) in the table gives CA$71300.00 for line B (rounded to the nearest cent)."
         },
         {
           "label": "t4_cpp_pensionable_earnings_outside_quebec",
@@ -81,7 +108,8 @@
             "placement": "before",
             "singular": "CA$",
             "plural": "CA$",
-            "spaced": false
+            "spaced": false,
+            "as_percentage": false
           },
           "text": "Lesser of line 10100 (CA$70000.00) and the maximum per slip (CA$81200.00) gives CA$70000.00 (rounded to the nearest cent)."
         },
@@ -95,7 +123,8 @@
             "placement": "before",
             "singular": "CA$",
             "plural": "CA$",
-            "spaced": false
+            "spaced": false,
+            "as_percentage": false
           },
           "text": "Lesser of line D (CA$81200.00) and line 1 (CA$70000.00) gives CA$70000.00."
         },
@@ -109,7 +138,8 @@
             "placement": "before",
             "singular": "CA$",
             "plural": "CA$",
-            "spaced": false
+            "spaced": false,
+            "as_percentage": false
           },
           "text": "Line 2 (CA$70000.00) less line B (CA$71300.00), not below 0, gives CA$0.00 (rounded to the nearest cent)."
         },
@@ -123,7 +153,8 @@
             "placement": "before",
             "singular": "CA$",
             "plural": "CA$",
-            "spaced": false
+            "spaced": false,
+            "as_percentage": false
           },
           "text": "4% of the part of line 4 (CA$0.00) between 0.00 and 9900.00, which is 0.00, at most 396.00, gives CA$0.00 (rounded to the nearest cent)."
         },
@@ -137,7 +168,8 @@
             "placement": "before",
             "singular": "CA$",
             "plural": "CA$",
-            "spaced": false
+            "spaced": false,
+            "as_percentage": false
           },
           "text": "Line 2 (CA$70000.00) less line 4 (CA$0.00), not below 0, gives CA$70000.00 (rounded to the nearest cent)."
         },
@@ -151,7 +183,8 @@
             "placement": "before",
             "singular": "CA$",
             "plural": "CA$",
-            "spaced": false
+            "spaced": false,
+            "as_percentage": false
           },
           "text": "Line 5 (CA$70000.00) less line E (CA$3500.00), not below 0, gives CA$66500.00 (rounded to the nearest cent)."
         },
@@ -165,7 +198,8 @@
             "placement": "before",
             "singular": "CA$",
             "plural": "CA$",
-            "spaced": false
+            "spaced": false,
+            "as_percentage": false
           },
           "text": "Lesser of cpp part 3 line 7 difference (CA$66500.00) and the maximum (CA$67800.00) gives CA$66500.00 (rounded to the nearest cent)."
         },
@@ -179,7 +213,8 @@
             "placement": "before",
             "singular": "CA$",
             "plural": "CA$",
-            "spaced": false
+            "spaced": false,
+            "as_percentage": false
           },
           "text": "4.95% of the part of line 7 (CA$66500.00) between 0.00 and 67800.00, which is 66500.00, at most 3356.10, gives CA$3291.75 (rounded to the nearest cent)."
         },
@@ -193,7 +228,8 @@
             "placement": "before",
             "singular": "CA$",
             "plural": "CA$",
-            "spaced": false
+            "spaced": false,
+            "as_percentage": false
           },
           "text": "1% of the part of line 7 (CA$66500.00) between 0.00 and 67800.00, which is 66500.00, at most 678.00, gives CA$665.00 (rounded to the nearest cent)."
         },
@@ -207,7 +243,8 @@
             "placement": "before",
             "singular": "CA$",
             "plural": "CA$",
-            "spaced": false
+            "spaced": false,
+            "as_percentage": false
           },
           "text": "Line 11 (CA$3291.75) gives CA$3291.75 (rounded to the nearest cent)."
         },
@@ -221,7 +258,8 @@
             "placement": "before",
             "singular": "CA$",
             "plural": "CA$",
-            "spaced": false
+            "spaced": false,
+            "as_percentage": false
           },
           "text": "Line 12 (CA$665.00) plus line 22 (CA$0.00) gives CA$665.00 (rounded to the nearest cent)."
         }
@@ -241,7 +279,8 @@
             "placement": "before",
             "singular": "CA$",
             "plural": "CA$",
-            "spaced": false
+            "spaced": false,
+            "as_percentage": false
           },
           "text": "No value given, so the form's default gives CA$0.00."
         },
@@ -255,7 +294,8 @@
             "placement": "before",
             "singular": "CA$",
             "plural": "CA$",
-            "spaced": false
+            "spaced": false,
+            "as_percentage": false
           },
           "text": "No value given, so the form's default gives CA$0.00."
         },
@@ -269,7 +309,8 @@
             "placement": "before",
             "singular": "CA$",
             "plural": "CA$",
-            "spaced": false
+            "spaced": false,
+            "as_percentage": false
           },
           "text": "No value given, so the form's default gives CA$0.00."
         },
@@ -283,7 +324,8 @@
             "placement": "before",
             "singular": "CA$",
             "plural": "CA$",
-            "spaced": false
+            "spaced": false,
+            "as_percentage": false
           },
           "text": "Line 28 of Schedule 8 (CA$665.00) gives CA$665.00."
         },
@@ -297,7 +339,8 @@
             "placement": "before",
             "singular": "CA$",
             "plural": "CA$",
-            "spaced": false
+            "spaced": false,
+            "as_percentage": false
           },
           "text": "Line 10100 (CA$70000.00) plus line 10400 (CA$0.00) gives CA$70000.00 (rounded to the nearest cent)."
         },
@@ -311,7 +354,8 @@
             "placement": "before",
             "singular": "CA$",
             "plural": "CA$",
-            "spaced": false
+            "spaced": false,
+            "as_percentage": false
           },
           "text": "Line 15000 (CA$70000.00) less line 23300 (CA$665.00) gives CA$69335.00 (rounded to the nearest cent)."
         },
@@ -325,7 +369,8 @@
             "placement": "before",
             "singular": "CA$",
             "plural": "CA$",
-            "spaced": false
+            "spaced": false,
+            "as_percentage": false
           },
           "text": "Line 23400 (CA$69335.00) less line 23500 (CA$0.00) gives CA$69335.00 (rounded to the nearest cent)."
         },
@@ -339,7 +384,8 @@
             "placement": "before",
             "singular": "CA$",
             "plural": "CA$",
-            "spaced": false
+            "spaced": false,
+            "as_percentage": false
           },
           "text": "Line 23400 (CA$69335.00) less line 23500 (CA$0.00), not below 0, gives CA$69335.00 (rounded to the nearest cent)."
         },
@@ -353,7 +399,8 @@
             "placement": "before",
             "singular": "CA$",
             "plural": "CA$",
-            "spaced": false
+            "spaced": false,
+            "as_percentage": false
           },
           "text": "Line 23600 (CA$69335.00) less line 25700 (CA$0.00), not below 0, gives CA$69335.00 (rounded to the nearest cent)."
         }
@@ -373,7 +420,8 @@
             "placement": "before",
             "singular": "CA$",
             "plural": "CA$",
-            "spaced": false
+            "spaced": false,
+            "as_percentage": false
           },
           "text": "No value given, so the form's default gives CA$0.00."
         },
@@ -387,7 +435,8 @@
             "placement": "before",
             "singular": "CA$",
             "plural": "CA$",
-            "spaced": false
+            "spaced": false,
+            "as_percentage": false
           },
           "text": "Credit amount of 32500.00 (rounded to the nearest cent)."
         },
@@ -401,7 +450,8 @@
             "placement": "before",
             "singular": "CA$",
             "plural": "CA$",
-            "spaced": false
+            "spaced": false,
+            "as_percentage": false
           },
           "text": "Net income signed (CA$69335.00) gives CA$69335.00."
         },
@@ -415,7 +465,8 @@
             "placement": "before",
             "singular": "CA$",
             "plural": "CA$",
-            "spaced": false
+            "spaced": false,
+            "as_percentage": false
           },
           "text": "Line 10100 (CA$70000.00) plus line 10400 (CA$0.00) gives CA$70000.00 (rounded to the nearest cent)."
         },
@@ -429,7 +480,8 @@
             "placement": "before",
             "singular": "CA$",
             "plural": "CA$",
-            "spaced": false
+            "spaced": false,
+            "as_percentage": false
           },
           "text": "5.05% of line 3 (CA$70000.00) gives CA$3535.00 (rounded to the nearest cent)."
         },
@@ -443,7 +495,8 @@
             "placement": "before",
             "singular": "CA$",
             "plural": "CA$",
-            "spaced": false
+            "spaced": false,
+            "as_percentage": false
           },
           "text": "Lesser of lift credit before maximum (CA$3535.00) and the maximum (CA$875.00) gives CA$875.00 (rounded to the nearest cent)."
         },
@@ -457,7 +510,8 @@
             "placement": "before",
             "singular": "CA$",
             "plural": "CA$",
-            "spaced": false
+            "spaced": false,
+            "as_percentage": false
           },
           "text": "Line 6 (CA$69335.00), not below 0, gives CA$69335.00 (rounded to the nearest cent)."
         },
@@ -471,7 +525,8 @@
             "placement": "before",
             "singular": "CA$",
             "plural": "CA$",
-            "spaced": false
+            "spaced": false,
+            "as_percentage": false
           },
           "text": "Line 13 (CA$69335.00) less line 16 (CA$32500.00), not below 0, gives CA$36835.00 (rounded to the nearest cent)."
         },
@@ -485,7 +540,8 @@
             "placement": "before",
             "singular": "CA$",
             "plural": "CA$",
-            "spaced": false
+            "spaced": false,
+            "as_percentage": false
           },
           "text": "5% of line 17 (CA$36835.00) gives CA$1841.75 (rounded to the nearest cent)."
         },
@@ -499,7 +555,8 @@
             "placement": "before",
             "singular": "CA$",
             "plural": "CA$",
-            "spaced": false
+            "spaced": false,
+            "as_percentage": false
           },
           "text": "Line 5 (CA$875.00) less line 19 (CA$1841.75), not below 0, gives CA$0.00 (rounded to the nearest cent)."
         }
@@ -519,7 +576,8 @@
             "placement": "before",
             "singular": "CA$",
             "plural": "CA$",
-            "spaced": false
+            "spaced": false,
+            "as_percentage": false
           },
           "text": "No value given, so the form's default gives CA$0.00."
         },
@@ -533,7 +591,8 @@
             "placement": "before",
             "singular": "CA$",
             "plural": "CA$",
-            "spaced": false
+            "spaced": false,
+            "as_percentage": false
           },
           "text": "Credit amount of 3000.00 (rounded to the nearest cent)."
         },
@@ -547,7 +606,8 @@
             "placement": "before",
             "singular": "CA$",
             "plural": "CA$",
-            "spaced": false
+            "spaced": false,
+            "as_percentage": false
           },
           "text": "Credit amount of 1633.00 (rounded to the nearest cent)."
         },
@@ -561,7 +621,8 @@
             "placement": "before",
             "singular": "CA$",
             "plural": "CA$",
-            "spaced": false
+            "spaced": false,
+            "as_percentage": false
           },
           "text": "Credit amount of 26855.00 (rounded to the nearest cent)."
         },
@@ -575,7 +636,8 @@
             "placement": "before",
             "singular": "CA$",
             "plural": "CA$",
-            "spaced": false
+            "spaced": false,
+            "as_percentage": false
           },
           "text": "Net income signed (CA$69335.00) gives CA$69335.00."
         },
@@ -589,7 +651,8 @@
             "placement": "before",
             "singular": "CA$",
             "plural": "CA$",
-            "spaced": false
+            "spaced": false,
+            "as_percentage": false
           },
           "text": "Line 10100 (CA$70000.00) plus line 10400 (CA$0.00) gives CA$70000.00 (rounded to the nearest cent)."
         },
@@ -603,7 +666,8 @@
             "placement": "before",
             "singular": "CA$",
             "plural": "CA$",
-            "spaced": false
+            "spaced": false,
+            "as_percentage": false
           },
           "text": "Line 7 (CA$69335.00) gives CA$69335.00 (rounded to the nearest cent)."
         },
@@ -617,7 +681,8 @@
             "placement": "before",
             "singular": "CA$",
             "plural": "CA$",
-            "spaced": false
+            "spaced": false,
+            "as_percentage": false
           },
           "text": "Left blank, taken as CA$0.00."
         },
@@ -631,7 +696,8 @@
             "placement": "before",
             "singular": "CA$",
             "plural": "CA$",
-            "spaced": false
+            "spaced": false,
+            "as_percentage": false
           },
           "text": "Line 10 (CA$69335.00) less line 11 (CA$0.00), not below 0, gives CA$69335.00 (rounded to the nearest cent)."
         },
@@ -645,7 +711,8 @@
             "placement": "before",
             "singular": "CA$",
             "plural": "CA$",
-            "spaced": false
+            "spaced": false,
+            "as_percentage": false
           },
           "text": "Line 12 (CA$69335.00) gives CA$69335.00 (rounded to the nearest cent)."
         },
@@ -659,7 +726,8 @@
             "placement": "before",
             "singular": "CA$",
             "plural": "CA$",
-            "spaced": false
+            "spaced": false,
+            "as_percentage": false
           },
           "text": "Left blank, taken as CA$0.00."
         },
@@ -673,7 +741,8 @@
             "placement": "before",
             "singular": "CA$",
             "plural": "CA$",
-            "spaced": false
+            "spaced": false,
+            "as_percentage": false
           },
           "text": "Line 13 (CA$69335.00) less line 14 (CA$0.00) gives CA$69335.00 (rounded to the nearest cent)."
         },
@@ -687,7 +756,8 @@
             "placement": "before",
             "singular": "CA$",
             "plural": "CA$",
-            "spaced": false
+            "spaced": false,
+            "as_percentage": false
           },
           "text": "Line 15 (CA$69335.00) less line 24 (CA$26855.00), not below 0, gives CA$42480.00 (rounded to the nearest cent)."
         },
@@ -701,7 +771,8 @@
             "placement": "before",
             "singular": "CA$",
             "plural": "CA$",
-            "spaced": false
+            "spaced": false,
+            "as_percentage": false
           },
           "text": "15% of line 25 (CA$42480.00) gives CA$6372.00 (rounded to the nearest cent)."
         },
@@ -715,7 +786,8 @@
             "placement": "before",
             "singular": "CA$",
             "plural": "CA$",
-            "spaced": false
+            "spaced": false,
+            "as_percentage": false
           },
           "text": "Line 1 (CA$70000.00) gives CA$70000.00 (rounded to the nearest cent)."
         },
@@ -729,7 +801,8 @@
             "placement": "before",
             "singular": "CA$",
             "plural": "CA$",
-            "spaced": false
+            "spaced": false,
+            "as_percentage": false
           },
           "text": "Line 5 (CA$70000.00) gives CA$70000.00 (rounded to the nearest cent)."
         },
@@ -743,7 +816,8 @@
             "placement": "before",
             "singular": "CA$",
             "plural": "CA$",
-            "spaced": false
+            "spaced": false,
+            "as_percentage": false
           },
           "text": "Line 6 (CA$70000.00) less line 17 (CA$3000.00), not below 0, gives CA$67000.00 (rounded to the nearest cent)."
         },
@@ -757,7 +831,8 @@
             "placement": "before",
             "singular": "CA$",
             "plural": "CA$",
-            "spaced": false
+            "spaced": false,
+            "as_percentage": false
           },
           "text": "27% of line 18 (CA$67000.00) gives CA$18090.00 (rounded to the nearest cent)."
         },
@@ -771,7 +846,8 @@
             "placement": "before",
             "singular": "CA$",
             "plural": "CA$",
-            "spaced": false
+            "spaced": false,
+            "as_percentage": false
           },
           "text": "Lesser of line 20 (CA$18090.00) and line 21 (CA$1633.00) gives CA$1633.00."
         },
@@ -785,7 +861,8 @@
             "placement": "before",
             "singular": "CA$",
             "plural": "CA$",
-            "spaced": false
+            "spaced": false,
+            "as_percentage": false
           },
           "text": "Line 22 (CA$1633.00) less line 27 (CA$6372.00), not below 0, gives CA$0.00 (rounded to the nearest cent)."
         }
@@ -805,7 +882,8 @@
             "placement": "before",
             "singular": "CA$",
             "plural": "CA$",
-            "spaced": false
+            "spaced": false,
+            "as_percentage": false
           },
           "text": "Credit amount of 2000.00 (rounded to the nearest cent)."
         },
@@ -819,7 +897,8 @@
             "placement": "before",
             "singular": "CA$",
             "plural": "CA$",
-            "spaced": false
+            "spaced": false,
+            "as_percentage": false
           },
           "text": "Left blank, taken as CA$0.00."
         },
@@ -849,7 +928,8 @@
             "placement": "before",
             "singular": "CA$",
             "plural": "CA$",
-            "spaced": false
+            "spaced": false,
+            "as_percentage": false
           },
           "text": "Line 10100 (CA$70000.00) for each of t2204 line 1 count (1) gives CA$70000.00 (rounded to the nearest cent)."
         },
@@ -863,7 +943,8 @@
             "placement": "before",
             "singular": "CA$",
             "plural": "CA$",
-            "spaced": false
+            "spaced": false,
+            "as_percentage": false
           },
           "text": "1.64% of the part of line 1 (CA$70000.00) between 0.00 and 65700.00, which is 65700.00, at most 1077.48, gives CA$1077.48 (rounded to the nearest cent)."
         },
@@ -877,7 +958,8 @@
             "placement": "before",
             "singular": "CA$",
             "plural": "CA$",
-            "spaced": false
+            "spaced": false,
+            "as_percentage": false
           },
           "text": "1.64% of the part of line 1 (CA$70000.00) between 0.00 and 65700.00, which is 65700.00, at most 1077.48, gives CA$1077.48 (rounded to the nearest cent)."
         },
@@ -891,7 +973,8 @@
             "placement": "before",
             "singular": "CA$",
             "plural": "CA$",
-            "spaced": false
+            "spaced": false,
+            "as_percentage": false
           },
           "text": "\"Total premiums deducted\" (CA$1077.48) less line 10 (CA$1077.48), not below 0, gives CA$0.00 (rounded to the nearest cent)."
         },
@@ -905,7 +988,8 @@
             "placement": "before",
             "singular": "CA$",
             "plural": "CA$",
-            "spaced": false
+            "spaced": false,
+            "as_percentage": false
           },
           "text": "Left blank, taken as CA$0.00."
         },
@@ -919,7 +1003,8 @@
             "placement": "before",
             "singular": "CA$",
             "plural": "CA$",
-            "spaced": false
+            "spaced": false,
+            "as_percentage": false
           },
           "text": "Line 1 (CA$70000.00) plus line 2 (CA$0.00) gives CA$70000.00 (rounded to the nearest cent)."
         },
@@ -933,7 +1018,8 @@
             "placement": "before",
             "singular": "CA$",
             "plural": "CA$",
-            "spaced": false
+            "spaced": false,
+            "as_percentage": false
           },
           "text": "Lesser of t2204 line 1 plus 2 (CA$70000.00) and the maximum (CA$65700.00) gives CA$65700.00 (rounded to the nearest cent)."
         },
@@ -947,7 +1033,8 @@
             "placement": "before",
             "singular": "CA$",
             "plural": "CA$",
-            "spaced": false
+            "spaced": false,
+            "as_percentage": false
           },
           "text": "Line 3 (CA$65700.00) less t2204 exemption (CA$2000.00), not below 0, gives CA$63700.00 (rounded to the nearest cent)."
         },
@@ -961,7 +1048,8 @@
             "placement": "before",
             "singular": "CA$",
             "plural": "CA$",
-            "spaced": false
+            "spaced": false,
+            "as_percentage": false
           },
           "text": "Least of line 7 (CA$63700.00), \"Total premiums deducted\" (CA$1077.48) and line 10 (CA$1077.48) gives CA$1077.48."
         },
@@ -975,7 +1063,8 @@
             "placement": "before",
             "singular": "CA$",
             "plural": "CA$",
-            "spaced": false
+            "spaced": false,
+            "as_percentage": false
           },
           "text": "Left blank, taken as CA$0.00."
         },
@@ -989,7 +1078,8 @@
             "placement": "before",
             "singular": "CA$",
             "plural": "CA$",
-            "spaced": false
+            "spaced": false,
+            "as_percentage": false
           },
           "text": "\"Total premiums deducted\" (CA$1077.48) plus line 5 (CA$0.00) gives CA$1077.48 (rounded to the nearest cent)."
         },
@@ -1003,7 +1093,8 @@
             "placement": "before",
             "singular": "CA$",
             "plural": "CA$",
-            "spaced": false
+            "spaced": false,
+            "as_percentage": false
           },
           "text": "Line 6 (CA$1077.48) less line 7 (CA$63700.00), not below 0, gives CA$0.00 (rounded to the nearest cent)."
         },
@@ -1017,7 +1108,8 @@
             "placement": "before",
             "singular": "CA$",
             "plural": "CA$",
-            "spaced": false
+            "spaced": false,
+            "as_percentage": false
           },
           "text": "Greater of line 8 (CA$0.00) and line 13 (CA$0.00) gives CA$0.00."
         },
@@ -1031,7 +1123,8 @@
             "placement": "before",
             "singular": "CA$",
             "plural": "CA$",
-            "spaced": false
+            "spaced": false,
+            "as_percentage": false
           },
           "text": "Lesser of \"Total premiums deducted\" (CA$1077.48) and line 14 (CA$0.00) gives CA$0.00."
         },
@@ -1061,7 +1154,8 @@
             "placement": "before",
             "singular": "CA$",
             "plural": "CA$",
-            "spaced": false
+            "spaced": false,
+            "as_percentage": false
           },
           "text": "Line 15 (CA$0.00) for each of t2204 line 15 count (0) gives CA$0.00 (rounded to the nearest cent)."
         }
@@ -1081,7 +1175,8 @@
             "placement": "before",
             "singular": "CA$",
             "plural": "CA$",
-            "spaced": false
+            "spaced": false,
+            "as_percentage": false
           },
           "text": "No value given, so the form's default gives CA$0.00."
         },
@@ -1095,7 +1190,8 @@
             "placement": "before",
             "singular": "CA$",
             "plural": "CA$",
-            "spaced": false
+            "spaced": false,
+            "as_percentage": false
           },
           "text": "No value given, so the form's default gives CA$0.00."
         },
@@ -1109,7 +1205,8 @@
             "placement": "before",
             "singular": "CA$",
             "plural": "CA$",
-            "spaced": false
+            "spaced": false,
+            "as_percentage": false
           },
           "text": "No value given, so the form's default gives CA$0.00."
         },
@@ -1123,7 +1220,8 @@
             "placement": "before",
             "singular": "CA$",
             "plural": "CA$",
-            "spaced": false
+            "spaced": false,
+            "as_percentage": false
           },
           "text": "Left blank, taken as CA$0.00."
         },
@@ -1153,7 +1251,8 @@
             "placement": "before",
             "singular": "CA$",
             "plural": "CA$",
-            "spaced": false
+            "spaced": false,
+            "as_percentage": false
           },
           "text": "25% of line 87 box A (CA$0.00) gives CA$0.00 (rounded to the nearest cent)."
         },
@@ -1167,7 +1266,8 @@
             "placement": "before",
             "singular": "CA$",
             "plural": "CA$",
-            "spaced": false
+            "spaced": false,
+            "as_percentage": false
           },
           "text": "Credit amount of 12747.00 (rounded to the nearest cent)."
         },
@@ -1181,7 +1281,8 @@
             "placement": "before",
             "singular": "CA$",
             "plural": "CA$",
-            "spaced": false
+            "spaced": false,
+            "as_percentage": false
           },
           "text": "Credit amount of 294.00 (rounded to the nearest cent)."
         },
@@ -1195,7 +1296,8 @@
             "placement": "before",
             "singular": "CA$",
             "plural": "CA$",
-            "spaced": false
+            "spaced": false,
+            "as_percentage": false
           },
           "text": "Line 25 of Schedule 8 (CA$3291.75) gives CA$3291.75."
         },
@@ -1209,7 +1311,8 @@
             "placement": "before",
             "singular": "CA$",
             "plural": "CA$",
-            "spaced": false
+            "spaced": false,
+            "as_percentage": false
           },
           "text": "Line 16 of T2204 (CA$1077.48) gives CA$1077.48."
         },
@@ -1223,7 +1326,8 @@
             "placement": "before",
             "singular": "CA$",
             "plural": "CA$",
-            "spaced": false
+            "spaced": false,
+            "as_percentage": false
           },
           "text": "Line 20 of Schedule ON428-A (CA$0.00) gives CA$0.00."
         },
@@ -1237,7 +1341,8 @@
             "placement": "before",
             "singular": "CA$",
             "plural": "CA$",
-            "spaced": false
+            "spaced": false,
+            "as_percentage": false
           },
           "text": "Line 26000 of T1 Income Tax and Benefit Return, Steps 2 to 4 (CA$69335.00) gives CA$69335.00."
         },
@@ -1251,7 +1356,8 @@
             "placement": "before",
             "singular": "CA$",
             "plural": "CA$",
-            "spaced": false
+            "spaced": false,
+            "as_percentage": false
           },
           "text": "Line 1 (CA$69335.00) falls in the bracket that starts at CA$52886.00."
         },
@@ -1273,7 +1379,8 @@
             "placement": "before",
             "singular": "CA$",
             "plural": "CA$",
-            "spaced": false
+            "spaced": false,
+            "as_percentage": false
           },
           "text": "Line 1 (CA$69335.00) falls in a bracket with CA$2670.74 of tax on the income below it."
         },
@@ -1287,7 +1394,8 @@
             "placement": "before",
             "singular": "CA$",
             "plural": "CA$",
-            "spaced": false
+            "spaced": false,
+            "as_percentage": false
           },
           "text": "Line 26000 of T1 Income Tax and Benefit Return, Steps 2 to 4 (CA$69335.00) gives CA$69335.00."
         },
@@ -1301,7 +1409,8 @@
             "placement": "before",
             "singular": "CA$",
             "plural": "CA$",
-            "spaced": false
+            "spaced": false,
+            "as_percentage": false
           },
           "text": "Line 1 (CA$69335.00) is over 48600.00, so the amount is CA$600.00 (rounded to the nearest cent)."
         },
@@ -1315,7 +1424,8 @@
             "placement": "before",
             "singular": "CA$",
             "plural": "CA$",
-            "spaced": false
+            "spaced": false,
+            "as_percentage": false
           },
           "text": "Line 1 (CA$69335.00) less line 3 (CA$52886.00), not below 0, gives CA$16449.00 (rounded to the nearest cent)."
         },
@@ -1329,7 +1439,8 @@
             "placement": "before",
             "singular": "CA$",
             "plural": "CA$",
-            "spaced": false
+            "spaced": false,
+            "as_percentage": false
           },
           "text": "Line 5 (9.15%) of line 4 (CA$16449.00) gives CA$1505.08 (rounded to the nearest cent)."
         },
@@ -1343,7 +1454,8 @@
             "placement": "before",
             "singular": "CA$",
             "plural": "CA$",
-            "spaced": false
+            "spaced": false,
+            "as_percentage": false
           },
           "text": "Line 19 (CA$3291.75) plus line 21 (CA$1077.48) gives CA$4369.23 (rounded to the nearest cent)."
         },
@@ -1357,7 +1469,8 @@
             "placement": "before",
             "singular": "CA$",
             "plural": "CA$",
-            "spaced": false
+            "spaced": false,
+            "as_percentage": false
           },
           "text": "Line 9 (CA$12747.00) gives CA$12747.00 (rounded to the nearest cent)."
         },
@@ -1371,7 +1484,8 @@
             "placement": "before",
             "singular": "CA$",
             "plural": "CA$",
-            "spaced": false
+            "spaced": false,
+            "as_percentage": false
           },
           "text": "Line 18 (CA$12747.00) plus line 24 (CA$4369.23) gives CA$17116.23 (rounded to the nearest cent)."
         },
@@ -1385,7 +1499,8 @@
             "placement": "before",
             "singular": "CA$",
             "plural": "CA$",
-            "spaced": false
+            "spaced": false,
+            "as_percentage": false
           },
           "text": "Line 25 (CA$17116.23) plus line 27 (CA$0.00) gives CA$17116.23 (rounded to the nearest cent)."
         },
@@ -1399,7 +1514,8 @@
             "placement": "before",
             "singular": "CA$",
             "plural": "CA$",
-            "spaced": false
+            "spaced": false,
+            "as_percentage": false
           },
           "text": "Line 28 (CA$17116.23) gives CA$17116.23 (rounded to the nearest cent)."
         },
@@ -1413,7 +1529,8 @@
             "placement": "before",
             "singular": "CA$",
             "plural": "CA$",
-            "spaced": false
+            "spaced": false,
+            "as_percentage": false
           },
           "text": "Line 31 (CA$17116.23) gives CA$17116.23 (rounded to the nearest cent)."
         },
@@ -1427,7 +1544,8 @@
             "placement": "before",
             "singular": "CA$",
             "plural": "CA$",
-            "spaced": false
+            "spaced": false,
+            "as_percentage": false
           },
           "text": "Line 6 (CA$1505.08) plus line 7 (CA$2670.74) gives CA$4175.82 (rounded to the nearest cent)."
         },
@@ -1441,7 +1559,8 @@
             "placement": "before",
             "singular": "CA$",
             "plural": "CA$",
-            "spaced": false
+            "spaced": false,
+            "as_percentage": false
           },
           "text": "Line 74 (CA$294.00) gives CA$294.00 (rounded to the nearest cent)."
         },
@@ -1455,7 +1574,8 @@
             "placement": "before",
             "singular": "CA$",
             "plural": "CA$",
-            "spaced": false
+            "spaced": false,
+            "as_percentage": false
           },
           "text": "2 times line 77 (CA$294.00) gives CA$588.00 (rounded to the nearest cent)."
         },
@@ -1469,7 +1589,8 @@
             "placement": "before",
             "singular": "CA$",
             "plural": "CA$",
-            "spaced": false
+            "spaced": false,
+            "as_percentage": false
           },
           "text": "Left blank, taken as CA$0.00."
         },
@@ -1483,7 +1604,8 @@
             "placement": "before",
             "singular": "CA$",
             "plural": "CA$",
-            "spaced": false
+            "spaced": false,
+            "as_percentage": false
           },
           "text": "Line 35 (CA$17116.23) plus line 43 (CA$0.00) gives CA$17116.23 (rounded to the nearest cent)."
         },
@@ -1497,7 +1619,8 @@
             "placement": "before",
             "singular": "CA$",
             "plural": "CA$",
-            "spaced": false
+            "spaced": false,
+            "as_percentage": false
           },
           "text": "5.05% of line 44 (CA$17116.23) gives CA$864.37 (rounded to the nearest cent)."
         },
@@ -1511,7 +1634,8 @@
             "placement": "before",
             "singular": "CA$",
             "plural": "CA$",
-            "spaced": false
+            "spaced": false,
+            "as_percentage": false
           },
           "text": "Line 46 (CA$864.37) plus line 49 (CA$0.00) gives CA$864.37 (rounded to the nearest cent)."
         },
@@ -1525,7 +1649,8 @@
             "placement": "before",
             "singular": "CA$",
             "plural": "CA$",
-            "spaced": false
+            "spaced": false,
+            "as_percentage": false
           },
           "text": "Line 8 (CA$4175.82) less line 50 (CA$864.37), not below 0, gives CA$3311.45 (rounded to the nearest cent)."
         },
@@ -1539,7 +1664,8 @@
             "placement": "before",
             "singular": "CA$",
             "plural": "CA$",
-            "spaced": false
+            "spaced": false,
+            "as_percentage": false
           },
           "text": "Left blank, taken as CA$0.00."
         },
@@ -1553,7 +1679,8 @@
             "placement": "before",
             "singular": "CA$",
             "plural": "CA$",
-            "spaced": false
+            "spaced": false,
+            "as_percentage": false
           },
           "text": "Line 53 (CA$3311.45) plus line 54 (CA$0.00) gives CA$3311.45 (rounded to the nearest cent)."
         },
@@ -1567,7 +1694,8 @@
             "placement": "before",
             "singular": "CA$",
             "plural": "CA$",
-            "spaced": false
+            "spaced": false,
+            "as_percentage": false
           },
           "text": "Left blank, taken as CA$0.00."
         },
@@ -1581,7 +1709,8 @@
             "placement": "before",
             "singular": "CA$",
             "plural": "CA$",
-            "spaced": false
+            "spaced": false,
+            "as_percentage": false
           },
           "text": "Line 55 (CA$3311.45) less line 60 (CA$0.00), not below 0, gives CA$3311.45 (rounded to the nearest cent)."
         },
@@ -1595,7 +1724,8 @@
             "placement": "before",
             "singular": "CA$",
             "plural": "CA$",
-            "spaced": false
+            "spaced": false,
+            "as_percentage": false
           },
           "text": "Left blank, taken as CA$0.00."
         },
@@ -1609,7 +1739,8 @@
             "placement": "before",
             "singular": "CA$",
             "plural": "CA$",
-            "spaced": false
+            "spaced": false,
+            "as_percentage": false
           },
           "text": "Line 61 (CA$3311.45) less line 54 (CA$0.00), not below 0, gives CA$3311.45 (rounded to the nearest cent)."
         },
@@ -1623,7 +1754,8 @@
             "placement": "before",
             "singular": "CA$",
             "plural": "CA$",
-            "spaced": false
+            "spaced": false,
+            "as_percentage": false
           },
           "text": "20% of the part of line 65 (CA$3311.45) over 5710.00, gives CA$0.00 (rounded to the nearest cent)."
         },
@@ -1637,7 +1769,8 @@
             "placement": "before",
             "singular": "CA$",
             "plural": "CA$",
-            "spaced": false
+            "spaced": false,
+            "as_percentage": false
           },
           "text": "36% of the part of line 65 (CA$3311.45) over 7307.00, gives CA$0.00 (rounded to the nearest cent)."
         },
@@ -1651,7 +1784,8 @@
             "placement": "before",
             "singular": "CA$",
             "plural": "CA$",
-            "spaced": false
+            "spaced": false,
+            "as_percentage": false
           },
           "text": "Line 66 (CA$0.00) plus line 67 (CA$0.00) gives CA$0.00 (rounded to the nearest cent)."
         },
@@ -1665,7 +1799,8 @@
             "placement": "before",
             "singular": "CA$",
             "plural": "CA$",
-            "spaced": false
+            "spaced": false,
+            "as_percentage": false
           },
           "text": "Line 61 (CA$3311.45) plus line 68 (CA$0.00) gives CA$3311.45 (rounded to the nearest cent)."
         },
@@ -1679,7 +1814,8 @@
             "placement": "before",
             "singular": "CA$",
             "plural": "CA$",
-            "spaced": false
+            "spaced": false,
+            "as_percentage": false
           },
           "text": "Left blank, taken as CA$0.00."
         },
@@ -1693,7 +1829,8 @@
             "placement": "before",
             "singular": "CA$",
             "plural": "CA$",
-            "spaced": false
+            "spaced": false,
+            "as_percentage": false
           },
           "text": "Line 69 (CA$3311.45) less line 57 (CA$0.00), not below 0, gives CA$3311.45 (rounded to the nearest cent)."
         },
@@ -1707,7 +1844,8 @@
             "placement": "before",
             "singular": "CA$",
             "plural": "CA$",
-            "spaced": false
+            "spaced": false,
+            "as_percentage": false
           },
           "text": "Left blank, taken as CA$0.00."
         },
@@ -1721,7 +1859,8 @@
             "placement": "before",
             "singular": "CA$",
             "plural": "CA$",
-            "spaced": false
+            "spaced": false,
+            "as_percentage": false
           },
           "text": "Line 71 (CA$3311.45) plus line 72 (CA$0.00) gives CA$3311.45 (rounded to the nearest cent)."
         },
@@ -1735,7 +1874,8 @@
             "placement": "before",
             "singular": "CA$",
             "plural": "CA$",
-            "spaced": false
+            "spaced": false,
+            "as_percentage": false
           },
           "text": "Line 78 (CA$588.00) less line 73 (CA$3311.45), not below 0, gives CA$0.00 (rounded to the nearest cent)."
         },
@@ -1749,7 +1889,8 @@
             "placement": "before",
             "singular": "CA$",
             "plural": "CA$",
-            "spaced": false
+            "spaced": false,
+            "as_percentage": false
           },
           "text": "On428 tax reduction before conditions line 80 (CA$0.00) for each of on428 tax reduction conditions count line 80 (1) gives CA$0.00 (rounded to the nearest cent)."
         },
@@ -1763,7 +1904,8 @@
             "placement": "before",
             "singular": "CA$",
             "plural": "CA$",
-            "spaced": false
+            "spaced": false,
+            "as_percentage": false
           },
           "text": "Line 73 (CA$3311.45) less line 80 (CA$0.00), not below 0, gives CA$3311.45 (rounded to the nearest cent)."
         },
@@ -1777,7 +1919,8 @@
             "placement": "before",
             "singular": "CA$",
             "plural": "CA$",
-            "spaced": false
+            "spaced": false,
+            "as_percentage": false
           },
           "text": "Left blank, taken as CA$0.00."
         },
@@ -1791,7 +1934,8 @@
             "placement": "before",
             "singular": "CA$",
             "plural": "CA$",
-            "spaced": false
+            "spaced": false,
+            "as_percentage": false
           },
           "text": "Line 81 (CA$3311.45) less line 82 (CA$0.00), not below 0, gives CA$3311.45 (rounded to the nearest cent)."
         },
@@ -1805,7 +1949,8 @@
             "placement": "before",
             "singular": "CA$",
             "plural": "CA$",
-            "spaced": false
+            "spaced": false,
+            "as_percentage": false
           },
           "text": "Line 83 (CA$3311.45) less line 85 (CA$0.00), not below 0, gives CA$3311.45 (rounded to the nearest cent)."
         },
@@ -1819,7 +1964,8 @@
             "placement": "before",
             "singular": "CA$",
             "plural": "CA$",
-            "spaced": false
+            "spaced": false,
+            "as_percentage": false
           },
           "text": "Line 86 (CA$3311.45) less line 87 box B (CA$0.00), not below 0, gives CA$3311.45 (rounded to the nearest cent)."
         },
@@ -1833,7 +1979,8 @@
             "placement": "before",
             "singular": "CA$",
             "plural": "CA$",
-            "spaced": false
+            "spaced": false,
+            "as_percentage": false
           },
           "text": "Line 88 (CA$3311.45) plus line 89 (CA$600.00) gives CA$3911.45 (rounded to the nearest cent)."
         }
@@ -1853,7 +2000,8 @@
             "placement": "before",
             "singular": "CA$",
             "plural": "CA$",
-            "spaced": false
+            "spaced": false,
+            "as_percentage": false
           },
           "text": "No value given, so the form's default gives CA$0.00."
         },
@@ -1867,7 +2015,8 @@
             "placement": "before",
             "singular": "CA$",
             "plural": "CA$",
-            "spaced": false
+            "spaced": false,
+            "as_percentage": false
           },
           "text": "No value given, so the form's default gives CA$0.00."
         },
@@ -1881,7 +2030,8 @@
             "placement": "before",
             "singular": "CA$",
             "plural": "CA$",
-            "spaced": false
+            "spaced": false,
+            "as_percentage": false
           },
           "text": "No value given, so the form's default gives CA$0.00."
         },
@@ -1895,7 +2045,8 @@
             "placement": "before",
             "singular": "CA$",
             "plural": "CA$",
-            "spaced": false
+            "spaced": false,
+            "as_percentage": false
           },
           "text": "Line 23600 of T1 Income Tax and Benefit Return, Steps 2 to 4 (CA$69335.00) gives CA$69335.00."
         },
@@ -1909,7 +2060,8 @@
             "placement": "before",
             "singular": "CA$",
             "plural": "CA$",
-            "spaced": false
+            "spaced": false,
+            "as_percentage": false
           },
           "text": "14538.00 plus 1591.00, less 0.00 (the reduction for basic personal amount net income line 3 (CA$69335.00) over 177882.00, spread over a range of 75532.00), not below 14538.00, gives CA$16129.00 (rounded to the nearest cent)."
         },
@@ -1923,7 +2075,8 @@
             "placement": "before",
             "singular": "CA$",
             "plural": "CA$",
-            "spaced": false
+            "spaced": false,
+            "as_percentage": false
           },
           "text": "Line 25 of Schedule 8 (CA$3291.75) gives CA$3291.75."
         },
@@ -1937,7 +2090,8 @@
             "placement": "before",
             "singular": "CA$",
             "plural": "CA$",
-            "spaced": false
+            "spaced": false,
+            "as_percentage": false
           },
           "text": "Line 28 of Schedule 6 (CA$0.00) gives CA$0.00."
         },
@@ -1951,7 +2105,8 @@
             "placement": "before",
             "singular": "CA$",
             "plural": "CA$",
-            "spaced": false
+            "spaced": false,
+            "as_percentage": false
           },
           "text": "Ei overpayment (CA$0.00) gives CA$0.00."
         },
@@ -1965,7 +2120,8 @@
             "placement": "before",
             "singular": "CA$",
             "plural": "CA$",
-            "spaced": false
+            "spaced": false,
+            "as_percentage": false
           },
           "text": "Line 16 of T2204 (CA$1077.48) gives CA$1077.48."
         },
@@ -1979,7 +2135,8 @@
             "placement": "before",
             "singular": "CA$",
             "plural": "CA$",
-            "spaced": false
+            "spaced": false,
+            "as_percentage": false
           },
           "text": "Line 26000 of T1 Income Tax and Benefit Return, Steps 2 to 4 (CA$69335.00) gives CA$69335.00."
         },
@@ -1993,7 +2150,8 @@
             "placement": "before",
             "singular": "CA$",
             "plural": "CA$",
-            "spaced": false
+            "spaced": false,
+            "as_percentage": false
           },
           "text": "Line 70 (CA$69335.00) falls in the bracket that starts at CA$57375.00."
         },
@@ -2015,7 +2173,8 @@
             "placement": "before",
             "singular": "CA$",
             "plural": "CA$",
-            "spaced": false
+            "spaced": false,
+            "as_percentage": false
           },
           "text": "Line 70 (CA$69335.00) falls in a bracket with CA$8319.38 of tax on the income below it."
         },
@@ -2029,7 +2188,8 @@
             "placement": "before",
             "singular": "CA$",
             "plural": "CA$",
-            "spaced": false
+            "spaced": false,
+            "as_percentage": false
           },
           "text": "Line 90 of ON428 (CA$3911.45) gives CA$3911.45."
         },
@@ -2043,7 +2203,8 @@
             "placement": "before",
             "singular": "CA$",
             "plural": "CA$",
-            "spaced": false
+            "spaced": false,
+            "as_percentage": false
           },
           "text": "Line 70 (CA$69335.00) less line 71 (CA$57375.00), not below 0, gives CA$11960.00 (rounded to the nearest cent)."
         },
@@ -2057,7 +2218,8 @@
             "placement": "before",
             "singular": "CA$",
             "plural": "CA$",
-            "spaced": false
+            "spaced": false,
+            "as_percentage": false
           },
           "text": "Line 73 (20.5%) of line 72 (CA$11960.00) gives CA$2451.80 (rounded to the nearest cent)."
         },
@@ -2071,7 +2233,8 @@
             "placement": "before",
             "singular": "CA$",
             "plural": "CA$",
-            "spaced": false
+            "spaced": false,
+            "as_percentage": false
           },
           "text": "Line 10100 (CA$70000.00) plus line 10400 (CA$0.00) gives CA$70000.00 (rounded to the nearest cent)."
         },
@@ -2085,7 +2248,8 @@
             "placement": "before",
             "singular": "CA$",
             "plural": "CA$",
-            "spaced": false
+            "spaced": false,
+            "as_percentage": false
           },
           "text": "Lesser of canada employment amount income (CA$70000.00) and the canada employment amount (CA$1471.00) gives CA$1471.00 (rounded to the nearest cent)."
         },
@@ -2099,7 +2263,8 @@
             "placement": "before",
             "singular": "CA$",
             "plural": "CA$",
-            "spaced": false
+            "spaced": false,
+            "as_percentage": false
           },
           "text": "Line 30000 (CA$16129.00) gives CA$16129.00 (rounded to the nearest cent)."
         },
@@ -2113,7 +2278,8 @@
             "placement": "before",
             "singular": "CA$",
             "plural": "CA$",
-            "spaced": false
+            "spaced": false,
+            "as_percentage": false
           },
           "text": "Nothing to add, so CA$0.00."
         },
@@ -2127,7 +2293,8 @@
             "placement": "before",
             "singular": "CA$",
             "plural": "CA$",
-            "spaced": false
+            "spaced": false,
+            "as_percentage": false
           },
           "text": "Line 30800 (CA$3291.75) plus line 31200 (CA$1077.48) plus line 31260 (CA$1471.00) gives CA$5840.23 (rounded to the nearest cent)."
         },
@@ -2141,7 +2308,8 @@
             "placement": "before",
             "singular": "CA$",
             "plural": "CA$",
-            "spaced": false
+            "spaced": false,
+            "as_percentage": false
           },
           "text": "Line 84 (CA$16129.00) plus line 96 (CA$5840.23) gives CA$21969.23 (rounded to the nearest cent)."
         },
@@ -2155,7 +2323,8 @@
             "placement": "before",
             "singular": "CA$",
             "plural": "CA$",
-            "spaced": false
+            "spaced": false,
+            "as_percentage": false
           },
           "text": "Line 98 (CA$21969.23) gives CA$21969.23 (rounded to the nearest cent)."
         },
@@ -2169,7 +2338,8 @@
             "placement": "before",
             "singular": "CA$",
             "plural": "CA$",
-            "spaced": false
+            "spaced": false,
+            "as_percentage": false
           },
           "text": "Line 101 (CA$21969.23) gives CA$21969.23 (rounded to the nearest cent)."
         },
@@ -2183,7 +2353,8 @@
             "placement": "before",
             "singular": "CA$",
             "plural": "CA$",
-            "spaced": false
+            "spaced": false,
+            "as_percentage": false
           },
           "text": "Line 74 (CA$2451.80) plus line 75 (CA$8319.38) gives CA$10771.18 (rounded to the nearest cent)."
         },
@@ -2197,7 +2368,8 @@
             "placement": "before",
             "singular": "CA$",
             "plural": "CA$",
-            "spaced": false
+            "spaced": false,
+            "as_percentage": false
           },
           "text": "Line 76 (CA$10771.18) gives CA$10771.18 (rounded to the nearest cent)."
         },
@@ -2211,7 +2383,8 @@
             "placement": "before",
             "singular": "CA$",
             "plural": "CA$",
-            "spaced": false
+            "spaced": false,
+            "as_percentage": false
           },
           "text": "Line 106 (CA$21969.23) gives CA$21969.23 (rounded to the nearest cent)."
         },
@@ -2225,7 +2398,8 @@
             "placement": "before",
             "singular": "CA$",
             "plural": "CA$",
-            "spaced": false
+            "spaced": false,
+            "as_percentage": false
           },
           "text": "14.5% of line 33500 (CA$21969.23) gives CA$3185.54 (rounded to the nearest cent)."
         },
@@ -2239,7 +2413,8 @@
             "placement": "before",
             "singular": "CA$",
             "plural": "CA$",
-            "spaced": false
+            "spaced": false,
+            "as_percentage": false
           },
           "text": "Line 33800 (CA$3185.54) gives CA$3185.54 (rounded to the nearest cent)."
         },
@@ -2253,7 +2428,8 @@
             "placement": "before",
             "singular": "CA$",
             "plural": "CA$",
-            "spaced": false
+            "spaced": false,
+            "as_percentage": false
           },
           "text": "Line 35000 (CA$3185.54) gives CA$3185.54 (rounded to the nearest cent)."
         },
@@ -2267,7 +2443,8 @@
             "placement": "before",
             "singular": "CA$",
             "plural": "CA$",
-            "spaced": false
+            "spaced": false,
+            "as_percentage": false
           },
           "text": "Line 40400 (CA$10771.18) less line 125 (CA$3185.54), not below 0, gives CA$7585.64 (rounded to the nearest cent)."
         },
@@ -2281,7 +2458,8 @@
             "placement": "before",
             "singular": "CA$",
             "plural": "CA$",
-            "spaced": false
+            "spaced": false,
+            "as_percentage": false
           },
           "text": "Line 42900 (CA$7585.64) gives CA$7585.64 (rounded to the nearest cent)."
         },
@@ -2295,7 +2473,8 @@
             "placement": "before",
             "singular": "CA$",
             "plural": "CA$",
-            "spaced": false
+            "spaced": false,
+            "as_percentage": false
           },
           "text": "Line 128 (CA$7585.64) less line 40500 (CA$0.00) gives CA$7585.64 (rounded to the nearest cent)."
         },
@@ -2309,7 +2488,8 @@
             "placement": "before",
             "singular": "CA$",
             "plural": "CA$",
-            "spaced": false
+            "spaced": false,
+            "as_percentage": false
           },
           "text": "Line 130 (CA$7585.64) gives CA$7585.64 (rounded to the nearest cent)."
         },
@@ -2323,7 +2503,8 @@
             "placement": "before",
             "singular": "CA$",
             "plural": "CA$",
-            "spaced": false
+            "spaced": false,
+            "as_percentage": false
           },
           "text": "Line 132 (CA$7585.64) less line 133 (CA$0.00), not below 0, gives CA$7585.64 (rounded to the nearest cent)."
         },
@@ -2337,7 +2518,8 @@
             "placement": "before",
             "singular": "CA$",
             "plural": "CA$",
-            "spaced": false
+            "spaced": false,
+            "as_percentage": false
           },
           "text": "Line 40600 (CA$7585.64) less line 41600 (CA$0.00), not below 0, gives CA$7585.64 (rounded to the nearest cent)."
         },
@@ -2351,7 +2533,8 @@
             "placement": "before",
             "singular": "CA$",
             "plural": "CA$",
-            "spaced": false
+            "spaced": false,
+            "as_percentage": false
           },
           "text": "Line 41700 (CA$7585.64) gives CA$7585.64 (rounded to the nearest cent)."
         },
@@ -2365,7 +2548,8 @@
             "placement": "before",
             "singular": "CA$",
             "plural": "CA$",
-            "spaced": false
+            "spaced": false,
+            "as_percentage": false
           },
           "text": "Line 45000 (CA$0.00) plus line 45300 (CA$0.00) gives CA$0.00 (rounded to the nearest cent)."
         },
@@ -2379,7 +2563,8 @@
             "placement": "before",
             "singular": "CA$",
             "plural": "CA$",
-            "spaced": false
+            "spaced": false,
+            "as_percentage": false
           },
           "text": "Line 42000 (CA$7585.64) plus line 42800 (CA$3911.45) gives CA$11497.09 (rounded to the nearest cent)."
         },
@@ -2393,7 +2578,8 @@
             "placement": "before",
             "singular": "CA$",
             "plural": "CA$",
-            "spaced": false
+            "spaced": false,
+            "as_percentage": false
           },
           "text": "Line 43500 (CA$11497.09) less line 48200 (CA$0.00) gives CA$11497.09 (rounded to the nearest cent)."
         }
@@ -2404,6 +2590,104 @@
       "name": "Return summary",
       "lines": [
         {
+          "label": "ontario_bracket_rate_return",
+          "name": null,
+          "reference": null,
+          "amount": "0.0915",
+          "unit": {
+            "name": "core/percent",
+            "placement": "after",
+            "singular": "%",
+            "plural": "%",
+            "spaced": false,
+            "as_percentage": true
+          },
+          "text": "Line 5 of ON428 (0.0915) gives 9.15%."
+        },
+        {
+          "label": "ontario_surtax_base",
+          "name": null,
+          "reference": null,
+          "amount": "3311.45",
+          "unit": {
+            "name": "ca/cad",
+            "placement": "before",
+            "singular": "CA$",
+            "plural": "CA$",
+            "spaced": false,
+            "as_percentage": false
+          },
+          "text": "Line 65 of ON428 (CA$3311.45) gives CA$3311.45."
+        },
+        {
+          "label": "ontario_surtax_factor",
+          "name": null,
+          "reference": null,
+          "amount": "1",
+          "unit": null,
+          "text": "Ontario surtax base (CA$3311.45) is over no surtax threshold, so no rate is added to 1.00, gives 1.00."
+        },
+        {
+          "label": "ontario_marginal_rate",
+          "name": null,
+          "reference": null,
+          "amount": "0.0915",
+          "unit": {
+            "name": "core/percent",
+            "placement": "after",
+            "singular": "%",
+            "plural": "%",
+            "spaced": false,
+            "as_percentage": true
+          },
+          "text": "Ontario bracket rate return (9.15%) of ontario surtax factor (1.00) gives 9.15% (not rounded)."
+        },
+        {
+          "label": "return_taxable_income",
+          "name": null,
+          "reference": null,
+          "amount": "69335.00",
+          "unit": {
+            "name": "ca/cad",
+            "placement": "before",
+            "singular": "CA$",
+            "plural": "CA$",
+            "spaced": false,
+            "as_percentage": false
+          },
+          "text": "Line 26000 of T1 Income Tax and Benefit Return, Steps 2 to 4 (CA$69335.00) gives CA$69335.00."
+        },
+        {
+          "label": "return_health_premium_slope",
+          "name": null,
+          "reference": null,
+          "amount": "0",
+          "unit": {
+            "name": "core/percent",
+            "placement": "after",
+            "singular": "%",
+            "plural": "%",
+            "spaced": false,
+            "as_percentage": true
+          },
+          "text": "Return taxable income (CA$69335.00) is over 48600.00, so the band is a flat amount and the rate is 0%."
+        },
+        {
+          "label": "federal_marginal_rate",
+          "name": null,
+          "reference": null,
+          "amount": "0.205",
+          "unit": {
+            "name": "core/percent",
+            "placement": "after",
+            "singular": "%",
+            "plural": "%",
+            "spaced": false,
+            "as_percentage": true
+          },
+          "text": "Line 73 of T1 Income Tax and Benefit Return, Steps 5 and 6 (0.205) gives 20.5%."
+        },
+        {
           "label": "refund_or_balance_owing",
           "name": "Refund or balance owing",
           "reference": "167",
@@ -2413,9 +2697,55 @@
             "placement": "before",
             "singular": "CA$",
             "plural": "CA$",
-            "spaced": false
+            "spaced": false,
+            "as_percentage": false
           },
           "text": "Line 167 of T1 Income Tax and Benefit Return, Steps 5 and 6 (CA$11497.09) gives CA$11497.09."
+        },
+        {
+          "label": "total_payable",
+          "name": null,
+          "reference": null,
+          "amount": "11497.09",
+          "unit": {
+            "name": "ca/cad",
+            "placement": "before",
+            "singular": "CA$",
+            "plural": "CA$",
+            "spaced": false,
+            "as_percentage": false
+          },
+          "text": "Line 43500 of T1 Income Tax and Benefit Return, Steps 5 and 6 (CA$11497.09) gives CA$11497.09."
+        },
+        {
+          "label": "average_income_tax_rate",
+          "name": null,
+          "reference": null,
+          "amount": "0.1642",
+          "unit": {
+            "name": "core/percent",
+            "placement": "after",
+            "singular": "%",
+            "plural": "%",
+            "spaced": false,
+            "as_percentage": true
+          },
+          "text": "Line 43500 of T1 Income Tax and Benefit Return, Steps 5 and 6 (CA$11497.09) divided by line 10100 (CA$70000.00) gives 16.42% (rounded half-up to 0.0001)."
+        },
+        {
+          "label": "marginal_tax_rate",
+          "name": null,
+          "reference": null,
+          "amount": "0.2965",
+          "unit": {
+            "name": "core/percent",
+            "placement": "after",
+            "singular": "%",
+            "plural": "%",
+            "spaced": false,
+            "as_percentage": true
+          },
+          "text": "Federal marginal rate (20.5%) plus ontario marginal rate (9.15%) plus return health premium slope (0%) gives 29.65% (not rounded)."
         }
       ]
     }

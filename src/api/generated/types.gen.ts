@@ -42,6 +42,8 @@ export type ComputeTakeHomeCalculationResponse = {
    */
   take_home: string;
   unit: Unit;
+  average_income_tax_rate: Rate;
+  marginal_income_tax_rate: Rate;
   /**
    * True when the year's figures are provisional.
    */
@@ -50,6 +52,14 @@ export type ComputeTakeHomeCalculationResponse = {
    * Present only when include_trace is true; one entry per form.
    */
   trace?: Array<FormTrace>;
+};
+
+/**
+ * A rate of income tax, as a fraction written as a decimal string and the unit that says how to show it; when the unit is `as_percentage`, show the amount times 100 (0.2965 is 29.65%).
+ */
+export type Rate = {
+  amount: string;
+  unit: Unit;
 };
 
 export type FormTrace = {
@@ -117,6 +127,10 @@ export type Unit = {
    * Whether one space separates the text from the number.
    */
   spaced: boolean;
+  /**
+   * True when the amounts of this unit are fractions that are shown as percentages: show the amount times 100 before the text (0.2965 is 29.65%).
+   */
+  as_percentage: boolean;
 };
 
 export type ListJurisdictionsResponse = {

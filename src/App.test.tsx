@@ -532,10 +532,13 @@ describe('App answer card', () => {
   });
 
   it('still renders a response without a unit, with the fallback unit', async () => {
-    // The response and every line without a unit, as an older API sends it.
+    // The response and every money line without a unit, as an older API sends it.
     const noUnit: unknown = JSON.parse(
       JSON.stringify(compute2025),
-      (key, value: unknown) => (key === 'unit' ? undefined : value),
+      (key, value: unknown) =>
+        key === 'unit' && !JSON.stringify(value).includes('core/percent')
+          ? undefined
+          : value,
     );
     await calculate(fixtureClient(() => {}, noUnit));
     expect(screen.getAllByText('$53,468.68')).toHaveLength(2);
@@ -573,6 +576,23 @@ describe('App answer card', () => {
     expect(screen.getByText('CA$5,833.33')).toBeInTheDocument();
     expect(screen.getByText('CA$1,377.61')).toBeInTheDocument();
     expect(screen.getByText(strings.answer.label.monthly)).toBeInTheDocument();
+  });
+
+  it('shows the two income tax rates in the summary, whatever the pay period', async () => {
+    const user = await calculate(fixtureClient());
+    expect(screen.getByText('16.42%')).toBeInTheDocument();
+    expect(screen.getByText('29.65%')).toBeInTheDocument();
+    await user.click(
+      screen.getByRole('radio', { name: strings.payPeriod.monthly }),
+    );
+    expect(screen.getByText('16.42%')).toBeInTheDocument();
+    expect(screen.getByText('29.65%')).toBeInTheDocument();
+  });
+
+  it('shows the 2026 rates as sent', async () => {
+    await calculate(fixtureClient(undefined, compute2026), '2026');
+    expect(screen.getByText('15.91%')).toBeInTheDocument();
+    expect(screen.getByText('29.65%')).toBeInTheDocument();
   });
 
   it('keeps the chosen pay period for the next answer', async () => {

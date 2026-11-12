@@ -20,6 +20,7 @@ export const strings = {
     singular: '$',
     plural: '$',
     spaced: false,
+    as_percentage: false,
   } as const,
   payPeriod: {
     legend: 'Show amounts',
@@ -58,6 +59,14 @@ export const strings = {
     salary: 'Salary before tax',
     takeHomeRow: 'Take-home',
     takenOff: 'Taken off (tax and contributions)',
+    averageRate: {
+      name: 'Average income tax rate',
+      help: 'Your income tax divided by your salary. It is the share of your salary that goes to income tax, federal and provincial together.',
+    },
+    marginalRate: {
+      name: 'Marginal income tax rate',
+      help: 'The federal and provincial income tax, including any surtax and health premium, on your next dollar of salary. Canada Pension Plan and Employment Insurance are not included.',
+    },
     estimateNote:
       'This is an estimate for a single yearly salary. Your own situation may differ.',
   },
