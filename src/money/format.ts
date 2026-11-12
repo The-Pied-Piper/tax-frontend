@@ -9,6 +9,8 @@ export interface MoneyUnit {
   singular: string;
   plural: string;
   spaced: boolean;
+  /** True when the amount is a fraction to show times 100 (0.2965 -> 29.65). */
+  as_percentage?: boolean;
 }
 
 const AMOUNT = /^(-?)(0|[1-9]\d*)(\.\d+)?$/;
@@ -62,4 +64,26 @@ export function displayMoney(
   } catch {
     return yearly;
   }
+}
+
+// Moves the decimal point two places right in the text, so no digit is lost
+// and nothing is rounded: "0.2965" -> "29.65", "0.1" -> "10". Text that is not
+// a plain non-negative decimal is returned as is.
+function timesHundred(amount: string): string {
+  const match = /^(0|[1-9]\d*)(?:\.(\d+))?$/.exec(amount);
+  if (!match) return amount;
+  const [, whole = '', fraction = ''] = match;
+  const padded = fraction.padEnd(2, '0');
+  const digits = `${whole}${padded.slice(0, 2)}`.replace(/^0+(?=\d)/, '');
+  const rest = padded.slice(2).replace(/0+$/, '');
+  return rest === '' ? digits : `${digits}.${rest}`;
+}
+
+// A rate with its unit, ready to show; the same for every pay period. A unit
+// marked as_percentage means the API sent a fraction, shown times 100.
+export function displayRate(amount: string, unit: MoneyUnit): string {
+  if (unit.as_percentage !== true)
+    return withUnit(groupThousands(amount), unit);
+  const shifted = timesHundred(amount);
+  return shifted === amount ? amount : withUnit(shifted, unit);
 }

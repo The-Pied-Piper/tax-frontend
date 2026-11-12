@@ -1,10 +1,14 @@
 import { useId, type ReactNode } from 'react';
 import type { Unit } from '../adapters';
-import { displayMoney } from '../money/format';
+import { displayMoney, displayRate } from '../money/format';
 import type { PayPeriod } from '../money/payPeriod';
 import { strings } from '../strings';
 import styles from './AnswerCard.module.css';
+import { HelpTerm } from './HelpTerm';
 import { PayPeriodSwitch } from './PayPeriodSwitch';
+
+/** A rate exactly as the API sent it, with its unit. */
+export type Rate = { amount: string; unit: Unit };
 
 type Props = {
   salary: string;
@@ -12,6 +16,9 @@ type Props = {
   takeHome: string;
   /** The unit of the three amounts above. */
   unit: Unit;
+  /** Average and marginal income tax rate; the same for every pay period. */
+  averageRate: Rate;
+  marginalRate: Rate;
   /** The place and year the answer is for, as asked. */
   place: string;
   year: number;
@@ -28,6 +35,8 @@ export function AnswerCard({
   totalDeductions,
   takeHome,
   unit,
+  averageRate,
+  marginalRate,
   place,
   year,
   payPeriod,
@@ -62,6 +71,17 @@ export function AnswerCard({
           <dt>{strings.answer.takeHomeRow}</dt>
           <dd>{show(takeHome)}</dd>
         </div>
+        {[
+          { text: strings.answer.averageRate, rate: averageRate },
+          { text: strings.answer.marginalRate, rate: marginalRate },
+        ].map(({ text, rate }) => (
+          <div className={styles.row} key={text.name}>
+            <dt>
+              <HelpTerm name={text.name} help={text.help} />
+            </dt>
+            <dd>{displayRate(rate.amount, rate.unit)}</dd>
+          </div>
+        ))}
       </dl>
       <p className={styles.estimate}>{strings.answer.estimateNote}</p>
       <div className={styles.extras}>{children}</div>

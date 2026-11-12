@@ -1,6 +1,6 @@
 import type { Unit } from '../api';
-import { cad, months } from '../test/units';
-import { displayMoney, groupThousands, withUnit } from './format';
+import { cad, months, percent } from '../test/units';
+import { displayMoney, displayRate, groupThousands, withUnit } from './format';
 
 describe('groupThousands', () => {
   it.each([
@@ -105,5 +105,29 @@ describe('displayMoney', () => {
   it('shows an unreadable amount as sent, without the unit', () => {
     expect(displayMoney('53468.555', 'monthly', cad)).toBe('53468.555');
     expect(displayMoney('53468.555', 'monthly', months)).toBe('53468.555');
+  });
+});
+
+describe('displayRate', () => {
+  const pct = { ...percent, as_percentage: true };
+  it.each([
+    ['0.1642', '16.42%'],
+    ['0.2965', '29.65%'],
+    ['0.1', '10%'],
+    ['0.0905', '9.05%'],
+    ['0.50', '50%'],
+    ['0', '0%'],
+    ['1', '100%'],
+    ['0.123456', '12.3456%'],
+  ])('shows %s as %s', (amount, shown) => {
+    expect(displayRate(amount, pct)).toBe(shown);
+  });
+  it('leaves the amount as it is when the unit is not a percentage', () => {
+    expect(displayRate('16.42', { ...percent, as_percentage: false })).toBe(
+      '16.42%',
+    );
+  });
+  it('shows text it cannot read as sent', () => {
+    expect(displayRate('abc', pct)).toBe('abc');
   });
 });

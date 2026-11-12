@@ -2,7 +2,7 @@ import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { AnswerCard } from './AnswerCard';
 import { strings } from '../strings';
-import { cad } from '../test/units';
+import { cad, percent } from '../test/units';
 
 const base = {
   salary: '70000.00',
@@ -13,6 +13,8 @@ const base = {
   payPeriod: 'annually' as const,
   onPayPeriodChange: () => {},
   unit: cad,
+  averageRate: { amount: '16.42', unit: percent },
+  marginalRate: { amount: '29.65', unit: percent },
 };
 
 describe('AnswerCard', () => {
@@ -95,5 +97,46 @@ describe('AnswerCard', () => {
     expect(screen.getAllByText('$53,468.68')).toHaveLength(2);
     expect(screen.getByText('$70,000.00')).toBeInTheDocument();
     expect(screen.getByText('$16,531.32')).toBeInTheDocument();
+  });
+
+  it('shows the two income tax rates directly under take-home, as sent', () => {
+    render(<AnswerCard {...base} />);
+    const labels = screen
+      .getAllByRole('term')
+      .map((term) => term.textContent ?? '');
+    const takeHome = labels.findIndex((t) =>
+      t.startsWith(strings.answer.takeHomeRow),
+    );
+    expect(labels[takeHome + 1]).toContain(strings.answer.averageRate.name);
+    expect(labels[takeHome + 2]).toContain(strings.answer.marginalRate.name);
+    expect(screen.getByText('16.42%')).toBeInTheDocument();
+    expect(screen.getByText('29.65%')).toBeInTheDocument();
+  });
+
+  it.each(['weekly', 'biweekly', 'monthly', 'annually'] as const)(
+    'leaves the rates unchanged on the %s view',
+    (payPeriod) => {
+      render(<AnswerCard {...base} payPeriod={payPeriod} />);
+      expect(screen.getByText('16.42%')).toBeInTheDocument();
+      expect(screen.getByText('29.65%')).toBeInTheDocument();
+    },
+  );
+
+  it('opens each rate help on click and not before', async () => {
+    render(<AnswerCard {...base} />);
+    const average = strings.answer.averageRate;
+    expect(screen.getByText(average.help)).not.toBeVisible();
+    await userEvent.click(
+      screen.getByRole('button', {
+        name: strings.breakdown.helpButton(average.name),
+      }),
+    );
+    expect(screen.getByText(average.help)).toBeVisible();
+    await userEvent.click(
+      screen.getByRole('button', {
+        name: strings.breakdown.helpButton(strings.answer.marginalRate.name),
+      }),
+    );
+    expect(screen.getByText(strings.answer.marginalRate.help)).toBeVisible();
   });
 });

@@ -16,3 +16,12 @@ export const months: Unit = {
   plural: 'months',
   spaced: true,
 };
+
+export const percent: Unit = {
+  name: 'core/percent',
+  placement: 'after',
+  singular: '%',
+  plural: '%',
+  spaced: false,
+  as_percentage: true,
+};
