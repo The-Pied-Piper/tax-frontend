@@ -25,6 +25,6 @@ describe('page flow through the shared mock service worker', () => {
     expect(
       await screen.findByRole('heading', { name: strings.answer.heading }),
     ).toBeInTheDocument();
-    expect(screen.getAllByText('$53,468.68')[0]).toBeInTheDocument();
+    expect(screen.getAllByText('CA$53,468.68')[0]).toBeInTheDocument();
   });
 });
