@@ -1,6 +1,11 @@
 import type { ComputeTakeHomeCalculationResponse } from '../api';
 import { strings } from '../strings';
-import type { AdaptedResult, AdvancedGroup } from './types';
+import type { AdaptedResult, AdvancedGroup, Unit } from './types';
+
+/** The response's unit; an older API sends none, then the fallback unit stands in. */
+export function responseUnit(response: { unit?: Unit | null }): Unit {
+  return response.unit ?? strings.fallbackUnit;
+}
 
 /** Groups every trace line by form for the advanced view. Same for every jurisdiction. */
 export function advancedGroups(
@@ -35,7 +40,7 @@ export function fallbackResult(
   response: ComputeTakeHomeCalculationResponse,
 ): AdaptedResult {
   return {
-    unit: response.unit,
+    unit: responseUnit(response),
     rows: [],
     totals: [],
     advanced: advancedGroups(response),

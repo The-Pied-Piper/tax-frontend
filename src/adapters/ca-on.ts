@@ -1,7 +1,7 @@
 import type { ComputeTakeHomeCalculationResponse, Unit } from '../api';
 import { sumAmounts } from '../money/sum';
 import { strings } from '../strings';
-import { advancedGroups, fallbackResult } from './fallback';
+import { advancedGroups, fallbackResult, responseUnit } from './fallback';
 import type { AdaptedResult, DisplayRow, JurisdictionAdapter } from './types';
 
 /** Exact trace labels read from the real $70,000 and $90,000 responses for 2025 and 2026. */
@@ -87,7 +87,7 @@ function adapt(response: ComputeTakeHomeCalculationResponse): AdaptedResult {
   }
   const text = strings.adapters.caOn;
   return {
-    unit: response.unit,
+    unit: responseUnit(response),
     rows: [
       row(
         'cpp',
@@ -109,7 +109,7 @@ function adapt(response: ComputeTakeHomeCalculationResponse): AdaptedResult {
       row('total-tax', text.totalTax, totalTax, text.groups.incomeTax),
       row('total-taken-off', text.totalTakenOff, {
         amount: response.total_deductions,
-        unit: response.unit,
+        unit: responseUnit(response),
       }),
     ],
     advanced: advancedGroups(response),

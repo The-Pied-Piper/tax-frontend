@@ -4,6 +4,7 @@ import fixture2025 from '../api/fixtures/compute-on-2025-70000.json';
 import fixture2025High from '../api/fixtures/compute-on-2025-90000.json';
 import fixture2026 from '../api/fixtures/compute-on-2026-70000.json';
 import { sumAmounts } from '../money/sum';
+import { strings } from '../strings';
 import { cad, months } from '../test/units';
 import { adapters } from './index';
 import { caOnAdapter } from './ca-on';
@@ -225,6 +226,15 @@ describe('Ontario adapter', () => {
       const total = result.totals.find((r) => r.id === 'total-taken-off');
       expect(total?.unit).toEqual(months);
       expect(result.rows.find((r) => r.id === 'ei')?.unit).toEqual(cad);
+    });
+
+    it('gives every row and the result the fallback unit when the response has no unit', () => {
+      // What an older API sends: the same response with no unit at all.
+      const older = Object.assign({}, r2025, { unit: undefined });
+      const result = caOnAdapter.adapt(older);
+      const total = result.totals.find((r) => r.id === 'total-taken-off');
+      expect(total?.unit).toEqual(strings.fallbackUnit);
+      expect(result.unit).toEqual(strings.fallbackUnit);
     });
 
     it('gives a row the unit of its own line', () => {
