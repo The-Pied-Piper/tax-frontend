@@ -247,7 +247,7 @@ describe('App form', () => {
         if (calls === 1) return base.computeTakeHomeCalculation(body);
         return new Promise((resolve) => {
           release = () => {
-            resolve(compute2025);
+            resolve(base.computeTakeHomeCalculation(body));
           };
         });
       },
@@ -318,7 +318,7 @@ describe('App form', () => {
       expect(
         screen.queryByRole('heading', { name: strings.answer.heading }),
       ).not.toBeInTheDocument();
-      expect(screen.queryByText('$53,468.68')).not.toBeInTheDocument();
+      expect(screen.queryByText('CA$53,468.68')).not.toBeInTheDocument();
     });
 
     it('puts a salary problem under the salary box', async () => {
@@ -458,23 +458,47 @@ describe('App answer card', () => {
 
   it('shows the 2025 figures with no provisional notice', async () => {
     await calculate(fixtureClient());
-    expect(screen.getAllByText('$53,468.68')).toHaveLength(2);
-    expect(screen.getAllByText('$70,000.00')[0]).toBeVisible();
-    expect(screen.getByText('$16,531.32')).toBeInTheDocument();
+    expect(screen.getAllByText('CA$53,468.68')).toHaveLength(2);
+    expect(screen.getAllByText('CA$70,000.00')[0]).toBeVisible();
+    expect(screen.getByText('CA$16,531.32')).toBeInTheDocument();
     expect(screen.queryByRole('note')).not.toBeInTheDocument();
   });
 
-  it('names the place and year that were asked', async () => {
-    await calculate(fixtureClient());
+  it('shows the unit the API sent, before the amount, a year or a month', async () => {
+    const user = await calculate(fixtureClient());
+    expect(screen.getAllByText('CA$53,468.68')).toHaveLength(2);
+    await user.click(
+      screen.getByRole('radio', { name: strings.payPeriod.monthly }),
+    );
+    expect(screen.getAllByText('CA$4,455.72')).toHaveLength(2);
+    expect(document.body.textContent).not.toMatch(/(?<!CA)\$\d/);
+  });
+
+  it('still renders a response without a unit, with the fallback unit', async () => {
+    // The response and every line without a unit, as an older API sends it.
+    const noUnit: unknown = JSON.parse(
+      JSON.stringify(compute2025),
+      (key, value: unknown) => (key === 'unit' ? undefined : value),
+    );
+    await calculate(fixtureClient(() => {}, noUnit));
+    expect(screen.getAllByText('$53,468.68')).toHaveLength(2);
+    expect(screen.getByText('$16,531.32')).toBeInTheDocument();
     expect(
       screen.getByText('out of $70,000.00, Ontario, 2025'),
     ).toBeInTheDocument();
   });
 
+  it('names the place and year that were asked', async () => {
+    await calculate(fixtureClient());
+    expect(
+      screen.getByText('out of CA$70,000.00, Ontario, 2025'),
+    ).toBeInTheDocument();
+  });
+
   it('shows the 2026 figures with the provisional notice', async () => {
     await calculate(fixtureClient(undefined, compute2026), '2026');
-    expect(screen.getAllByText('$53,786.25')).toHaveLength(2);
-    expect(screen.getByText('$16,213.75')).toBeInTheDocument();
+    expect(screen.getAllByText('CA$53,786.25')).toHaveLength(2);
+    expect(screen.getByText('CA$16,213.75')).toBeInTheDocument();
     expect(screen.getByRole('note')).toHaveTextContent(
       strings.notices.provisionalTitle(2026),
     );
@@ -488,9 +512,9 @@ describe('App answer card', () => {
     await user.click(
       screen.getByRole('radio', { name: strings.payPeriod.monthly }),
     );
-    expect(screen.getAllByText('$4,455.72')).toHaveLength(2);
-    expect(screen.getByText('$5,833.33')).toBeInTheDocument();
-    expect(screen.getByText('$1,377.61')).toBeInTheDocument();
+    expect(screen.getAllByText('CA$4,455.72')).toHaveLength(2);
+    expect(screen.getByText('CA$5,833.33')).toBeInTheDocument();
+    expect(screen.getByText('CA$1,377.61')).toBeInTheDocument();
     expect(screen.getByText(strings.answer.label.monthly)).toBeInTheDocument();
   });
 
@@ -506,7 +530,7 @@ describe('App answer card', () => {
     expect(
       screen.getByRole('radio', { name: strings.payPeriod.monthly }),
     ).toBeChecked();
-    expect(screen.getAllByText('$4,455.72')).toHaveLength(2);
+    expect(screen.getAllByText('CA$4,455.72')).toHaveLength(2);
   });
 });
 
@@ -522,6 +546,7 @@ describe('App breakdown', () => {
           name: 'Salary before tax',
           help: 'What you earn before anything is taken off.',
           amount: response.salary,
+          unit: response.unit,
         },
       ],
       totals: [
@@ -530,9 +555,11 @@ describe('App breakdown', () => {
           name: 'Total taken off',
           help: 'Tax and contributions together.',
           amount: response.total_deductions,
+          unit: response.unit,
         },
       ],
       advanced: advancedGroups(response),
+      unit: response.unit,
     }),
   });
 
@@ -560,7 +587,7 @@ describe('App breakdown', () => {
     expect(details).toHaveAttribute('open');
     expect(screen.getByText('Total taken off')).toBeVisible();
     expect(
-      within(details as HTMLElement).getByText('$16,531.32'),
+      within(details as HTMLElement).getByText('CA$16,531.32'),
     ).toBeVisible();
   });
 
@@ -658,7 +685,7 @@ describe('App advanced view', () => {
       0,
     );
     expect(lines).toHaveLength(expected);
-    expect(expected).toBe(131);
+    expect(expected).toBe(157);
     expect(
       screen.getByRole('button', {
         name: strings.breakdown.helpButton('Line 2'),
@@ -674,6 +701,6 @@ describe('App advanced view', () => {
     await user.click(screen.getByText('Return summary'));
     const form = screen.getByText('Return summary').closest('details');
     expect(form).not.toBeNull();
-    expect(within(form as HTMLElement).getByText('11,497.09')).toBeVisible();
+    expect(within(form as HTMLElement).getByText('CA$11,497.09')).toBeVisible();
   });
 });

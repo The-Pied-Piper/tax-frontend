@@ -27,4 +27,5 @@ export type {
   ListJurisdictionsResponses,
   StatusOutput,
   TraceLine,
+  Unit,
 } from './types.gen';

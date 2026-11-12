@@ -1,7 +1,12 @@
-import type { ComputeTakeHomeCalculationResponse } from '../api';
+import type { ComputeTakeHomeCalculationResponse, Unit } from '../api';
 import { sumAmounts } from '../money/sum';
 import { strings } from '../strings';
-import { advancedGroups, fallbackResult } from './fallback';
+import {
+  advancedGroups,
+  fallbackResult,
+  readUnit,
+  responseUnit,
+} from './fallback';
 import type { AdaptedResult, DisplayRow, JurisdictionAdapter } from './types';
 
 /** Exact trace labels read from the real $70,000 and $90,000 responses for 2025 and 2026. */
@@ -22,26 +27,34 @@ const LABELS = {
 } as const;
 
 type Wanted = { form: string; label: string };
+type Found = { amount: string; unit: Unit | null };
 
 function find(
   response: ComputeTakeHomeCalculationResponse,
   wanted: Wanted,
-): string | undefined {
-  return response.trace
+): Found | undefined {
+  const line = response.trace
     ?.filter((f) => f.form === wanted.form)
     .flatMap((f) => f.lines)
-    .find((l) => l.label === wanted.label)?.amount;
+    .find((l) => l.label === wanted.label);
+  if (line?.amount === undefined) return undefined;
+  return { amount: line.amount, unit: readUnit(line.unit) };
+}
+
+function sameUnit(a: Unit | null, b: Unit | null): boolean {
+  return a === null || b === null ? a === b : a.name === b.name;
 }
 
 function row(
   id: string,
   text: { name: string; help: string },
-  amount: string,
+  found: { amount: string; unit: Unit | null },
   group?: string,
 ): DisplayRow {
+  const { amount, unit } = found;
   return group === undefined
-    ? { id, name: text.name, help: text.help, amount }
-    : { id, name: text.name, help: text.help, amount, group };
+    ? { id, name: text.name, help: text.help, amount, unit }
+    : { id, name: text.name, help: text.help, amount, unit, group };
 }
 
 function adapt(response: ComputeTakeHomeCalculationResponse): AdaptedResult {
@@ -64,27 +77,45 @@ function adapt(response: ComputeTakeHomeCalculationResponse): AdaptedResult {
     // A label we rely on is missing: show nothing half-right, keep the advanced view.
     return fallbackResult(response);
   }
+  // Two lines in different units cannot be added: same rule as an unreadable amount.
+  if (!sameUnit(cppBase.unit, cppEnhancedFirst.unit)) {
+    return fallbackResult(response);
+  }
   let cpp: string;
   let cpp2Exact: string;
   try {
-    cpp = sumAmounts([cppBase, cppEnhancedFirst]);
-    cpp2Exact = sumAmounts([cpp2]);
+    cpp = sumAmounts([cppBase.amount, cppEnhancedFirst.amount]);
+    cpp2Exact = sumAmounts([cpp2.amount]);
   } catch {
     // An amount we cannot add exactly: same rule, show nothing half-right.
     return fallbackResult(response);
   }
   const text = strings.adapters.caOn;
   return {
+    unit: responseUnit(response),
     rows: [
-      row('cpp', text.cpp, cpp, text.groups.pension),
-      row('cpp2', text.cpp2, cpp2Exact, text.groups.pension),
+      row(
+        'cpp',
+        text.cpp,
+        { amount: cpp, unit: cppBase.unit },
+        text.groups.pension,
+      ),
+      row(
+        'cpp2',
+        text.cpp2,
+        { amount: cpp2Exact, unit: cpp2.unit },
+        text.groups.pension,
+      ),
       row('ei', text.ei, ei, text.groups.ei),
       row('federal-tax', text.federalTax, federalTax, text.groups.incomeTax),
       row('ontario-tax', text.ontarioTax, ontarioTax, text.groups.incomeTax),
     ],
     totals: [
       row('total-tax', text.totalTax, totalTax, text.groups.incomeTax),
-      row('total-taken-off', text.totalTakenOff, response.total_deductions),
+      row('total-taken-off', text.totalTakenOff, {
+        amount: response.total_deductions,
+        unit: responseUnit(response),
+      }),
     ],
     advanced: advancedGroups(response),
   };

@@ -1,4 +1,5 @@
 import { useId, type ReactNode } from 'react';
+import type { Unit } from '../adapters';
 import { displayMoney } from '../money/format';
 import type { PayPeriod } from '../money/payPeriod';
 import { strings } from '../strings';
@@ -9,6 +10,8 @@ type Props = {
   salary: string;
   totalDeductions: string;
   takeHome: string;
+  /** The unit of the three amounts above. */
+  unit: Unit;
   /** The place and year the answer is for, as asked. */
   place: string;
   year: number;
@@ -24,6 +27,7 @@ export function AnswerCard({
   salary,
   totalDeductions,
   takeHome,
+  unit,
   place,
   year,
   payPeriod,
@@ -31,8 +35,7 @@ export function AnswerCard({
   children,
 }: Props) {
   const headingId = useId();
-  const show = (yearly: string) =>
-    displayMoney(yearly, payPeriod, strings.currencySymbol);
+  const show = (yearly: string) => displayMoney(yearly, payPeriod, unit);
   return (
     <section className={styles.card} aria-labelledby={headingId}>
       <h2 id={headingId} className={styles.visuallyHidden}>

@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import type { ComputeTakeHomeCalculationResponse } from '../api';
 import fixture from '../api/fixtures/compute-on-2025-70000.json';
 import { strings } from '../strings';
+import { cad, months } from '../test/units';
 import { advancedGroups } from './fallback';
 import { AdapterRegistry } from './registry';
 import type { AdaptedResult, JurisdictionAdapter } from './types';
@@ -14,9 +15,12 @@ function fake(
   years?: readonly number[],
 ): JurisdictionAdapter {
   const result: AdaptedResult = {
-    rows: [{ id: tag, name: tag, help: `${tag} help`, amount: '1.00' }],
+    rows: [
+      { id: tag, name: tag, help: `${tag} help`, amount: '1.00', unit: null },
+    ],
     totals: [],
     advanced: [],
+    unit: cad,
   };
   return { jurisdictionCode, years, adapt: () => result };
 }
@@ -100,6 +104,13 @@ describe('AdapterRegistry', () => {
     expect(result.totals).toEqual([]);
     expect(result.advanced).toEqual(advancedGroups(response));
   });
+
+  it('carries the response unit on the result it falls back to', () => {
+    const registry = new AdapterRegistry();
+    expect(registry.adapt('ZZ', 2025, response).unit).toEqual(cad);
+    const inMonths = { ...response, unit: months };
+    expect(registry.adapt('ZZ', 2025, inMonths).unit).toEqual(months);
+  });
 });
 
 describe('advancedGroups', () => {
@@ -109,12 +120,12 @@ describe('advancedGroups', () => {
       (response.trace ?? []).map((f) => f.form),
     );
     expect(groups[0]?.lines[0]).toEqual({
-      label: 'Additional maximum pensionable earnings',
-      reference: 'D',
-      amount: '81200.00',
-      detail:
-        'cpp_additional_maximum_pensionable_earnings: 81200.00 for cpp_months 12 (half-up to 0.01)',
-      named: true,
+      label: 'Line A',
+      reference: 'A',
+      amount: '12',
+      detail: "No value given, so the form's default gives 12 months.",
+      named: false,
+      unit: months,
     });
   });
 
@@ -123,6 +134,7 @@ describe('advancedGroups', () => {
       salary: '1.00',
       total_deductions: '0.00',
       take_home: '1.00',
+      unit: cad,
       provisional: false,
       trace: [
         {
@@ -135,6 +147,7 @@ describe('advancedGroups', () => {
               reference: '65',
               text: 't',
               amount: '1.00',
+              unit: months,
             },
             { label: 'b_step', name: null, reference: null, text: 't' },
             { label: 'c_step', name: '  ', reference: ' ', text: 't' },
@@ -164,6 +177,7 @@ describe('advancedGroups', () => {
         amount: '1.00',
         detail: 't',
         named: true,
+        unit: months,
       },
       {
         label: 'Line 2',
@@ -171,6 +185,7 @@ describe('advancedGroups', () => {
         amount: null,
         detail: 'x = 2',
         named: false,
+        unit: null,
       },
       {
         label: 'Line 3',
@@ -178,6 +193,7 @@ describe('advancedGroups', () => {
         amount: null,
         detail: strings.advanced.noDetail,
         named: false,
+        unit: null,
       },
     ]);
   });
@@ -188,8 +204,40 @@ describe('advancedGroups', () => {
         salary: '1.00',
         total_deductions: '0.00',
         take_home: '1.00',
+        unit: cad,
         provisional: false,
       }),
     ).toEqual([]);
+  });
+
+  it('gives every line the unit the API sent for it, and null for none', () => {
+    const lines = advancedGroups(response).flatMap((g) => g.lines);
+    // Money lines carry dollars, month counts carry months, rates carry none.
+    expect(
+      lines.every(
+        (l) =>
+          l.unit === null ||
+          l.unit.name === 'ca/cad' ||
+          l.unit.name === 'core/months',
+      ),
+    ).toBe(true);
+    expect(
+      lines.filter((l) => l.unit?.name === 'ca/cad').length,
+    ).toBeGreaterThan(100);
+    const mixed = advancedGroups({
+      ...response,
+      trace: [
+        {
+          form: 'ex/form',
+          name: 'Example',
+          lines: [
+            { text: 't', reference: '1', amount: '12', unit: months },
+            { text: 't', reference: '2', amount: '0.0915', unit: null },
+            { text: 't', reference: '3', amount: '0.205' },
+          ],
+        },
+      ],
+    });
+    expect(mixed[0]?.lines.map((l) => l.unit)).toEqual([months, null, null]);
   });
 });

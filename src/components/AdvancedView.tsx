@@ -1,6 +1,6 @@
 import { useId, useState } from 'react';
-import type { AdvancedGroup, AdvancedLine } from '../adapters';
-import { groupThousands } from '../money/format';
+import type { AdvancedGroup, AdvancedLine, Unit } from '../adapters';
+import { groupThousands, withUnit } from '../money/format';
 import { strings } from '../strings';
 import { HelpTerm } from './HelpTerm';
 import styles from './AdvancedView.module.css';
@@ -80,7 +80,7 @@ function FormGroup({ group }: { group: AdvancedGroup }) {
                   </span>
                 </>
               ) : (
-                groupThousands(line.amount)
+                lineAmount(line.amount, line.unit)
               )}
             </dd>
           </div>
@@ -99,4 +99,9 @@ function reference(line: AdvancedLine) {
       {line.reference}
     </span>
   );
+}
+
+function lineAmount(amount: string, unit: Unit | null) {
+  const grouped = groupThousands(amount);
+  return unit === null ? grouped : withUnit(grouped, unit);
 }
