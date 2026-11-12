@@ -120,13 +120,12 @@ describe('advancedGroups', () => {
       (response.trace ?? []).map((f) => f.form),
     );
     expect(groups[0]?.lines[0]).toEqual({
-      label: 'Additional maximum pensionable earnings',
-      reference: 'D',
-      amount: '81200.00',
-      detail:
-        'cpp_additional_maximum_pensionable_earnings: 81200.00 for cpp_months 12 (half-up to 0.01)',
-      named: true,
-      unit: cad,
+      label: 'Line A',
+      reference: 'A',
+      amount: '12',
+      detail: "No value given, so the form's default gives 12 months.",
+      named: false,
+      unit: months,
     });
   });
 
@@ -213,7 +212,18 @@ describe('advancedGroups', () => {
 
   it('gives every line the unit the API sent for it, and null for none', () => {
     const lines = advancedGroups(response).flatMap((g) => g.lines);
-    expect(lines.every((l) => l.unit?.name === 'ca/cad')).toBe(true);
+    // Money lines carry dollars, month counts carry months, rates carry none.
+    expect(
+      lines.every(
+        (l) =>
+          l.unit === null ||
+          l.unit.name === 'ca/cad' ||
+          l.unit.name === 'core/months',
+      ),
+    ).toBe(true);
+    expect(
+      lines.filter((l) => l.unit?.name === 'ca/cad').length,
+    ).toBeGreaterThan(100);
     const mixed = advancedGroups({
       ...response,
       trace: [

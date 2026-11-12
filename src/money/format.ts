@@ -8,6 +8,7 @@ export interface MoneyUnit {
   placement: 'before' | 'after';
   singular: string;
   plural: string;
+  spaced: boolean;
 }
 
 const AMOUNT = /^(-?)(0|[1-9]\d*)(\.\d+)?$/;
@@ -23,8 +24,8 @@ export function groupThousands(amount: string): string {
 const ONE = /^1(\.0+)?$/;
 
 // "53,468.68" + CA$ -> "CA$53,468.68"; "12" + months -> "12 months". The minus
-// sign stays first, the plural is used unless the amount is exactly 1, and only
-// a unit after the number gets a space. Text that is not a plain decimal is
+// sign stays first, the plural is used unless the amount is exactly 1, and a
+// space separates text and number only when the unit says `spaced`. Text that is not a plain decimal is
 // returned as is, with no unit.
 export function withUnit(amount: string, unit: MoneyUnit): string {
   const digits = amount.replace(/,/g, '');
@@ -33,9 +34,10 @@ export function withUnit(amount: string, unit: MoneyUnit): string {
   const body = negative ? amount.slice(1) : amount;
   const text = ONE.test(digits) ? unit.singular : unit.plural;
   const sign = negative ? '-' : '';
+  const gap = unit.spaced ? ' ' : '';
   return unit.placement === 'before'
-    ? `${sign}${text}${body}`
-    : `${sign}${body} ${text}`;
+    ? `${sign}${text}${gap}${body}`
+    : `${sign}${body}${gap}${text}`;
 }
 
 // Amount for one pay period as a bare grouped number (a row with no unit). An

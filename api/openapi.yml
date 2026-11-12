@@ -197,33 +197,41 @@ components:
           type: string
           example: "1077.48"
         unit:
-          nullable: true
-          allOf:
+          description: The unit of amount; null if the figure has none.
+          oneOf:
             - $ref: "#/components/schemas/Unit"
-          description: The unit of the amount; null when the figure has no unit.
+            - {type: object, nullable: true, maxProperties: 0}
         text:
           type: string
           description: Explanation in the requested language.
     Unit:
       type: object
-      required: [name, placement, singular, plural]
+      description: >-
+        What a figure is counted in, as data for the caller to format; amounts stay plain decimal
+        strings. The text is in the language of the trace (English).
+      required: [name, placement, singular, plural, spaced]
       properties:
         name:
           type: string
-          description: Registry name of the unit; opaque, to be compared and not parsed.
+          description: Identifier of the unit; opaque, to be compared and not parsed.
           example: ca/cad
         placement:
           type: string
           enum: [before, after]
           description: Whether the text goes before or after the number.
+          example: before
         singular:
           type: string
-          description: The text printed for an amount of exactly 1.
+          description: The text beside an amount of exactly 1.
           example: CA$
         plural:
           type: string
-          description: The text printed for any other amount.
+          description: The text beside any other amount.
           example: CA$
+        spaced:
+          type: boolean
+          description: Whether one space separates the text from the number.
+          example: false
     ListJurisdictionsResponse:
       type: object
       required: [jurisdictions, next_page_token]

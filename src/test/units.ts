@@ -6,11 +6,13 @@ export const cad: Unit = {
   placement: 'before',
   singular: 'CA$',
   plural: 'CA$',
+  spaced: false,
 };
 
 export const months: Unit = {
-  name: 'months',
+  name: 'core/months',
   placement: 'after',
   singular: 'month',
   plural: 'months',
+  spaced: true,
 };

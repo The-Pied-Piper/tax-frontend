@@ -79,18 +79,26 @@ export type TraceLine = {
   reference?: string | null;
   amount?: string;
   /**
-   * The unit of the amount; null when the figure has no unit.
+   * The unit of amount; null if the figure has none.
    */
-  unit?: Unit | null;
+  unit?:
+    | Unit
+    | {
+        [key: string]: unknown;
+      }
+    | null;
   /**
    * Explanation in the requested language.
    */
   text: string;
 };
 
+/**
+ * What a figure is counted in, as data for the caller to format; amounts stay plain decimal strings. The text is in the language of the trace (English).
+ */
 export type Unit = {
   /**
-   * Registry name of the unit; opaque, to be compared and not parsed.
+   * Identifier of the unit; opaque, to be compared and not parsed.
    */
   name: string;
   /**
@@ -98,13 +106,17 @@ export type Unit = {
    */
   placement: 'before' | 'after';
   /**
-   * The text printed for an amount of exactly 1.
+   * The text beside an amount of exactly 1.
    */
   singular: string;
   /**
-   * The text printed for any other amount.
+   * The text beside any other amount.
    */
   plural: string;
+  /**
+   * Whether one space separates the text from the number.
+   */
+  spaced: boolean;
 };
 
 export type ListJurisdictionsResponse = {

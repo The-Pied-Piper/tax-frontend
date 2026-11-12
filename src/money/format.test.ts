@@ -65,6 +65,7 @@ describe('withUnit', () => {
       placement: 'before',
       singular: 'S$',
       plural: 'P$',
+      spaced: false,
     };
     expect(withUnit('1.00', dollars)).toBe('S$1.00');
     expect(withUnit('2.00', dollars)).toBe('P$2.00');

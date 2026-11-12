@@ -188,7 +188,7 @@ describe('Ontario adapter', () => {
       .find((g) => g.form === 'ca/schedule_8')
       ?.lines.find((l) => l.reference === '2');
     expect(line2?.label).toBe('Line 2');
-    expect(line2?.detail).toMatch(/^cpp_part_3_line_2:/);
+    expect(line2?.detail).toMatch(/^Lesser of line D/);
   });
 
   describe('units', () => {
@@ -288,10 +288,13 @@ describe('Ontario adapter', () => {
         .find((g) => g.form === 'ca/schedule_8')
         ?.lines.find((l) => l.reference === '2');
       expect(line2?.unit).toBeNull();
-      expect(lines.filter((l) => l.unit === null)).toHaveLength(1);
-      expect(lines.filter((l) => l.unit?.name === 'ca/cad')).toHaveLength(
-        lines.length - 1,
-      );
+      const before = caOnAdapter
+        .adapt(r2025)
+        .advanced.flatMap((g) => g.lines)
+        .filter((l) => l.unit === null).length;
+      // The rate lines never carry a unit; clearing line 2's adds exactly one.
+      expect(before).toBeGreaterThan(0);
+      expect(lines.filter((l) => l.unit === null)).toHaveLength(before + 1);
     });
 
     it('still adapts a response with no unit on any line', () => {

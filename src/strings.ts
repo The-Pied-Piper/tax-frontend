@@ -19,6 +19,7 @@ export const strings = {
     placement: 'before',
     singular: '$',
     plural: '$',
+    spaced: false,
   } as const,
   payPeriod: {
     legend: 'Show amounts',

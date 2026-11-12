@@ -1,7 +1,12 @@
 import type { ComputeTakeHomeCalculationResponse, Unit } from '../api';
 import { sumAmounts } from '../money/sum';
 import { strings } from '../strings';
-import { advancedGroups, fallbackResult, responseUnit } from './fallback';
+import {
+  advancedGroups,
+  fallbackResult,
+  readUnit,
+  responseUnit,
+} from './fallback';
 import type { AdaptedResult, DisplayRow, JurisdictionAdapter } from './types';
 
 /** Exact trace labels read from the real $70,000 and $90,000 responses for 2025 and 2026. */
@@ -33,7 +38,7 @@ function find(
     .flatMap((f) => f.lines)
     .find((l) => l.label === wanted.label);
   if (line?.amount === undefined) return undefined;
-  return { amount: line.amount, unit: line.unit ?? null };
+  return { amount: line.amount, unit: readUnit(line.unit) };
 }
 
 function sameUnit(a: Unit | null, b: Unit | null): boolean {
