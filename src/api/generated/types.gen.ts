@@ -41,6 +41,7 @@ export type ComputeTakeHomeCalculationResponse = {
    * Salary minus total deductions.
    */
   take_home: string;
+  unit: Unit;
   /**
    * True when the year's figures are provisional.
    */
@@ -78,9 +79,32 @@ export type TraceLine = {
   reference?: string | null;
   amount?: string;
   /**
+   * The unit of the amount; null when the figure has no unit.
+   */
+  unit?: Unit | null;
+  /**
    * Explanation in the requested language.
    */
   text: string;
+};
+
+export type Unit = {
+  /**
+   * Registry name of the unit; opaque, to be compared and not parsed.
+   */
+  name: string;
+  /**
+   * Whether the text goes before or after the number.
+   */
+  placement: 'before' | 'after';
+  /**
+   * The text printed for an amount of exactly 1.
+   */
+  singular: string;
+  /**
+   * The text printed for any other amount.
+   */
+  plural: string;
 };
 
 export type ListJurisdictionsResponse = {
