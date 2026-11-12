@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import {
   adapters,
+  COMING_SOON,
   type AdaptedResult,
   type AdapterRegistry,
 } from '../adapters';
@@ -13,13 +14,18 @@ import {
 import type { PayPeriod } from '../money/payPeriod';
 import { languageCode } from '../strings';
 import { describeFailure } from './failure';
+import { placeOptions, type PlaceOption } from './places';
 import { checkSalary, type SalaryCheck } from './salary';
 
 type Jurisdictions = ListJurisdictionsResponse['jurisdictions'];
 
 export type JurisdictionsState =
   | { status: 'loading' }
-  | { status: 'ready'; jurisdictions: Jurisdictions }
+  | {
+      status: 'ready';
+      jurisdictions: Jurisdictions;
+      places: PlaceOption[];
+    }
   | { status: 'failed' };
 
 /** One request at a time; a new request clears the previous answer. */
@@ -71,6 +77,7 @@ export function useTakeHome(
         setJurisdictionsState({
           status: 'ready',
           jurisdictions: response.jurisdictions,
+          places: placeOptions(response.jurisdictions, COMING_SOON),
         });
         if (first) {
           setValues((v) => ({

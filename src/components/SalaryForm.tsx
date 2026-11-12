@@ -14,7 +14,6 @@ import {
 } from '../money/salaryInput';
 import type { SalaryCheck } from '../state/salary';
 import type { FormValues, JurisdictionsState } from '../state/useTakeHome';
-import { placeOptions } from '../state/places';
 import { languageCode, strings } from '../strings';
 import styles from './SalaryForm.module.css';
 
@@ -110,7 +109,7 @@ export function SalaryForm({
             onJurisdictionChange(e.target.value);
           }}
         >
-          {placeOptions(jurisdictions).map((p) => (
+          {jurisdictionsState.places.map((p) => (
             <option key={p.code} value={p.code} disabled={!p.supported}>
               {p.supported ? p.name : `${p.name} (${strings.form.comingSoon})`}
             </option>
