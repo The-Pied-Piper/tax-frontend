@@ -1,4 +1,4 @@
-import type { ListJurisdictionsResponse } from '../api/client';
+import type { ListJurisdictionsResponse } from '../api';
 import { placeOptions } from './places';
 
 type Supported = ListJurisdictionsResponse['jurisdictions'];

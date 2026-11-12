@@ -1,4 +1,4 @@
-import type { ListJurisdictionsResponse } from '../api/generated';
+import type { ListJurisdictionsResponse } from '../api';
 
 type Supported = ListJurisdictionsResponse['jurisdictions'];
 

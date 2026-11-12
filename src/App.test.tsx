@@ -447,7 +447,6 @@ describe('App form', () => {
     expect(others).toHaveLength(12);
     for (const o of others) {
       expect(o).toBeDisabled();
-      expect(o.textContent).toMatch(/ \(Coming Soon\)$/);
       expect(o.textContent).toMatch(
         new RegExp(` \\(${strings.form.comingSoon}\\)$`),
       );
