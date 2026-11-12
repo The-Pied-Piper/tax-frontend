@@ -418,6 +418,63 @@ describe('App form', () => {
     ).toBeInTheDocument();
   });
 
+  const only = (codes: [string, string][]): ApiClient => ({
+    listJurisdictions: () =>
+      Promise.resolve({
+        jurisdictions: codes.map(([code, name]) => ({
+          code,
+          name,
+          years: [{ year: 2025, provisional: false }],
+        })),
+        next_page_token: '',
+      }),
+    computeTakeHomeCalculation: () => Promise.reject(new Error('unused')),
+  });
+
+  it('lists all 13 places, with only Ontario selectable when the API returns it alone', async () => {
+    render(<App client={only([['CA-ON', 'Ontario']])} />);
+    const place = await screen.findByRole('combobox', {
+      name: strings.form.place,
+    });
+    await waitFor(() => {
+      expect(within(place).getAllByRole('option')).toHaveLength(13);
+    });
+    const options = within(place).getAllByRole('option');
+    const ontario = within(place).getByRole('option', { name: 'Ontario' });
+    expect(ontario).toBeEnabled();
+    expect(ontario).toHaveProperty('selected', true);
+    const others = options.filter((o) => o !== ontario);
+    expect(others).toHaveLength(12);
+    for (const o of others) {
+      expect(o).toBeDisabled();
+      expect(o.textContent).toMatch(
+        new RegExp(` \\(${strings.form.comingSoon}\\)$`),
+      );
+    }
+  });
+
+  it('enables Alberta when the API also returns it', async () => {
+    render(
+      <App
+        client={only([
+          ['CA-ON', 'Ontario'],
+          ['CA-AB', 'Alberta'],
+        ])}
+      />,
+    );
+    const place = await screen.findByRole('combobox', {
+      name: strings.form.place,
+    });
+    expect(
+      await within(place).findByRole('option', { name: 'Alberta' }),
+    ).toBeEnabled();
+    expect(
+      within(place).getByRole('option', {
+        name: 'British Columbia (Coming Soon)',
+      }),
+    ).toBeDisabled();
+  });
+
   it('keeps Calculate off when no place has a year to choose', async () => {
     const client: ApiClient = {
       listJurisdictions: () =>

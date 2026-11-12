@@ -109,9 +109,9 @@ export function SalaryForm({
             onJurisdictionChange(e.target.value);
           }}
         >
-          {jurisdictions.map((j) => (
-            <option key={j.code} value={j.code}>
-              {j.name.trim() || j.code}
+          {jurisdictionsState.places.map((p) => (
+            <option key={p.code} value={p.code} disabled={!p.supported}>
+              {p.supported ? p.name : `${p.name} (${strings.form.comingSoon})`}
             </option>
           ))}
         </select>

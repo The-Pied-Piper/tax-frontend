@@ -37,6 +37,7 @@ export const strings = {
       `For example ${whole} or ${cents}`,
     calculate: 'Calculate',
     calculating: 'Calculating…',
+    comingSoon: 'Coming Soon',
     loadingPlaces: 'Loading places…',
     placesFailed: 'Could not load the list of places. Please reload the page.',
     salaryEmpty: 'Enter your yearly salary.',
