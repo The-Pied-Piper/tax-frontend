@@ -10,6 +10,28 @@
     "spaced": false,
     "as_percentage": false
   },
+  "average_income_tax_rate": {
+    "amount": "0.1642",
+    "unit": {
+      "name": "core/percent",
+      "placement": "after",
+      "singular": "%",
+      "plural": "%",
+      "spaced": false,
+      "as_percentage": true
+    }
+  },
+  "marginal_income_tax_rate": {
+    "amount": "0.2965",
+    "unit": {
+      "name": "core/percent",
+      "placement": "after",
+      "singular": "%",
+      "plural": "%",
+      "spaced": false,
+      "as_percentage": true
+    }
+  },
   "provisional": false,
   "trace": [
     {
@@ -44,7 +66,7 @@
             "spaced": false,
             "as_percentage": false
           },
-          "text": "The table amount for line A (12 months) is CA$81200.00 (rounded to the nearest cent)."
+          "text": "Looking up line A (12 months) in the table gives CA$81200.00 for line D (rounded to the nearest cent)."
         },
         {
           "label": "cpp_basic_exemption",
@@ -59,7 +81,7 @@
             "spaced": false,
             "as_percentage": false
           },
-          "text": "The table amount for line A (12 months) is CA$3500.00 (rounded to the nearest cent)."
+          "text": "Looking up line A (12 months) in the table gives CA$3500.00 for line E (rounded to the nearest cent)."
         },
         {
           "label": "cpp_maximum_pensionable_earnings",
@@ -74,7 +96,7 @@
             "spaced": false,
             "as_percentage": false
           },
-          "text": "The table amount for line A (12 months) is CA$71300.00 (rounded to the nearest cent)."
+          "text": "Looking up line A (12 months) in the table gives CA$71300.00 for line B (rounded to the nearest cent)."
         },
         {
           "label": "t4_cpp_pensionable_earnings_outside_quebec",
@@ -2568,6 +2590,104 @@
       "name": "Return summary",
       "lines": [
         {
+          "label": "ontario_bracket_rate_return",
+          "name": null,
+          "reference": null,
+          "amount": "0.0915",
+          "unit": {
+            "name": "core/percent",
+            "placement": "after",
+            "singular": "%",
+            "plural": "%",
+            "spaced": false,
+            "as_percentage": true
+          },
+          "text": "Line 5 of ON428 (0.0915) gives 9.15%."
+        },
+        {
+          "label": "ontario_surtax_base",
+          "name": null,
+          "reference": null,
+          "amount": "3311.45",
+          "unit": {
+            "name": "ca/cad",
+            "placement": "before",
+            "singular": "CA$",
+            "plural": "CA$",
+            "spaced": false,
+            "as_percentage": false
+          },
+          "text": "Line 65 of ON428 (CA$3311.45) gives CA$3311.45."
+        },
+        {
+          "label": "ontario_surtax_factor",
+          "name": null,
+          "reference": null,
+          "amount": "1",
+          "unit": null,
+          "text": "Ontario surtax base (CA$3311.45) is over no surtax threshold, so no rate is added to 1.00, gives 1.00."
+        },
+        {
+          "label": "ontario_marginal_rate",
+          "name": null,
+          "reference": null,
+          "amount": "0.0915",
+          "unit": {
+            "name": "core/percent",
+            "placement": "after",
+            "singular": "%",
+            "plural": "%",
+            "spaced": false,
+            "as_percentage": true
+          },
+          "text": "Ontario bracket rate return (9.15%) of ontario surtax factor (1.00) gives 9.15% (not rounded)."
+        },
+        {
+          "label": "return_taxable_income",
+          "name": null,
+          "reference": null,
+          "amount": "69335.00",
+          "unit": {
+            "name": "ca/cad",
+            "placement": "before",
+            "singular": "CA$",
+            "plural": "CA$",
+            "spaced": false,
+            "as_percentage": false
+          },
+          "text": "Line 26000 of T1 Income Tax and Benefit Return, Steps 2 to 4 (CA$69335.00) gives CA$69335.00."
+        },
+        {
+          "label": "return_health_premium_slope",
+          "name": null,
+          "reference": null,
+          "amount": "0",
+          "unit": {
+            "name": "core/percent",
+            "placement": "after",
+            "singular": "%",
+            "plural": "%",
+            "spaced": false,
+            "as_percentage": true
+          },
+          "text": "Return taxable income (CA$69335.00) is over 48600.00, so the band is a flat amount and the rate is 0%."
+        },
+        {
+          "label": "federal_marginal_rate",
+          "name": null,
+          "reference": null,
+          "amount": "0.205",
+          "unit": {
+            "name": "core/percent",
+            "placement": "after",
+            "singular": "%",
+            "plural": "%",
+            "spaced": false,
+            "as_percentage": true
+          },
+          "text": "Line 73 of T1 Income Tax and Benefit Return, Steps 5 and 6 (0.205) gives 20.5%."
+        },
+        {
           "label": "refund_or_balance_owing",
           "name": "Refund or balance owing",
           "reference": "167",
@@ -2581,30 +2701,53 @@
             "as_percentage": false
           },
           "text": "Line 167 of T1 Income Tax and Benefit Return, Steps 5 and 6 (CA$11497.09) gives CA$11497.09."
+        },
+        {
+          "label": "total_payable",
+          "name": null,
+          "reference": null,
+          "amount": "11497.09",
+          "unit": {
+            "name": "ca/cad",
+            "placement": "before",
+            "singular": "CA$",
+            "plural": "CA$",
+            "spaced": false,
+            "as_percentage": false
+          },
+          "text": "Line 43500 of T1 Income Tax and Benefit Return, Steps 5 and 6 (CA$11497.09) gives CA$11497.09."
+        },
+        {
+          "label": "average_income_tax_rate",
+          "name": null,
+          "reference": null,
+          "amount": "0.1642",
+          "unit": {
+            "name": "core/percent",
+            "placement": "after",
+            "singular": "%",
+            "plural": "%",
+            "spaced": false,
+            "as_percentage": true
+          },
+          "text": "Line 43500 of T1 Income Tax and Benefit Return, Steps 5 and 6 (CA$11497.09) divided by line 10100 (CA$70000.00) gives 16.42% (rounded half-up to 0.0001)."
+        },
+        {
+          "label": "marginal_tax_rate",
+          "name": null,
+          "reference": null,
+          "amount": "0.2965",
+          "unit": {
+            "name": "core/percent",
+            "placement": "after",
+            "singular": "%",
+            "plural": "%",
+            "spaced": false,
+            "as_percentage": true
+          },
+          "text": "Federal marginal rate (20.5%) plus ontario marginal rate (9.15%) plus return health premium slope (0%) gives 29.65% (not rounded)."
         }
       ]
     }
-  ],
-  "average_income_tax_rate": {
-    "amount": "0.1642",
-    "unit": {
-      "name": "core/percent",
-      "placement": "after",
-      "singular": "%",
-      "plural": "%",
-      "spaced": false,
-      "as_percentage": true
-    }
-  },
-  "marginal_income_tax_rate": {
-    "amount": "0.2965",
-    "unit": {
-      "name": "core/percent",
-      "placement": "after",
-      "singular": "%",
-      "plural": "%",
-      "spaced": false,
-      "as_percentage": true
-    }
-  }
+  ]
 }
