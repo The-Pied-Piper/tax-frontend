@@ -17,6 +17,7 @@ export function advancedGroups(
           named: Boolean(line.name?.trim()),
           reference,
           amount: line.amount ?? null,
+          unit: line.unit ?? null,
           detail: line.text.trim() ? line.text : strings.advanced.noDetail,
         },
       ];
@@ -33,5 +34,10 @@ export function advancedGroups(
 export function fallbackResult(
   response: ComputeTakeHomeCalculationResponse,
 ): AdaptedResult {
-  return { rows: [], totals: [], advanced: advancedGroups(response) };
+  return {
+    unit: response.unit,
+    rows: [],
+    totals: [],
+    advanced: advancedGroups(response),
+  };
 }

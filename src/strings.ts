@@ -13,7 +13,13 @@ export const strings = {
   starLink: 'Star the engine on GitHub',
   starNote:
     'The calculations are open source. A star helps other people find it.',
-  currencySymbol: '$',
+  // Shown only when the API response carries no unit.
+  fallbackUnit: {
+    name: 'fallback',
+    placement: 'before',
+    singular: '$',
+    plural: '$',
+  } as const,
   payPeriod: {
     legend: 'Show amounts',
     weekly: 'Weekly',

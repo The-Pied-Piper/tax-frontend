@@ -1,5 +1,5 @@
 import type { AdapterRegistry } from './adapters';
-import type { ApiClient } from './api';
+import type { ApiClient, Unit } from './api';
 import { AdvancedView } from './components/AdvancedView';
 import { AnswerCard } from './components/AnswerCard';
 import { Breakdown } from './components/Breakdown';
@@ -10,6 +10,11 @@ import { StarLink } from './components/StarLink';
 import { ThemeToggle } from './components/ThemeToggle';
 import { useTakeHome } from './state/useTakeHome';
 import { strings } from './strings';
+
+// An older API sends no unit; the page then shows the fallback unit.
+function unitOrFallback(unit: Unit | null | undefined): Unit {
+  return unit ?? strings.fallbackUnit;
+}
 
 type Props = { client?: ApiClient; registry?: AdapterRegistry };
 
@@ -52,6 +57,7 @@ export function App({ client, registry }: Props) {
               salary={page.request.response.salary}
               totalDeductions={page.request.response.total_deductions}
               takeHome={page.request.response.take_home}
+              unit={unitOrFallback(page.request.response.unit)}
               place={page.request.asked.jurisdictionName}
               year={page.request.asked.year}
               payPeriod={page.payPeriod}

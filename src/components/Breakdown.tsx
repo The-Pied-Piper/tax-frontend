@@ -1,5 +1,5 @@
 import type { DisplayRow } from '../adapters';
-import { displayMoney } from '../money/format';
+import { displayBare, displayMoney } from '../money/format';
 import type { PayPeriod } from '../money/payPeriod';
 import { strings } from '../strings';
 import { HelpTerm } from './HelpTerm';
@@ -85,7 +85,9 @@ function SectionBlock({
               <HelpTerm name={row.name} help={row.help} />
             </dt>
             <dd>
-              {displayMoney(row.amount, payPeriod, strings.currencySymbol)}
+              {row.unit === null
+                ? displayBare(row.amount, payPeriod)
+                : displayMoney(row.amount, payPeriod, row.unit)}
             </dd>
           </div>
         ))}

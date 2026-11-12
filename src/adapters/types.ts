@@ -1,7 +1,9 @@
-import type { ComputeTakeHomeCalculationResponse } from '../api';
+import type { ComputeTakeHomeCalculationResponse, Unit } from '../api';
 
 /** Money is always text, exactly as the API sent it. */
 export type Amount = string;
+
+export type { Unit };
 
 /** One line of the simple breakdown: a name, its help text and an amount. */
 export interface DisplayRow {
@@ -11,6 +13,8 @@ export interface DisplayRow {
   /** Explanation shown in the "?" bubble. */
   help: string;
   amount: Amount;
+  /** The unit the API sent for the amount; null for a bare number. */
+  unit: Unit | null;
   /** Heading the row is listed under (for example "Pension"). Rows without one are listed last, unheaded. */
   group?: string;
 }
@@ -22,6 +26,8 @@ export interface AdvancedLine {
   /** What the form prints beside the figure; null for a step the form does not print. */
   reference: string | null;
   amount: Amount | null;
+  /** The unit the API sent for this line; null for a bare number. */
+  unit: Unit | null;
   /** The API's explanation of how the figure was worked out, as sent. */
   detail: string;
   /** True when the API gave the line its own name; false when the label is "Line N". */
@@ -39,6 +45,8 @@ export interface AdvancedGroup {
 
 /** What the page shows for one calculation. */
 export interface AdaptedResult {
+  /** The response's top-level unit, for salary, deductions and take-home. */
+  unit: Unit;
   /** Simple breakdown rows, in display order. */
   rows: DisplayRow[];
   /** Summary rows shown after `rows` (for example the total taken off). */
