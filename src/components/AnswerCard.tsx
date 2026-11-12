@@ -1,4 +1,5 @@
 import { useId, type ReactNode } from 'react';
+import type { Rate } from '../api';
 import type { Unit } from '../adapters';
 import { displayMoney, displayRate } from '../money/format';
 import type { PayPeriod } from '../money/payPeriod';
@@ -6,9 +7,6 @@ import { strings } from '../strings';
 import styles from './AnswerCard.module.css';
 import { HelpTerm } from './HelpTerm';
 import { PayPeriodSwitch } from './PayPeriodSwitch';
-
-/** A rate exactly as the API sent it, with its unit. */
-export type Rate = { amount: string; unit: Unit };
 
 type Props = {
   salary: string;
