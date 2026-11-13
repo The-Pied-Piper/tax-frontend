@@ -87,8 +87,7 @@ describe('useTakeHome with an initial state (a pre-built salary page)', () => {
   });
 });
 
-// FOLLOW-UP A (b), expected to FAIL until implemented: the seeded success
-// state carries the page's links, and a new calculation drops them.
+// The seeded success state carries the page's links, and a new calculation drops them.
 describe('useTakeHome links of a pre-built page', () => {
   const links = {
     calculator: '/',

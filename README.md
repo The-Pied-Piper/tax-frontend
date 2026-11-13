@@ -66,7 +66,7 @@ A deploy build can write one finished page per province and salary step (for Ont
 
 ### Adding a province (for example Alberta or British Columbia)
 
-1. Make sure the tax service returns the province and its year in `GET /v1/jurisdictions`, and that its adapter and wording are in `src/adapters/` (the calculator already shows the province once the adapter is registered).
+1. Make sure `GET /v1/jurisdictions` returns the province code (a listed province the API does not return gets no pages) and that the year you list is one the API can compute, otherwise the build fails naming the page. Put its adapter and wording in `src/adapters/` and register the adapter in `src/adapters/index.ts`; without one, the page uses the fallback adapter (no simple breakdown, every trace line in the advanced view).
 2. Add one entry to the list in `build/salaryPages/provinces.ts`: `code` (for example `CA-AB`), `slug` (for example `ca-ab`), `year`, `from`, `to` and `step`.
 3. Run `npm run check`, then a build with `VITE_API_BASE_URL` set, and open `dist/ca-ab/<salary>/index.html`.
 

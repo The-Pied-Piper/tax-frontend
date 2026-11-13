@@ -5,13 +5,17 @@ import type { ApiClient } from './api';
 import { strings } from './strings';
 import { ontarioIndex } from './test/salaryIndexData';
 import { compute70000, pageData } from './test/syntheticPages';
-import { salaryLinks } from '../build/salaryPages/links';
 import jurisdictions from './api/fixtures/jurisdictions.json';
 
-// FOLLOW-UP A (c), expected to FAIL until implemented: the page's links come
-// from the hook's request state, the nearby list from the index when the
-// request carries no links, and App compares nothing with `initial.response`.
-const links = salaryLinks('ca-on', ['65000', '70000', '75000'], '70000');
+// The page's links come from the hook's request state, the nearby list from
+// the index when the request carries no links, and App compares nothing with
+// `initial.response`.
+const links = {
+  calculator: '/',
+  previous: { salary: '65000', href: '/ca-on/65000/' },
+  next: { salary: '75000', href: '/ca-on/75000/' },
+  others: [],
+};
 const seeded = { ...pageData(compute70000, '70000'), links };
 
 /** A client that answers every calculation with the very object the page was built from. */

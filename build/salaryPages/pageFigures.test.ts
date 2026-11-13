@@ -10,12 +10,15 @@ import {
   compute70000,
 } from '../../src/test/syntheticPages';
 import { template } from '../../src/test/generatedSite';
-import type { SalaryPageData } from '../../src/state/useTakeHome';
+import {
+  parseSalaryPageData,
+  SALARY_PAGE_DATA_ID,
+} from '../../src/state/salaryPageData';
 import { generateSalaryPages } from './generate';
 import { renderSalaryApp } from './prerender';
 import type { Province } from './provinces';
 
-// Item: every built page carries the figures the API gave for ITS salary.
+// Every built page carries the figures the API gave for ITS salary.
 // The fake API answers by the salary in the request body, with the saved
 // engine responses. One list entry per salary (from = to), so exactly the
 // three saved salaries are built.
@@ -131,9 +134,10 @@ describe('each built page carries the figures the API gave for its own salary', 
   it.each(expected)(
     'writes the API response for $salary, and no other, in the data block of that page',
     ({ salary }) => {
-      const block = pageOf(salary).getElementById('salary-page-data');
-      const data = JSON.parse(block?.textContent ?? '') as SalaryPageData;
-      expect(data.response).toEqual(answers.get(salary));
+      const block = pageOf(salary).getElementById(SALARY_PAGE_DATA_ID);
+      const data = parseSalaryPageData(block?.textContent ?? null);
+      expect(data).not.toBeNull();
+      expect(data?.response).toEqual(answers.get(salary));
     },
   );
 

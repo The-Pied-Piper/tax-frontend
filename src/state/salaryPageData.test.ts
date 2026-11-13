@@ -195,8 +195,7 @@ describe('parseSalaryPageData links (#81)', () => {
   });
 });
 
-// FOLLOW-UP A (a), expected to FAIL until implemented: the block's unit check
-// is the adapters' readUnit and is not repeated in state/.
+// The block's unit check is the adapters' readUnit and is not repeated in state/.
 describe('parseSalaryPageData reads the response unit as readUnit does', () => {
   const withoutSpaced = {
     name: cad.name,
