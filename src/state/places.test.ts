@@ -1,3 +1,4 @@
+import { COMING_SOON } from '../adapters/coming-soon';
 import type { ListJurisdictionsResponse } from '../api';
 import { placeOptions } from './places';
 
@@ -11,23 +12,25 @@ const api = (...places: [string, string][]): Supported =>
   }));
 
 const soon = [
-  { code: 'CA-AB', name: 'Alberta' },
   { code: 'CA-BC', name: 'British Columbia' },
+  { code: 'CA-MB', name: 'Manitoba' },
 ];
 
 describe('placeOptions', () => {
   it('lists the API places first, then the coming-soon ones', () => {
     expect(placeOptions(api(['CA-ON', 'Ontario']), soon)).toEqual([
       { code: 'CA-ON', name: 'Ontario', supported: true },
-      { code: 'CA-AB', name: 'Alberta', supported: false },
       { code: 'CA-BC', name: 'British Columbia', supported: false },
+      { code: 'CA-MB', name: 'Manitoba', supported: false },
     ]);
   });
 
   it('lets the API entry win for a code it serves', () => {
-    expect(placeOptions(api(['CA-AB', '  Alberta Prov ']), soon)).toEqual([
-      { code: 'CA-AB', name: 'Alberta Prov', supported: true },
-      { code: 'CA-BC', name: 'British Columbia', supported: false },
+    expect(
+      placeOptions(api(['CA-BC', '  British Columbia Prov ']), soon),
+    ).toEqual([
+      { code: 'CA-BC', name: 'British Columbia Prov', supported: true },
+      { code: 'CA-MB', name: 'Manitoba', supported: false },
     ]);
   });
 
@@ -39,5 +42,11 @@ describe('placeOptions', () => {
 
   it('lists only coming-soon places for an empty API', () => {
     expect(placeOptions([], soon).every((o) => !o.supported)).toBe(true);
+  });
+});
+
+describe('COMING_SOON', () => {
+  it('no longer lists Alberta, which the API now serves', () => {
+    expect(COMING_SOON.map((p) => p.code)).not.toContain('CA-AB');
   });
 });

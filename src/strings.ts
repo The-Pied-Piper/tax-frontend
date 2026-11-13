@@ -183,5 +183,42 @@ export const strings = {
         help: 'Income tax, Canada Pension Plan and Employment Insurance added together. Your salary minus this is your estimated take-home pay.',
       },
     },
+    caAb: {
+      groups: {
+        pension: 'Pension',
+        ei: 'Employment Insurance',
+        incomeTax: 'Income tax',
+      },
+      cpp: {
+        name: 'Canada Pension Plan',
+        help: 'Your contribution to the Canada Pension Plan (the regular contribution, plus the extra enhanced part up to the first yearly ceiling), taken off your pay for a pension when you retire.',
+      },
+      cpp2: {
+        name: 'Canada Pension Plan, second additional contribution',
+        help: 'An extra Canada Pension Plan contribution on earnings above the first yearly ceiling. It is nothing if your pay is below that ceiling.',
+      },
+      ei: {
+        name: 'Employment Insurance',
+        help: 'Your Employment Insurance premium, taken off your pay to cover benefits if you lose your job.',
+      },
+      eiRefundedNote:
+        'On a salary this small the premium is refunded when you file, so none is counted in this estimate. A pay slip would still show it withheld during the year, and it comes back at tax time.',
+      federalTax: {
+        name: 'Federal income tax',
+        help: 'Income tax owed to the federal government after the federal credits that apply to you.',
+      },
+      albertaTax: {
+        name: 'Alberta income tax',
+        help: 'Income tax owed to Alberta after the Alberta credits that apply to you.',
+      },
+      totalTax: {
+        name: 'Total income tax',
+        help: 'Federal and Alberta income tax added together.',
+      },
+      totalTakenOff: {
+        name: 'Total taken off',
+        help: 'Income tax, Canada Pension Plan and Employment Insurance added together. Your salary minus this is your estimated take-home pay.',
+      },
+    },
   },
 };

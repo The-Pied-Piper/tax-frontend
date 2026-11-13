@@ -1,7 +1,8 @@
 import { render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { http, HttpResponse } from 'msw';
 import { App } from './App';
-import { AdapterRegistry, advancedGroups } from './adapters';
+import { AdapterRegistry, advancedGroups, COMING_SOON } from './adapters';
 import {
   ApiError,
   NetworkError,
@@ -11,8 +12,11 @@ import {
 } from './api';
 import compute2026 from './api/fixtures/compute-on-2026-70000.json';
 import compute2025 from './api/fixtures/compute-on-2025-70000.json';
+import computeAb2025 from './api/fixtures/compute-ab-2025-70000.json';
+import computeAb2026 from './api/fixtures/compute-ab-2026-70000.json';
 import invalidSalary from './api/fixtures/error-invalid-salary.json';
 import jurisdictions from './api/fixtures/jurisdictions.json';
+import { server } from './mocks/server';
 import { strings } from './strings';
 import { fixtureClient } from './test/fixtureClient';
 
@@ -404,20 +408,22 @@ describe('App form', () => {
     computeTakeHomeCalculation: () => Promise.reject(new Error('unused')),
   });
 
-  it('lists all 13 places, with only Ontario selectable when the API returns it alone', async () => {
+  it('lists every place, with only Ontario selectable when the API returns it alone', async () => {
     render(<App client={only([['CA-ON', 'Ontario']])} />);
     const place = await screen.findByRole('combobox', {
       name: strings.form.place,
     });
     await waitFor(() => {
-      expect(within(place).getAllByRole('option')).toHaveLength(13);
+      expect(within(place).getAllByRole('option')).toHaveLength(
+        COMING_SOON.length + 1,
+      );
     });
     const options = within(place).getAllByRole('option');
     const ontario = within(place).getByRole('option', { name: 'Ontario' });
     expect(ontario).toBeEnabled();
     expect(ontario).toHaveProperty('selected', true);
     const others = options.filter((o) => o !== ontario);
-    expect(others).toHaveLength(12);
+    expect(others).toHaveLength(COMING_SOON.length);
     for (const o of others) {
       expect(o).toBeDisabled();
       expect(o.textContent).toMatch(
@@ -752,5 +758,96 @@ describe('App advanced view', () => {
     const form = screen.getByText('Return summary').closest('details');
     expect(form).not.toBeNull();
     expect(within(form as HTMLElement).getByText('CA$11,497.09')).toBeVisible();
+  });
+});
+
+describe('App, Alberta page through the mock service', () => {
+  const alberta = {
+    jurisdictions: [
+      {
+        code: 'CA-AB',
+        name: 'Alberta',
+        years: [
+          { year: 2025, provisional: false },
+          { year: 2026, provisional: true },
+        ],
+      },
+    ],
+    next_page_token: '',
+  };
+
+  function serveAlberta() {
+    server.use(
+      http.get('*/api/v1/jurisdictions', () => HttpResponse.json(alberta)),
+      http.post(
+        '*/api/v1/take-home-calculations\\:compute',
+        async ({ request }) => {
+          const body = (await request.json()) as { year?: unknown };
+          return HttpResponse.json(
+            body.year === 2026 ? computeAb2026 : computeAb2025,
+          );
+        },
+      ),
+    );
+  }
+
+  async function calculateAlberta(year?: string) {
+    serveAlberta();
+    const user = userEvent.setup();
+    render(<App />);
+    const place = await screen.findByRole('combobox', {
+      name: strings.form.place,
+    });
+    await within(place).findByRole('option', { name: 'Alberta' });
+    await user.selectOptions(place, 'CA-AB');
+    if (year) {
+      await user.selectOptions(
+        screen.getByRole('combobox', { name: strings.form.year }),
+        year,
+      );
+    }
+    await user.type(
+      screen.getByRole('textbox', { name: strings.form.salary }),
+      '70000',
+    );
+    await user.click(
+      screen.getByRole('button', { name: strings.form.calculate }),
+    );
+    await screen.findByRole('heading', { name: strings.answer.heading });
+    return user;
+  }
+
+  it('shows the breakdown card with Alberta tax and take-home for 2025', async () => {
+    const user = await calculateAlberta();
+    expect(screen.getAllByText('CA$53,782.01')).toHaveLength(2);
+    expect(screen.queryByRole('note')).not.toBeInTheDocument();
+    await user.click(screen.getByText(strings.breakdown.toggle));
+    expect(
+      screen.getByText(strings.adapters.caAb.albertaTax.name),
+    ).toBeVisible();
+    expect(screen.getByText('CA$3,598.12')).toBeVisible();
+    expect(screen.getByText('CA$7,585.64')).toBeVisible();
+    const details = screen
+      .getByText(strings.breakdown.toggle)
+      .closest('details');
+    expect(
+      within(details as HTMLElement).getByText('CA$16,217.99'),
+    ).toBeVisible();
+  });
+
+  it('shows the 2026 take-home with the provisional notice', async () => {
+    const user = await calculateAlberta('2026');
+    expect(screen.getAllByText('CA$54,107.20')).toHaveLength(2);
+    expect(screen.getByRole('note')).toHaveTextContent(
+      strings.notices.provisionalTitle(2026),
+    );
+    await user.click(screen.getByText(strings.breakdown.toggle));
+    expect(screen.getByText('CA$3,534.79')).toBeVisible();
+    const details = screen
+      .getByText(strings.breakdown.toggle)
+      .closest('details');
+    expect(
+      within(details as HTMLElement).getByText('CA$15,892.80'),
+    ).toBeVisible();
   });
 });
