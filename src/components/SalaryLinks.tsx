@@ -1,3 +1,4 @@
+import { useId } from 'react';
 import type { Unit } from '../adapters';
 import { displayMoney } from '../money/format';
 import type { SalaryPageLinks } from '../state/useTakeHome';
@@ -5,15 +6,15 @@ import { strings } from '../strings';
 import styles from './SalaryLinks.module.css';
 
 type Props = {
-  /** The links of a pre-built page; none on the live calculator. */
-  links: SalaryPageLinks | undefined;
+  /** The links of a pre-built page. */
+  links: SalaryPageLinks;
   /** The unit of the page's answer, for the amounts in the link text. */
   unit: Unit;
 };
 
 /** Plain links to the neighbouring salary pages, the calculator and nearby pages. */
 export function SalaryLinks({ links, unit }: Props) {
-  if (!links) return null;
+  const headingId = useId();
   const money = (salary: string) => displayMoney(salary, 'annually', unit);
   return (
     <nav className={styles.nav} aria-label={strings.salaryLinks.label}>
@@ -34,8 +35,10 @@ export function SalaryLinks({ links, unit }: Props) {
       </div>
       {links.others.length > 0 && (
         <>
-          <p className={styles.heading}>{strings.salaryLinks.others}</p>
-          <ul className={styles.list}>
+          <p id={headingId} className={styles.heading}>
+            {strings.salaryLinks.others}
+          </p>
+          <ul className={styles.list} aria-labelledby={headingId}>
             {links.others.map((other) => (
               <li key={other.href}>
                 <a className={styles.link} href={other.href}>

@@ -46,18 +46,23 @@ function isJurisdiction(value: unknown): boolean {
   );
 }
 
+/** A path on this site: one leading slash, not a protocol-relative or outside address. */
+function isSitePath(value: unknown): boolean {
+  return typeof value === 'string' && /^\/(?!\/)/.test(value);
+}
+
 function isLink(value: unknown): boolean {
   return (
     isRecord(value) &&
     typeof value.salary === 'string' &&
-    typeof value.href === 'string'
+    isSitePath(value.href)
   );
 }
 
 function isLinks(value: unknown): boolean {
   return (
     isRecord(value) &&
-    typeof value.calculator === 'string' &&
+    isSitePath(value.calculator) &&
     (value.previous === null || isLink(value.previous)) &&
     (value.next === null || isLink(value.next)) &&
     Array.isArray(value.others) &&

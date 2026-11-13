@@ -82,10 +82,12 @@ export function App({ client, registry, initial }: Props) {
               <AdvancedView groups={page.request.adapted.advanced} />
             </AnswerCard>
             {text && <p className="page-summary">{text.paragraph}</p>}
-            <SalaryLinks
-              links={initial?.links}
-              unit={page.request.adapted.unit}
-            />
+            {initial?.links && page.request.response === initial.response && (
+              <SalaryLinks
+                links={initial.links}
+                unit={page.request.adapted.unit}
+              />
+            )}
           </>
         )}
         <StarLink />

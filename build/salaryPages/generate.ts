@@ -8,6 +8,7 @@ import {
 } from '../../src/api';
 import { languageCode } from '../../src/strings';
 import type { SalaryPageData } from '../../src/state/useTakeHome';
+import { pageUrl } from './address';
 import { buildPageHtml } from './pageHtml';
 import { pageMeta } from './pageMeta';
 import { DESCRIPTION_LIMIT, TITLE_LIMIT } from './limits';
@@ -113,8 +114,9 @@ export async function generateSalaryPages(
           template,
           render(data),
           data,
-          options.siteUrl ?? null,
-          province.slug,
+          options.siteUrl
+            ? pageUrl(options.siteUrl, province.slug, salary)
+            : null,
         ),
       });
     });

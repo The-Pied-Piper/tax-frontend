@@ -154,4 +154,34 @@ describe('parseSalaryPageData links (#81)', () => {
   ])('is null when links are bad: %s', (_why, bad) => {
     expect(parse({ ...valid, links: bad })).toBeNull();
   });
+
+  it.each([
+    'javascript:alert(1)',
+    '//evil.test/',
+    'https://x.test/',
+    '',
+    'ca-on/65000/',
+  ])('is null when an address is not a path on this site: %j', (bad) => {
+    expect(
+      parse({ ...valid, links: { ...links, calculator: bad } }),
+    ).toBeNull();
+    expect(
+      parse({
+        ...valid,
+        links: { ...links, next: { salary: '1', href: bad } },
+      }),
+    ).toBeNull();
+    expect(
+      parse({
+        ...valid,
+        links: { ...links, previous: { salary: '1', href: bad } },
+      }),
+    ).toBeNull();
+    expect(
+      parse({
+        ...valid,
+        links: { ...links, others: [{ salary: '1', href: bad }] },
+      }),
+    ).toBeNull();
+  });
 });

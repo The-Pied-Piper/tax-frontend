@@ -58,6 +58,12 @@ describe('sitemapXml with page paths', () => {
     ]);
   });
 
+  it('escapes characters that are special in XML', () => {
+    const xml = sitemapXml('https://aftertaxlens.com', ['/a&b/1/']);
+    expect(xml).toContain('<loc>https://aftertaxlens.com/a&amp;b/1/</loc>');
+    expect(xml).not.toContain('a&b');
+  });
+
   it('lists only the calculator for no paths, as before', () => {
     expect(locs(sitemapXml('https://aftertaxlens.com', []))).toEqual([
       'https://aftertaxlens.com/',

@@ -209,4 +209,44 @@ describe('salary links in the static page and the mounted page (#81)', () => {
     render(<App initial={withLinks} />);
     expect(screen.getByRole('navigation').outerHTML).toBe(staticNav);
   });
+
+  it('shows the nav only while the answer is the one the page was built with', async () => {
+    const client = createApiClient({
+      baseUrl: 'https://api.test',
+      fetch: (input) => {
+        const url =
+          typeof input === 'string'
+            ? input
+            : input instanceof URL
+              ? input.href
+              : input.url;
+        return Promise.resolve(
+          url.endsWith('/jurisdictions')
+            ? Response.json(jurisdictions)
+            : Response.json(compute30000),
+        );
+      },
+    });
+    const user = userEvent.setup();
+    render(<App client={client} initial={withLinks} />);
+    expect(
+      screen.getByRole('navigation', { name: strings.salaryLinks.label }),
+    ).toBeInTheDocument();
+    const salary = screen.getByRole('textbox', { name: strings.form.salary });
+    await user.clear(salary);
+    await user.type(salary, '30000');
+    await user.click(
+      screen.getByRole('button', { name: strings.form.calculate }),
+    );
+    const after = pageMeta(dataFor(compute30000, '30000'));
+    await waitFor(() => {
+      expect(
+        screen.getByRole('heading', { name: after.heading, level: 1 }),
+      ).toBeInTheDocument();
+    });
+    expect(screen.queryByRole('navigation')).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole('link', { name: strings.salaryLinks.calculator }),
+    ).not.toBeInTheDocument();
+  });
 });

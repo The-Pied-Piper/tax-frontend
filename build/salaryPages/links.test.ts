@@ -3,6 +3,7 @@ import { OTHERS_LIMIT, salaryLinks } from './links';
 
 // All 25 Ontario steps, as the strings the generator uses for a salary.
 const all = syntheticOntarioPages().map((p) => p.salary);
+const salaries = (links: { salary: string }[]) => links.map((l) => l.salary);
 
 describe('salaryLinks(slug, salaries, salary)', () => {
   it('links the $70,000 page to $65,000 and $75,000 and to the calculator', () => {
@@ -24,41 +25,45 @@ describe('salaryLinks(slug, salaries, salary)', () => {
     });
   });
 
-  it('lists the other pages nearest first, never the page itself, capped', () => {
+  it('lists the other pages nearest first, capped, without the page or its neighbours', () => {
     const { others } = salaryLinks('ca-on', all, '70000');
     expect(OTHERS_LIMIT).toBe(6);
-    expect(others.map((l) => l.salary)).toEqual([
-      '65000',
-      '75000',
+    expect(salaries(others)).toEqual([
       '60000',
       '80000',
       '55000',
       '85000',
+      '50000',
+      '90000',
     ]);
-    expect(others[0]?.href).toBe('/ca-on/65000/');
+    expect(others[0]?.href).toBe('/ca-on/60000/');
   });
 
-  it('gives an edge page the nearest pages on its one side', () => {
-    const { others } = salaryLinks('ca-on', all, '30000');
-    expect(others.map((l) => l.salary)).toEqual([
-      '35000',
-      '40000',
-      '45000',
-      '50000',
-      '55000',
-      '60000',
-    ]);
+  it('gives an edge page the nearest pages on its one side, after the neighbour', () => {
+    expect(
+      salaryLinks('ca-on', all, '30000').others.map((l) => l.salary),
+    ).toEqual(['40000', '45000', '50000', '55000', '60000', '65000']);
+    expect(
+      salaryLinks('ca-on', all, '150000').others.map((l) => l.salary),
+    ).toEqual(['140000', '135000', '130000', '125000', '120000', '115000']);
+  });
+
+  it('never repeats a link between previous, next and others', () => {
+    const links = salaryLinks('ca-on', all, '70000');
+    const hrefs = [
+      links.previous?.href,
+      links.next?.href,
+      ...links.others.map((l) => l.href),
+      '/ca-on/70000/',
+    ];
+    expect(new Set(hrefs).size).toBe(hrefs.length);
   });
 
   it('links only to the salaries it is given', () => {
-    const some = ['30000', '40000', '50000'];
-    const links = salaryLinks('ca-on', some, '40000');
+    const links = salaryLinks('ca-on', ['30000', '40000', '50000'], '40000');
     expect(links.previous?.salary).toBe('30000');
     expect(links.next?.salary).toBe('50000');
-    expect(links.others.map((l) => l.salary).sort()).toEqual([
-      '30000',
-      '50000',
-    ]);
+    expect(links.others).toEqual([]);
   });
 
   it('has nothing to link to when the page is the only one', () => {

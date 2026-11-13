@@ -1,19 +1,9 @@
-import { mkdtempSync, existsSync, readFileSync, writeFileSync } from 'node:fs';
-import { rmSync } from 'node:fs';
-import { tmpdir } from 'node:os';
+import { existsSync, readFileSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
+import { tmpDirs } from '../../src/test/generatedSite';
 import { rewriteSitemap } from './sitemap';
 
-const made: string[] = [];
-function outDir() {
-  const dir = mkdtempSync(join(tmpdir(), 'sitemap-'));
-  made.push(dir);
-  return dir;
-}
-afterEach(() => {
-  for (const dir of made.splice(0))
-    rmSync(dir, { recursive: true, force: true });
-});
+const outDir = tmpDirs('sitemap');
 
 function locs(xml: string): string[] {
   return [...xml.matchAll(/<loc>([^<]*)<\/loc>/g)].map((m) => m[1] ?? '');

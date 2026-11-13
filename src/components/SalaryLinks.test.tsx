@@ -20,7 +20,7 @@ const links: SalaryPageLinks = {
   ],
 };
 
-function show(value: SalaryPageLinks | undefined) {
+function show(value: SalaryPageLinks) {
   return render(<SalaryLinks links={value} unit={unit} />);
 }
 
@@ -58,7 +58,9 @@ describe('SalaryLinks', () => {
 
   it('lists the other pages as links named by their salary, in the given order', () => {
     show(links);
-    const list = screen.getByRole('list');
+    const list = screen.getByRole('list', {
+      name: strings.salaryLinks.others,
+    });
     const items = within(list).getAllByRole('link');
     expect(items.map((a) => a.getAttribute('href'))).toEqual(
       links.others.map((l) => l.href),
@@ -102,11 +104,5 @@ describe('SalaryLinks', () => {
     expect(
       screen.getByRole('link', { name: strings.salaryLinks.calculator }),
     ).toBeInTheDocument();
-  });
-
-  it('renders nothing without links', () => {
-    show(undefined);
-    expect(screen.queryByRole('navigation')).not.toBeInTheDocument();
-    expect(screen.queryByRole('link')).not.toBeInTheDocument();
   });
 });

@@ -45,10 +45,19 @@ export function robotsTxt(siteUrl: string | null): string {
   return lines.join('\n') + '\n';
 }
 
+function escapeXml(text: string): string {
+  return text
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&apos;');
+}
+
 /** The calculator plus the given page paths (each with a leading slash). */
 export function sitemapXml(siteUrl: string, paths: string[] = []): string {
   const urls = ['/', ...paths].map(
-    (path) => `  <url><loc>${siteUrl}${path}</loc></url>\n`,
+    (path) => `  <url><loc>${escapeXml(`${siteUrl}${path}`)}</loc></url>\n`,
   );
   return (
     '<?xml version="1.0" encoding="UTF-8"?>\n' +

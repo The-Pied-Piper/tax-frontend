@@ -29,7 +29,7 @@ export function salaryLinks(
   const after = salaries[index + 1];
   const others = salaries
     .map((other, at) => ({ other, at, distance: Math.abs(at - index) }))
-    .filter(({ at }) => at !== index)
+    .filter(({ distance }) => distance > 1)
     .sort((a, b) => a.distance - b.distance || a.at - b.at)
     .slice(0, OTHERS_LIMIT)
     .map(({ other }) => link(other));
