@@ -34,6 +34,18 @@ export const withXland = {
   ],
 };
 
+/** The API's list with Alberta added, as it lists it: 2026 provisional. */
+export const withAlberta = {
+  jurisdictions: [
+    ...jurisdictions.jurisdictions,
+    {
+      code: 'CA-AB',
+      name: 'Alberta',
+      years: [{ year: 2026, provisional: true }],
+    },
+  ],
+};
+
 function urlOf(input: Parameters<typeof fetch>[0]): string {
   return typeof input === 'string'
     ? input

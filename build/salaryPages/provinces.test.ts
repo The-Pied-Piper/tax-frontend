@@ -1,11 +1,19 @@
 import { provinces, salaries, TAX_YEAR } from './provinces';
 
 describe('the province list', () => {
-  it('has Ontario first and only, from $30,000 to $150,000 in $5,000 steps', () => {
+  it('has Ontario then Alberta, each from $30,000 to $150,000 in $5,000 steps', () => {
     expect(provinces).toEqual([
       {
         code: 'CA-ON',
         slug: 'ca-on',
+        year: TAX_YEAR,
+        from: 30000,
+        to: 150000,
+        step: 5000,
+      },
+      {
+        code: 'CA-AB',
+        slug: 'ca-ab',
         year: TAX_YEAR,
         from: 30000,
         to: 150000,
@@ -25,6 +33,16 @@ describe('salaries', () => {
     const [ontario] = provinces;
     if (!ontario) throw new Error('Ontario is missing from the list');
     const steps = salaries(ontario);
+    expect(steps).toHaveLength(25);
+    expect(steps[0]).toBe(30000);
+    expect(steps[1]).toBe(35000);
+    expect(steps[24]).toBe(150000);
+  });
+
+  it('lists the 25 Alberta steps, ends included', () => {
+    const [, alberta] = provinces;
+    if (!alberta) throw new Error('Alberta is missing from the list');
+    const steps = salaries(alberta);
     expect(steps).toHaveLength(25);
     expect(steps[0]).toBe(30000);
     expect(steps[1]).toBe(35000);

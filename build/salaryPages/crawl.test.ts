@@ -6,6 +6,7 @@ import {
   siteUrl as site,
   template,
   tmpDirs,
+  withAlberta,
   withXland,
   xland,
 } from '../../src/test/generatedSite';
@@ -26,13 +27,19 @@ import { rewriteSitemap } from './sitemap';
 const outDir = tmpDirs('salary-crawl');
 
 /** A built output folder: the calculator's index.html (the template) and the salary pages. */
-async function build(withSecond = false) {
+async function build(options: { list?: 'xland' | 'alberta' } = {}) {
   const dir = outDir();
   writeFileSync(join(dir, 'index.html'), template);
   const { written } = await generateSalaryPages({
-    fetch: fakeFetch(withSecond ? withXland : undefined),
+    fetch: fakeFetch(
+      options.list === 'xland'
+        ? withXland
+        : options.list === 'alberta'
+          ? withAlberta
+          : undefined,
+    ),
     baseUrl: apiBaseUrl,
-    provinces: withSecond ? [...provinces, xland] : provinces,
+    provinces: options.list === 'xland' ? [...provinces, xland] : provinces,
     outDir: dir,
     template,
     render: renderSalaryApp,
@@ -100,9 +107,28 @@ describe('crawl of a generated output folder', () => {
     }
   });
 
+  it('lists all 50 pages in the sitemap, Ontario then Alberta, and every link resolves', async () => {
+    const { dir, written } = await build({ list: 'alberta' });
+    expect(written).toHaveLength(50);
+    expect(sitemapLocs(dir)).toHaveLength(51);
+    expect(sitemapLocs(dir)).toContain(`${site}/ca-ab/30000/`);
+    expect(sitemapLocs(dir)).toContain(`${site}/ca-ab/150000/`);
+    for (const { file, target } of internalLinks(dir, written)) {
+      expect(existsSync(join(dir, target)), `${file} -> ${target}`).toBe(true);
+    }
+  });
+
+  it('gives each Alberta page its own title, naming Alberta', async () => {
+    const { dir } = await build({ list: 'alberta' });
+    expect(parse(dir, 'ca-ab/70000/index.html').title).toContain('Alberta');
+    expect(parse(dir, 'ca-ab/70000/index.html').title).not.toBe(
+      parse(dir, 'ca-on/70000/index.html').title,
+    );
+  });
+
   it('adds a made-up second province to links and sitemap with no other change', async () => {
     const alone = await build();
-    const both = await build(true);
+    const both = await build({ list: 'xland' });
     expect(both.written).toHaveLength(28);
     expect(sitemapLocs(both.dir)).toHaveLength(29);
     expect(sitemapLocs(both.dir)).toContain(`${site}/ca-xx/15000/`);
