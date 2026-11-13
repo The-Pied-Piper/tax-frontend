@@ -1,0 +1,44 @@
+/* Links between salary pages. Colours come only from styles/tokens.css. */
+.nav {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding-top: 16px;
+  border-top: 1px solid var(--line);
+}
+
+.row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 20px;
+}
+
+.heading {
+  margin: 0;
+  font-size: 13px;
+  color: var(--muted);
+}
+
+.list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 16px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.link {
+  color: var(--accent);
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.link:hover {
+  color: var(--fg);
+}
+
+.link:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}

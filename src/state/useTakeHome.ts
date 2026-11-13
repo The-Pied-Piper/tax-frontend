@@ -47,6 +47,17 @@ export type FormValues = {
   salary: string;
 };
 
+/** One link to another pre-built page: the yearly salary it is for and its address. */
+export type SalaryPageLink = { salary: string; href: string };
+
+/** The links of a pre-built page: its neighbours, the calculator and nearby pages. */
+export type SalaryPageLinks = {
+  calculator: string;
+  previous: SalaryPageLink | null;
+  next: SalaryPageLink | null;
+  others: SalaryPageLink[];
+};
+
 /** What a pre-built salary page carries so React can start where it left off. */
 export type SalaryPageData = {
   jurisdictions: Jurisdictions;
@@ -54,6 +65,7 @@ export type SalaryPageData = {
   jurisdictionCode: string;
   year: number;
   salary: string;
+  links?: SalaryPageLinks;
 };
 
 type Seed = {

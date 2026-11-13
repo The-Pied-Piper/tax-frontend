@@ -4,8 +4,10 @@ import { join, resolve } from 'node:path';
 import { pathToFileURL } from 'node:url';
 import { build, type Plugin } from 'vite';
 import react from '@vitejs/plugin-react';
+import { normalizeSiteUrl } from './seo';
 import { generateSalaryPages } from './salaryPages/generate';
 import { provinces } from './salaryPages/provinces';
+import { rewriteSitemap } from './salaryPages/sitemap';
 import type { SalaryPageData } from '../src/state/useTakeHome';
 
 type Prerender = { renderSalaryApp: (data: SalaryPageData) => string };
@@ -45,10 +47,15 @@ async function loadRenderer(tempDir: string): Promise<Prerender> {
 
 /**
  * Writes dist/<slug>/<salary>/index.html for every listed province and step.
- * Only when the API address is set (deploy builds); local builds and CI write
+ * With the site address set it also lists them in dist/sitemap.xml and gives
+ * each its own canonical address. Only when the API address is set (deploy builds); local builds and CI write
  * no salary pages.
  */
-export function salaryPages(apiBaseUrl: string | undefined): Plugin {
+export function salaryPages(
+  apiBaseUrl: string | undefined,
+  siteUrlValue?: string,
+): Plugin {
+  const siteUrl = normalizeSiteUrl(siteUrlValue);
   const baseUrl = (apiBaseUrl ?? '').trim().replace(/\/+$/, '');
   const plugin: Plugin = { name: 'salary-pages' };
   if (baseUrl === '') return plugin;
@@ -69,7 +76,9 @@ export function salaryPages(apiBaseUrl: string | undefined): Plugin {
           outDir,
           template,
           render: renderSalaryApp,
+          siteUrl,
         });
+        await rewriteSitemap(outDir, siteUrl, written);
         console.log(`Salary pages: wrote ${written.length.toString()}`);
         for (const code of skipped) {
           console.log(`Salary pages: ${code} not returned by the API, skipped`);

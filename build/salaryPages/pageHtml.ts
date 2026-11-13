@@ -27,11 +27,47 @@ function withContent(html: string, key: string, text: string): string {
   );
 }
 
+// A whole tag, quoted attribute values included (they may contain ">").
+const LINK_TAG = /<link\b(?:[^>"']|"[^"]*"|'[^']*')*>\s*/gi;
+const META_TAG = /<meta\b(?:[^>"']|"[^"]*"|'[^']*')*>\s*/gi;
+
+/** The words of an attribute of a tag, lower-cased; none when it has no such attribute. */
+function attributeWords(tag: string, name: string): string[] {
+  const found = new RegExp(
+    `\\s${name}\\s*=\\s*(?:"([^"]*)"|'([^']*)'|([^\\s>]+))`,
+    'i',
+  ).exec(tag);
+  const value = found?.[1] ?? found?.[2] ?? found?.[3] ?? '';
+  return value.toLowerCase().split(/\s+/);
+}
+
+/**
+ * Gives the page its own canonical link and og:url: every canonical link and
+ * og:url tag the template has (the calculator's, from the site build) is
+ * removed and one of each is added.
+ */
+function withAddress(html: string, address: string): string {
+  const url = escapeHtml(address);
+  return html
+    .replace(LINK_TAG, (tag) =>
+      attributeWords(tag, 'rel').includes('canonical') ? '' : tag,
+    )
+    .replace(META_TAG, (tag) =>
+      attributeWords(tag, 'property').includes('og:url') ? '' : tag,
+    )
+    .replace(
+      '</head>',
+      () =>
+        `<link rel="canonical" href="${url}" />\n    <meta property="og:url" content="${url}" />\n  </head>`,
+    );
+}
+
 /** The template with `#root` holding the rendered page, plus the data block for React. */
 export function buildPageHtml(
   template: string,
   appHtml: string,
   data: SalaryPageData,
+  canonicalUrl: string | null = null,
 ): string {
   const block = `<script type="application/json" id="${SALARY_PAGE_DATA_ID}">${safeJson(data)}</script>`;
   // #root ends at the </div> that is followed by a script or the end of the body.
@@ -53,7 +89,11 @@ export function buildPageHtml(
     ['twitter:title', meta.title],
     ['twitter:description', meta.description],
   ];
-  return tags
-    .reduce((html, [key, text]) => withContent(html, key, text), head)
-    .replace('</body>', () => `${block}\n  </body>`);
+  const described = tags.reduce(
+    (html, [key, text]) => withContent(html, key, text),
+    head,
+  );
+  const addressed =
+    canonicalUrl === null ? described : withAddress(described, canonicalUrl);
+  return addressed.replace('</body>', () => `${block}\n  </body>`);
 }

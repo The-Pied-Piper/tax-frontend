@@ -5,6 +5,7 @@ import jurisdictions from '../../src/api/fixtures/jurisdictions.json';
 import type { SalaryPageData } from '../../src/state/useTakeHome';
 import { buildPageHtml } from './pageHtml';
 import { pageMeta } from './pageMeta';
+import { pageUrl } from './address';
 
 const compute = computeFixture as ComputeTakeHomeCalculationResponse;
 const template = readFileSync('index.html', 'utf8');
@@ -128,5 +129,85 @@ describe('buildPageHtml: the head of each page', () => {
     expect(content(out, 'meta[name="twitter:description"]')).toBe(
       expected.description,
     );
+  });
+});
+
+describe('buildPageHtml with the page address (#81)', () => {
+  const origin = 'https://aftertaxlens.com';
+  const address = pageUrl(origin, 'ca-on', data.salary);
+  // What dist/index.html looks like when the site build has run with VITE_SITE_URL.
+  const withTags = (canonical: string, ogUrl: string) =>
+    template.replace('</head>', `${canonical}${ogUrl}</head>`);
+  const plain = withTags(
+    `<link rel="canonical" href="${origin}/" />`,
+    `<meta property="og:url" content="${origin}/" />`,
+  );
+
+  function built(html: string, url: string | null = address) {
+    return parse(buildPageHtml(html, '<main></main>', data, url));
+  }
+
+  function expectOwnAddress(out: Document, url = address) {
+    const canonical = out.querySelectorAll('link[rel~="canonical" i]');
+    expect(canonical).toHaveLength(1);
+    expect(canonical[0]?.getAttribute('href')).toBe(url);
+    expect(out.querySelectorAll('meta[property="og:url"]')).toHaveLength(1);
+    expect(content(out, 'meta[property="og:url"]')).toBe(url);
+  }
+
+  it('adds one canonical and one og:url when the template has none', () => {
+    expectOwnAddress(built(template));
+  });
+
+  it('replaces the calculator canonical and og:url the site build put in the template', () => {
+    expectOwnAddress(built(plain));
+  });
+
+  it('uses the address it is given, whatever it is', () => {
+    expectOwnAddress(
+      built(template, 'https://aftertaxlens.com/ca-on/30000/'),
+      'https://aftertaxlens.com/ca-on/30000/',
+    );
+  });
+
+  it('escapes the address in the attributes', () => {
+    const out = built(template, 'https://aftertaxlens.com/a"b/');
+    expect(
+      out.querySelector('link[rel="canonical"]')?.getAttribute('href'),
+    ).toBe('https://aftertaxlens.com/a"b/');
+    expect(out.querySelectorAll('link[rel="canonical"]')).toHaveLength(1);
+  });
+
+  it.each([
+    ['single-quoted canonical', `<link rel='canonical' href='${origin}/'>`],
+    ['uppercase REL', `<link REL="canonical" HREF="${origin}/">`],
+    [
+      'rel with two values',
+      `<link rel="alternate canonical" href="${origin}/">`,
+    ],
+  ])('still ends with exactly one canonical for a %s', (_name, tag) => {
+    expectOwnAddress(
+      built(withTags(tag, `<meta property="og:url" content="${origin}/" />`)),
+    );
+  });
+
+  it.each([
+    ['single-quoted og:url', `<meta property='og:url' content='${origin}/'>`],
+    ['uppercase PROPERTY', `<meta PROPERTY="og:url" CONTENT="${origin}/">`],
+  ])('still ends with exactly one og:url for a %s', (_name, tag) => {
+    expectOwnAddress(
+      built(withTags(`<link rel="canonical" href="${origin}/" />`, tag)),
+    );
+  });
+
+  it('leaves the template as it was with no address: no canonical added, none changed', () => {
+    const out = built(template, null);
+    expect(out.querySelector('link[rel="canonical"]')).toBeNull();
+    expect(out.querySelector('meta[property="og:url"]')).toBeNull();
+    const kept = built(plain, null);
+    expect(
+      kept.querySelector('link[rel="canonical"]')?.getAttribute('href'),
+    ).toBe(`${origin}/`);
+    expect(content(kept, 'meta[property="og:url"]')).toBe(`${origin}/`);
   });
 });

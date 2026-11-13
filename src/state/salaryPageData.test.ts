@@ -115,3 +115,73 @@ describe('parseSalaryPageData', () => {
     ).toBeNull();
   });
 });
+
+describe('parseSalaryPageData links (#81)', () => {
+  const links = {
+    calculator: '/',
+    previous: { salary: '65000', href: '/ca-on/65000/' },
+    next: { salary: '75000', href: '/ca-on/75000/' },
+    others: [{ salary: '60000', href: '/ca-on/60000/' }],
+  };
+
+  it('keeps good links', () => {
+    expect(parse({ ...valid, links })).toEqual({ ...valid, links });
+  });
+
+  it('still accepts a block with no links, as written before', () => {
+    expect(parse(valid)).toEqual(valid);
+  });
+
+  it('accepts no neighbour on either end', () => {
+    const ends = { ...links, previous: null, next: null, others: [] };
+    expect(parse({ ...valid, links: ends })).toEqual({
+      ...valid,
+      links: ends,
+    });
+  });
+
+  it.each([
+    ['not an object', 'x'],
+    ['null', null],
+    ['no calculator', { ...links, calculator: undefined }],
+    ['calculator not text', { ...links, calculator: 1 }],
+    ['previous missing', { ...links, previous: undefined }],
+    ['previous not a link', { ...links, previous: '65000' }],
+    ['link without href', { ...links, next: { salary: '75000' } }],
+    ['link salary not text', { ...links, next: { salary: 75000, href: '/' } }],
+    ['others not a list', { ...links, others: {} }],
+    ['others holding a non-link', { ...links, others: [null] }],
+  ])('is null when links are bad: %s', (_why, bad) => {
+    expect(parse({ ...valid, links: bad })).toBeNull();
+  });
+
+  it.each([
+    'javascript:alert(1)',
+    '//evil.test/',
+    'https://x.test/',
+    '',
+    'ca-on/65000/',
+  ])('is null when an address is not a path on this site: %j', (bad) => {
+    expect(
+      parse({ ...valid, links: { ...links, calculator: bad } }),
+    ).toBeNull();
+    expect(
+      parse({
+        ...valid,
+        links: { ...links, next: { salary: '1', href: bad } },
+      }),
+    ).toBeNull();
+    expect(
+      parse({
+        ...valid,
+        links: { ...links, previous: { salary: '1', href: bad } },
+      }),
+    ).toBeNull();
+    expect(
+      parse({
+        ...valid,
+        links: { ...links, others: [{ salary: '1', href: bad }] },
+      }),
+    ).toBeNull();
+  });
+});
