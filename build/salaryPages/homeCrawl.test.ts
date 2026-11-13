@@ -6,6 +6,7 @@ import {
   siteUrl as site,
   template,
   tmpDirs,
+  withAlberta,
   withXland,
   xland,
 } from '../../src/test/generatedSite';
@@ -21,11 +22,13 @@ import { rewriteSitemap } from './sitemap';
 // Sits beside crawl.test.ts, which keeps the checks on the pages themselves.
 const outDir = tmpDirs('salary-home-crawl');
 
-async function build(withSecond = false) {
+async function build(withSecond = false, alberta = false) {
   const dir = outDir();
   writeFileSync(join(dir, 'index.html'), template);
   const { written, index } = await generateSalaryPages({
-    fetch: fakeFetch(withSecond ? withXland : undefined),
+    fetch: fakeFetch(
+      withSecond ? withXland : alberta ? withAlberta : undefined,
+    ),
     baseUrl: apiBaseUrl,
     provinces: withSecond ? [...provinces, xland] : provinces,
     outDir: dir,
@@ -71,6 +74,22 @@ describe('crawl from the built home page', () => {
     const { dir, written } = await build();
     expect(written).toHaveLength(25);
     expect(orphans(dir, written)).toEqual([]);
+  });
+
+  it('lists Ontario then Alberta on the home page, 25 links each, and reaches all 50 pages', async () => {
+    const { dir, written } = await build(false, true);
+    expect(written).toHaveLength(50);
+    expect(orphans(dir, written)).toEqual([]);
+    const home = parse(dir, 'index.html');
+    const hrefs = [...home.querySelectorAll('details a')].map((a) =>
+      a.getAttribute('href'),
+    );
+    const steps = Array.from({ length: 25 }, (_, i) => 30000 + i * 5000);
+    expect(hrefs).toEqual([
+      ...steps.map((s) => `/ca-on/${s.toString()}/`),
+      ...steps.map((s) => `/ca-ab/${s.toString()}/`),
+    ]);
+    expect(home.querySelector('details')?.textContent).toContain('Alberta');
   });
 
   it('would fail on a page nothing points at: without the home links nothing is reached', async () => {

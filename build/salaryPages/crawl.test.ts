@@ -6,6 +6,7 @@ import {
   siteUrl as site,
   template,
   tmpDirs,
+  withAlberta,
   withXland,
   xland,
 } from '../../src/test/generatedSite';
@@ -26,11 +27,13 @@ import { rewriteSitemap } from './sitemap';
 const outDir = tmpDirs('salary-crawl');
 
 /** A built output folder: the calculator's index.html (the template) and the salary pages. */
-async function build(withSecond = false) {
+async function build(withSecond = false, alberta = false) {
   const dir = outDir();
   writeFileSync(join(dir, 'index.html'), template);
   const { written } = await generateSalaryPages({
-    fetch: fakeFetch(withSecond ? withXland : undefined),
+    fetch: fakeFetch(
+      withSecond ? withXland : alberta ? withAlberta : undefined,
+    ),
     baseUrl: apiBaseUrl,
     provinces: withSecond ? [...provinces, xland] : provinces,
     outDir: dir,
@@ -98,6 +101,25 @@ describe('crawl of a generated output folder', () => {
         page.querySelector('meta[property="og:url"]')?.getAttribute('content'),
       ).toBe(canonical);
     }
+  });
+
+  it('lists all 50 pages in the sitemap, Ontario then Alberta, and every link resolves', async () => {
+    const { dir, written } = await build(false, true);
+    expect(written).toHaveLength(50);
+    expect(sitemapLocs(dir)).toHaveLength(51);
+    expect(sitemapLocs(dir)).toContain(`${site}/ca-ab/30000/`);
+    expect(sitemapLocs(dir)).toContain(`${site}/ca-ab/150000/`);
+    for (const { file, target } of internalLinks(dir, written)) {
+      expect(existsSync(join(dir, target)), `${file} -> ${target}`).toBe(true);
+    }
+  });
+
+  it('gives each Alberta page its own title, naming Alberta', async () => {
+    const { dir } = await build(false, true);
+    expect(parse(dir, 'ca-ab/70000/index.html').title).toContain('Alberta');
+    expect(parse(dir, 'ca-ab/70000/index.html').title).not.toBe(
+      parse(dir, 'ca-on/70000/index.html').title,
+    );
   });
 
   it('adds a made-up second province to links and sitemap with no other change', async () => {
