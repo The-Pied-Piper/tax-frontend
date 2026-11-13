@@ -142,7 +142,7 @@ jobs:
         if: ${{ steps.check.outputs.ready == 'true' }}
         with:
           role-to-assume: ${{ vars.AWS_SITE_DEPLOY_ROLE_ARN_PROD }}
-          role-session-name: tax-frontend-release-deploy-${{ github.run_id }}
+          role-session-name: tax-frontend-release-publish-${{ github.run_id }}
           role-duration-seconds: 1800
           aws-region: ca-central-1
 
