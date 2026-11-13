@@ -1,5 +1,6 @@
 import compute70000 from '../api/fixtures/compute-on-2026-70000.json';
-import { parseSalaryIndex, SALARY_INDEX_ID } from './salaryIndex';
+import { ontarioGroup, xlandGroup } from '../test/salaryIndexData';
+import { nearbyPages, parseSalaryIndex, SALARY_INDEX_ID } from './salaryIndex';
 
 const unit = compute70000.unit;
 
@@ -90,6 +91,12 @@ describe('parseSalaryIndex', () => {
     ['a script address', { salary: '30000', href: 'javascript:alert(1)' }],
     ['a relative path', { salary: '30000', href: 'ca-on/30000/' }],
     ['an empty href', { salary: '30000', href: '' }],
+    ['a tab in the host', { salary: '30000', href: '/\t/evil.com' }],
+    ['a newline in the host', { salary: '30000', href: '/\n/evil.com' }],
+    ['a carriage return', { salary: '30000', href: '/\r/x' }],
+    ['a space', { salary: '30000', href: '/ /x' }],
+    ['a space at the end', { salary: '30000', href: '/ca-on/30000/ ' }],
+    ['a null character', { salary: '30000', href: '/\u0000/x' }],
     [
       'a salary that is markup',
       { salary: '<img src=x>', href: '/ca-on/30000/' },
@@ -97,5 +104,66 @@ describe('parseSalaryIndex', () => {
     ['an empty salary', { salary: '', href: '/ca-on/30000/' }],
   ])('is null for a page with %s', (_name, page) => {
     expect(parse(withPages([page]))).toBeNull();
+  });
+});
+
+describe('nearbyPages', () => {
+  const hrefs = (pages: { href: string }[]) => pages.map((p) => p.href);
+
+  it('gives the four nearest pages of the group, nearest first, ties lower first', () => {
+    expect(hrefs(nearbyPages(ontarioGroup, '82000'))).toEqual([
+      '/ca-on/80000/',
+      '/ca-on/85000/',
+      '/ca-on/75000/',
+      '/ca-on/90000/',
+    ]);
+    expect(hrefs(nearbyPages(ontarioGroup, '82500')).slice(0, 2)).toEqual([
+      '/ca-on/80000/',
+      '/ca-on/85000/',
+    ]);
+  });
+
+  it('returns whole pages (salary and href), from the group', () => {
+    expect(nearbyPages(ontarioGroup, '82000')[0]).toEqual({
+      salary: '80000',
+      href: '/ca-on/80000/',
+    });
+  });
+
+  it('starts with the page itself when the salary is a step', () => {
+    expect(hrefs(nearbyPages(ontarioGroup, '70000'))).toEqual([
+      '/ca-on/70000/',
+      '/ca-on/65000/',
+      '/ca-on/75000/',
+      '/ca-on/60000/',
+    ]);
+  });
+
+  it('reads cents, and works below the lowest and above the highest page', () => {
+    expect(hrefs(nearbyPages(ontarioGroup, '82000.50'))[0]).toBe(
+      '/ca-on/80000/',
+    );
+    expect(hrefs(nearbyPages(ontarioGroup, '10000'))).toEqual([
+      '/ca-on/30000/',
+      '/ca-on/35000/',
+      '/ca-on/40000/',
+      '/ca-on/45000/',
+    ]);
+    expect(hrefs(nearbyPages(ontarioGroup, '200000'))).toEqual([
+      '/ca-on/150000/',
+      '/ca-on/145000/',
+      '/ca-on/140000/',
+      '/ca-on/135000/',
+    ]);
+  });
+
+  it('takes the number wanted, and gives fewer when the group has fewer', () => {
+    expect(nearbyPages(ontarioGroup, '82000', 2)).toHaveLength(2);
+    expect(hrefs(nearbyPages(xlandGroup, '12000'))).toEqual([
+      '/ca-xx/10000/',
+      '/ca-xx/15000/',
+      '/ca-xx/20000/',
+    ]);
+    expect(nearbyPages({ ...ontarioGroup, pages: [] }, '82000')).toEqual([]);
   });
 });

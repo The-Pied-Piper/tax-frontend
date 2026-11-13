@@ -116,6 +116,16 @@ describe('rewriteHome (dist/index.html)', () => {
     expect(readFileSync(join(dir, 'index.html'), 'utf8')).toBe(template);
   });
 
+  it('is idempotent: a second call changes nothing', async () => {
+    const { dir, html } = await home(twoProvinceIndex);
+    await rewriteHome(dir, twoProvinceIndex, renderSalaryIndexNav);
+    const again = readFileSync(join(dir, 'index.html'), 'utf8');
+    expect(again).toBe(html);
+    const page = new DOMParser().parseFromString(again, 'text/html');
+    expect(page.querySelectorAll('script#salary-pages-index')).toHaveLength(1);
+    expect(popular(page)).toHaveLength(1);
+  });
+
   it('is the same nav that React mounts from the data block', async () => {
     const { page } = await home(twoProvinceIndex);
     const parsed = parseSalaryIndex(

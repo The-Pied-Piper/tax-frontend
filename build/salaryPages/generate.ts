@@ -9,13 +9,13 @@ import {
 import { languageCode } from '../../src/strings';
 import type { SalaryIndex } from '../../src/state/salaryIndex';
 import type { SalaryPageData } from '../../src/state/useTakeHome';
-import { pagePath, pageUrl } from './address';
-import { indexBlock } from './indexBlock';
+import { pageUrl } from './address';
 import { buildPageHtml } from './pageHtml';
 import { pageMeta } from './pageMeta';
 import { DESCRIPTION_LIMIT, TITLE_LIMIT } from './limits';
 import { salaryLinks } from './links';
 import { salaries, type Province } from './provinces';
+import { salaryIndex, type BuiltProvince } from './salaryIndex';
 
 export type GenerateOptions = {
   fetch: typeof fetch;
@@ -61,9 +61,12 @@ export async function generateSalaryPages(
     );
   }
 
-  const pages: { path: string; html: string }[] = [];
+  const fetched: {
+    province: Province;
+    steps: string[];
+    responses: ComputeTakeHomeCalculationResponse[];
+  }[] = [];
   const skipped: string[] = [];
-  const index: SalaryIndex = { groups: [] };
   for (const province of provinces) {
     if (!list.jurisdictions.some((j) => j.code === province.code)) {
       skipped.push(province.code);
@@ -89,23 +92,22 @@ export async function generateSalaryPages(
         });
       }
     }
-    const [first] = responses;
-    if (first) {
-      index.groups.push({
-        code: province.code,
-        name:
-          list.jurisdictions.find((j) => j.code === province.code)?.name ??
-          province.code,
-        unit: first.unit,
-        pages: steps.map((salary) => ({
-          salary,
-          href: pagePath(province.slug, salary),
-        })),
-      });
-    }
+    fetched.push({ province, steps, responses });
+  }
+  const built: BuiltProvince[] = fetched.map(
+    ({ province, steps, responses }) => {
+      const [first] = responses;
+      if (!first)
+        throw new Error(`Salary pages: no answer for ${province.code}`);
+      return { province, unit: first.unit, salaries: steps };
+    },
+  );
+  const index = salaryIndex(built, list.jurisdictions);
+  const pages: { path: string; html: string }[] = [];
+  for (const { province, steps, responses } of fetched) {
     // Links go only to the pages of this province that are about to be written.
-    steps.forEach((salary, index) => {
-      const response = responses[index];
+    steps.forEach((salary, at) => {
+      const response = responses[at];
       if (!response) throw new Error(`Salary pages: no answer for ${salary}`);
       const page = `${province.slug}/${salary}`;
       const data: SalaryPageData = {
@@ -136,19 +138,16 @@ export async function generateSalaryPages(
           options.siteUrl
             ? pageUrl(options.siteUrl, province.slug, salary)
             : null,
+          index,
         ),
       });
     });
   }
   // Everything was fetched and rendered; only now is anything written.
-  const block = indexBlock(index);
   for (const { path, html } of pages) {
     const file = join(outDir, path);
     await mkdir(dirname(file), { recursive: true });
-    await writeFile(
-      file,
-      html.replace('</body>', () => `${block}\n  </body>`),
-    );
+    await writeFile(file, html);
   }
   return { written: pages.map((p) => p.path), skipped, index };
 }

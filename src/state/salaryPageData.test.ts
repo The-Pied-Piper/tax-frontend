@@ -161,6 +161,13 @@ describe('parseSalaryPageData links (#81)', () => {
     'https://x.test/',
     '',
     'ca-on/65000/',
+    '/\\evil.test/',
+    '/\t/evil.com',
+    '/\n/evil.com',
+    '/\r/x',
+    '/ /x',
+    '/ca-on/65000/ ',
+    '/\u0000/x',
   ])('is null when an address is not a path on this site: %j', (bad) => {
     expect(
       parse({ ...valid, links: { ...links, calculator: bad } }),

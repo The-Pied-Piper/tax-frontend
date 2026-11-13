@@ -46,9 +46,12 @@ function isJurisdiction(value: unknown): boolean {
   );
 }
 
-/** A path on this site: one leading slash, not a protocol-relative or outside address. */
+/** A path on this site: one leading slash, not a protocol-relative or outside address, no whitespace or control characters. */
 export function isSitePath(value: unknown): boolean {
-  return typeof value === 'string' && /^\/(?![/\\])/.test(value);
+  return (
+    typeof value === 'string' &&
+    /^\/(?![/\\])(?!.*\s)[\u0021-\uffff]*$/.test(value)
+  );
 }
 
 function isLink(value: unknown): boolean {

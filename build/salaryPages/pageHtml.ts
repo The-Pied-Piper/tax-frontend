@@ -1,10 +1,12 @@
+import { SALARY_INDEX_ID, type SalaryIndex } from '../../src/state/salaryIndex';
 import { SALARY_PAGE_DATA_ID } from '../../src/state/salaryPageData';
 import type { SalaryPageData } from '../../src/state/useTakeHome';
 import { pageMeta } from './pageMeta';
 
-/** JSON that cannot end its own script element or start a comment inside it. */
-function safeJson(data: SalaryPageData): string {
-  return JSON.stringify(data).replace(/</g, '\\u003c');
+/** A JSON data block for React to read: its text cannot end the script element or start a comment inside it. */
+export function dataBlock(id: string, value: unknown): string {
+  const json = JSON.stringify(value).replace(/</g, '\\u003c');
+  return `<script type="application/json" id="${id}">${json}</script>`;
 }
 
 function escapeHtml(text: string): string {
@@ -62,14 +64,18 @@ function withAddress(html: string, address: string): string {
     );
 }
 
-/** The template with `#root` holding the rendered page, plus the data block for React. */
+/** The template with `#root` holding the rendered page, plus the data blocks for React (the page's, and the link index when given). */
 export function buildPageHtml(
   template: string,
   appHtml: string,
   data: SalaryPageData,
   canonicalUrl: string | null = null,
+  index: SalaryIndex | null = null,
 ): string {
-  const block = `<script type="application/json" id="${SALARY_PAGE_DATA_ID}">${safeJson(data)}</script>`;
+  const blocks = [
+    dataBlock(SALARY_PAGE_DATA_ID, data),
+    ...(index === null ? [] : [dataBlock(SALARY_INDEX_ID, index)]),
+  ].join('\n    ');
   // #root ends at the </div> that is followed by a script or the end of the body.
   const root = /(<div id="root">)[\s\S]*?(?=<\/div>\s*(?:<script|<\/body>))/;
   if (!root.test(template)) throw new Error('index.html has no #root element');
@@ -95,5 +101,5 @@ export function buildPageHtml(
   );
   const addressed =
     canonicalUrl === null ? described : withAddress(described, canonicalUrl);
-  return addressed.replace('</body>', () => `${block}\n  </body>`);
+  return addressed.replace('</body>', () => `${blocks}\n  </body>`);
 }

@@ -6,11 +6,12 @@ import { Breakdown } from './components/Breakdown';
 import { ErrorNotice } from './components/ErrorNotice';
 import { ProvisionalNotice } from './components/ProvisionalNotice';
 import { SalaryForm } from './components/SalaryForm';
-import { SalaryIndexNav, NearbySalaries } from './components/SalaryIndexNav';
+import { NearbySalaries } from './components/NearbySalaries';
+import { SalaryIndexNav } from './components/SalaryIndexNav';
 import { SalaryLinks } from './components/SalaryLinks';
 import { StarLink } from './components/StarLink';
 import { ThemeToggle } from './components/ThemeToggle';
-import type { SalaryIndex } from './state/salaryIndex';
+import { nearbyPages, type SalaryIndex } from './state/salaryIndex';
 import { salaryPageText } from './state/salaryPageText';
 import { useTakeHome, type SalaryPageData } from './state/useTakeHome';
 import { strings } from './strings';
@@ -33,12 +34,15 @@ export function App({ client, registry, initial, salaryIndex }: Props) {
           page.request.asked.year,
         )
       : null;
-  const answer = page.request.status === 'success' ? page.request : null;
-  const group = answer
-    ? salaryIndex?.groups.find((g) => g.code === answer.jurisdictionCode)
-    : undefined;
+  const { request } = page;
   // A pre-built page keeps its own links until another salary is calculated.
-  const seeded = answer !== null && answer.response === initial?.response;
+  const group =
+    request.status === 'success' &&
+    !(initial?.links && request.response === initial.response)
+      ? salaryIndex?.groups.find(
+          (g) => g.code === request.asked.jurisdictionCode,
+        )
+      : undefined;
   return (
     <>
       <main>
@@ -92,16 +96,17 @@ export function App({ client, registry, initial, salaryIndex }: Props) {
               <AdvancedView groups={page.request.adapted.advanced} />
             </AnswerCard>
             {text && <p className="page-summary">{text.paragraph}</p>}
-            {initial?.links && seeded && (
+            {initial?.links && page.request.response === initial.response && (
               <SalaryLinks
                 links={initial.links}
                 unit={page.request.adapted.unit}
               />
             )}
-            {group && !seeded && (
+            {group && (
               <NearbySalaries
-                group={group}
-                salary={page.request.response.salary}
+                pages={nearbyPages(group, page.request.response.salary)}
+                place={group.name}
+                unit={group.unit}
               />
             )}
           </>
