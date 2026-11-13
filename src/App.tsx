@@ -8,13 +8,17 @@ import { ProvisionalNotice } from './components/ProvisionalNotice';
 import { SalaryForm } from './components/SalaryForm';
 import { StarLink } from './components/StarLink';
 import { ThemeToggle } from './components/ThemeToggle';
-import { useTakeHome } from './state/useTakeHome';
+import { useTakeHome, type SalaryPageData } from './state/useTakeHome';
 import { strings } from './strings';
 
-type Props = { client?: ApiClient; registry?: AdapterRegistry };
+type Props = {
+  client?: ApiClient;
+  registry?: AdapterRegistry;
+  initial?: SalaryPageData;
+};
 
-export function App({ client, registry }: Props) {
-  const page = useTakeHome(client, registry);
+export function App({ client, registry, initial }: Props) {
+  const page = useTakeHome(client, registry, initial);
   return (
     <>
       <main>

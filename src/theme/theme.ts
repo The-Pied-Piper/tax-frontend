@@ -26,7 +26,9 @@ export function storeTheme(theme: Theme): void {
 }
 
 export function deviceTheme(): Theme {
-  return typeof window.matchMedia === 'function' &&
+  // No window while a salary page is rendered at build time: light.
+  return typeof window !== 'undefined' &&
+    typeof window.matchMedia === 'function' &&
     window.matchMedia('(prefers-color-scheme: dark)').matches
     ? 'dark'
     : 'light';

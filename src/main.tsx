@@ -1,6 +1,10 @@
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import { App } from './App';
+import {
+  parseSalaryPageData,
+  SALARY_PAGE_DATA_ID,
+} from './state/salaryPageData';
 import './styles/fonts.css';
 import './styles/tokens.css';
 import './styles/global.css';
@@ -17,9 +21,12 @@ async function start(root: HTMLElement) {
     const { worker } = await import('./mocks/browser');
     await worker.start({ onUnhandledFrame: 'bypass' });
   }
+  const initial = parseSalaryPageData(
+    document.getElementById(SALARY_PAGE_DATA_ID)?.textContent ?? null,
+  );
   createRoot(root).render(
     <StrictMode>
-      <App />
+      <App initial={initial ?? undefined} />
     </StrictMode>,
   );
 }

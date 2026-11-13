@@ -47,28 +47,89 @@ export type FormValues = {
   salary: string;
 };
 
+/** What a pre-built salary page carries so React can start where it left off. */
+export type SalaryPageData = {
+  jurisdictions: Jurisdictions;
+  response: ComputeTakeHomeCalculationResponse;
+  jurisdictionCode: string;
+  year: number;
+  salary: string;
+};
+
+type Seed = {
+  jurisdictionsState: JurisdictionsState;
+  values: FormValues;
+  request: RequestState;
+};
+
+/** The state a pre-built page starts in, or null if its answer cannot be read. */
+function seedFrom(
+  data: SalaryPageData | undefined,
+  registry: AdapterRegistry,
+): Seed | null {
+  if (!data) return null;
+  try {
+    const adapted = registry.adapt(
+      data.jurisdictionCode,
+      data.year,
+      data.response,
+    );
+    return {
+      jurisdictionsState: {
+        status: 'ready',
+        jurisdictions: data.jurisdictions,
+        places: placeOptions(data.jurisdictions, COMING_SOON),
+      },
+      values: {
+        jurisdictionCode: data.jurisdictionCode,
+        year: data.year,
+        salary: data.salary,
+      },
+      request: {
+        status: 'success',
+        asked: {
+          jurisdictionName:
+            data.jurisdictions.find((j) => j.code === data.jurisdictionCode)
+              ?.name ?? data.jurisdictionCode,
+          year: data.year,
+        },
+        response: data.response,
+        adapted,
+      },
+    };
+  } catch {
+    return null;
+  }
+}
+
 const defaultClient = createApiClient();
 
 export function useTakeHome(
   client: ApiClient = defaultClient,
   registry: AdapterRegistry = adapters,
+  initial?: SalaryPageData,
 ) {
+  const [seed] = useState(() => seedFrom(initial, registry));
   const [jurisdictionsState, setJurisdictionsState] =
-    useState<JurisdictionsState>({ status: 'loading' });
-  const [values, setValues] = useState<FormValues>({
-    jurisdictionCode: '',
-    year: null,
-    salary: '',
-  });
+    useState<JurisdictionsState>(
+      seed?.jurisdictionsState ?? { status: 'loading' },
+    );
+  const [values, setValues] = useState<FormValues>(
+    seed?.values ?? { jurisdictionCode: '', year: null, salary: '' },
+  );
   const [salaryCheck, setSalaryCheck] = useState<SalaryCheck>('ok');
   const [payPeriod, setPayPeriod] = useState<PayPeriod>('annually');
-  const [request, setRequest] = useState<RequestState>({ status: 'idle' });
+  const [request, setRequest] = useState<RequestState>(
+    seed?.request ?? { status: 'idle' },
+  );
   // Only the latest request may write its answer.
   const latest = useRef(0);
 
   // The one effect: the list of places and years is needed to draw the form.
   // Calculating is triggered by submit, never by an effect.
   useEffect(() => {
+    // A pre-built page already carries the list.
+    if (seed) return;
     let cancelled = false;
     client.listJurisdictions().then(
       (response) => {
@@ -94,7 +155,7 @@ export function useTakeHome(
     return () => {
       cancelled = true;
     };
-  }, [client]);
+  }, [client, seed]);
 
   const jurisdictions =
     jurisdictionsState.status === 'ready'
