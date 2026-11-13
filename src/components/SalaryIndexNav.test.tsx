@@ -72,6 +72,17 @@ describe('SalaryIndexNav', () => {
     }
   });
 
+  it('is a disclosure closed on load, with every link already in the markup', () => {
+    const { container } = show(ontarioIndex);
+    const details = container.querySelector('details');
+    expect(details).not.toBeNull();
+    expect(details).not.toHaveAttribute('open');
+    expect(details?.querySelector('summary')).toHaveTextContent(
+      strings.salaryIndex.label,
+    );
+    expect(details?.querySelectorAll('a[href]')).toHaveLength(25);
+  });
+
   it('renders nothing when the index has no groups', () => {
     const { container } = show({ groups: [] });
     expect(container).toBeEmptyDOMElement();
