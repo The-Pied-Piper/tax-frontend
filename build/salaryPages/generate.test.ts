@@ -355,3 +355,44 @@ describe('the build fails clearly', () => {
     ).rejects.toThrow(/jurisdictions.*503/s);
   });
 });
+
+describe('a page whose text is too long fails the build', () => {
+  /** The API lists Ontario's code under a very long name. */
+  function namedAs(name: string) {
+    return () =>
+      Response.json({
+        ...jurisdictions,
+        jurisdictions: jurisdictions.jurisdictions.map((j) => ({ ...j, name })),
+      });
+  }
+  const long = 'The Very Long Named Province of Somewhere Far Away';
+
+  async function build(name: string, dir: string) {
+    const api = fakeApi(seventyThousand, namedAs(name));
+    return generateSalaryPages({
+      fetch: api.fetch,
+      baseUrl,
+      provinces,
+      outDir: dir,
+      template,
+      render,
+    });
+  }
+
+  it('throws, naming the page and the title, when a title is 60 or more', async () => {
+    await expect(build(long, outDir())).rejects.toThrow(
+      /ca-on\/30000.*title/is,
+    );
+  });
+
+  it('writes nothing when it throws', async () => {
+    const dir = outDir();
+    await build(long, dir).catch(() => undefined);
+    expect(readdirSync(dir)).toEqual([]);
+  });
+
+  it('builds as before when the limits hold', async () => {
+    const result = await build('Ontario', outDir());
+    expect(result.written).toHaveLength(25);
+  });
+});

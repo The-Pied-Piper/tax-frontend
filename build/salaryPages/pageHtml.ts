@@ -1,6 +1,6 @@
+import { SALARY_PAGE_DATA_ID } from '../../src/state/salaryPageData';
 import type { SalaryPageData } from '../../src/state/useTakeHome';
 import { pageMeta } from './pageMeta';
-import { SALARY_PAGE_DATA_ID } from '../../src/state/salaryPageData';
 
 /** JSON that cannot end its own script element or start a comment inside it. */
 function safeJson(data: SalaryPageData): string {

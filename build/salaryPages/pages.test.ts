@@ -6,7 +6,11 @@ import { generateSalaryPages } from './generate';
 import { pageMeta } from './pageMeta';
 import { renderSalaryApp } from './prerender';
 import { provinces } from './provinces';
-import { duplicates, pageData, syntheticResponse } from './syntheticPages';
+import {
+  duplicates,
+  pageData,
+  syntheticResponse,
+} from '../../src/test/syntheticPages';
 
 // Whole build: 25 Ontario pages from a fake API whose answer differs per salary
 // (SYNTHETIC responses, see syntheticPages.ts), rendered by the real App.

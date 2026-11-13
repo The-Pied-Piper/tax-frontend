@@ -1,11 +1,16 @@
-// Test data only: nothing in the build imports this file.
-import type { ComputeTakeHomeCalculationResponse } from '../../src/api';
-import fixture70000 from '../../src/api/fixtures/compute-on-2026-70000.json';
-import jurisdictions from '../../src/api/fixtures/jurisdictions.json';
-import type { SalaryPageData } from '../../src/state/useTakeHome';
-import { provinces, salaries } from './provinces';
+// Test data only: nothing in the build imports this file. The saved engine
+// responses are real; syntheticResponse below is not.
+import type { ComputeTakeHomeCalculationResponse } from '../api';
+import fixture30000 from '../api/fixtures/compute-on-2026-30000.json';
+import fixture150000 from '../api/fixtures/compute-on-2026-150000.json';
+import fixture70000 from '../api/fixtures/compute-on-2026-70000.json';
+import jurisdictions from '../api/fixtures/jurisdictions.json';
+import type { SalaryPageData } from '../state/useTakeHome';
 
+export const compute30000 = fixture30000 as ComputeTakeHomeCalculationResponse;
 export const compute70000 = fixture70000 as ComputeTakeHomeCalculationResponse;
+export const compute150000 =
+  fixture150000 as ComputeTakeHomeCalculationResponse;
 
 /** A page's data for the real saved response of that salary. */
 export function pageData(
@@ -40,9 +45,7 @@ export function syntheticResponse(
 
 /** One synthetic page per Ontario salary step (25 of them). */
 export function syntheticOntarioPages(): SalaryPageData[] {
-  const ontario = provinces.find((p) => p.code === 'CA-ON');
-  if (!ontario) throw new Error('Ontario is not in the province list');
-  return salaries(ontario).map((n) =>
+  return Array.from({ length: 25 }, (_, i) => 30000 + i * 5000).map((n) =>
     pageData(syntheticResponse(n), n.toString()),
   );
 }

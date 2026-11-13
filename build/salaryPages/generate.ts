@@ -9,6 +9,8 @@ import {
 import { languageCode } from '../../src/strings';
 import type { SalaryPageData } from '../../src/state/useTakeHome';
 import { buildPageHtml } from './pageHtml';
+import { pageMeta } from './pageMeta';
+import { DESCRIPTION_LIMIT, TITLE_LIMIT } from './limits';
 import { salaries, type Province } from './provinces';
 
 export type GenerateOptions = {
@@ -81,6 +83,17 @@ export async function generateSalaryPages(
         year: province.year,
         salary: salary.toString(),
       };
+      const meta = pageMeta(data);
+      if (meta.title.length >= TITLE_LIMIT) {
+        throw new Error(
+          `Salary pages: ${page} title is ${meta.title.length.toString()} characters, limit ${(TITLE_LIMIT - 1).toString()}`,
+        );
+      }
+      if (meta.description.length >= DESCRIPTION_LIMIT) {
+        throw new Error(
+          `Salary pages: ${page} description is ${meta.description.length.toString()} characters, limit ${(DESCRIPTION_LIMIT - 1).toString()}`,
+        );
+      }
       pages.push({
         path: `${page}/index.html`,
         html: buildPageHtml(template, render(data), data),

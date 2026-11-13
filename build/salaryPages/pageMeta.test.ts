@@ -1,19 +1,17 @@
-import type { ComputeTakeHomeCalculationResponse } from '../../src/api';
-import fixture30000 from '../../src/api/fixtures/compute-on-2026-30000.json';
-import fixture150000 from '../../src/api/fixtures/compute-on-2026-150000.json';
 import jurisdictions from '../../src/api/fixtures/jurisdictions.json';
+import { COMING_SOON } from '../../src/adapters/coming-soon';
 import { readFileSync, readdirSync } from 'node:fs';
 import { join } from 'node:path';
 import { pageMeta } from './pageMeta';
+import { salaryPageText } from '../../src/state/salaryPageText';
 import {
+  compute150000,
+  compute30000,
   compute70000,
   duplicates,
   pageData,
   syntheticOntarioPages,
-} from './syntheticPages';
-
-const compute30000 = fixture30000 as ComputeTakeHomeCalculationResponse;
-const compute150000 = fixture150000 as ComputeTakeHomeCalculationResponse;
+} from '../../src/test/syntheticPages';
 
 const page30000 = pageData(compute30000, '30000');
 const page70000 = pageData(compute70000, '70000');
@@ -35,86 +33,58 @@ function elsewhere(name: string, year: number) {
   };
 }
 
-describe('pageMeta: title, description, heading and paragraph of a page', () => {
-  it('names the place, year and salary in the title, from that page', () => {
-    const { title } = pageMeta(page70000);
-    expect(title).toContain('Ontario');
-    expect(title).toContain('2026');
-    expect(title).toContain('70,000');
-  });
-
-  it('puts the take-home in the description, as an estimate', () => {
-    const { description } = pageMeta(page70000);
-    expect(description).toContain('53,786.25');
-    expect(description.toLowerCase()).toContain('estimate');
-  });
-
-  it('has a heading naming the place, year and salary', () => {
-    const { heading } = pageMeta(page70000);
-    expect(heading).toContain('Ontario');
-    expect(heading).toContain('2026');
-    expect(heading).toContain('70,000');
-  });
-
-  it("states the page's own figures in the paragraph, as the API printed them", () => {
-    const { paragraph } = pageMeta(page70000);
-    expect(paragraph).toContain('CA$53,786.25');
-    expect(paragraph).toContain('CA$16,213.75');
-    expect(paragraph).toContain('15.91%');
-    expect(paragraph).toContain('29.65%');
-  });
-
-  it.each([
-    [page30000, 'CA$27,550.43'],
-    [page150000, 'CA$104,319.88'],
-  ])('uses the real take-home on the edge pages (%#)', (data, takeHome) => {
-    const meta = pageMeta(data);
-    expect(meta.paragraph).toContain(takeHome);
-    expect(meta.description).toContain(takeHome.replace('CA$', ''));
-  });
-
-  it('takes the place and year from the data, never from the code', () => {
+describe('pageMeta: the wrapper around salaryPageText', () => {
+  it('takes the place name from the province list by code, and the year from the data', () => {
     const meta = pageMeta(elsewhere('Quebec', 2031));
-    for (const text of Object.values(meta)) {
-      expect(text).not.toContain('Ontario');
-      expect(text).not.toContain('2026');
-    }
     expect(meta.title).toContain('Quebec');
     expect(meta.title).toContain('2031');
-    expect(meta.description).toContain('Quebec');
-    expect(meta.heading).toContain('Quebec');
-    expect(meta.paragraph).toContain('Quebec');
+    expect(meta.title).not.toContain('Ontario');
   });
 
-  it('is pure: the same data gives the same text', () => {
-    expect(pageMeta(page70000)).toEqual(pageMeta(page70000));
+  it('gives the text salaryPageText gives for that answer, place and year', () => {
+    expect(pageMeta(page70000)).toEqual(
+      salaryPageText(compute70000, 'Ontario', 2026),
+    );
+  });
+
+  it('picks the place by code when the list has several', () => {
+    const data = {
+      ...page70000,
+      jurisdictions: [
+        { code: 'CA-XX', name: 'Xland', years: [] },
+        ...page70000.jurisdictions,
+      ],
+    };
+    expect(pageMeta(data).title).toContain('Ontario');
+    expect(pageMeta(data).title).not.toContain('Xland');
+  });
+
+  it('falls back to the code when the name is blank', () => {
+    const data = elsewhere('   ', 2026);
+    expect(pageMeta(data).title).toContain('CA-XX');
+  });
+
+  it('has a place name for every coming-soon province too (through placeOptions)', () => {
+    for (const p of COMING_SOON) {
+      const data = {
+        ...page70000,
+        jurisdictionCode: p.code,
+        jurisdictions: [{ code: p.code, name: p.name, years: [] }],
+      };
+      expect(pageMeta(data).title).toContain(p.name);
+    }
   });
 });
 
 describe('pageMeta limits, for every page', () => {
-  const pages = [...real, ...synthetic];
-
-  it.each(pages.map((p) => [p.salary, p] as const))(
+  it.each([...real, ...synthetic].map((p) => [p.salary, p] as const))(
     'title under 60 and description under 160 characters for $%s',
     (_salary, data) => {
       const { title, description } = pageMeta(data);
       expect(title.length).toBeLessThan(60);
-      expect(title.length).toBeGreaterThan(0);
       expect(description.length).toBeLessThan(160);
-      expect(description.length).toBeGreaterThan(0);
     },
   );
-
-  it('does not cut a long province name: the limit fails instead', () => {
-    const long = pageMeta(
-      elsewhere('The Very Long Named Province of Somewhere Far Away', 2026),
-    );
-    // Not truncated: the whole name is there, and so the title is over the limit.
-    expect(long.title).toContain(
-      'The Very Long Named Province of Somewhere Far Away',
-    );
-    expect(long.title.length).toBeGreaterThanOrEqual(60);
-  });
 });
 
 describe('pageMeta: unique per page', () => {
@@ -149,27 +119,6 @@ describe('pageMeta: unique per page', () => {
     expect(a).not.toBe(b);
     expect(a).not.toContain('104,319.88');
     expect(b).not.toContain('27,550.43');
-  });
-});
-
-describe('estimate wording', () => {
-  const all = [...real, ...synthetic].flatMap((d) =>
-    Object.values(pageMeta(d)),
-  );
-
-  it('says "estimate" in the description and the paragraph', () => {
-    const meta = pageMeta(page70000);
-    expect(meta.description.toLowerCase()).toContain('estimate');
-    expect(meta.paragraph.toLowerCase()).toContain('estimate');
-  });
-
-  it('never claims a CRA check or gives tax advice', () => {
-    for (const text of all) {
-      const lower = text.toLowerCase();
-      expect(lower).not.toContain('checked against cra');
-      expect(lower).not.toContain('verified');
-      expect(lower.replace(/not tax advice/g, '')).not.toContain('tax advice');
-    }
   });
 });
 
