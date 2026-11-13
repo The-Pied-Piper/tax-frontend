@@ -1,4 +1,4 @@
-import { mkdtempSync, readFileSync, readdirSync } from 'node:fs';
+import { mkdtempSync, readFileSync, readdirSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import fixture30000 from '../../src/api/fixtures/compute-on-2026-30000.json';
@@ -54,9 +54,16 @@ function fakeApi(
 
 const seventyThousand = () => Response.json(compute70000);
 
+const made: string[] = [];
 function outDir() {
-  return mkdtempSync(join(tmpdir(), 'salary-pages-'));
+  const dir = mkdtempSync(join(tmpdir(), 'salary-pages-'));
+  made.push(dir);
+  return dir;
 }
+afterEach(() => {
+  for (const dir of made.splice(0))
+    rmSync(dir, { recursive: true, force: true });
+});
 
 /** Stands in for the real App render; echoes what it was given. */
 function render(data: SalaryPageData): string {
@@ -288,6 +295,29 @@ describe('the build fails clearly', () => {
         render,
       }),
     ).rejects.toThrow(/ca-on\/35000.*500/s);
+  });
+
+  it('leaves nothing written under outDir when any page fails', async () => {
+    let computes = 0;
+    const api = fakeApi(() => {
+      computes += 1;
+      return computes === 5
+        ? new Response('boom', { status: 500 })
+        : Response.json(compute70000);
+    });
+    const dir = outDir();
+    await expect(
+      generateSalaryPages({
+        fetch: api.fetch,
+        baseUrl,
+        provinces,
+        outDir: dir,
+        template,
+        render,
+      }),
+    ).rejects.toThrow(/500/);
+    expect(computes).toBe(5);
+    expect(readdirSync(dir)).toEqual([]);
   });
 
   it('names the page when the API cannot be reached', async () => {

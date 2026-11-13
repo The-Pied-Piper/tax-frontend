@@ -43,4 +43,18 @@ describe('salaries', () => {
       }),
     ).toEqual([10000, 15000, 20000]);
   });
+
+  it('refuses a step of zero or less, or a range that runs backwards', () => {
+    const base = {
+      code: 'CA-XX',
+      slug: 'ca-xx',
+      year: 2026,
+      from: 10000,
+      to: 20000,
+      step: 5000,
+    };
+    expect(() => salaries({ ...base, step: 0 })).toThrow();
+    expect(() => salaries({ ...base, step: -5000 })).toThrow();
+    expect(() => salaries({ ...base, from: 30000 })).toThrow();
+  });
 });

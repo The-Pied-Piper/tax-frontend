@@ -1,12 +1,12 @@
 import { screen, within } from '@testing-library/react';
 import { renderSalaryApp } from './prerender';
-import type { ComputeTakeHomeCalculationResponse } from './api';
-import fixture30000 from './api/fixtures/compute-on-2026-30000.json';
-import fixture70000 from './api/fixtures/compute-on-2026-70000.json';
-import fixture150000 from './api/fixtures/compute-on-2026-150000.json';
-import jurisdictions from './api/fixtures/jurisdictions.json';
-import { strings } from './strings';
-import type { SalaryPageData } from './state/useTakeHome';
+import type { ComputeTakeHomeCalculationResponse } from '../../src/api';
+import fixture30000 from '../../src/api/fixtures/compute-on-2026-30000.json';
+import fixture70000 from '../../src/api/fixtures/compute-on-2026-70000.json';
+import fixture150000 from '../../src/api/fixtures/compute-on-2026-150000.json';
+import jurisdictions from '../../src/api/fixtures/jurisdictions.json';
+import { strings } from '../../src/strings';
+import type { SalaryPageData } from '../../src/state/useTakeHome';
 
 const compute30000 = fixture30000 as ComputeTakeHomeCalculationResponse;
 const compute70000 = fixture70000 as ComputeTakeHomeCalculationResponse;

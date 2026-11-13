@@ -51,7 +51,7 @@ export async function generateSalaryPages(
     );
   }
 
-  const written: string[] = [];
+  const pages: { path: string; html: string }[] = [];
   const skipped: string[] = [];
   for (const province of provinces) {
     if (!list.jurisdictions.some((j) => j.code === province.code)) {
@@ -81,12 +81,17 @@ export async function generateSalaryPages(
         year: province.year,
         salary: salary.toString(),
       };
-      const path = `${page}/index.html`;
-      const file = join(outDir, path);
-      await mkdir(dirname(file), { recursive: true });
-      await writeFile(file, buildPageHtml(template, render(data), data));
-      written.push(path);
+      pages.push({
+        path: `${page}/index.html`,
+        html: buildPageHtml(template, render(data), data),
+      });
     }
   }
-  return { written, skipped };
+  // Everything was fetched and rendered; only now is anything written.
+  for (const { path, html } of pages) {
+    const file = join(outDir, path);
+    await mkdir(dirname(file), { recursive: true });
+    await writeFile(file, html);
+  }
+  return { written: pages.map((p) => p.path), skipped };
 }

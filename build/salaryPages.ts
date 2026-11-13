@@ -14,7 +14,7 @@ function isRenderer(value: unknown): value is Prerender['renderSalaryApp'] {
   return typeof value === 'function';
 }
 
-/** Builds src/prerender.tsx for Node, in a temp folder, and loads it. */
+/** Builds build/salaryPages/prerender.tsx for Node, in a temp folder, and loads it. */
 async function loadRenderer(tempDir: string): Promise<Prerender> {
   await build({
     configFile: false,
@@ -22,7 +22,7 @@ async function loadRenderer(tempDir: string): Promise<Prerender> {
     plugins: [react()],
     // Same CSS-module naming as the client build, so class names match.
     build: {
-      ssr: resolve('src/prerender.tsx'),
+      ssr: resolve('build/salaryPages/prerender.tsx'),
       outDir: tempDir,
       emptyOutDir: true,
       rollupOptions: { output: { entryFileNames: 'prerender.mjs' } },

@@ -25,6 +25,12 @@ export const provinces: Province[] = [
 ];
 
 export function salaries(province: Province): number[] {
+  const { code, from, to, step } = province;
+  if (!(step > 0) || from > to) {
+    throw new Error(
+      `Province ${code}: step must be above 0 and from must not exceed to (from ${from.toString()}, to ${to.toString()}, step ${step.toString()})`,
+    );
+  }
   const steps: number[] = [];
   for (let n = province.from; n <= province.to; n += province.step) {
     steps.push(n);
