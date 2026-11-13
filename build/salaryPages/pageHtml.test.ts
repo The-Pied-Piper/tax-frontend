@@ -4,6 +4,7 @@ import computeFixture from '../../src/api/fixtures/compute-on-2026-70000.json';
 import jurisdictions from '../../src/api/fixtures/jurisdictions.json';
 import type { SalaryPageData } from '../../src/state/useTakeHome';
 import { buildPageHtml } from './pageHtml';
+import { pageMeta } from './pageMeta';
 
 const compute = computeFixture as ComputeTakeHomeCalculationResponse;
 const template = readFileSync('index.html', 'utf8');
@@ -36,7 +37,8 @@ describe('buildPageHtml', () => {
 
   it('keeps the rest of the template, including the bundle script', () => {
     expect(page.querySelector('script[type="module"]')).not.toBeNull();
-    expect(page.title).toBe(parse(template).title);
+    expect(page.querySelector('meta[name="viewport"]')).not.toBeNull();
+    expect(page.querySelector('meta[name="theme-color"]')).not.toBeNull();
   });
 
   it('carries the data as a JSON block, not executable script', () => {
@@ -55,5 +57,76 @@ describe('buildPageHtml', () => {
       response: { ...compute, salary: '</script><b id="x">' },
     });
     expect(parse(tricky).getElementById('x')).toBeNull();
+  });
+});
+
+function content(page: Document, selector: string): string | null {
+  return page.querySelector(selector)?.getAttribute('content') ?? null;
+}
+
+describe('buildPageHtml: the head of each page', () => {
+  const meta = pageMeta(data);
+  const page = parse(buildPageHtml(template, '<main></main>', data));
+
+  it("has the page's own title, replacing the template's", () => {
+    expect(page.title).toBe(meta.title);
+    expect(page.title).not.toBe(parse(template).title);
+    expect(page.querySelectorAll('title')).toHaveLength(1);
+  });
+
+  it("has the page's own meta description, once", () => {
+    expect(content(page, 'meta[name="description"]')).toBe(meta.description);
+    expect(page.querySelectorAll('meta[name="description"]')).toHaveLength(1);
+  });
+
+  it('has the same text for Open Graph and Twitter', () => {
+    expect(content(page, 'meta[property="og:title"]')).toBe(meta.title);
+    expect(content(page, 'meta[property="og:description"]')).toBe(
+      meta.description,
+    );
+    expect(content(page, 'meta[name="twitter:title"]')).toBe(meta.title);
+    expect(content(page, 'meta[name="twitter:description"]')).toBe(
+      meta.description,
+    );
+  });
+
+  it('leaves og:url, canonical and the other meta tags as the template has them (#81 owns them)', () => {
+    const before = parse(template);
+    for (const selector of [
+      'meta[property="og:url"]',
+      'meta[property="og:type"]',
+      'meta[name="twitter:card"]',
+      'link[rel="canonical"]',
+    ]) {
+      expect(page.querySelectorAll(selector).length).toBe(
+        before.querySelectorAll(selector).length,
+      );
+      expect(page.querySelector(selector)?.outerHTML).toBe(
+        before.querySelector(selector)?.outerHTML,
+      );
+    }
+  });
+
+  it('escapes the text, so a place name cannot break out of an attribute or the title', () => {
+    const nasty = {
+      ...data,
+      jurisdictions: [
+        {
+          code: 'CA-ON',
+          name: 'On"tario </title><b id="x">&amp;',
+          years: [{ year: 2026, provisional: true }],
+        },
+      ],
+    };
+    const html = buildPageHtml(template, '<main></main>', nasty);
+    const out = parse(html);
+    expect(out.getElementById('x')).toBeNull();
+    const expected = pageMeta(nasty);
+    expect(out.title).toBe(expected.title);
+    expect(content(out, 'meta[name="description"]')).toBe(expected.description);
+    expect(content(out, 'meta[property="og:title"]')).toBe(expected.title);
+    expect(content(out, 'meta[name="twitter:description"]')).toBe(
+      expected.description,
+    );
   });
 });

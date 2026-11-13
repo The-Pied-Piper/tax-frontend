@@ -70,6 +70,31 @@ export const strings = {
     estimateNote:
       'This is an estimate for a single yearly salary. Your own situation may differ.',
   },
+  // Per-page wording for the pre-built salary pages and the live page heading.
+  // Place and year come from the API's list and the request, never from code.
+  pageText: {
+    title: (salary: string, place: string, year: number) =>
+      `${salary} after tax in ${place} (${String(year)})`,
+    description: (
+      salary: string,
+      place: string,
+      year: number,
+      takeHome: string,
+    ) =>
+      `Estimate: on ${salary} in ${place} for ${String(year)}, your yearly take-home is ${takeHome} after income tax, CPP and EI.`,
+    heading: (salary: string, place: string, year: number) =>
+      `Take-home pay on ${salary} in ${place}, ${String(year)}`,
+    paragraph: (
+      salary: string,
+      place: string,
+      year: number,
+      takeHome: string,
+      takenOff: string,
+      averageRate: string,
+      marginalRate: string,
+    ) =>
+      `On a salary of ${salary} in ${place} in ${String(year)}, this estimate puts your take-home at ${takeHome} for the year. ${takenOff} is taken off for income tax, Canada Pension Plan and Employment Insurance. Your average income tax rate is ${averageRate}, and your marginal income tax rate is ${marginalRate}: the rate on your next dollar of salary. It is an estimate for a single person, not tax advice.`,
+  },
   notices: {
     provisionalTitle: (year: number) =>
       `${String(year)} figures are provisional.`,

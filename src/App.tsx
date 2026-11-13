@@ -8,6 +8,7 @@ import { ProvisionalNotice } from './components/ProvisionalNotice';
 import { SalaryForm } from './components/SalaryForm';
 import { StarLink } from './components/StarLink';
 import { ThemeToggle } from './components/ThemeToggle';
+import { salaryPageText } from './state/salaryPageText';
 import { useTakeHome, type SalaryPageData } from './state/useTakeHome';
 import { strings } from './strings';
 
@@ -19,12 +20,20 @@ type Props = {
 
 export function App({ client, registry, initial }: Props) {
   const page = useTakeHome(client, registry, initial);
+  const text =
+    page.request.status === 'success'
+      ? salaryPageText(
+          page.request.response,
+          page.request.asked.jurisdictionName,
+          page.request.asked.year,
+        )
+      : null;
   return (
     <>
       <main>
         <header className="page-header">
           <div className="page-header-text">
-            <h1>{strings.title}</h1>
+            <h1>{text ? text.heading : strings.title}</h1>
             <p className="lede">{strings.intro}</p>
           </div>
           <ThemeToggle />
@@ -71,6 +80,7 @@ export function App({ client, registry, initial }: Props) {
               />
               <AdvancedView groups={page.request.adapted.advanced} />
             </AnswerCard>
+            {text && <p className="page-summary">{text.paragraph}</p>}
           </>
         )}
         <StarLink />

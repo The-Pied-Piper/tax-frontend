@@ -1,5 +1,9 @@
-import { screen, within } from '@testing-library/react';
+import { render, screen, waitFor, within } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import { renderSalaryApp } from './prerender';
+import { pageMeta } from './pageMeta';
+import { App } from '../../src/App';
+import { createApiClient } from '../../src/api';
 import type { ComputeTakeHomeCalculationResponse } from '../../src/api';
 import fixture30000 from '../../src/api/fixtures/compute-on-2026-30000.json';
 import fixture70000 from '../../src/api/fixtures/compute-on-2026-70000.json';
@@ -52,7 +56,10 @@ describe('renderSalaryApp (the static body of a salary page)', () => {
   it('shows the same page as the live app: heading, estimate card, footer', () => {
     show(dataFor(compute70000, '70000'));
     expect(
-      screen.getByRole('heading', { name: strings.title, level: 1 }),
+      screen.getByRole('heading', {
+        name: pageMeta(dataFor(compute70000, '70000')).heading,
+        level: 1,
+      }),
     ).toBeInTheDocument();
     const card = screen.getByRole('region', { name: strings.answer.heading });
     expect(within(card).getAllByText('CA$53,786.25').length).toBeGreaterThan(0);
@@ -82,5 +89,91 @@ describe('renderSalaryApp (the static body of a salary page)', () => {
     renderSalaryApp(dataFor(compute70000, '70000'));
     expect(spy).not.toHaveBeenCalled();
     spy.mockRestore();
+  });
+});
+
+afterEach(() => {
+  document.body.innerHTML = '';
+});
+
+describe('the h1 and paragraph of a salary page', () => {
+  const pages = [
+    dataFor(compute30000, '30000'),
+    dataFor(compute70000, '70000'),
+    dataFor(compute150000, '150000'),
+  ];
+
+  it.each(pages.map((p) => [p.salary, p] as const))(
+    'has exactly one h1, the page heading, for $%s',
+    (_salary, data) => {
+      show(data);
+      const h1s = screen.getAllByRole('heading', { level: 1 });
+      expect(h1s).toHaveLength(1);
+      expect(h1s[0]).toHaveTextContent(pageMeta(data).heading);
+    },
+  );
+
+  it.each(pages.map((p) => [p.salary, p] as const))(
+    'has the paragraph from pageMeta in the static HTML for $%s, once',
+    (_salary, data) => {
+      show(data);
+      expect(screen.getAllByText(pageMeta(data).paragraph)).toHaveLength(1);
+    },
+  );
+
+  it('has different headings and paragraphs on different pages', () => {
+    const headings = pages.map((p) => pageMeta(p).heading);
+    const paragraphs = pages.map((p) => pageMeta(p).paragraph);
+    expect(new Set(headings).size).toBe(3);
+    expect(new Set(paragraphs).size).toBe(3);
+  });
+
+  it('keeps the generic title and one h1 when there is no answer yet', () => {
+    const pending = createApiClient({
+      baseUrl: 'https://api.test',
+      fetch: () => new Promise<Response>(() => undefined),
+    });
+    render(<App client={pending} />);
+    expect(
+      screen.getByRole('heading', { name: strings.title, level: 1 }),
+    ).toBeInTheDocument();
+    expect(screen.getAllByRole('heading', { level: 1 })).toHaveLength(1);
+  });
+
+  it('follows the answer when the salary is changed in place', async () => {
+    const before = pageMeta(dataFor(compute70000, '70000'));
+    const after = pageMeta(dataFor(compute30000, '30000'));
+    const client = createApiClient({
+      baseUrl: 'https://api.test',
+      fetch: (input) => {
+        const url =
+          typeof input === 'string'
+            ? input
+            : input instanceof URL
+              ? input.href
+              : input.url;
+        return Promise.resolve(
+          url.endsWith('/jurisdictions')
+            ? Response.json(jurisdictions)
+            : Response.json(compute30000),
+        );
+      },
+    });
+    const user = userEvent.setup();
+    render(<App client={client} initial={dataFor(compute70000, '70000')} />);
+    const salary = screen.getByRole('textbox', { name: strings.form.salary });
+    await user.clear(salary);
+    await user.type(salary, '30000');
+    await user.click(
+      screen.getByRole('button', { name: strings.form.calculate }),
+    );
+    await waitFor(() => {
+      expect(
+        screen.getByRole('heading', { name: after.heading, level: 1 }),
+      ).toBeInTheDocument();
+    });
+    expect(screen.getAllByRole('heading', { level: 1 })).toHaveLength(1);
+    expect(screen.getByText(after.paragraph)).toBeInTheDocument();
+    expect(screen.queryByText(before.paragraph)).not.toBeInTheDocument();
   });
 });
