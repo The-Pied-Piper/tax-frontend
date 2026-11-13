@@ -2,12 +2,12 @@ name: Release
 
 # Publishing a GitHub release (a tag like v1 or v2) builds that commit's site and publishes it
 # to prod. This file is only the trigger: it comes from the tagged commit, so it holds no
-# logic and no credentials of its own. The two jobs call reusable workflows pinned to main,
-# and the prod AWS role trusts only release-deploy.yml as it is on main (and only a v tag, and
-# only the GitHub environment prod-deploy, which needs Umar's approval). Everything that
-# checks the release (event, tag shape, commit on main) runs in those files, before any role
-# is assumed. The build runs with no cloud access at all; the deploy never runs npm.
-# See release-build.yml and release-deploy.yml.
+# logic and no credentials of its own, and it has exactly one job, which calls
+# release-publish.yml as it is on main. The whole chain (checks, build with no cloud access,
+# approval, deploy that never runs npm) lives in that one file, so nothing can be inserted or
+# skipped here. The prod AWS role trusts only that file as it is on main (and only a v tag,
+# and only the GitHub environment prod-deploy, which needs the owner's approval).
+# See release-publish.yml.
 
 on:
   release:
@@ -22,15 +22,11 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
-  build:
-    # A pre-release does not go to prod.
+  publish:
+    # A pre-release does not go to prod (release-publish.yml checks this again).
     if: ${{ !github.event.release.prerelease }}
+    # The most the called file may use: its build job narrows itself to contents: read.
     permissions:
       contents: read
-    uses: The-Pied-Piper/tax_frontend/.github/workflows/release-build.yml@main
-
-  deploy:
-    needs: build
-    permissions:
       id-token: write
-    uses: The-Pied-Piper/tax_frontend/.github/workflows/release-deploy.yml@main
+    uses: The-Pied-Piper/tax_frontend/.github/workflows/release-publish.yml@main
