@@ -1,0 +1,36 @@
+name: Release
+
+# Publishing a GitHub release (a tag like v1 or v2) builds that commit's site and publishes it
+# to prod. This file is only the trigger: it comes from the tagged commit, so it holds no
+# logic and no credentials of its own. The two jobs call reusable workflows pinned to main,
+# and the prod AWS role trusts only release-deploy.yml as it is on main (and only a v tag, and
+# only the GitHub environment prod-deploy, which needs Umar's approval). Everything that
+# checks the release (event, tag shape, commit on main) runs in those files, before any role
+# is assumed. The build runs with no cloud access at all; the deploy never runs npm.
+# See release-build.yml and release-deploy.yml.
+
+on:
+  release:
+    types: [published]
+
+permissions: {}
+
+concurrency:
+  # One release at a time, and never cancel one half-way. (A convenience, not a guard: this
+  # file comes from the tagged commit.)
+  group: release-prod
+  cancel-in-progress: false
+
+jobs:
+  build:
+    # A pre-release does not go to prod.
+    if: ${{ !github.event.release.prerelease }}
+    permissions:
+      contents: read
+    uses: The-Pied-Piper/tax_frontend/.github/workflows/release-build.yml@main
+
+  deploy:
+    needs: build
+    permissions:
+      id-token: write
+    uses: The-Pied-Piper/tax_frontend/.github/workflows/release-deploy.yml@main

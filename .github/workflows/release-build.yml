@@ -1,0 +1,72 @@
+name: Release build
+
+# Reusable: called by release.yml on main. Builds the released commit and hands the finished
+# site (dist/) to release-deploy.yml as a workflow artifact. This job holds no cloud
+# credentials (no id-token, no environment variables of the AWS kind): the build runs npm,
+# and npm must never run next to the right to publish.
+# The build calls the prod API once per page, so the prod API must be up before a release
+# is published; if it is not, the build fails naming the page and nothing is published.
+# Actions are pinned by commit; Dependabot (github-actions) keeps the tags in the comments current.
+
+on:
+  workflow_call:
+
+permissions: {}
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    env:
+      # The prod API and the public address, set at build time (see README, "API client").
+      VITE_API_BASE_URL: https://api.aftertaxlens.com/api/v1
+      VITE_SITE_URL: https://aftertaxlens.com
+    steps:
+      - name: Check this is a release with a v-and-number tag
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          TAG: ${{ github.event.release.tag_name }}
+          REF: ${{ github.ref }}
+        run: |
+          set -euo pipefail
+          [[ "$EVENT_NAME" == release ]] || { echo "not a release event" >&2; exit 1; }
+          [[ "$TAG" =~ ^v[1-9][0-9]{0,5}$ ]] || { echo "unexpected release tag" >&2; exit 1; }
+          [[ "$REF" == "refs/tags/$TAG" ]] || { echo "the run is not for the release tag" >&2; exit 1; }
+
+      # The released commit, with full history so it can be compared with main.
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+          persist-credentials: false
+
+      # The released commit must already be on main (main only takes reviewed pull
+      # requests with green CI): a tag on any other commit is refused before anything is built.
+      - name: Check the commit is on main
+        run: |
+          set -euo pipefail
+          git merge-base --is-ancestor "$GITHUB_SHA" refs/remotes/origin/main || { echo "the released commit is not on main" >&2; exit 1; }
+
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+
+      - run: npm ci --ignore-scripts
+      - run: npm run build
+
+      # Nothing is published unless the build produced a page and the sitemap.
+      - name: Check the build
+        run: |
+          set -euo pipefail
+          test -s dist/index.html
+          test -s dist/sitemap.xml
+          test -d dist/assets
+
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: site
+          path: dist
+          if-no-files-found: error
+          retention-days: 7

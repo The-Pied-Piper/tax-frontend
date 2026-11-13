@@ -1,0 +1,83 @@
+name: Release deploy
+
+# Reusable: called by release.yml on main, after release-build.yml. Publishes the built site
+# to the prod bucket through the prod-deploy role and refreshes the CDN. The job waits in the
+# prod-deploy GitHub environment for Umar's approval. It never runs on its own and never runs
+# npm: it only uploads the files the build job produced. Until the prod site exists
+# (tax-infra creates the bucket, distribution and role), the variables below are unset and
+# this job ends green without deploying.
+# Actions are pinned by commit; Dependabot (github-actions) keeps the tags in the comments current.
+
+on:
+  workflow_call:
+
+permissions: {}
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    # Variables of this environment (not secrets): AWS_SITE_DEPLOY_ROLE_ARN_PROD,
+    # SITE_BUCKET_PROD and SITE_DISTRIBUTION_ID_PROD. The role trusts only this environment.
+    environment: prod-deploy
+    permissions:
+      id-token: write
+    steps:
+      - name: Check this is a release and the prod site is set up
+        id: check
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          TAG: ${{ github.event.release.tag_name }}
+          REF: ${{ github.ref }}
+          ROLE_ARN: ${{ vars.AWS_SITE_DEPLOY_ROLE_ARN_PROD }}
+          BUCKET: ${{ vars.SITE_BUCKET_PROD }}
+          DISTRIBUTION_ID: ${{ vars.SITE_DISTRIBUTION_ID_PROD }}
+        run: |
+          set -euo pipefail
+          [[ "$EVENT_NAME" == release ]] || { echo "not a release event" >&2; exit 1; }
+          [[ "$TAG" =~ ^v[1-9][0-9]{0,5}$ ]] || { echo "unexpected release tag" >&2; exit 1; }
+          [[ "$REF" == "refs/tags/$TAG" ]] || { echo "the run is not for the release tag" >&2; exit 1; }
+          if [[ -z "$ROLE_ARN" || -z "$BUCKET" || -z "$DISTRIBUTION_ID" ]]; then
+            echo "::warning::Not deployed: the prod site is not set up yet (no role, bucket or distribution)."
+            echo "Not deployed: no prod site yet." >> "$GITHUB_STEP_SUMMARY"
+            echo "ready=false" >> "$GITHUB_OUTPUT"
+          else
+            [[ "$BUCKET" =~ ^[a-z0-9][a-z0-9.-]{2,62}$ ]] || { echo "unexpected bucket name" >&2; exit 1; }
+            [[ "$DISTRIBUTION_ID" =~ ^E[A-Z0-9]{8,20}$ ]] || { echo "unexpected distribution id" >&2; exit 1; }
+            echo "ready=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+        if: ${{ steps.check.outputs.ready == 'true' }}
+        with:
+          name: site
+          path: dist
+
+      - uses: aws-actions/configure-aws-credentials@e1253824e5c10ff9df46874f81ed3ec929e19cfd # v6.3.0
+        if: ${{ steps.check.outputs.ready == 'true' }}
+        with:
+          role-to-assume: ${{ vars.AWS_SITE_DEPLOY_ROLE_ARN_PROD }}
+          role-session-name: tax-frontend-release-deploy-${{ github.run_id }}
+          role-duration-seconds: 1800
+          aws-region: ca-central-1
+
+      # Same order as dev: files under assets/ have a hash in their name, so they never
+      # change and can be cached for a year; everything else keeps its name and must be
+      # asked for each time. New assets go up first, the page files second, and only then
+      # are the old assets removed (the bucket keeps their old versions).
+      - name: Upload the site
+        if: ${{ steps.check.outputs.ready == 'true' }}
+        env:
+          BUCKET: ${{ vars.SITE_BUCKET_PROD }}
+        run: |
+          set -euo pipefail
+          aws s3 sync dist/assets "s3://$BUCKET/assets" --cache-control "public,max-age=31536000,immutable"
+          aws s3 sync dist "s3://$BUCKET" --delete --exclude "assets/*" --exclude "mockServiceWorker.js" --cache-control "no-cache"
+          aws s3 sync dist/assets "s3://$BUCKET/assets" --delete --cache-control "public,max-age=31536000,immutable"
+
+      # Last, and always after the --delete above: cached pages at the edge point at hashed
+      # files, so they must be dropped once the old files are gone.
+      - name: Refresh the CDN
+        if: ${{ steps.check.outputs.ready == 'true' }}
+        env:
+          DISTRIBUTION_ID: ${{ vars.SITE_DISTRIBUTION_ID_PROD }}
+        run: aws cloudfront create-invalidation --distribution-id "$DISTRIBUTION_ID" --paths "/*"
