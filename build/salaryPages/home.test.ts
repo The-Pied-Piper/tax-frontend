@@ -138,4 +138,58 @@ describe('rewriteHome (dist/index.html)', () => {
     });
     expect(shape(popular(page)[0] as Element)).toEqual(shape(mounted));
   });
+
+  describe('disclosure in the built home page', () => {
+    it('puts one closed details with a summary around the 25 anchors', async () => {
+      const { page } = await home();
+      const all = page.querySelectorAll('details');
+      expect(all).toHaveLength(1);
+      const details = all[0] as HTMLDetailsElement;
+      expect(details.hasAttribute('open')).toBe(false);
+      expect(details.querySelector('summary')).not.toBeNull();
+      expect(details.querySelectorAll('a')).toHaveLength(25);
+      expect(page.querySelectorAll('a[href^="/ca-on/"]')).toHaveLength(25);
+      expect(details.closest('#root > main')).not.toBeNull();
+    });
+
+    it('writes the anchors as static markup, in the same order, with no hiding', async () => {
+      const { html, page } = await home();
+      expect(
+        [
+          ...(page.querySelector('details') as Element).querySelectorAll('a'),
+        ].map((a) => a.getAttribute('href')),
+      ).toEqual(ontarioIndex.groups[0]?.pages.map((p) => p.href));
+      for (const h of ontarioIndex.groups[0]?.pages.map((p) => p.href) ?? [])
+        expect(html).toContain(`href="${h}"`);
+      expect(page.querySelector('[hidden], [aria-hidden="true"]')).toBeNull();
+      expect(page.querySelector('details [style*="display"]')).toBeNull();
+    });
+
+    it('shows crawlers the same links as visitors: the static anchors equal what React mounts', async () => {
+      const { page } = await home(twoProvinceIndex);
+      const details = page.querySelector('details') as Element;
+      render(createElement(SalaryIndexNav, { index: twoProvinceIndex }));
+      const mounted = screen.getByRole('navigation', {
+        name: 'Popular salaries',
+      });
+      const pairs = (root: Element) =>
+        [...root.querySelectorAll('a')].map((a) => [
+          a.textContent,
+          a.getAttribute('href'),
+        ]);
+      expect(pairs(details)).toEqual(pairs(mounted));
+    });
+
+    it('is idempotent for the disclosure: still one details, one nav, same bytes', async () => {
+      const { dir, html } = await home();
+      await rewriteHome(dir, ontarioIndex, renderSalaryIndexNav);
+      await rewriteHome(dir, ontarioIndex, renderSalaryIndexNav);
+      const again = readFileSync(join(dir, 'index.html'), 'utf8');
+      expect(again).toBe(html);
+      const page = new DOMParser().parseFromString(again, 'text/html');
+      expect(page.querySelectorAll('details')).toHaveLength(1);
+      expect(popular(page)).toHaveLength(1);
+      expect(page.querySelectorAll('a[href^="/ca-on/"]')).toHaveLength(25);
+    });
+  });
 });

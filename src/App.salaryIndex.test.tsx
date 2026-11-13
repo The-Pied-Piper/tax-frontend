@@ -44,7 +44,11 @@ describe('App with a salary index: the calculator', () => {
     showCalculator(ontarioIndex);
     const nav = screen.getByRole('navigation', { name: 'Popular salaries' });
     expect(within(nav).getAllByRole('link')).toHaveLength(25);
-    expect(within(nav).getByRole('list', { name: 'Ontario' })).toBeVisible();
+    expect(
+      within(nav).getByRole('list', { name: 'Ontario' }),
+    ).toBeInTheDocument();
+    const details = nav.closest('details');
+    expect(details).not.toHaveAttribute('open');
   });
 
   it('shows no Popular salaries nav without an index (plain build)', () => {

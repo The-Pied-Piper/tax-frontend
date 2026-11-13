@@ -9,7 +9,7 @@ const END_OF_MAIN = /<\/main>(?=\s*<\/div>\s*(?:<script|<\/body>))/;
 
 // What an earlier call wrote, so a second call leaves exactly one of each.
 const OLD_NAV = new RegExp(
-  `<nav [^>]*aria-label="${strings.salaryIndex.label}"[\\s\\S]*?</nav>`,
+  `<details [^>]*><summary[^>]*>${strings.salaryIndex.label}</summary><nav [^>]*aria-label="${strings.salaryIndex.label}"[\\s\\S]*?</nav></details>`,
 );
 const OLD_BLOCK = new RegExp(
   `<script type="application/json" id="${SALARY_INDEX_ID}">[\\s\\S]*?</script>\\n  `,
