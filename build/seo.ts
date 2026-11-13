@@ -45,11 +45,15 @@ export function robotsTxt(siteUrl: string | null): string {
   return lines.join('\n') + '\n';
 }
 
-export function sitemapXml(siteUrl: string): string {
+/** The calculator plus the given page paths (each with a leading slash). */
+export function sitemapXml(siteUrl: string, paths: string[] = []): string {
+  const urls = ['/', ...paths].map(
+    (path) => `  <url><loc>${siteUrl}${path}</loc></url>\n`,
+  );
   return (
     '<?xml version="1.0" encoding="UTF-8"?>\n' +
     '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n' +
-    `  <url><loc>${siteUrl}/</loc></url>\n` +
+    urls.join('') +
     '</urlset>\n'
   );
 }

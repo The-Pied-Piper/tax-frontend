@@ -1,5 +1,6 @@
 import { SALARY_PAGE_DATA_ID } from '../../src/state/salaryPageData';
 import type { SalaryPageData } from '../../src/state/useTakeHome';
+import { pageUrl } from './address';
 import { pageMeta } from './pageMeta';
 
 /** JSON that cannot end its own script element or start a comment inside it. */
@@ -27,11 +28,29 @@ function withContent(html: string, key: string, text: string): string {
   );
 }
 
+/**
+ * Gives the page its own canonical link and og:url, replacing the calculator's
+ * that the site build put in the template.
+ */
+function withAddress(html: string, address: string): string {
+  const url = escapeHtml(address);
+  return html
+    .replace(/<link\s[^>]*rel="canonical"[^>]*>\s*/g, '')
+    .replace(/<meta\s[^>]*property="og:url"[^>]*>\s*/g, '')
+    .replace(
+      '</head>',
+      () =>
+        `<link rel="canonical" href="${url}" />\n    <meta property="og:url" content="${url}" />\n  </head>`,
+    );
+}
+
 /** The template with `#root` holding the rendered page, plus the data block for React. */
 export function buildPageHtml(
   template: string,
   appHtml: string,
   data: SalaryPageData,
+  origin: string | null = null,
+  slug: string = data.jurisdictionCode.toLowerCase(),
 ): string {
   const block = `<script type="application/json" id="${SALARY_PAGE_DATA_ID}">${safeJson(data)}</script>`;
   // #root ends at the </div> that is followed by a script or the end of the body.
@@ -53,7 +72,13 @@ export function buildPageHtml(
     ['twitter:title', meta.title],
     ['twitter:description', meta.description],
   ];
-  return tags
-    .reduce((html, [key, text]) => withContent(html, key, text), head)
-    .replace('</body>', () => `${block}\n  </body>`);
+  const described = tags.reduce(
+    (html, [key, text]) => withContent(html, key, text),
+    head,
+  );
+  const addressed =
+    origin === null
+      ? described
+      : withAddress(described, pageUrl(origin, slug, data.salary));
+  return addressed.replace('</body>', () => `${block}\n  </body>`);
 }

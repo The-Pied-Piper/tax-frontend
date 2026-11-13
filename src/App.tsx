@@ -6,6 +6,7 @@ import { Breakdown } from './components/Breakdown';
 import { ErrorNotice } from './components/ErrorNotice';
 import { ProvisionalNotice } from './components/ProvisionalNotice';
 import { SalaryForm } from './components/SalaryForm';
+import { SalaryLinks } from './components/SalaryLinks';
 import { StarLink } from './components/StarLink';
 import { ThemeToggle } from './components/ThemeToggle';
 import { salaryPageText } from './state/salaryPageText';
@@ -81,6 +82,10 @@ export function App({ client, registry, initial }: Props) {
               <AdvancedView groups={page.request.adapted.advanced} />
             </AnswerCard>
             {text && <p className="page-summary">{text.paragraph}</p>}
+            <SalaryLinks
+              links={initial?.links}
+              unit={page.request.adapted.unit}
+            />
           </>
         )}
         <StarLink />

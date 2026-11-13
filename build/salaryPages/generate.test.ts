@@ -9,6 +9,7 @@ import jurisdictions from '../../src/api/fixtures/jurisdictions.json';
 import { languageCode } from '../../src/strings';
 import type { SalaryPageData } from '../../src/state/useTakeHome';
 import { generateSalaryPages } from './generate';
+import { salaryLinks } from './links';
 import { provinces, type Province } from './provinces';
 
 const compute30000 = fixture30000 as ComputeTakeHomeCalculationResponse;
@@ -207,6 +208,11 @@ describe('generateSalaryPages for Ontario', () => {
       jurisdictionCode: 'CA-ON',
       year: 2026,
       salary: '70000',
+      links: salaryLinks(
+        'ca-on',
+        Array.from({ length: 25 }, (_, i) => String(30000 + i * 5000)),
+        '70000',
+      ),
     });
   });
 

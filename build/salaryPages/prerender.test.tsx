@@ -2,6 +2,7 @@ import { render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { renderSalaryApp } from './prerender';
 import { pageMeta } from './pageMeta';
+import { salaryLinks } from './links';
 import { App } from '../../src/App';
 import { createApiClient } from '../../src/api';
 import type { ComputeTakeHomeCalculationResponse } from '../../src/api';
@@ -175,5 +176,37 @@ describe('the h1 and paragraph of a salary page', () => {
     expect(screen.getAllByRole('heading', { level: 1 })).toHaveLength(1);
     expect(screen.getByText(after.paragraph)).toBeInTheDocument();
     expect(screen.queryByText(before.paragraph)).not.toBeInTheDocument();
+  });
+});
+
+describe('salary links in the static page and the mounted page (#81)', () => {
+  const base = dataFor(compute70000, '70000');
+  const links = salaryLinks('ca-on', ['65000', '70000', '75000'], '70000');
+  const withLinks: SalaryPageData = { ...base, links };
+
+  it('puts the nav with its links in the static HTML', () => {
+    show(withLinks);
+    const nav = screen.getByRole('navigation', {
+      name: strings.salaryLinks.label,
+    });
+    const hrefs = within(nav)
+      .getAllByRole('link')
+      .map((a) => a.getAttribute('href'));
+    expect(hrefs).toEqual(
+      expect.arrayContaining(['/', '/ca-on/65000/', '/ca-on/75000/']),
+    );
+  });
+
+  it('has no nav in the static HTML for data without links', () => {
+    show(base);
+    expect(screen.queryByRole('navigation')).not.toBeInTheDocument();
+  });
+
+  it('renders the same nav when mounted from the same data (the pre-hydration rule)', () => {
+    show(withLinks);
+    const staticNav = screen.getByRole('navigation').outerHTML;
+    document.body.innerHTML = '';
+    render(<App initial={withLinks} />);
+    expect(screen.getByRole('navigation').outerHTML).toBe(staticNav);
   });
 });

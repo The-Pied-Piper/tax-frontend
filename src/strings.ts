@@ -95,6 +95,14 @@ export const strings = {
     ) =>
       `On a salary of ${salary} in ${place} in ${String(year)}, this estimate puts your take-home at ${takeHome} for the year. ${takenOff} is taken off for income tax, Canada Pension Plan and Employment Insurance. Your average income tax rate is ${averageRate}, and your marginal income tax rate is ${marginalRate}: the rate on your next dollar of salary. It is an estimate for a single person, not tax advice.`,
   },
+  // Navigation between the pre-built salary pages; amounts come from displayMoney.
+  salaryLinks: {
+    label: 'More salaries',
+    previous: (amount: string) => `Previous: ${amount}`,
+    next: (amount: string) => `Next: ${amount}`,
+    calculator: 'Back to the calculator',
+    others: 'Other salaries',
+  },
   notices: {
     provisionalTitle: (year: number) =>
       `${String(year)} figures are provisional.`,

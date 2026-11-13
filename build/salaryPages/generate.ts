@@ -11,6 +11,7 @@ import type { SalaryPageData } from '../../src/state/useTakeHome';
 import { buildPageHtml } from './pageHtml';
 import { pageMeta } from './pageMeta';
 import { DESCRIPTION_LIMIT, TITLE_LIMIT } from './limits';
+import { salaryLinks } from './links';
 import { salaries, type Province } from './provinces';
 
 export type GenerateOptions = {
@@ -22,6 +23,8 @@ export type GenerateOptions = {
   template: string;
   /** The real App as a string for one page's data. */
   render: (data: SalaryPageData) => string;
+  /** The normalized site origin; null leaves canonical and og:url as the template has them. */
+  siteUrl?: string | null;
 };
 
 export type GenerateResult = {
@@ -60,28 +63,38 @@ export async function generateSalaryPages(
       skipped.push(province.code);
       continue;
     }
-    for (const salary of salaries(province)) {
-      const page = `${province.slug}/${salary.toString()}`;
-      let response: ComputeTakeHomeCalculationResponse;
+    const steps = salaries(province).map((salary) => salary.toString());
+    const responses: ComputeTakeHomeCalculationResponse[] = [];
+    for (const salary of steps) {
+      const page = `${province.slug}/${salary}`;
       try {
-        response = await client.computeTakeHomeCalculation({
-          jurisdiction_code: province.code,
-          year: province.year,
-          salary: salary.toString(),
-          language_code: languageCode,
-          include_trace: true,
-        });
+        responses.push(
+          await client.computeTakeHomeCalculation({
+            jurisdiction_code: province.code,
+            year: province.year,
+            salary,
+            language_code: languageCode,
+            include_trace: true,
+          }),
+        );
       } catch (error) {
         throw new Error(`Salary pages: ${page} failed: ${reason(error)}`, {
           cause: error,
         });
       }
+    }
+    // Links go only to the pages of this province that are about to be written.
+    steps.forEach((salary, index) => {
+      const response = responses[index];
+      if (!response) throw new Error(`Salary pages: no answer for ${salary}`);
+      const page = `${province.slug}/${salary}`;
       const data: SalaryPageData = {
         jurisdictions: list.jurisdictions,
         response,
         jurisdictionCode: province.code,
         year: province.year,
-        salary: salary.toString(),
+        salary,
+        links: salaryLinks(province.slug, steps, salary),
       };
       const meta = pageMeta(data);
       if (meta.title.length >= TITLE_LIMIT) {
@@ -96,9 +109,15 @@ export async function generateSalaryPages(
       }
       pages.push({
         path: `${page}/index.html`,
-        html: buildPageHtml(template, render(data), data),
+        html: buildPageHtml(
+          template,
+          render(data),
+          data,
+          options.siteUrl ?? null,
+          province.slug,
+        ),
       });
-    }
+    });
   }
   // Everything was fetched and rendered; only now is anything written.
   for (const { path, html } of pages) {

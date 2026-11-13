@@ -42,6 +42,36 @@ describe('robots.txt and sitemap.xml', () => {
   });
 });
 
+describe('sitemapXml with page paths', () => {
+  const locs = (xml: string) =>
+    [...xml.matchAll(/<loc>([^<]*)<\/loc>/g)].map((m) => m[1]);
+
+  it('lists the calculator first, then each path after the site address', () => {
+    const xml = sitemapXml('https://aftertaxlens.com', [
+      '/ca-on/65000/',
+      '/ca-on/70000/',
+    ]);
+    expect(locs(xml)).toEqual([
+      'https://aftertaxlens.com/',
+      'https://aftertaxlens.com/ca-on/65000/',
+      'https://aftertaxlens.com/ca-on/70000/',
+    ]);
+  });
+
+  it('lists only the calculator for no paths, as before', () => {
+    expect(locs(sitemapXml('https://aftertaxlens.com', []))).toEqual([
+      'https://aftertaxlens.com/',
+    ]);
+  });
+
+  it('still emits the one-URL sitemap from the bundle hook (the pages plugin rewrites it later)', () => {
+    const { files } = run('https://aftertaxlens.com');
+    expect(locs(files['sitemap.xml'] ?? '')).toEqual([
+      'https://aftertaxlens.com/',
+    ]);
+  });
+});
+
 // The two hooks are called directly with a stand-in for Rollup's context.
 function run(siteUrl: string | undefined) {
   const plugin = seo(siteUrl);

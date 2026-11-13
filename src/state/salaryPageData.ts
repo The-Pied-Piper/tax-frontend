@@ -46,6 +46,25 @@ function isJurisdiction(value: unknown): boolean {
   );
 }
 
+function isLink(value: unknown): boolean {
+  return (
+    isRecord(value) &&
+    typeof value.salary === 'string' &&
+    typeof value.href === 'string'
+  );
+}
+
+function isLinks(value: unknown): boolean {
+  return (
+    isRecord(value) &&
+    typeof value.calculator === 'string' &&
+    (value.previous === null || isLink(value.previous)) &&
+    (value.next === null || isLink(value.next)) &&
+    Array.isArray(value.others) &&
+    value.others.every(isLink)
+  );
+}
+
 function isSalaryPageData(value: unknown): value is SalaryPageData {
   return (
     isRecord(value) &&
@@ -54,7 +73,8 @@ function isSalaryPageData(value: unknown): value is SalaryPageData {
     isResponse(value.response) &&
     typeof value.jurisdictionCode === 'string' &&
     typeof value.year === 'number' &&
-    typeof value.salary === 'string'
+    typeof value.salary === 'string' &&
+    (value.links === undefined || isLinks(value.links))
   );
 }
 

@@ -14,7 +14,7 @@ export default defineConfig(({ mode }) => {
     plugins: [
       react(),
       seo(env.VITE_SITE_URL),
-      salaryPages(env.VITE_API_BASE_URL),
+      salaryPages(env.VITE_API_BASE_URL, env.VITE_SITE_URL),
     ],
     server: {
       proxy: { '/api': { target: apiTarget, changeOrigin: true } },
