@@ -36,17 +36,20 @@ jobs:
           [[ "$EVENT_NAME" == release ]] || { echo "not a release event" >&2; exit 1; }
           [[ "$TAG" =~ ^v[1-9][0-9]{0,5}$ ]] || { echo "unexpected release tag" >&2; exit 1; }
           [[ "$REF" == "refs/tags/$TAG" ]] || { echo "the run is not for the release tag" >&2; exit 1; }
-          if [[ -z "$ROLE_ARN" || -z "$BUCKET" || -z "$DISTRIBUTION_ID" ]]; then
+          if [[ -z "$ROLE_ARN" && -z "$BUCKET" && -z "$DISTRIBUTION_ID" ]]; then
             echo "::warning::Not deployed: the prod site is not set up yet (no role, bucket or distribution)."
             echo "Not deployed: no prod site yet." >> "$GITHUB_STEP_SUMMARY"
             echo "ready=false" >> "$GITHUB_OUTPUT"
           else
+            # Some set and some not is a misconfiguration, not "not set up yet".
+            [[ -n "$ROLE_ARN" && -n "$BUCKET" && -n "$DISTRIBUTION_ID" ]] || { echo "only some of the prod site variables are set" >&2; exit 1; }
             [[ "$BUCKET" =~ ^[a-z0-9][a-z0-9.-]{2,62}$ ]] || { echo "unexpected bucket name" >&2; exit 1; }
             [[ "$DISTRIBUTION_ID" =~ ^E[A-Z0-9]{8,20}$ ]] || { echo "unexpected distribution id" >&2; exit 1; }
             echo "ready=true" >> "$GITHUB_OUTPUT"
           fi
 
-      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+      - id: download
+        uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
         if: ${{ steps.check.outputs.ready == 'true' }}
         with:
           name: site
@@ -75,9 +78,11 @@ jobs:
           aws s3 sync dist/assets "s3://$BUCKET/assets" --delete --cache-control "public,max-age=31536000,immutable"
 
       # Last, and always after the --delete above: cached pages at the edge point at hashed
-      # files, so they must be dropped once the old files are gone.
+      # files, so they must be dropped once the old files are gone. It also runs when an
+      # upload step failed part-way (some old assets may already be deleted), but not when
+      # the run was cancelled before the upload.
       - name: Refresh the CDN
-        if: ${{ steps.check.outputs.ready == 'true' }}
+        if: ${{ !cancelled() && steps.check.outputs.ready == 'true' && steps.download.outcome == 'success' }}
         env:
           DISTRIBUTION_ID: ${{ vars.SITE_DISTRIBUTION_ID_PROD }}
         run: aws cloudfront create-invalidation --distribution-id "$DISTRIBUTION_ID" --paths "/*"
