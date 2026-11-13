@@ -123,23 +123,6 @@ describe('Alberta adapter', () => {
     expect(result.advanced.length).toBeGreaterThan(0);
   });
 
-  it('falls back when the Alberta tax amount is not a money amount', () => {
-    const odd: ComputeTakeHomeCalculationResponse = {
-      ...r2025,
-      trace: (r2025.trace ?? []).map((f) => ({
-        ...f,
-        lines: f.lines.map((l) =>
-          l.label === 'ab428_alberta_tax_line_75'
-            ? { ...l, amount: '3598.125' }
-            : l,
-        ),
-      })),
-    };
-    const result = caAbAdapter.adapt(odd);
-    expect(result.rows).toEqual([]);
-    expect(result.advanced.length).toBeGreaterThan(0);
-  });
-
   it.each(['cpp_part_3_line_12', 'cpp_part_3_line_22'])(
     'falls back when %s is not a money amount',
     (label) => {

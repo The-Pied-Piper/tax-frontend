@@ -84,12 +84,10 @@ function adapt(response: ComputeTakeHomeCalculationResponse): AdaptedResult {
   }
   let cpp: string;
   let cpp2Exact: string;
-  let albertaTaxExact: string;
   let eiHelp = strings.adapters.caAb.ei.help;
   try {
     cpp = sumAmounts([cppBase.amount, cppEnhancedFirst.amount]);
     cpp2Exact = sumAmounts([cpp2.amount]);
-    albertaTaxExact = sumAmounts([albertaTax.amount]);
     // No premium counted on a real salary: say why, since a pay slip shows one.
     if (isZero(ei.amount) && isPositive(response.salary)) {
       eiHelp = `${eiHelp} ${strings.adapters.caAb.eiRefundedNote}`;
@@ -116,12 +114,7 @@ function adapt(response: ComputeTakeHomeCalculationResponse): AdaptedResult {
       ),
       row('ei', { name: text.ei.name, help: eiHelp }, ei, text.groups.ei),
       row('federal-tax', text.federalTax, federalTax, text.groups.incomeTax),
-      row(
-        'alberta-tax',
-        text.albertaTax,
-        { amount: albertaTaxExact, unit: albertaTax.unit },
-        text.groups.incomeTax,
-      ),
+      row('alberta-tax', text.albertaTax, albertaTax, text.groups.incomeTax),
     ],
     totals: [
       row('total-tax', text.totalTax, totalTax, text.groups.incomeTax),

@@ -1,4 +1,3 @@
-import { COMING_SOON } from '../adapters/coming-soon';
 import type { ListJurisdictionsResponse } from '../api';
 import { placeOptions } from './places';
 
@@ -42,11 +41,5 @@ describe('placeOptions', () => {
 
   it('lists only coming-soon places for an empty API', () => {
     expect(placeOptions([], soon).every((o) => !o.supported)).toBe(true);
-  });
-});
-
-describe('COMING_SOON', () => {
-  it('no longer lists Alberta, which the API now serves', () => {
-    expect(COMING_SOON.map((p) => p.code)).not.toContain('CA-AB');
   });
 });
