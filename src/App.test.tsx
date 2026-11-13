@@ -4,7 +4,6 @@ import { App } from './App';
 import { AdapterRegistry, advancedGroups } from './adapters';
 import {
   ApiError,
-  createApiClient,
   NetworkError,
   RequestTimeoutError,
   type ApiClient,
@@ -15,33 +14,7 @@ import compute2025 from './api/fixtures/compute-on-2025-70000.json';
 import invalidSalary from './api/fixtures/error-invalid-salary.json';
 import jurisdictions from './api/fixtures/jurisdictions.json';
 import { strings } from './strings';
-
-// Real client, fake network: the saved engine responses are served as text.
-function fixtureClient(
-  onCompute: (body: ComputeTakeHomeCalculationRequest) => void = () => {},
-  answer: unknown = compute2025,
-): ApiClient {
-  return createApiClient({
-    baseUrl: 'http://test/api/v1',
-    fetch: (input, init) => {
-      const url =
-        typeof input === 'string'
-          ? input
-          : input instanceof URL
-            ? input.href
-            : input.url;
-      if (url.endsWith('/jurisdictions')) {
-        return Promise.resolve(new Response(JSON.stringify(jurisdictions)));
-      }
-      onCompute(
-        JSON.parse(
-          typeof init?.body === 'string' ? init.body : '',
-        ) as ComputeTakeHomeCalculationRequest,
-      );
-      return Promise.resolve(new Response(JSON.stringify(answer)));
-    },
-  });
-}
+import { fixtureClient } from './test/fixtureClient';
 
 describe('App form', () => {
   it('shows the page title', () => {

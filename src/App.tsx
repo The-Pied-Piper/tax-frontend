@@ -6,9 +6,12 @@ import { Breakdown } from './components/Breakdown';
 import { ErrorNotice } from './components/ErrorNotice';
 import { ProvisionalNotice } from './components/ProvisionalNotice';
 import { SalaryForm } from './components/SalaryForm';
+import { NearbySalaries } from './components/NearbySalaries';
+import { SalaryIndexNav } from './components/SalaryIndexNav';
 import { SalaryLinks } from './components/SalaryLinks';
 import { StarLink } from './components/StarLink';
 import { ThemeToggle } from './components/ThemeToggle';
+import { nearbyPages, type SalaryIndex } from './state/salaryIndex';
 import { salaryPageText } from './state/salaryPageText';
 import { useTakeHome, type SalaryPageData } from './state/useTakeHome';
 import { strings } from './strings';
@@ -17,9 +20,11 @@ type Props = {
   client?: ApiClient;
   registry?: AdapterRegistry;
   initial?: SalaryPageData;
+  /** Every pre-built salary page; none in a plain build. */
+  salaryIndex?: SalaryIndex;
 };
 
-export function App({ client, registry, initial }: Props) {
+export function App({ client, registry, initial, salaryIndex }: Props) {
   const page = useTakeHome(client, registry, initial);
   const text =
     page.request.status === 'success'
@@ -29,6 +34,15 @@ export function App({ client, registry, initial }: Props) {
           page.request.asked.year,
         )
       : null;
+  const { request } = page;
+  // A pre-built page keeps its own links until another salary is calculated.
+  const group =
+    request.status === 'success' &&
+    !(initial?.links && request.response === initial.response)
+      ? salaryIndex?.groups.find(
+          (g) => g.code === request.asked.jurisdictionCode,
+        )
+      : undefined;
   return (
     <>
       <main>
@@ -88,9 +102,17 @@ export function App({ client, registry, initial }: Props) {
                 unit={page.request.adapted.unit}
               />
             )}
+            {group && (
+              <NearbySalaries
+                pages={nearbyPages(group, page.request.response.salary)}
+                place={group.name}
+                unit={group.unit}
+              />
+            )}
           </>
         )}
         <StarLink />
+        {salaryIndex && !initial && <SalaryIndexNav index={salaryIndex} />}
       </main>
       <footer className="page-footer">{strings.footer}</footer>
     </>

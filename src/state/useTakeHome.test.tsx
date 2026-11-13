@@ -41,7 +41,12 @@ describe('useTakeHome with an initial state (a pre-built salary page)', () => {
     expect(request.status).toBe('success');
     if (request.status !== 'success') return;
     expect(request.response.take_home).toBe('53786.25');
-    expect(request.asked).toEqual({ jurisdictionName: 'Ontario', year: 2026 });
+    expect(request.asked).toEqual({
+      jurisdictionName: 'Ontario',
+      year: 2026,
+      jurisdictionCode: 'CA-ON',
+    });
+    expect(request).not.toHaveProperty('jurisdictionCode');
     expect(request.adapted.rows.length).toBeGreaterThan(0);
   });
 

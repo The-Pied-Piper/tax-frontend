@@ -35,7 +35,11 @@ export type RequestState =
   | {
       status: 'success';
       /** What was asked, kept so the card names the place and year it answers. */
-      asked: { jurisdictionName: string; year: number };
+      asked: {
+        jurisdictionName: string;
+        year: number;
+        jurisdictionCode: string;
+      };
       response: ComputeTakeHomeCalculationResponse;
       adapted: AdaptedResult;
     }
@@ -100,6 +104,7 @@ function seedFrom(
       request: {
         status: 'success',
         asked: {
+          jurisdictionCode: data.jurisdictionCode,
           jurisdictionName:
             data.jurisdictions.find((j) => j.code === data.jurisdictionCode)
               ?.name ?? data.jurisdictionCode,
@@ -222,7 +227,7 @@ export function useTakeHome(
           try {
             setRequest({
               status: 'success',
-              asked: { jurisdictionName, year },
+              asked: { jurisdictionName, year, jurisdictionCode },
               response,
               adapted: registry.adapt(jurisdictionCode, year, response),
             });
