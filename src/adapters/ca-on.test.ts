@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import type { ComputeTakeHomeCalculationResponse } from '../api';
 import fixture2025 from '../api/fixtures/compute-on-2025-70000.json';
 import fixture2025High from '../api/fixtures/compute-on-2025-90000.json';
+import fixture2026Small from '../api/fixtures/compute-on-2026-1500.json';
 import fixture2026 from '../api/fixtures/compute-on-2026-70000.json';
 import { sumAmounts } from '../money/sum';
 import { strings } from '../strings';
@@ -12,6 +13,7 @@ import { caOnAdapter } from './ca-on';
 const r2025 = fixture2025 as ComputeTakeHomeCalculationResponse;
 const r2025High = fixture2025High as ComputeTakeHomeCalculationResponse;
 const r2026 = fixture2026 as ComputeTakeHomeCalculationResponse;
+const r2026Small = fixture2026Small as ComputeTakeHomeCalculationResponse;
 
 function figures(response: ComputeTakeHomeCalculationResponse) {
   const result = caOnAdapter.adapt(response);
@@ -320,5 +322,82 @@ describe('Ontario adapter', () => {
         result.totals.find((r) => r.id === 'total-taken-off')?.unit,
       ).toEqual(cad);
     });
+  });
+});
+
+describe('Ontario adapter, Employment Insurance help', () => {
+  const eiHelp = (response: ComputeTakeHomeCalculationResponse) =>
+    caOnAdapter.adapt(response).rows.find((r) => r.id === 'ei')?.help;
+  const text = strings.adapters.caOn;
+
+  it('has the saved $1,500 answer with EI 0.00 and a trace', () => {
+    expect(r2026Small.salary).toBe('1500.00');
+    expect(r2026Small.take_home).toBe('1500.00');
+    expect(r2026Small.trace?.length).toBeGreaterThan(0);
+    expect(figures(r2026Small)).toContainEqual(['ei', '0.00']);
+  });
+
+  it('adds the refund note after the usual text at $1,500', () => {
+    expect(eiHelp(r2026Small)).toBe(`${text.ei.help} ${text.eiRefundedNote}`);
+  });
+
+  it('keeps exactly the usual text at $70,000 in both years', () => {
+    expect(eiHelp(r2025)).toBe(text.ei.help);
+    expect(eiHelp(r2026)).toBe(text.ei.help);
+  });
+
+  it('adds no note when the salary is zero, even with EI 0.00', () => {
+    const zeroSalary: ComputeTakeHomeCalculationResponse = {
+      ...r2026Small,
+      salary: '0.00',
+    };
+    expect(eiHelp(zeroSalary)).toBe(text.ei.help);
+  });
+
+  it('falls back instead of throwing when the EI amount or the salary is unreadable', () => {
+    const badEi: ComputeTakeHomeCalculationResponse = {
+      ...r2026Small,
+      trace: (r2026Small.trace ?? []).map((f) => ({
+        ...f,
+        lines: f.lines.map((l) =>
+          l.label === 'ei_premiums_line_88' ? { ...l, amount: 'n/a' } : l,
+        ),
+      })),
+    };
+    const badSalary: ComputeTakeHomeCalculationResponse = {
+      ...r2026Small,
+      salary: 'lots',
+    };
+    for (const response of [badEi, badSalary]) {
+      const result = caOnAdapter.adapt(response);
+      expect(result.rows).toEqual([]);
+      expect(result.advanced.length).toBeGreaterThan(0);
+    }
+  });
+
+  it('gives the other rows the same help at $1,500 as at $70,000', () => {
+    const helps = (response: ComputeTakeHomeCalculationResponse) =>
+      [...caOnAdapter.adapt(response).rows]
+        .filter((r) => r.id !== 'ei')
+        .map((r) => r.help);
+    expect(helps(r2026Small)).toEqual(helps(r2026));
+  });
+});
+
+describe('Ontario adapter, refund note text', () => {
+  const note = strings.adapters.caOn.eiRefundedNote;
+
+  it('is a sentence', () => {
+    expect(note.length).toBeGreaterThan(0);
+  });
+
+  it('makes no claim of a check or official status', () => {
+    expect(note).not.toMatch(/CRA/i);
+    expect(note).not.toMatch(/official/i);
+  });
+
+  it('carries no dollar sign and no digit, so no figure or rate', () => {
+    expect(note).not.toContain('$');
+    expect(note).not.toMatch(/\d/);
   });
 });

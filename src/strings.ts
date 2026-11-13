@@ -164,6 +164,8 @@ export const strings = {
         name: 'Employment Insurance',
         help: 'Your Employment Insurance premium, taken off your pay to cover benefits if you lose your job.',
       },
+      eiRefundedNote:
+        'On a salary this small the premium is refunded when you file, so none is counted in this estimate. A pay slip would still show it withheld during the year, and it comes back at tax time.',
       federalTax: {
         name: 'Federal income tax',
         help: 'Income tax owed to the federal government after the federal credits that apply to you.',
