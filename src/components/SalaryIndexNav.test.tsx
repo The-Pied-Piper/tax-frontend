@@ -1,4 +1,5 @@
 import { render, screen, within } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import { displayMoney } from '../money/format';
 import { strings } from '../strings';
 import {
@@ -75,5 +76,69 @@ describe('SalaryIndexNav', () => {
   it('renders nothing when the index has no groups', () => {
     const { container } = show({ groups: [] });
     expect(container).toBeEmptyDOMElement();
+  });
+
+  describe('disclosure', () => {
+    const details = (container: HTMLElement) =>
+      container.querySelector('details') as HTMLDetailsElement;
+
+    it('wraps the list in one details element that is closed on load', () => {
+      const { container } = show(ontarioIndex);
+      expect(container.querySelectorAll('details')).toHaveLength(1);
+      expect(details(container).open).toBe(false);
+      expect(details(container)).not.toHaveAttribute('open');
+    });
+
+    it('has a summary, as the first child of details, that names the list', () => {
+      const { container } = show(ontarioIndex);
+      const summary = details(container).querySelector('summary');
+      expect(summary).not.toBeNull();
+      expect(details(container).firstElementChild).toBe(summary);
+      expect(summary?.textContent).toContain(strings.salaryIndex.label);
+    });
+
+    it('keeps all 25 links as anchors inside the details, not added by script', () => {
+      const { container } = show(ontarioIndex);
+      const anchors = [...details(container).querySelectorAll('a')];
+      expect(anchors).toHaveLength(25);
+      expect(anchors.map((a) => a.getAttribute('href'))).toEqual(
+        ontarioIndex.groups[0]?.pages.map((p) => p.href),
+      );
+      expect(container.querySelectorAll('a')).toHaveLength(25);
+    });
+
+    it('does not hide the links with hidden, aria-hidden or inline display', () => {
+      const { container } = show(ontarioIndex);
+      expect(
+        container.querySelector('[hidden], [aria-hidden="true"]'),
+      ).toBeNull();
+      expect(container.querySelector('[style*="display"]')).toBeNull();
+    });
+
+    it('opens and closes from the summary with the mouse', async () => {
+      const user = userEvent.setup();
+      const { container } = show(ontarioIndex);
+      const summary = screen.getByText(strings.salaryIndex.label, {
+        selector: 'summary, summary *',
+      });
+      await user.click(summary);
+      expect(details(container).open).toBe(true);
+      await user.click(summary);
+      expect(details(container).open).toBe(false);
+    });
+
+    it('puts the summary first in the tab order, so the keyboard reaches it (the browser toggles it on Enter)', async () => {
+      const user = userEvent.setup();
+      show(ontarioIndex);
+      await user.tab();
+      expect(document.activeElement?.tagName).toBe('SUMMARY');
+    });
+
+    it('keeps a closed state for two provinces too: still one details, all 28 links', () => {
+      const { container } = show(twoProvinceIndex);
+      expect(container.querySelectorAll('details')).toHaveLength(1);
+      expect(details(container).open).toBe(false);
+      expect(details(container).querySelectorAll('a')).toHaveLength(28);
+    });
   });
 });
