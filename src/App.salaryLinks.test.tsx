@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { App } from './App';
 import type { ApiClient } from './api';
@@ -30,7 +30,7 @@ const sameObjectClient = () => clientAnswering(compute70000);
 const pageLinks = () =>
   screen.queryByRole('navigation', { name: strings.salaryLinks.label });
 const nearby = () =>
-  screen.queryByRole('navigation', { name: strings.salaryIndex.nearby });
+  screen.queryByRole('navigation', { name: 'Nearby salaries' });
 
 async function calculate(salary: string) {
   const user = userEvent.setup();
@@ -55,24 +55,35 @@ describe('App links on a pre-built salary page', () => {
     expect(nearby()).not.toBeInTheDocument();
   });
 
-  it('shows the nearby list and not the links after another salary is calculated', async () => {
-    render(
-      <App
-        client={clientAnswering({ ...compute70000 })}
-        initial={seeded}
-        salaryIndex={ontarioIndex}
-      />,
-    );
-    await calculate('80000');
-    expect(
-      await screen.findByRole('navigation', {
-        name: strings.salaryIndex.nearby,
-      }),
-    ).toBeInTheDocument();
-    expect(pageLinks()).not.toBeInTheDocument();
-  });
+  it.each([
+    ['another salary', '80000', () => clientAnswering({ ...compute70000 })],
+    ['the same salary', '70000', sameObjectClient],
+  ])(
+    'turns into the plain calculator after %s is calculated',
+    async (_name, salary, makeClient) => {
+      render(
+        <App
+          client={makeClient()}
+          initial={seeded}
+          salaryIndex={ontarioIndex}
+        />,
+      );
+      await calculate(salary);
+      await screen.findByRole('heading', { name: strings.answer.heading });
+      await waitFor(() => {
+        expect(pageLinks()).not.toBeInTheDocument();
+      });
+      expect(nearby()).not.toBeInTheDocument();
+      expect(document.querySelector('.page-summary')).not.toBeInTheDocument();
+      expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent(
+        strings.title,
+      );
+    },
+  );
+});
 
-  it('shows the nearby list, not the stale links, after recalculating the same salary', async () => {
+describe('App summary on a pre-built salary page', () => {
+  it('shows the Take-home heading, About this estimate and the paragraph when seeded', () => {
     render(
       <App
         client={sameObjectClient()}
@@ -80,12 +91,19 @@ describe('App links on a pre-built salary page', () => {
         salaryIndex={ontarioIndex}
       />,
     );
-    await calculate('70000');
-    expect(
-      await screen.findByRole('navigation', {
-        name: strings.salaryIndex.nearby,
-      }),
-    ).toBeInTheDocument();
-    expect(pageLinks()).not.toBeInTheDocument();
+    expect(screen.getByRole('heading', { level: 1 }).textContent).toMatch(
+      /^Take-home pay on /,
+    );
+    const heading = screen.getByRole('heading', {
+      level: 2,
+      name: 'About this estimate',
+    });
+    const section = heading.closest('section');
+    expect(section).toBeInTheDocument();
+    const paragraph = section?.querySelector('.page-summary');
+    expect(paragraph?.textContent).toBeTruthy();
+    expect(paragraph?.tagName).toBe('P');
+    expect(pageLinks()).toBeInTheDocument();
+    expect(nearby()).not.toBeInTheDocument();
   });
 });

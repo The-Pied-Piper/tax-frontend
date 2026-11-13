@@ -6,12 +6,11 @@ import { Breakdown } from './components/Breakdown';
 import { ErrorNotice } from './components/ErrorNotice';
 import { ProvisionalNotice } from './components/ProvisionalNotice';
 import { SalaryForm } from './components/SalaryForm';
-import { NearbySalaries } from './components/NearbySalaries';
 import { SalaryIndexNav } from './components/SalaryIndexNav';
 import { SalaryLinks } from './components/SalaryLinks';
 import { StarLink } from './components/StarLink';
 import { ThemeToggle } from './components/ThemeToggle';
-import { nearbyPages, type SalaryIndex } from './state/salaryIndex';
+import type { SalaryIndex } from './state/salaryIndex';
 import { salaryPageText } from './state/salaryPageText';
 import { useTakeHome, type SalaryPageData } from './state/useTakeHome';
 import { strings } from './strings';
@@ -26,22 +25,16 @@ type Props = {
 
 export function App({ client, registry, initial, salaryIndex }: Props) {
   const page = useTakeHome(client, registry, initial);
+  const { request } = page;
+  // Only a pre-built page carries a summary; a fresh calculation does not.
   const text =
-    page.request.status === 'success'
+    request.status === 'success' && request.links
       ? salaryPageText(
-          page.request.response,
-          page.request.asked.jurisdictionName,
-          page.request.asked.year,
+          request.response,
+          request.asked.jurisdictionName,
+          request.asked.year,
         )
       : null;
-  const { request } = page;
-  // A pre-built page keeps its own links until another salary is calculated.
-  const group =
-    request.status === 'success' && !request.links
-      ? salaryIndex?.groups.find(
-          (g) => g.code === request.asked.jurisdictionCode,
-        )
-      : undefined;
   return (
     <>
       <main>
@@ -94,18 +87,16 @@ export function App({ client, registry, initial, salaryIndex }: Props) {
               />
               <AdvancedView groups={page.request.adapted.advanced} />
             </AnswerCard>
-            {text && <p className="page-summary">{text.paragraph}</p>}
+            {text && (
+              <section className="page-summary-section">
+                <h2>{strings.summaryHeading}</h2>
+                <p className="page-summary">{text.paragraph}</p>
+              </section>
+            )}
             {page.request.links && (
               <SalaryLinks
                 links={page.request.links}
                 unit={page.request.adapted.unit}
-              />
-            )}
-            {group && (
-              <NearbySalaries
-                pages={nearbyPages(group, page.request.response.salary)}
-                place={group.name}
-                unit={group.unit}
               />
             )}
           </>
