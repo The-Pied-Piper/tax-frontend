@@ -12,7 +12,7 @@ type Props = {
   unit: Unit;
 };
 
-/** Plain links to the neighbouring salary pages, the calculator and nearby pages. */
+/** Plain links to the neighbouring salary pages, the calculator and other pages. */
 export function SalaryLinks({ links, unit }: Props) {
   const headingId = useId();
   const money = (salary: string) => displayMoney(salary, 'annually', unit);

@@ -49,9 +49,23 @@ h1 {
 }
 
 /* The plain-language paragraph under the answer. */
+.page-summary-section {
+  margin: 8px 0 0;
+}
+
+.page-summary-section h2 {
+  margin: 0 0 6px;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--fg);
+}
+
 .page-summary {
-  color: var(--muted);
   margin: 0;
+  max-width: 62ch;
+  font-size: 14px;
+  line-height: 1.65;
+  color: var(--muted);
 }
 
 button:focus-visible {
