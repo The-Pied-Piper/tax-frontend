@@ -1,4 +1,5 @@
 import type { ComputeTakeHomeCalculationResponse, Unit } from '../api';
+import { isPositive, isZero } from '../money/sign';
 import { sumAmounts } from '../money/sum';
 import { strings } from '../strings';
 import {
@@ -83,9 +84,14 @@ function adapt(response: ComputeTakeHomeCalculationResponse): AdaptedResult {
   }
   let cpp: string;
   let cpp2Exact: string;
+  let eiHelp = strings.adapters.caOn.ei.help;
   try {
     cpp = sumAmounts([cppBase.amount, cppEnhancedFirst.amount]);
     cpp2Exact = sumAmounts([cpp2.amount]);
+    // No premium counted on a real salary: say why, since a pay slip shows one.
+    if (isZero(ei.amount) && isPositive(response.salary)) {
+      eiHelp = `${eiHelp} ${strings.adapters.caOn.eiRefundedNote}`;
+    }
   } catch {
     // An amount we cannot add exactly: same rule, show nothing half-right.
     return fallbackResult(response);
@@ -106,7 +112,7 @@ function adapt(response: ComputeTakeHomeCalculationResponse): AdaptedResult {
         { amount: cpp2Exact, unit: cpp2.unit },
         text.groups.pension,
       ),
-      row('ei', text.ei, ei, text.groups.ei),
+      row('ei', { name: text.ei.name, help: eiHelp }, ei, text.groups.ei),
       row('federal-tax', text.federalTax, federalTax, text.groups.incomeTax),
       row('ontario-tax', text.ontarioTax, ontarioTax, text.groups.incomeTax),
     ],

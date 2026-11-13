@@ -354,6 +354,27 @@ describe('Ontario adapter, Employment Insurance help', () => {
     expect(eiHelp(zeroSalary)).toBe(text.ei.help);
   });
 
+  it('falls back instead of throwing when the EI amount or the salary is unreadable', () => {
+    const badEi: ComputeTakeHomeCalculationResponse = {
+      ...r2026Small,
+      trace: (r2026Small.trace ?? []).map((f) => ({
+        ...f,
+        lines: f.lines.map((l) =>
+          l.label === 'ei_premiums_line_88' ? { ...l, amount: 'n/a' } : l,
+        ),
+      })),
+    };
+    const badSalary: ComputeTakeHomeCalculationResponse = {
+      ...r2026Small,
+      salary: 'lots',
+    };
+    for (const response of [badEi, badSalary]) {
+      const result = caOnAdapter.adapt(response);
+      expect(result.rows).toEqual([]);
+      expect(result.advanced.length).toBeGreaterThan(0);
+    }
+  });
+
   it('gives the other rows the same help at $1,500 as at $70,000', () => {
     const helps = (response: ComputeTakeHomeCalculationResponse) =>
       [...caOnAdapter.adapt(response).rows]
