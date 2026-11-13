@@ -5,7 +5,11 @@ import fixture30000 from '../../src/api/fixtures/compute-on-2026-30000.json';
 import type { ComputeTakeHomeCalculationResponse } from '../../src/api';
 import fixture70000 from '../../src/api/fixtures/compute-on-2026-70000.json';
 import fixture150000 from '../../src/api/fixtures/compute-on-2026-150000.json';
+import computeAlberta from '../../src/api/fixtures/compute-ab-2026-70000.json';
+import computeAlberta30000 from '../../src/api/fixtures/compute-ab-2026-30000.json';
+import computeAlberta150000 from '../../src/api/fixtures/compute-ab-2026-150000.json';
 import jurisdictions from '../../src/api/fixtures/jurisdictions.json';
+import { withAlberta } from '../../src/test/generatedSite';
 import { languageCode } from '../../src/strings';
 import type { SalaryPageData } from '../../src/state/useTakeHome';
 import { generateSalaryPages } from './generate';
@@ -15,6 +19,11 @@ import { provinces, type Province } from './provinces';
 const compute30000 = fixture30000 as ComputeTakeHomeCalculationResponse;
 const compute70000 = fixture70000 as ComputeTakeHomeCalculationResponse;
 const compute150000 = fixture150000 as ComputeTakeHomeCalculationResponse;
+/** Alberta's 2026 answer for $70,000 (provisional). */
+const alberta70000 = computeAlberta as ComputeTakeHomeCalculationResponse;
+const alberta30000 = computeAlberta30000 as ComputeTakeHomeCalculationResponse;
+const alberta150000 =
+  computeAlberta150000 as ComputeTakeHomeCalculationResponse;
 const baseUrl = 'https://api.test/api/v1';
 const template = readFileSync('index.html', 'utf8');
 
@@ -94,6 +103,10 @@ const withXland = {
   ],
 };
 
+const ontarioOnly = provinces.filter((p) => p.code === 'CA-ON');
+
+const albertaOnly = provinces.filter((p) => p.code === 'CA-AB');
+
 describe('generateSalaryPages for Ontario', () => {
   it('writes 25 pages, one per $5,000 step, at <slug>/<salary>/index.html', async () => {
     const api = fakeApi(seventyThousand);
@@ -101,7 +114,7 @@ describe('generateSalaryPages for Ontario', () => {
     const result = await generateSalaryPages({
       fetch: api.fetch,
       baseUrl,
-      provinces,
+      provinces: ontarioOnly,
       outDir: dir,
       template,
       render,
@@ -123,7 +136,7 @@ describe('generateSalaryPages for Ontario', () => {
     await generateSalaryPages({
       fetch: api.fetch,
       baseUrl,
-      provinces,
+      provinces: ontarioOnly,
       outDir: outDir(),
       template,
       render,
@@ -137,7 +150,7 @@ describe('generateSalaryPages for Ontario', () => {
     await generateSalaryPages({
       fetch: api.fetch,
       baseUrl,
-      provinces,
+      provinces: ontarioOnly,
       outDir: outDir(),
       template,
       render,
@@ -168,7 +181,7 @@ describe('generateSalaryPages for Ontario', () => {
     await generateSalaryPages({
       fetch: api.fetch,
       baseUrl,
-      provinces,
+      provinces: ontarioOnly,
       outDir: dir,
       template,
       render,
@@ -186,7 +199,7 @@ describe('generateSalaryPages for Ontario', () => {
     await generateSalaryPages({
       fetch: api.fetch,
       baseUrl,
-      provinces,
+      provinces: ontarioOnly,
       outDir: dir,
       template,
       render,
@@ -233,6 +246,108 @@ describe('generateSalaryPages for Ontario', () => {
   });
 });
 
+describe('generateSalaryPages for Alberta', () => {
+  const alberta = () => Response.json(alberta70000);
+  const steps = Array.from({ length: 25 }, (_, i) => String(30000 + i * 5000));
+
+  it('writes 25 pages, one per $5,000 step, at ca-ab/<salary>/index.html', async () => {
+    const api = fakeApi(alberta, () => Response.json(withAlberta));
+    const dir = outDir();
+    const result = await generateSalaryPages({
+      fetch: api.fetch,
+      baseUrl,
+      provinces: albertaOnly,
+      outDir: dir,
+      template,
+      render,
+    });
+    expect(files(dir, 'ca-ab')).toEqual([...steps].sort());
+    expect(result.written).toHaveLength(25);
+    expect(result.written).toContain('ca-ab/30000/index.html');
+    expect(result.written).toContain('ca-ab/150000/index.html');
+    expect(result.skipped).toEqual([]);
+  });
+
+  it('asks the API for Alberta in the tax year of its entry, as the live page does', async () => {
+    const api = fakeApi(alberta, () => Response.json(withAlberta));
+    await generateSalaryPages({
+      fetch: api.fetch,
+      baseUrl,
+      provinces: albertaOnly,
+      outDir: outDir(),
+      template,
+      render,
+    });
+    const posts = api.calls.filter((c) => c.method === 'POST');
+    expect(posts).toHaveLength(25);
+    expect(posts[0]?.body).toEqual({
+      jurisdiction_code: 'CA-AB',
+      year: 2026,
+      salary: '30000',
+      language_code: languageCode,
+      include_trace: true,
+    });
+  });
+
+  it('writes the $70,000 answer into the page and the data block, naming Alberta', async () => {
+    const api = fakeApi(alberta, () => Response.json(withAlberta));
+    const dir = outDir();
+    await generateSalaryPages({
+      fetch: api.fetch,
+      baseUrl,
+      provinces: albertaOnly,
+      outDir: dir,
+      template,
+      render,
+    });
+    const html = readFileSync(
+      join(dir, 'ca-ab', '70000', 'index.html'),
+      'utf8',
+    );
+    const page = new DOMParser().parseFromString(html, 'text/html');
+    expect(page.getElementById('root')?.textContent).toContain(
+      'take-home 54107.20 for 70000 in CA-AB 2026',
+    );
+    const data = JSON.parse(
+      page.getElementById('salary-page-data')?.textContent ?? '',
+    ) as SalaryPageData;
+    expect(data).toEqual({
+      jurisdictions: withAlberta.jurisdictions,
+      response: alberta70000,
+      jurisdictionCode: 'CA-AB',
+      year: 2026,
+      salary: '70000',
+      links: salaryLinks('ca-ab', steps, '70000'),
+    });
+  });
+
+  it('writes each salary its own answer, edge pages included', async () => {
+    const answers: Record<string, unknown> = {
+      '30000': alberta30000,
+      '70000': alberta70000,
+      '150000': alberta150000,
+    };
+    const api = fakeApi(
+      (body) => Response.json(answers[body.salary] ?? alberta70000),
+      () => Response.json(withAlberta),
+    );
+    const dir = outDir();
+    await generateSalaryPages({
+      fetch: api.fetch,
+      baseUrl,
+      provinces: albertaOnly,
+      outDir: dir,
+      template,
+      render,
+    });
+    const page = (salary: string) =>
+      readFileSync(join(dir, 'ca-ab', salary, 'index.html'), 'utf8');
+    expect(page('30000')).toContain('take-home 27450.71 for 30000 in CA-AB');
+    expect(page('70000')).toContain('take-home 54107.20 for 70000 in CA-AB');
+    expect(page('150000')).toContain('take-home 107457.96 for 150000 in CA-AB');
+  });
+});
+
 describe('adding a province is one list entry', () => {
   it('writes its pages with the same code', async () => {
     const api = fakeApi(seventyThousand, () => Response.json(withXland));
@@ -264,7 +379,7 @@ describe('a listed province the API does not return', () => {
       fetch: api.fetch,
       baseUrl,
       provinces: [
-        ...provinces,
+        ...ontarioOnly,
         { ...xland, code: 'CA-AB', slug: 'ca-ab', from: 30000 },
       ],
       outDir: dir,

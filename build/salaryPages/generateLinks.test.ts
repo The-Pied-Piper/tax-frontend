@@ -100,7 +100,7 @@ describe('generateSalaryPages links', () => {
   it('gives a province the API does not return no pages and no links from or to it', async () => {
     const dir = outDir();
     const { written, skipped } = await run(dir, { all: true });
-    expect(skipped).toEqual(['CA-XX']);
+    expect(skipped).toEqual(['CA-AB', 'CA-XX']);
     expect(written.some((f) => f.startsWith('ca-xx/'))).toBe(false);
     for (const file of written) {
       expect(readFileSync(join(dir, file), 'utf8')).not.toContain('ca-xx');

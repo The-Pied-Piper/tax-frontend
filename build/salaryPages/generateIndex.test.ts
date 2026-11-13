@@ -8,6 +8,7 @@ import {
   fakeFetch,
   template,
   tmpDirs,
+  withAlberta,
   withXland,
   xland,
 } from '../../src/test/generatedSite';
@@ -86,12 +87,30 @@ describe('generateSalaryPages: the salary-pages-index', () => {
     ]);
   });
 
+  it('has an Ontario group then an Alberta group, 25 pages each, when the API lists Alberta', async () => {
+    const { index, written } = await run(outDir(), { list: withAlberta });
+    expect(index.groups.map((g) => [g.code, g.name])).toEqual([
+      ['CA-ON', 'Ontario'],
+      ['CA-AB', 'Alberta'],
+    ]);
+    expect(index.groups.map((g) => g.pages.length)).toEqual([25, 25]);
+    expect(index.groups[1]?.pages[0]).toEqual({
+      salary: '30000',
+      href: '/ca-ab/30000/',
+    });
+    expect(index.groups[1]?.pages[24]).toEqual({
+      salary: '150000',
+      href: '/ca-ab/150000/',
+    });
+    expect(written).toHaveLength(50);
+  });
+
   it('has no group for a listed province the API does not return', async () => {
     const dir = outDir();
     const result = await generateSalaryPages({
       fetch: fakeFetch(),
       baseUrl: apiBaseUrl,
-      provinces: [...provinces, xland],
+      provinces: [...provinces.filter((p) => p.code === 'CA-ON'), xland],
       outDir: dir,
       template,
       render: renderSalaryApp,
