@@ -56,7 +56,7 @@ export type FormValues = {
 /** One link to another pre-built page: the yearly salary it is for and its address. */
 export type SalaryPageLink = { salary: string; href: string };
 
-/** The links of a pre-built page: its neighbours, the calculator and nearby pages. */
+/** The links of a pre-built page: its neighbours, the calculator and other pages. */
 export type SalaryPageLinks = {
   calculator: string;
   previous: SalaryPageLink | null;

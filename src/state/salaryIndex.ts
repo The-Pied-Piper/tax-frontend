@@ -1,5 +1,4 @@
 import type { Unit } from '../adapters';
-import { nearestSteps } from '../money/nearestSteps';
 import { toCents } from '../money/payPeriod';
 import type { SalaryPageLink } from './useTakeHome';
 import { readUnit } from '../adapters/fallback';
@@ -64,17 +63,4 @@ export function parseSalaryIndex(text: string | null): SalaryIndex | null {
   } catch {
     return null;
   }
-}
-
-/** The pages of a province nearest to a salary, nearest first, lower first on a tie. */
-export function nearbyPages(
-  group: SalaryIndexGroup,
-  salary: string,
-  limit?: number,
-): SalaryPageLink[] {
-  return nearestSteps(
-    salary,
-    group.pages.map((page) => page.salary),
-    limit,
-  ).flatMap((step) => group.pages.filter((page) => page.salary === step));
 }

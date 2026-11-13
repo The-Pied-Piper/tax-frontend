@@ -29,7 +29,7 @@ function showCalculator(index?: SalaryIndex, salary = 82000) {
 
 const aboutEstimate = 'About this estimate';
 const nearby = () =>
-  screen.queryByRole('navigation', { name: strings.salaryIndex.nearby });
+  screen.queryByRole('navigation', { name: 'Nearby salaries' });
 
 describe('App with a salary index: the calculator', () => {
   it('shows the Popular salaries nav with every page, before any calculation', () => {

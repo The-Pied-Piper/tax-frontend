@@ -28,6 +28,8 @@ function dataFor(
     jurisdictionCode: 'CA-ON',
     year: 2026,
     salary,
+    // Only a pre-built page, which carries its links, shows the summary.
+    links: { calculator: '/', previous: null, next: null, others: [] },
   };
 }
 
@@ -144,7 +146,6 @@ describe('the h1 and paragraph of a salary page', () => {
 
   it('follows the answer when the salary is changed in place', async () => {
     const before = pageMeta(dataFor(compute70000, '70000'));
-    const after = pageMeta(dataFor(compute30000, '30000'));
     const client = createApiClient({
       baseUrl: 'https://api.test',
       fetch: (input) => {
@@ -171,17 +172,20 @@ describe('the h1 and paragraph of a salary page', () => {
     );
     await waitFor(() => {
       expect(
-        screen.getByRole('heading', { name: after.heading, level: 1 }),
+        screen.getByRole('heading', { name: strings.title, level: 1 }),
       ).toBeInTheDocument();
     });
     expect(screen.getAllByRole('heading', { level: 1 })).toHaveLength(1);
-    expect(screen.getByText(after.paragraph)).toBeInTheDocument();
     expect(screen.queryByText(before.paragraph)).not.toBeInTheDocument();
+    expect(document.querySelector('.page-summary')).not.toBeInTheDocument();
   });
 });
 
 describe('salary links in the static page and the mounted page (#81)', () => {
-  const base = dataFor(compute70000, '70000');
+  const base: SalaryPageData = {
+    ...dataFor(compute70000, '70000'),
+    links: undefined,
+  };
   const links = salaryLinks('ca-on', ['65000', '70000', '75000'], '70000');
   const withLinks: SalaryPageData = { ...base, links };
 
@@ -239,10 +243,9 @@ describe('salary links in the static page and the mounted page (#81)', () => {
     await user.click(
       screen.getByRole('button', { name: strings.form.calculate }),
     );
-    const after = pageMeta(dataFor(compute30000, '30000'));
     await waitFor(() => {
       expect(
-        screen.getByRole('heading', { name: after.heading, level: 1 }),
+        screen.getByRole('heading', { name: strings.title, level: 1 }),
       ).toBeInTheDocument();
     });
     expect(screen.queryByRole('navigation')).not.toBeInTheDocument();

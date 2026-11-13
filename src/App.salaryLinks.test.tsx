@@ -30,7 +30,7 @@ const sameObjectClient = () => clientAnswering(compute70000);
 const pageLinks = () =>
   screen.queryByRole('navigation', { name: strings.salaryLinks.label });
 const nearby = () =>
-  screen.queryByRole('navigation', { name: strings.salaryIndex.nearby });
+  screen.queryByRole('navigation', { name: 'Nearby salaries' });
 
 async function calculate(salary: string) {
   const user = userEvent.setup();
