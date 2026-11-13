@@ -1,3 +1,4 @@
+import { readUnit } from '../adapters/fallback';
 import type { SalaryPageData } from './useTakeHome';
 
 export const SALARY_PAGE_DATA_ID = 'salary-page-data';
@@ -6,21 +7,11 @@ export function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === 'object' && value !== null && !Array.isArray(value);
 }
 
-export function isUnit(value: unknown): boolean {
-  return (
-    isRecord(value) &&
-    typeof value.name === 'string' &&
-    (value.placement === 'before' || value.placement === 'after') &&
-    typeof value.singular === 'string' &&
-    typeof value.plural === 'string' &&
-    typeof value.spaced === 'boolean' &&
-    typeof value.as_percentage === 'boolean'
-  );
-}
-
 function isRate(value: unknown): boolean {
   return (
-    isRecord(value) && typeof value.amount === 'string' && isUnit(value.unit)
+    isRecord(value) &&
+    typeof value.amount === 'string' &&
+    readUnit(value.unit) !== null
   );
 }
 
@@ -30,7 +21,7 @@ function isResponse(value: unknown): boolean {
     typeof value.salary === 'string' &&
     typeof value.total_deductions === 'string' &&
     typeof value.take_home === 'string' &&
-    isUnit(value.unit) &&
+    readUnit(value.unit) !== null &&
     isRate(value.average_income_tax_rate) &&
     isRate(value.marginal_income_tax_rate)
   );

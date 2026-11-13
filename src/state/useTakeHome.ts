@@ -42,6 +42,8 @@ export type RequestState =
       };
       response: ComputeTakeHomeCalculationResponse;
       adapted: AdaptedResult;
+      /** Links of a pre-built page; set only by the seed, so a new calculation has none. */
+      links?: SalaryPageLinks;
     }
   | { status: 'error'; error: unknown };
 
@@ -112,6 +114,7 @@ function seedFrom(
         },
         response: data.response,
         adapted,
+        links: data.links,
       },
     };
   } catch {
