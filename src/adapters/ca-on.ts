@@ -1,4 +1,5 @@
 import type { ComputeTakeHomeCalculationResponse, Unit } from '../api';
+import { displayMoney } from '../money/format';
 import { isPositive, isZero } from '../money/sign';
 import { sumAmounts } from '../money/sum';
 import { strings } from '../strings';
@@ -90,7 +91,7 @@ function adapt(response: ComputeTakeHomeCalculationResponse): AdaptedResult {
     cpp2Exact = sumAmounts([cpp2.amount]);
     // No premium counted on a real salary: say why, since a pay slip shows one.
     if (isZero(ei.amount) && isPositive(response.salary)) {
-      eiHelp = `${eiHelp} ${strings.adapters.caOn.eiRefundedNote}`;
+      eiHelp = `${eiHelp} ${strings.adapters.caOn.eiRefundedNote(displayMoney(response.salary, 'annually', responseUnit(response)))}`;
     }
   } catch {
     // An amount we cannot add exactly: same rule, show nothing half-right.

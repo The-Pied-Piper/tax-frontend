@@ -338,7 +338,16 @@ describe('Ontario adapter, Employment Insurance help', () => {
   });
 
   it('adds the refund note after the usual text at $1,500', () => {
-    expect(eiHelp(r2026Small)).toBe(`${text.ei.help} ${text.eiRefundedNote}`);
+    expect(eiHelp(r2026Small)).toBe(
+      `${text.ei.help} ${text.eiRefundedNote('CA$1,500.00')}`,
+    );
+  });
+
+  it('names the salary in the exact refund sentence at $1,500', () => {
+    expect(eiHelp(r2026Small)).toBe(
+      `${text.ei.help} On a salary of CA$1,500.00 the premium is refunded when you file, so none is counted in this estimate. A pay slip would still show it withheld during the year, and it comes back at tax time.`,
+    );
+    expect(eiHelp(r2026Small)).not.toContain('this small');
   });
 
   it('keeps exactly the usual text at $70,000 in both years', () => {
@@ -385,19 +394,26 @@ describe('Ontario adapter, Employment Insurance help', () => {
 });
 
 describe('Ontario adapter, refund note text', () => {
-  const note = strings.adapters.caOn.eiRefundedNote;
+  const note = () => strings.adapters.caOn.eiRefundedNote('CA$1,500.00');
 
-  it('is a sentence', () => {
-    expect(note.length).toBeGreaterThan(0);
+  it('is the exact sentence with the salary in it', () => {
+    expect(note()).toBe(
+      'On a salary of CA$1,500.00 the premium is refunded when you file, so none is counted in this estimate. A pay slip would still show it withheld during the year, and it comes back at tax time.',
+    );
+  });
+
+  it('puts whatever salary text it is given into the sentence', () => {
+    expect(strings.adapters.caOn.eiRefundedNote('CA$900.00')).toContain(
+      'On a salary of CA$900.00 the premium',
+    );
+  });
+
+  it('no longer says "this small"', () => {
+    expect(note()).not.toContain('this small');
   });
 
   it('makes no claim of a check or official status', () => {
-    expect(note).not.toMatch(/CRA/i);
-    expect(note).not.toMatch(/official/i);
-  });
-
-  it('carries no dollar sign and no digit, so no figure or rate', () => {
-    expect(note).not.toContain('$');
-    expect(note).not.toMatch(/\d/);
+    expect(note()).not.toMatch(/CRA/i);
+    expect(note()).not.toMatch(/official/i);
   });
 });

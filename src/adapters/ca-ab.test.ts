@@ -324,3 +324,50 @@ describe('Alberta adapter, help text', () => {
     }
   });
 });
+
+describe('Alberta adapter, Employment Insurance refund note', () => {
+  const text = strings.adapters.caAb;
+  const eiHelp = (response: ComputeTakeHomeCalculationResponse) =>
+    caAbAdapter.adapt(response).rows.find((r) => r.id === 'ei')?.help;
+
+  // A $1,500 salary derived from the $70,000 answer: EI line is 0.00.
+  const small: ComputeTakeHomeCalculationResponse = {
+    ...r2026,
+    salary: '1500.00',
+    trace: (r2026.trace ?? []).map((f) => ({
+      ...f,
+      lines: f.lines.map((l) =>
+        l.label === 'ei_premiums_line_88' ? { ...l, amount: '0.00' } : l,
+      ),
+    })),
+  };
+
+  it('adds the refund note naming the salary at $1,500', () => {
+    expect(eiHelp(small)).toBe(
+      `${text.ei.help} ${text.eiRefundedNote('CA$1,500.00')}`,
+    );
+  });
+
+  it('says the exact sentence at $1,500', () => {
+    expect(eiHelp(small)).toBe(
+      `${text.ei.help} On a salary of CA$1,500.00 the premium is refunded when you file, so none is counted in this estimate. A pay slip would still show it withheld during the year, and it comes back at tax time.`,
+    );
+    expect(eiHelp(small)).not.toContain('this small');
+  });
+
+  it('keeps exactly the usual text at $70,000 in both years', () => {
+    expect(eiHelp(r2025)).toBe(text.ei.help);
+    expect(eiHelp(r2026)).toBe(text.ei.help);
+  });
+
+  it('adds no note when the salary is zero', () => {
+    expect(eiHelp({ ...small, salary: '0.00' })).toBe(text.ei.help);
+  });
+
+  it('makes no claim of a check or official status in the note', () => {
+    const note = text.eiRefundedNote('CA$1,500.00');
+    expect(note).not.toMatch(/CRA/i);
+    expect(note).not.toMatch(/official/i);
+    expect(note).not.toContain('this small');
+  });
+});
