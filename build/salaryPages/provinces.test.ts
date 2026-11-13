@@ -40,7 +40,7 @@ describe('salaries', () => {
   });
 
   it('lists the 25 Alberta steps, ends included', () => {
-    const alberta = provinces.find((p) => p.code === 'CA-AB');
+    const [, alberta] = provinces;
     if (!alberta) throw new Error('Alberta is missing from the list');
     const steps = salaries(alberta);
     expect(steps).toHaveLength(25);
