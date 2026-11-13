@@ -22,15 +22,19 @@ import { rewriteSitemap } from './sitemap';
 // Sits beside crawl.test.ts, which keeps the checks on the pages themselves.
 const outDir = tmpDirs('salary-home-crawl');
 
-async function build(withSecond = false, alberta = false) {
+async function build(options: { list?: 'xland' | 'alberta' } = {}) {
   const dir = outDir();
   writeFileSync(join(dir, 'index.html'), template);
   const { written, index } = await generateSalaryPages({
     fetch: fakeFetch(
-      withSecond ? withXland : alberta ? withAlberta : undefined,
+      options.list === 'xland'
+        ? withXland
+        : options.list === 'alberta'
+          ? withAlberta
+          : undefined,
     ),
     baseUrl: apiBaseUrl,
-    provinces: withSecond ? [...provinces, xland] : provinces,
+    provinces: options.list === 'xland' ? [...provinces, xland] : provinces,
     outDir: dir,
     template,
     render: renderSalaryApp,
@@ -77,7 +81,7 @@ describe('crawl from the built home page', () => {
   });
 
   it('lists Ontario then Alberta on the home page, 25 links each, and reaches all 50 pages', async () => {
-    const { dir, written } = await build(false, true);
+    const { dir, written } = await build({ list: 'alberta' });
     expect(written).toHaveLength(50);
     expect(orphans(dir, written)).toEqual([]);
     const home = parse(dir, 'index.html');
@@ -134,7 +138,7 @@ describe('crawl from the built home page', () => {
   });
 
   it('reaches a made-up second province with no other change, and the home page lists it', async () => {
-    const { dir, written } = await build(true);
+    const { dir, written } = await build({ list: 'xland' });
     expect(written).toHaveLength(28);
     expect(orphans(dir, written)).toEqual([]);
     const direct = linksFrom(dir, 'index.html');
