@@ -1,6 +1,8 @@
 import type { ComputeTakeHomeCalculationResponse } from '../api';
 import computeFixture from '../api/fixtures/compute-on-2026-70000.json';
 import jurisdictions from '../api/fixtures/jurisdictions.json';
+import { readUnit } from '../adapters/fallback';
+import { cad } from '../test/units';
 import { parseSalaryPageData, SALARY_PAGE_DATA_ID } from './salaryPageData';
 
 const response = computeFixture as ComputeTakeHomeCalculationResponse;
@@ -190,5 +192,39 @@ describe('parseSalaryPageData links (#81)', () => {
         links: { ...links, others: [{ salary: '1', href: bad }] },
       }),
     ).toBeNull();
+  });
+});
+
+// FOLLOW-UP A (a), expected to FAIL until implemented: the block's unit check
+// is the adapters' readUnit and is not repeated in state/.
+describe('parseSalaryPageData reads the response unit as readUnit does', () => {
+  const withoutSpaced = {
+    name: cad.name,
+    placement: cad.placement,
+    singular: cad.singular,
+    plural: cad.plural,
+    as_percentage: cad.as_percentage,
+  };
+  const withoutAsPercentage = {
+    name: cad.name,
+    placement: cad.placement,
+    singular: cad.singular,
+    plural: cad.plural,
+    spaced: cad.spaced,
+  };
+  const units: [string, unknown][] = [
+    ['a whole unit', cad],
+    ['a unit with an extra unknown field', { ...cad, extra: 'x' }],
+    ['a unit with no spaced', withoutSpaced],
+    ['a unit with no as_percentage', withoutAsPercentage],
+    ['a unit with a wrong placement', { ...cad, placement: 'middle' }],
+    ['a unit with a numeric name', { ...cad, name: 1 }],
+    ['an empty object', {}],
+    ['null', null],
+  ];
+
+  it.each(units)('gives the same verdict for %s', (_name, unit) => {
+    const block = { ...valid, response: { ...response, unit } };
+    expect(parse(block) !== null).toBe(readUnit(unit) !== null);
   });
 });

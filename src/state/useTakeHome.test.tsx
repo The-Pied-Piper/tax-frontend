@@ -86,3 +86,44 @@ describe('useTakeHome with an initial state (a pre-built salary page)', () => {
     expect(listJurisdictions).not.toHaveBeenCalled();
   });
 });
+
+// FOLLOW-UP A (b), expected to FAIL until implemented: the seeded success
+// state carries the page's links, and a new calculation drops them.
+describe('useTakeHome links of a pre-built page', () => {
+  const links = {
+    calculator: '/',
+    previous: { salary: '65000', href: '/ca-on/65000/' },
+    next: { salary: '75000', href: '/ca-on/75000/' },
+    others: [{ salary: '60000', href: '/ca-on/60000/' }],
+  };
+  const withLinks: SalaryPageData = { ...initial, links };
+
+  function linksOf(request: object): unknown {
+    return 'links' in request ? request.links : undefined;
+  }
+
+  it('carries the links of the data in the seeded success state', () => {
+    const { client } = fakeClient();
+    const { result } = renderHook(() =>
+      useTakeHome(client, undefined, withLinks),
+    );
+    expect(result.current.request.status).toBe('success');
+    expect(linksOf(result.current.request)).toEqual(links);
+  });
+
+  it('has no links in the success state after a new calculation', async () => {
+    const { client } = fakeClient();
+    const { result } = renderHook(() =>
+      useTakeHome(client, undefined, withLinks),
+    );
+    act(() => {
+      result.current.setSalary('80000');
+    });
+    await act(async () => {
+      result.current.submit();
+      await Promise.resolve();
+    });
+    expect(result.current.request.status).toBe('success');
+    expect(linksOf(result.current.request)).toBeUndefined();
+  });
+});
