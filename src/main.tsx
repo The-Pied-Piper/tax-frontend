@@ -1,6 +1,7 @@
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import { App } from './App';
+import { readSalaryPageData } from './state/salaryPageData';
 import './styles/fonts.css';
 import './styles/tokens.css';
 import './styles/global.css';
@@ -19,7 +20,7 @@ async function start(root: HTMLElement) {
   }
   createRoot(root).render(
     <StrictMode>
-      <App />
+      <App initial={readSalaryPageData(document)} />
     </StrictMode>,
   );
 }
