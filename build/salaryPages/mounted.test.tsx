@@ -14,10 +14,19 @@ import { renderSalaryApp } from './prerender';
 // The calculator mounted from a page's data block must agree with the static
 // HTML written for that page (section 11: pre-hydration content), and
 // recalculating on it must stay on the same address.
+// A pre-built page carries its links; only such a page shows the summary and
+// the "Take-home pay on" heading.
+const links = {
+  calculator: '/',
+  previous: null,
+  next: null,
+  others: [],
+};
+const withLinks = (data: ReturnType<typeof pageData>) => ({ ...data, links });
 const pages = [
-  { salary: '30000', data: pageData(compute30000, '30000') },
-  { salary: '70000', data: pageData(compute70000, '70000') },
-  { salary: '150000', data: pageData(compute150000, '150000') },
+  { salary: '30000', data: withLinks(pageData(compute30000, '30000')) },
+  { salary: '70000', data: withLinks(pageData(compute70000, '70000')) },
+  { salary: '150000', data: withLinks(pageData(compute150000, '150000')) },
 ];
 
 function staticPage(salary: string): Document {
@@ -117,6 +126,10 @@ describe('the page text before the bundle loads is the text after it mounts (#82
       expect(summary).toBe(
         staticPage(salary).querySelector('.page-summary')?.textContent,
       );
+      const about = Array.from(container.querySelectorAll('h2')).map(
+        (h) => h.textContent,
+      );
+      expect(about).toContain('About this estimate');
     },
   );
 });
@@ -131,7 +144,10 @@ describe('recalculating on a mounted salary page', () => {
     const client = fixtureClient(undefined, compute30000);
     const user = userEvent.setup();
     const { container } = render(
-      <App client={client} initial={pageData(compute70000, '70000')} />,
+      <App
+        client={client}
+        initial={withLinks(pageData(compute70000, '70000'))}
+      />,
     );
     const box = screen.getByRole('textbox', { name: strings.form.salary });
     await user.clear(box);
