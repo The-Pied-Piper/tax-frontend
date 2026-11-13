@@ -18,9 +18,10 @@ export type SalaryPageText = {
  */
 export function salaryPageText(
   response: ComputeTakeHomeCalculationResponse,
-  place: string,
+  rawPlace: string,
   year: number,
 ): SalaryPageText {
+  const place = rawPlace.trim();
   const unit = responseUnit(response);
   const show = (amount: string) => displayMoney(amount, 'annually', unit);
   const salary = show(response.salary);

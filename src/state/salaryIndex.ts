@@ -2,7 +2,8 @@ import type { Unit } from '../adapters';
 import { nearestSteps } from '../money/nearestSteps';
 import { toCents } from '../money/payPeriod';
 import type { SalaryPageLink } from './useTakeHome';
-import { isRecord, isSitePath, isUnit } from './salaryPageData';
+import { readUnit } from '../adapters/fallback';
+import { isRecord, isSitePath } from './salaryPageData';
 
 export const SALARY_INDEX_ID = 'salary-pages-index';
 
@@ -37,7 +38,7 @@ function isGroup(value: unknown): value is SalaryIndexGroup {
     isRecord(value) &&
     typeof value.code === 'string' &&
     typeof value.name === 'string' &&
-    isUnit(value.unit) &&
+    readUnit(value.unit) !== null &&
     Array.isArray(value.pages) &&
     value.pages.every(isPage)
   );

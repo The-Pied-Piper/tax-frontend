@@ -37,8 +37,7 @@ export function App({ client, registry, initial, salaryIndex }: Props) {
   const { request } = page;
   // A pre-built page keeps its own links until another salary is calculated.
   const group =
-    request.status === 'success' &&
-    !(initial?.links && request.response === initial.response)
+    request.status === 'success' && !request.links
       ? salaryIndex?.groups.find(
           (g) => g.code === request.asked.jurisdictionCode,
         )
@@ -96,9 +95,9 @@ export function App({ client, registry, initial, salaryIndex }: Props) {
               <AdvancedView groups={page.request.adapted.advanced} />
             </AnswerCard>
             {text && <p className="page-summary">{text.paragraph}</p>}
-            {initial?.links && page.request.response === initial.response && (
+            {page.request.links && (
               <SalaryLinks
-                links={initial.links}
+                links={page.request.links}
                 unit={page.request.adapted.unit}
               />
             )}

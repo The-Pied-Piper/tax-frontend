@@ -20,6 +20,11 @@ describe('salaryPageText: the text of a page from its own answer', () => {
     }
   });
 
+  it('trims stray spaces from the place name', () => {
+    const clean = salaryPageText(compute70000, 'Ontario', 2026);
+    expect(salaryPageText(compute70000, '  Ontario ', 2026)).toEqual(clean);
+  });
+
   it('puts the take-home in the description, as an estimate', () => {
     const { description } = salaryPageText(compute70000, 'Ontario', 2026);
     expect(description).toContain('53,786.25');
