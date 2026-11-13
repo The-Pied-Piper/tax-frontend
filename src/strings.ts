@@ -103,6 +103,12 @@ export const strings = {
     calculator: 'Back to the calculator',
     others: 'Other salaries',
   },
+  // The list of pre-built pages on the home page, and the nearby list after a result.
+  salaryIndex: {
+    label: 'Popular salaries',
+    nearby: 'Nearby salaries',
+    link: (amount: string, place: string) => `${amount} in ${place}`,
+  },
   notices: {
     provisionalTitle: (year: number) =>
       `${String(year)} figures are provisional.`,

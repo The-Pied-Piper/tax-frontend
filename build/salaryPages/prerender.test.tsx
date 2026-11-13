@@ -1,6 +1,7 @@
 import { render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { renderSalaryApp } from './prerender';
+import { renderSalaryApp, renderSalaryIndexNav } from './prerender';
+import { ontarioIndex } from '../../src/test/salaryIndexData';
 import { pageMeta } from './pageMeta';
 import { salaryLinks } from './links';
 import { App } from '../../src/App';
@@ -248,5 +249,13 @@ describe('salary links in the static page and the mounted page (#81)', () => {
     expect(
       screen.queryByRole('link', { name: strings.salaryLinks.calculator }),
     ).not.toBeInTheDocument();
+  });
+});
+
+describe('renderSalaryIndexNav (the static nav of the home page)', () => {
+  it('is the real Popular salaries nav as a string, with a plain link to every page', () => {
+    document.body.innerHTML = renderSalaryIndexNav(ontarioIndex);
+    const nav = screen.getByRole('navigation', { name: 'Popular salaries' });
+    expect(within(nav).getAllByRole('link')).toHaveLength(25);
   });
 });

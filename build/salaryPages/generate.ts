@@ -7,8 +7,10 @@ import {
   type ListJurisdictionsResponse,
 } from '../../src/api';
 import { languageCode } from '../../src/strings';
+import type { SalaryIndex } from '../../src/state/salaryIndex';
 import type { SalaryPageData } from '../../src/state/useTakeHome';
-import { pageUrl } from './address';
+import { pagePath, pageUrl } from './address';
+import { indexBlock } from './indexBlock';
 import { buildPageHtml } from './pageHtml';
 import { pageMeta } from './pageMeta';
 import { DESCRIPTION_LIMIT, TITLE_LIMIT } from './limits';
@@ -33,6 +35,8 @@ export type GenerateResult = {
   written: string[];
   /** Listed provinces the API did not return, so got no pages. */
   skipped: string[];
+  /** The links to every page written, by province: the one list the site's links come from. */
+  index: SalaryIndex;
 };
 
 function reason(error: unknown): string {
@@ -59,6 +63,7 @@ export async function generateSalaryPages(
 
   const pages: { path: string; html: string }[] = [];
   const skipped: string[] = [];
+  const index: SalaryIndex = { groups: [] };
   for (const province of provinces) {
     if (!list.jurisdictions.some((j) => j.code === province.code)) {
       skipped.push(province.code);
@@ -83,6 +88,20 @@ export async function generateSalaryPages(
           cause: error,
         });
       }
+    }
+    const [first] = responses;
+    if (first) {
+      index.groups.push({
+        code: province.code,
+        name:
+          list.jurisdictions.find((j) => j.code === province.code)?.name ??
+          province.code,
+        unit: first.unit,
+        pages: steps.map((salary) => ({
+          salary,
+          href: pagePath(province.slug, salary),
+        })),
+      });
     }
     // Links go only to the pages of this province that are about to be written.
     steps.forEach((salary, index) => {
@@ -122,10 +141,14 @@ export async function generateSalaryPages(
     });
   }
   // Everything was fetched and rendered; only now is anything written.
+  const block = indexBlock(index);
   for (const { path, html } of pages) {
     const file = join(outDir, path);
     await mkdir(dirname(file), { recursive: true });
-    await writeFile(file, html);
+    await writeFile(
+      file,
+      html.replace('</body>', () => `${block}\n  </body>`),
+    );
   }
-  return { written: pages.map((p) => p.path), skipped };
+  return { written: pages.map((p) => p.path), skipped, index };
 }

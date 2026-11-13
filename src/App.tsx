@@ -6,9 +6,11 @@ import { Breakdown } from './components/Breakdown';
 import { ErrorNotice } from './components/ErrorNotice';
 import { ProvisionalNotice } from './components/ProvisionalNotice';
 import { SalaryForm } from './components/SalaryForm';
+import { SalaryIndexNav, NearbySalaries } from './components/SalaryIndexNav';
 import { SalaryLinks } from './components/SalaryLinks';
 import { StarLink } from './components/StarLink';
 import { ThemeToggle } from './components/ThemeToggle';
+import type { SalaryIndex } from './state/salaryIndex';
 import { salaryPageText } from './state/salaryPageText';
 import { useTakeHome, type SalaryPageData } from './state/useTakeHome';
 import { strings } from './strings';
@@ -17,9 +19,11 @@ type Props = {
   client?: ApiClient;
   registry?: AdapterRegistry;
   initial?: SalaryPageData;
+  /** Every pre-built salary page; none in a plain build. */
+  salaryIndex?: SalaryIndex;
 };
 
-export function App({ client, registry, initial }: Props) {
+export function App({ client, registry, initial, salaryIndex }: Props) {
   const page = useTakeHome(client, registry, initial);
   const text =
     page.request.status === 'success'
@@ -29,6 +33,12 @@ export function App({ client, registry, initial }: Props) {
           page.request.asked.year,
         )
       : null;
+  const answer = page.request.status === 'success' ? page.request : null;
+  const group = answer
+    ? salaryIndex?.groups.find((g) => g.code === answer.jurisdictionCode)
+    : undefined;
+  // A pre-built page keeps its own links until another salary is calculated.
+  const seeded = answer !== null && answer.response === initial?.response;
   return (
     <>
       <main>
@@ -82,15 +92,22 @@ export function App({ client, registry, initial }: Props) {
               <AdvancedView groups={page.request.adapted.advanced} />
             </AnswerCard>
             {text && <p className="page-summary">{text.paragraph}</p>}
-            {initial?.links && page.request.response === initial.response && (
+            {initial?.links && seeded && (
               <SalaryLinks
                 links={initial.links}
                 unit={page.request.adapted.unit}
               />
             )}
+            {group && !seeded && (
+              <NearbySalaries
+                group={group}
+                salary={page.request.response.salary}
+              />
+            )}
           </>
         )}
         <StarLink />
+        {salaryIndex && !initial && <SalaryIndexNav index={salaryIndex} />}
       </main>
       <footer className="page-footer">{strings.footer}</footer>
     </>

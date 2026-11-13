@@ -2,11 +2,11 @@ import type { SalaryPageData } from './useTakeHome';
 
 export const SALARY_PAGE_DATA_ID = 'salary-page-data';
 
-function isRecord(value: unknown): value is Record<string, unknown> {
+export function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === 'object' && value !== null && !Array.isArray(value);
 }
 
-function isUnit(value: unknown): boolean {
+export function isUnit(value: unknown): boolean {
   return (
     isRecord(value) &&
     typeof value.name === 'string' &&
@@ -47,8 +47,8 @@ function isJurisdiction(value: unknown): boolean {
 }
 
 /** A path on this site: one leading slash, not a protocol-relative or outside address. */
-function isSitePath(value: unknown): boolean {
-  return typeof value === 'string' && /^\/(?!\/)/.test(value);
+export function isSitePath(value: unknown): boolean {
+  return typeof value === 'string' && /^\/(?![/\\])/.test(value);
 }
 
 function isLink(value: unknown): boolean {

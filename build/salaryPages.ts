@@ -7,12 +7,23 @@ import react from '@vitejs/plugin-react';
 import { normalizeSiteUrl } from './seo';
 import { generateSalaryPages } from './salaryPages/generate';
 import { provinces } from './salaryPages/provinces';
+import { rewriteHome } from './salaryPages/home';
 import { rewriteSitemap } from './salaryPages/sitemap';
+import type { SalaryIndex } from '../src/state/salaryIndex';
 import type { SalaryPageData } from '../src/state/useTakeHome';
 
-type Prerender = { renderSalaryApp: (data: SalaryPageData) => string };
+type Prerender = {
+  renderSalaryApp: (data: SalaryPageData) => string;
+  renderSalaryIndexNav: (index: SalaryIndex) => string;
+};
 
-function isRenderer(value: unknown): value is Prerender['renderSalaryApp'] {
+function isAppRenderer(value: unknown): value is Prerender['renderSalaryApp'] {
+  return typeof value === 'function';
+}
+
+function isNavRenderer(
+  value: unknown,
+): value is Prerender['renderSalaryIndexNav'] {
   return typeof value === 'function';
 }
 
@@ -38,11 +49,18 @@ async function loadRenderer(tempDir: string): Promise<Prerender> {
     typeof loaded === 'object' &&
     loaded !== null &&
     'renderSalaryApp' in loaded &&
-    isRenderer(loaded.renderSalaryApp)
+    isAppRenderer(loaded.renderSalaryApp) &&
+    'renderSalaryIndexNav' in loaded &&
+    isNavRenderer(loaded.renderSalaryIndexNav)
   ) {
-    return { renderSalaryApp: loaded.renderSalaryApp };
+    return {
+      renderSalaryApp: loaded.renderSalaryApp,
+      renderSalaryIndexNav: loaded.renderSalaryIndexNav,
+    };
   }
-  throw new Error('The prerender build did not export renderSalaryApp');
+  throw new Error(
+    'The prerender build did not export renderSalaryApp and renderSalaryIndexNav',
+  );
 }
 
 /**
@@ -67,9 +85,10 @@ export function salaryPages(
       const outDir = resolve('dist');
       const tempDir = await mkdtemp(join(tmpdir(), 'salary-pages-ssr-'));
       try {
-        const { renderSalaryApp } = await loadRenderer(tempDir);
+        const { renderSalaryApp, renderSalaryIndexNav } =
+          await loadRenderer(tempDir);
         const template = await readFile(join(outDir, 'index.html'), 'utf8');
-        const { written, skipped } = await generateSalaryPages({
+        const { written, skipped, index } = await generateSalaryPages({
           fetch,
           baseUrl,
           provinces,
@@ -79,6 +98,7 @@ export function salaryPages(
           siteUrl,
         });
         await rewriteSitemap(outDir, siteUrl, written);
+        await rewriteHome(outDir, index, renderSalaryIndexNav);
         console.log(`Salary pages: wrote ${written.length.toString()}`);
         for (const code of skipped) {
           console.log(`Salary pages: ${code} not returned by the API, skipped`);
