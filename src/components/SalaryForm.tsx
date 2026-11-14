@@ -104,6 +104,11 @@ export function SalaryForm({
       noValidate
       aria-busy={placesLoading || undefined}
     >
+      {placesLoading && (
+        <span role="status" className={styles.visuallyHidden}>
+          {strings.form.loadingPlaces}
+        </span>
+      )}
       <div className={styles.field}>
         <label htmlFor={placeId}>{strings.form.place}</label>
         <select

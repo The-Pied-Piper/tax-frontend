@@ -47,7 +47,10 @@ describe('SalaryForm while the places load', () => {
     const form = container.querySelector('form');
     expect(form).not.toBeNull();
     expect(form).toHaveAttribute('aria-busy', 'true');
-    expect(screen.queryByRole('status')).not.toBeInTheDocument();
+    const status = screen.getByRole('status');
+    expect(status).toHaveTextContent(strings.form.loadingPlaces);
+    expect(form).toContainElement(status);
+    expect(screen.getAllByRole('status')).toHaveLength(1);
   });
 
   it('shows the place select disabled with only the loading option', () => {
@@ -91,6 +94,7 @@ describe('SalaryForm once the places are loaded', () => {
   it('is not busy and its controls work', () => {
     const { container } = setup(ready);
     expect(container.querySelector('form')).not.toHaveAttribute('aria-busy');
+    expect(screen.queryByRole('status')).not.toBeInTheDocument();
     const place = screen.getByRole('combobox', { name: strings.form.place });
     expect(place).toBeEnabled();
     expect(place).toHaveValue('CA-ON');
@@ -113,5 +117,6 @@ describe('SalaryForm when the places failed', () => {
       strings.form.placesFailed,
     );
     expect(container.querySelector('form')).toBeNull();
+    expect(screen.queryByRole('status')).not.toBeInTheDocument();
   });
 });

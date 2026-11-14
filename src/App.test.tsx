@@ -40,10 +40,14 @@ describe('App form', () => {
     expect(place).toBeDisabled();
     expect(place.closest('form')).toHaveAttribute('aria-busy', 'true');
     expect(place).toHaveDisplayValue(strings.form.loadingPlaces);
-    expect(screen.queryByRole('status')).not.toBeInTheDocument();
+    const status = screen.getByRole('status');
+    expect(status).toHaveTextContent(strings.form.loadingPlaces);
+    expect(place.closest('form')).toContainElement(status);
+    expect(screen.getAllByRole('status')).toHaveLength(1);
     await waitFor(() => {
       expect(place).toBeEnabled();
     });
+    expect(screen.queryByRole('status')).not.toBeInTheDocument();
     expect(place.closest('form')).not.toHaveAttribute('aria-busy');
   });
 
