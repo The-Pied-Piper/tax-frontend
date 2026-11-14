@@ -30,7 +30,7 @@ jobs:
       contents: read
       id-token: write
     env:
-      # The dev API, set at build time (see README, "API client"). VITE_SITE_URL stays
+      # The dev API, set at build time (see DEVELOPMENT.md, "API client"). VITE_SITE_URL stays
       # unset: dev has no canonical address and no sitemap. (Search engines are kept away by
       # the X-Robots-Tag header that tax-infra's site sends for dev, not by this build.)
       VITE_API_BASE_URL: https://api-dev.aftertaxlens.com/api/v1

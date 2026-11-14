@@ -28,7 +28,7 @@ jobs:
     permissions:
       contents: read
     env:
-      # The prod API and the public address, set at build time (see README, "API client").
+      # The prod API and the public address, set at build time (see DEVELOPMENT.md, "API client").
       VITE_API_BASE_URL: https://api.aftertaxlens.com/api/v1
       VITE_SITE_URL: https://aftertaxlens.com
     steps:
