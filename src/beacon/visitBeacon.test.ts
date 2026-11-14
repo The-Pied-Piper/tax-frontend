@@ -14,6 +14,7 @@ describe('sendVisitBeacon', () => {
   afterEach(() => {
     vi.useRealTimers();
     vi.unstubAllGlobals();
+    vi.restoreAllMocks();
   });
 
   it('asks for the tiny file once, with only the page kind in the query', () => {
@@ -44,7 +45,8 @@ describe('sendVisitBeacon', () => {
     fetchMock.mockRejectedValueOnce(new Error('offline'));
     sendVisitBeacon('home');
     vi.runAllTimers();
-    await vi.runAllTimersAsync();
+    await Promise.resolve();
+    expect(fetchMock).toHaveBeenCalledTimes(1);
     fetchMock.mockImplementationOnce(() => {
       throw new Error('blocked');
     });
@@ -52,5 +54,6 @@ describe('sendVisitBeacon', () => {
       sendVisitBeacon('home');
       vi.runAllTimers();
     }).not.toThrow();
+    expect(fetchMock).toHaveBeenCalledTimes(2);
   });
 });
