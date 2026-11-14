@@ -1,6 +1,7 @@
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import { App } from './App';
+import { sendVisitBeacon } from './beacon/visitBeacon';
 import {
   parseSalaryPageData,
   SALARY_PAGE_DATA_ID,
@@ -36,6 +37,7 @@ async function start(root: HTMLElement) {
       />
     </StrictMode>,
   );
+  sendVisitBeacon(initial ? 'salary' : 'home');
 }
 
 void start(root);
