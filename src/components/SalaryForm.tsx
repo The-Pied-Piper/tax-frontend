@@ -72,13 +72,6 @@ export function SalaryForm({
     caretCount.current = null;
   });
 
-  if (jurisdictionsState.status === 'loading') {
-    return (
-      <p role="status" className={styles.panel}>
-        {strings.form.loadingPlaces}
-      </p>
-    );
-  }
   if (jurisdictionsState.status === 'failed') {
     return (
       <p role="alert" className={styles.panel}>
@@ -87,9 +80,15 @@ export function SalaryForm({
     );
   }
 
-  const { jurisdictions } = jurisdictionsState;
-  const years =
-    jurisdictions.find((j) => j.code === values.jurisdictionCode)?.years ?? [];
+  // While the places load the same form is drawn with its choices disabled,
+  // so the page does not change height when they arrive.
+  const placesLoading = jurisdictionsState.status === 'loading';
+  const places = placesLoading ? [] : jurisdictionsState.places;
+  const years = placesLoading
+    ? []
+    : (jurisdictionsState.jurisdictions.find(
+        (j) => j.code === values.jurisdictionCode,
+      )?.years ?? []);
   const salaryMessage =
     salaryCheck === 'ok' ? salaryProblem : SALARY_MESSAGES[salaryCheck];
 
@@ -99,17 +98,26 @@ export function SalaryForm({
   }
 
   return (
-    <form className={styles.form} onSubmit={handleSubmit} noValidate>
+    <form
+      className={styles.form}
+      onSubmit={handleSubmit}
+      noValidate
+      aria-busy={placesLoading || undefined}
+    >
       <div className={styles.field}>
         <label htmlFor={placeId}>{strings.form.place}</label>
         <select
           id={placeId}
-          value={values.jurisdictionCode}
+          value={placesLoading ? '' : values.jurisdictionCode}
+          disabled={placesLoading}
           onChange={(e) => {
             onJurisdictionChange(e.target.value);
           }}
         >
-          {jurisdictionsState.places.map((p) => (
+          {placesLoading && (
+            <option value="">{strings.form.loadingPlaces}</option>
+          )}
+          {places.map((p) => (
             <option key={p.code} value={p.code} disabled={!p.supported}>
               {p.supported ? p.name : `${p.name} (${strings.form.comingSoon})`}
             </option>
@@ -120,6 +128,7 @@ export function SalaryForm({
         <label htmlFor={yearId}>{strings.form.year}</label>
         <select
           id={yearId}
+          disabled={placesLoading}
           value={values.year ?? ''}
           onChange={(e) => {
             const chosen = years.find((y) => String(y.year) === e.target.value);
@@ -193,7 +202,7 @@ export function SalaryForm({
       <button
         type="submit"
         className={styles.primary}
-        disabled={loading || !canSubmit}
+        disabled={placesLoading || loading || !canSubmit}
       >
         {loading ? strings.form.calculating : strings.form.calculate}
       </button>

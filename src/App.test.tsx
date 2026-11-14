@@ -34,6 +34,19 @@ describe('App form', () => {
     expect(screen.getByRole('contentinfo')).toHaveTextContent(strings.footer);
   });
 
+  it('shows the whole form, busy, until the places arrive', async () => {
+    render(<App client={fixtureClient()} />);
+    const place = screen.getByRole('combobox', { name: strings.form.place });
+    expect(place).toBeDisabled();
+    expect(place.closest('form')).toHaveAttribute('aria-busy', 'true');
+    expect(place).toHaveDisplayValue(strings.form.loadingPlaces);
+    expect(screen.queryByRole('status')).not.toBeInTheDocument();
+    await waitFor(() => {
+      expect(place).toBeEnabled();
+    });
+    expect(place.closest('form')).not.toHaveAttribute('aria-busy');
+  });
+
   it('fills places and years from the API', async () => {
     render(<App client={fixtureClient()} />);
     const place = await screen.findByRole('combobox', {
