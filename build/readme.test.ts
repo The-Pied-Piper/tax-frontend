@@ -30,10 +30,13 @@ describe('README.md (the front door for strangers)', () => {
     expect(opening).toContain('https://aftertaxlens.com');
   });
 
-  it('opens with the demo image, which is under 1 MB', () => {
-    expect(opening).toContain('readme/demo.gif');
-    expect(existsSync('readme/demo.gif'), 'readme/demo.gif exists').toBe(true);
-    expect(statSync('readme/demo.gif').size).toBeLessThan(1024 * 1024);
+  it('opens with the breakdown screenshot, which is under 1 MB', () => {
+    expect(opening).toContain('readme/breakdown.png');
+    expect(
+      existsSync('readme/breakdown.png'),
+      'readme/breakdown.png exists',
+    ).toBe(true);
+    expect(statSync('readme/breakdown.png').size).toBeLessThan(1024 * 1024);
   });
 
   it('opens with a CI badge for the ci.yml workflow', () => {

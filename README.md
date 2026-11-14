@@ -8,7 +8,7 @@ It is for anyone in Canada who wants to understand their pay and not only see a 
 
 **Try it: [aftertaxlens.com](https://aftertaxlens.com)**
 
-![Entering $70,000 and opening the breakdown on aftertaxlens.com](readme/demo.gif)
+![The breakdown for a $70,000 salary in Ontario on aftertaxlens.com](readme/breakdown.png)
 
 For example, $70,000 in Ontario for 2025 comes to CA$53,468.68 after the Canada Pension Plan, Employment Insurance and income tax.
 
