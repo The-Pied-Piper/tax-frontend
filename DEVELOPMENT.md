@@ -18,7 +18,7 @@ Everything needed to run, change and deploy the site.
 
 ## API client
 
-`api/openapi.yml` is a copy of the spec tax-service publishes (`openapi/openapi.yml` on its main). Types in `src/api/generated/` are generated from it and committed; CI fails if they are stale, or if the copy differs from tax-service's current spec (run `npm run api:sync` to update both). The drift check runs on every push to main, daily, and on pull requests. The check reads tax-service's spec through the repository secret `TAX_SERVICE_READ_TOKEN` (read-only contents access); pull requests that cannot see the secret, such as those from forks and Dependabot, skip the check with a warning, while pushes to main and the daily run fail without it. Never edit either by hand.
+`api/openapi.yml` is a copy of the spec tax-service publishes (`openapi/openapi.yml` on its main). Types in `src/api/generated/` are generated from it and committed; CI fails if they are stale, or if the copy differs from tax-service's current spec (run `npm run api:sync` to update both). The drift check runs on every push to main, daily, and on every pull request, including from forks. It fetches tax-service's published spec without a token and fails if the download fails or the files differ. Never edit either by hand.
 
 `src/api/client.ts` is a thin hand-written client for the two endpoints: `listJurisdictions` and `computeTakeHomeCalculation`. Money stays a decimal string everywhere. Errors throw `ApiError` (with the RFC 9457 problem body) or `NetworkError`.
 

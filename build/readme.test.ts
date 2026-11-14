@@ -82,8 +82,11 @@ describe('DEVELOPMENT.md (the working detail)', () => {
     }
   });
 
-  it('says the drift check uses TAX_SERVICE_READ_TOKEN', () => {
-    expect(read('DEVELOPMENT.md')).toContain('TAX_SERVICE_READ_TOKEN');
+  it('does not name TAX_SERVICE_READ_TOKEN and says the drift check runs on every pull request, including from forks', () => {
+    const text = read('DEVELOPMENT.md');
+    expect(text).not.toContain('TAX_SERVICE_READ_TOKEN');
+    expect(text).toContain('every pull request');
+    expect(text).toContain('forks');
   });
 });
 
