@@ -23,9 +23,6 @@ export default defineConfig(({ mode }) => {
       environment: 'jsdom',
       globals: true,
       setupFiles: ['./src/setupTests.ts'],
-      // Each pre-built page now carries the advanced lines, so the tests that
-      // write and parse many pages take longer than the 5 s default on CI.
-      testTimeout: 20000,
     },
   };
 });

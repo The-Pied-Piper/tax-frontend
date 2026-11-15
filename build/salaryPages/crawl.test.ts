@@ -22,6 +22,10 @@ import { provinces } from './provinces';
 import { renderSalaryApp } from './prerender';
 import { rewriteSitemap } from './sitemap';
 
+// Each page carries the advanced lines, so building and parsing many pages
+// outlasts the 5 s default when the whole suite runs in parallel.
+const SLOW_TEST_MS = 20_000;
+
 // One integration home for the written output folder: every link resolves,
 // every canonical is its sitemap entry, and a second province needs no change.
 const outDir = tmpDirs('salary-crawl');
@@ -50,33 +54,44 @@ async function build(options: { list?: 'xland' | 'alberta' } = {}) {
 }
 
 describe('crawl of a generated output folder', () => {
-  it('resolves every internal link on every page to a written file', async () => {
-    const { dir, written } = await build();
-    const links = internalLinks(dir, written);
-    expect(links.length).toBeGreaterThan(written.length * 3);
-    for (const { file, target } of links) {
-      expect(existsSync(join(dir, target)), `${file} -> ${target}`).toBe(true);
-    }
-  });
+  it(
+    'resolves every internal link on every page to a written file',
+    async () => {
+      const { dir, written } = await build();
+      const links = internalLinks(dir, written);
+      expect(links.length).toBeGreaterThan(written.length * 3);
+      for (const { file, target } of links) {
+        expect(existsSync(join(dir, target)), `${file} -> ${target}`).toBe(
+          true,
+        );
+      }
+    },
+    SLOW_TEST_MS,
+  );
 
-  it('has the calculator link and the neighbours of the data block on every page', async () => {
-    const { dir, written } = await build();
-    for (const file of written) {
-      const hrefs = navHrefs(dir, file);
-      expect(hrefs, file).toContain('/');
-      const data = JSON.parse(
-        parse(dir, file).getElementById('salary-page-data')?.textContent ?? '',
-      ) as {
-        links: {
-          previous: { href: string } | null;
-          next: { href: string } | null;
+  it(
+    'has the calculator link and the neighbours of the data block on every page',
+    async () => {
+      const { dir, written } = await build();
+      for (const file of written) {
+        const hrefs = navHrefs(dir, file);
+        expect(hrefs, file).toContain('/');
+        const data = JSON.parse(
+          parse(dir, file).getElementById('salary-page-data')?.textContent ??
+            '',
+        ) as {
+          links: {
+            previous: { href: string } | null;
+            next: { href: string } | null;
+          };
         };
-      };
-      if (data.links.previous)
-        expect(hrefs).toContain(data.links.previous.href);
-      if (data.links.next) expect(hrefs).toContain(data.links.next.href);
-    }
-  });
+        if (data.links.previous)
+          expect(hrefs).toContain(data.links.previous.href);
+        if (data.links.next) expect(hrefs).toContain(data.links.next.href);
+      }
+    },
+    SLOW_TEST_MS,
+  );
 
   it('lists in the sitemap exactly the calculator and the pages on disk', async () => {
     const { dir, written } = await build();
@@ -107,16 +122,22 @@ describe('crawl of a generated output folder', () => {
     }
   });
 
-  it('lists all 50 pages in the sitemap, Ontario then Alberta, and every link resolves', async () => {
-    const { dir, written } = await build({ list: 'alberta' });
-    expect(written).toHaveLength(50);
-    expect(sitemapLocs(dir)).toHaveLength(51);
-    expect(sitemapLocs(dir)).toContain(`${site}/ca-ab/30000/`);
-    expect(sitemapLocs(dir)).toContain(`${site}/ca-ab/150000/`);
-    for (const { file, target } of internalLinks(dir, written)) {
-      expect(existsSync(join(dir, target)), `${file} -> ${target}`).toBe(true);
-    }
-  });
+  it(
+    'lists all 50 pages in the sitemap, Ontario then Alberta, and every link resolves',
+    async () => {
+      const { dir, written } = await build({ list: 'alberta' });
+      expect(written).toHaveLength(50);
+      expect(sitemapLocs(dir)).toHaveLength(51);
+      expect(sitemapLocs(dir)).toContain(`${site}/ca-ab/30000/`);
+      expect(sitemapLocs(dir)).toContain(`${site}/ca-ab/150000/`);
+      for (const { file, target } of internalLinks(dir, written)) {
+        expect(existsSync(join(dir, target)), `${file} -> ${target}`).toBe(
+          true,
+        );
+      }
+    },
+    SLOW_TEST_MS,
+  );
 
   it('gives each Alberta page its own title, naming Alberta', async () => {
     const { dir } = await build({ list: 'alberta' });
