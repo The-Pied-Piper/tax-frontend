@@ -59,13 +59,11 @@ const groups: AdvancedGroup[] = [
 ];
 
 function section() {
-  return screen.getByRole('group', { name: strings.advanced.heading });
+  return screen.getByRole('group', { name: strings.advanced.toggle });
 }
 
 function open() {
-  return userEvent.click(
-    screen.getByRole('checkbox', { name: strings.advanced.toggle }),
-  );
+  return userEvent.click(screen.getByText(strings.advanced.toggle));
 }
 
 function form(name: string) {
@@ -73,31 +71,44 @@ function form(name: string) {
 }
 
 describe('AdvancedView', () => {
-  it('is off by default and shows no forms', () => {
+  it('is a real details fold, closed by default, with every form already in the DOM', () => {
     render(<AdvancedView groups={groups} />);
-    expect(
-      screen.getByRole('checkbox', { name: strings.advanced.toggle }),
-    ).not.toBeChecked();
-    expect(screen.queryByText(strings.advanced.note)).not.toBeInTheDocument();
-    expect(screen.queryByText('ca/schedule_8')).not.toBeInTheDocument();
+    const fold = section();
+    expect(fold.tagName).toBe('DETAILS');
+    expect(fold).not.toHaveAttribute('open');
+    expect(fold.querySelector('summary')).toHaveTextContent(
+      strings.advanced.toggle,
+    );
+    expect(within(fold).getByText(strings.advanced.note)).toBeInTheDocument();
+    expect(within(fold).getByText('ca/schedule_8')).toBeInTheDocument();
+    expect(within(fold).getByText('cpp basic exemption')).toBeInTheDocument();
+    expect(within(fold).getByText('ca/schedule_8')).not.toBeVisible();
   });
 
-  it('can be switched on from the keyboard', async () => {
+  it('has no checkbox and hides nothing with display:none or the hidden attribute', () => {
+    const { container } = render(<AdvancedView groups={groups} />);
+    expect(screen.queryByRole('checkbox')).not.toBeInTheDocument();
+    expect(container.querySelector('[hidden]')).toBeNull();
+    expect(container.querySelector('[style]')).toBeNull();
+  });
+
+  it('can be opened from the keyboard', async () => {
     render(<AdvancedView groups={groups} />);
     await userEvent.tab();
-    const box = screen.getByRole('checkbox', { name: strings.advanced.toggle });
-    expect(box).toHaveFocus();
-    await userEvent.keyboard(' ');
-    expect(box).toBeChecked();
+    const summary = section().querySelector('summary');
+    expect(summary).toHaveFocus();
+    await userEvent.keyboard('{Enter}');
+    expect(section()).toHaveAttribute('open');
     expect(within(section()).getByText('ca/schedule_8')).toBeVisible();
   });
 
-  it('shows the yearly note and hides the forms again when switched off', async () => {
+  it('shows the yearly note once opened and hides it again when closed', async () => {
     render(<AdvancedView groups={groups} />);
+    expect(screen.getByText(strings.advanced.note)).not.toBeVisible();
     await open();
     expect(screen.getByText(strings.advanced.note)).toBeVisible();
-    await userEvent.click(screen.getByRole('checkbox'));
-    expect(screen.queryByText('ca/schedule_8')).not.toBeInTheDocument();
+    await open();
+    expect(screen.getByText('ca/schedule_8')).not.toBeVisible();
   });
 
   it('lists every form with its line count once opened', async () => {

@@ -726,11 +726,9 @@ describe('App advanced view', () => {
   it('is folded under the answer and lists every form from the trace', async () => {
     const user = await calculate();
     expect(
-      screen.getByRole('checkbox', { name: strings.advanced.toggle }),
-    ).not.toBeChecked();
-    await user.click(
-      screen.getByRole('checkbox', { name: strings.advanced.toggle }),
-    );
+      screen.getByRole('group', { name: strings.advanced.toggle }),
+    ).not.toHaveAttribute('open');
+    await user.click(screen.getByText(strings.advanced.toggle));
     for (const form of compute2025.trace) {
       expect(screen.getByText(form.name)).toBeVisible();
     }
@@ -738,9 +736,7 @@ describe('App advanced view', () => {
 
   it('puts every numbered trace line in the page once all forms are opened', async () => {
     const user = await calculate();
-    await user.click(
-      screen.getByRole('checkbox', { name: strings.advanced.toggle }),
-    );
+    await user.click(screen.getByText(strings.advanced.toggle));
     const numbered = compute2025.trace
       .map((form) => ({
         ...form,
@@ -751,7 +747,7 @@ describe('App advanced view', () => {
       await user.click(screen.getByText(form.name));
     }
     const lines = within(
-      screen.getByRole('group', { name: strings.advanced.heading }),
+      screen.getByRole('group', { name: strings.advanced.toggle }),
     ).getAllByRole('term');
     const expected = numbered.reduce(
       (count, form) => count + form.lines.length,
@@ -768,9 +764,7 @@ describe('App advanced view', () => {
 
   it('shows the yearly figures from the engine whatever the pay period', async () => {
     const user = await calculate(strings.payPeriod.monthly);
-    await user.click(
-      screen.getByRole('checkbox', { name: strings.advanced.toggle }),
-    );
+    await user.click(screen.getByText(strings.advanced.toggle));
     await user.click(screen.getByText('Return summary'));
     const form = screen.getByText('Return summary').closest('details');
     expect(form).not.toBeNull();
