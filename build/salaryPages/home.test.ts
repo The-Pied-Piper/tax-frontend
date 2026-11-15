@@ -3,7 +3,7 @@ import { join } from 'node:path';
 import { render, screen } from '@testing-library/react';
 import { createElement } from 'react';
 import { SalaryIndexNav } from '../../src/components/SalaryIndexNav';
-import { displayMoney } from '../../src/money/format';
+import { displayWholeMoney } from '../../src/money/format';
 import { parseSalaryIndex, SALARY_INDEX_ID } from '../../src/state/salaryIndex';
 import { strings } from '../../src/strings';
 import { tmpDirs, template } from '../../src/test/generatedSite';
@@ -83,7 +83,7 @@ describe('rewriteHome (dist/index.html)', () => {
     const first = nav.querySelector('a[href="/ca-on/75000/"]');
     expect(first?.textContent).toBe(
       strings.salaryIndex.link(
-        displayMoney('75000', 'annually', indexUnit),
+        displayWholeMoney('75000', 'annually', indexUnit),
         'Ontario',
       ),
     );

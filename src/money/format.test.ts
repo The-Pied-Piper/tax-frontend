@@ -30,8 +30,8 @@ describe('groupThousands', () => {
 
 describe('withUnit', () => {
   it('puts a symbol before the amount with no space', () => {
-    expect(withUnit('3,956.75', cad)).toBe('CA$3,956.75');
-    expect(withUnit('53,468.68', cad)).toBe('CA$53,468.68');
+    expect(withUnit('3,956.75', cad)).toBe('$3,956.75');
+    expect(withUnit('53,468.68', cad)).toBe('$53,468.68');
   });
 
   it('puts the unit after the amount with one space', () => {
@@ -40,8 +40,8 @@ describe('withUnit', () => {
   });
 
   it('keeps a minus sign first, in front of a symbol', () => {
-    expect(withUnit('-1,028.24', cad)).toBe('-CA$1,028.24');
-    expect(withUnit('-1,000.00', cad)).toBe('-CA$1,000.00');
+    expect(withUnit('-1,028.24', cad)).toBe('-$1,028.24');
+    expect(withUnit('-1,000.00', cad)).toBe('-$1,000.00');
   });
 
   it('keeps a minus sign first when the unit goes after', () => {
@@ -82,14 +82,14 @@ describe('withUnit', () => {
 
 describe('displayMoney', () => {
   it('puts the unit in front of the grouped amount', () => {
-    expect(displayMoney('53468.68', 'annually', cad)).toBe('CA$53,468.68');
-    expect(displayMoney('53468.68', 'monthly', cad)).toBe('CA$4,455.72');
+    expect(displayMoney('53468.68', 'annually', cad)).toBe('$53,468.68');
+    expect(displayMoney('53468.68', 'monthly', cad)).toBe('$4,455.72');
   });
 
   it('keeps the unit of the yearly figure for every pay period', () => {
-    expect(displayMoney('53468.68', 'biweekly', cad)).toBe('CA$2,056.49');
-    expect(displayMoney('53468.68', 'weekly', cad)).toBe('CA$1,028.24');
-    expect(displayMoney('70000.00', 'monthly', cad)).toBe('CA$5,833.33');
+    expect(displayMoney('53468.68', 'biweekly', cad)).toBe('$2,056.49');
+    expect(displayMoney('53468.68', 'weekly', cad)).toBe('$1,028.24');
+    expect(displayMoney('70000.00', 'monthly', cad)).toBe('$5,833.33');
   });
 
   it('places the unit after the amount, two decimals, one space', () => {
@@ -106,7 +106,7 @@ describe('displayMoney', () => {
   });
 
   it('keeps a minus sign in front of the unit', () => {
-    expect(displayMoney('-53468.68', 'weekly', cad)).toBe('-CA$1,028.24');
+    expect(displayMoney('-53468.68', 'weekly', cad)).toBe('-$1,028.24');
   });
 
   it('shows an unreadable amount as sent, without the unit', () => {

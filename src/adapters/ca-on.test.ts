@@ -217,7 +217,7 @@ describe('Ontario adapter', () => {
     });
 
     it('carries the response unit on the result', () => {
-      expect(caOnAdapter.adapt(r2025).unit).toEqual(r2025.unit);
+      expect(caOnAdapter.adapt(r2025).unit).toEqual(cad);
       expect(caOnAdapter.adapt({ ...r2025, unit: months }).unit).toEqual(
         months,
       );
@@ -277,7 +277,7 @@ describe('Ontario adapter', () => {
         expect(result.rows).toEqual([]);
         expect(result.totals).toEqual([]);
         expect(result.advanced.length).toBeGreaterThan(0);
-        expect(result.unit).toEqual(r2025.unit);
+        expect(result.unit).toEqual(cad);
       },
     );
 

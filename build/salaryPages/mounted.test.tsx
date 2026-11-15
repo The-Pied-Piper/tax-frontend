@@ -165,7 +165,7 @@ describe('recalculating on a mounted salary page', () => {
 
   it('shows the figures of the other salary', async () => {
     await recalculateTo30000();
-    expect(screen.getAllByText('CA$27,550.43').length).toBeGreaterThan(0);
+    expect(screen.getAllByText('$27,550.43').length).toBeGreaterThan(0);
   });
 
   it('does not change the address', async () => {

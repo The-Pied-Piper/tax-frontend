@@ -1,6 +1,6 @@
 import { responseUnit } from '../adapters/fallback';
 import type { ComputeTakeHomeCalculationResponse } from '../api';
-import { displayMoney, displayRate } from '../money/format';
+import { displayMoney, displayRate, displayWholeMoney } from '../money/format';
 import { strings } from '../strings';
 
 /** The text of one salary page, all built from that page's own answer. */
@@ -24,7 +24,7 @@ export function salaryPageText(
   const place = rawPlace.trim();
   const unit = responseUnit(response);
   const show = (amount: string) => displayMoney(amount, 'annually', unit);
-  const salary = show(response.salary);
+  const salary = displayWholeMoney(response.salary, 'annually', unit);
   const takeHome = show(response.take_home);
   const text = strings.pageText;
   return {

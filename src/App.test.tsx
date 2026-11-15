@@ -3,6 +3,7 @@ import userEvent from '@testing-library/user-event';
 import { http, HttpResponse } from 'msw';
 import { App } from './App';
 import { AdapterRegistry, advancedGroups, COMING_SOON } from './adapters';
+import { responseUnit } from './adapters/fallback';
 import {
   ApiError,
   NetworkError,
@@ -619,7 +620,7 @@ describe('App breakdown', () => {
           name: 'Salary before tax',
           help: 'What you earn before anything is taken off.',
           amount: response.salary,
-          unit: response.unit,
+          unit: responseUnit(response),
         },
       ],
       totals: [
@@ -628,11 +629,11 @@ describe('App breakdown', () => {
           name: 'Total taken off',
           help: 'Tax and contributions together.',
           amount: response.total_deductions,
-          unit: response.unit,
+          unit: responseUnit(response),
         },
       ],
       advanced: advancedGroups(response),
-      unit: response.unit,
+      unit: responseUnit(response),
     }),
   });
 

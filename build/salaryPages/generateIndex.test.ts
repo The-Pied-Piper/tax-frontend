@@ -142,8 +142,9 @@ describe('generateSalaryPages: the salary-pages-index', () => {
       const found = blocks(dir, file);
       expect(found, file).toHaveLength(1);
       expect(found[0]?.getAttribute('type')).toBe('application/json');
+      // The block carries the API's unit; reading it shows the plain $.
       expect(parseSalaryIndex(found[0]?.textContent ?? null), file).toEqual(
-        index,
+        parseSalaryIndex(JSON.stringify(index)),
       );
     }
   });

@@ -199,7 +199,7 @@ describe('Alberta adapter', () => {
     });
 
     it('carries the response unit on the result', () => {
-      expect(caAbAdapter.adapt(r2025).unit).toEqual(r2025.unit);
+      expect(caAbAdapter.adapt(r2025).unit).toEqual(cad);
       expect(caAbAdapter.adapt({ ...r2025, unit: months }).unit).toEqual(
         months,
       );
@@ -248,7 +248,7 @@ describe('Alberta adapter', () => {
         expect(result.rows).toEqual([]);
         expect(result.totals).toEqual([]);
         expect(result.advanced.length).toBeGreaterThan(0);
-        expect(result.unit).toEqual(r2025.unit);
+        expect(result.unit).toEqual(cad);
       },
     );
 

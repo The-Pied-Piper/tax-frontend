@@ -1,4 +1,4 @@
-import { displayMoney } from '../money/format';
+import { displayWholeMoney } from '../money/format';
 import type { SalaryIndex } from '../state/salaryIndex';
 import { strings } from '../strings';
 import styles from './SalaryIndexNav.module.css';
@@ -30,7 +30,7 @@ export function SalaryIndexNav({ index }: Props) {
                   <li key={page.href}>
                     <a className={styles.link} href={page.href}>
                       {strings.salaryIndex.link(
-                        displayMoney(page.salary, 'annually', group.unit),
+                        displayWholeMoney(page.salary, 'annually', group.unit),
                         group.name,
                       )}
                     </a>

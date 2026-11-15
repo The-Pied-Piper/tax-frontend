@@ -1,7 +1,8 @@
 import compute70000 from '../api/fixtures/compute-on-2026-70000.json';
+import { readUnit } from '../adapters/fallback';
 import { parseSalaryIndex, SALARY_INDEX_ID } from './salaryIndex';
 
-const unit = compute70000.unit;
+const unit = readUnit(compute70000.unit);
 
 const valid = {
   groups: [

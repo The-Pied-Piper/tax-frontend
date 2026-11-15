@@ -383,8 +383,8 @@ describe('AdvancedView', () => {
 
     it('shows the unit before the grouped amount of a line that has one', async () => {
       await openForm();
-      expect(screen.getByText('CA$1,077.48')).toBeVisible();
-      expect(screen.getByText('-CA$1,234.50')).toBeVisible();
+      expect(screen.getByText('$1,077.48')).toBeVisible();
+      expect(screen.getByText('-$1,234.50')).toBeVisible();
     });
 
     it('shows a unit that goes after the amount, singular only for 1', async () => {
