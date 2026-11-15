@@ -8,6 +8,7 @@ import { normalizeSiteUrl } from './seo';
 import { generateSalaryPages } from './salaryPages/generate';
 import { provinces } from './salaryPages/provinces';
 import { rewriteHome } from './salaryPages/home';
+import { pageDates } from './salaryPages/lastmod';
 import { rewriteSitemap } from './salaryPages/sitemap';
 import type { SalaryIndex } from '../src/state/salaryIndex';
 import type { SalaryPageData } from '../src/state/useTakeHome';
@@ -65,9 +66,10 @@ async function loadRenderer(tempDir: string): Promise<Prerender> {
 
 /**
  * Writes dist/<slug>/<salary>/index.html for every listed province and step.
- * With the site address set it also lists them in dist/sitemap.xml and gives
- * each its own canonical address. Only when the API address is set (deploy builds); local builds and CI write
- * no salary pages.
+ * With the site address set it also lists them in dist/sitemap.xml, each with a
+ * last-modified date kept in dist/page-hashes.json, and gives each its own
+ * canonical address. Only when the API address is set (deploy builds); local
+ * builds and CI write no salary pages.
  */
 export function salaryPages(
   apiBaseUrl: string | undefined,
@@ -97,8 +99,14 @@ export function salaryPages(
           render: renderSalaryApp,
           siteUrl,
         });
-        await rewriteSitemap(outDir, siteUrl, written);
         await rewriteHome(outDir, index, renderSalaryIndexNav);
+        const lastmods = await pageDates(
+          outDir,
+          siteUrl,
+          ['index.html', ...written],
+          { fetch, now: () => new Date(), warn: console.warn },
+        );
+        await rewriteSitemap(outDir, siteUrl, written, lastmods);
         console.log(`Salary pages: wrote ${written.length.toString()}`);
         for (const code of skipped) {
           console.log(`Salary pages: ${code} not returned by the API, skipped`);

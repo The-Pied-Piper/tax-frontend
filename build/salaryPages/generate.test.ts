@@ -523,3 +523,47 @@ describe('a page whose text is too long fails the build', () => {
     expect(result.written).toHaveLength(25);
   });
 });
+
+describe('generateSalaryPages is deterministic', () => {
+  async function build() {
+    const dir = outDir();
+    const api = fakeApi(seventyThousand);
+    const result = await generateSalaryPages({
+      fetch: api.fetch,
+      baseUrl,
+      provinces: ontarioOnly,
+      outDir: dir,
+      template,
+      render,
+      siteUrl: 'https://aftertaxlens.com',
+    });
+    return { dir, written: result.written };
+  }
+
+  it('writes byte-identical pages on two runs', async () => {
+    vi.useFakeTimers({ toFake: ['Date'] });
+    try {
+      vi.setSystemTime(new Date('2026-11-15T10:00:00Z'));
+      const first = await build();
+      vi.setSystemTime(new Date('2026-12-20T22:00:00Z'));
+      const second = await build();
+      expect(second.written).toEqual(first.written);
+      for (const file of first.written) {
+        expect(readFileSync(join(second.dir, file))).toEqual(
+          readFileSync(join(first.dir, file)),
+        );
+      }
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
+  it('puts no ISO timestamp in any page', async () => {
+    const { dir, written } = await build();
+    for (const file of written) {
+      expect(readFileSync(join(dir, file), 'utf8')).not.toMatch(
+        /\d{4}-\d{2}-\d{2}T\d{2}:/,
+      );
+    }
+  });
+});
