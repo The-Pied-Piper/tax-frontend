@@ -46,6 +46,7 @@ details[open] > .summary::after {
   opacity: 1;
 }
 
+/* Accessibility: in forced-colors mode the open box must still read as checked. */
 @media (forced-colors: active) {
   details[open] > .summary::before {
     forced-color-adjust: none;
