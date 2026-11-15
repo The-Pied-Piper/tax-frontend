@@ -194,7 +194,7 @@ describe('Alberta adapter', () => {
       const result = caAbAdapter.adapt(r2025);
       const rows = [...result.rows, ...result.totals];
       expect(rows.map((r) => [r.id, r.unit?.name, r.unit?.singular])).toEqual(
-        rows.map((r) => [r.id, 'ca/cad', 'CA$']),
+        rows.map((r) => [r.id, 'ca/cad', '$']),
       );
     });
 
@@ -344,13 +344,13 @@ describe('Alberta adapter, Employment Insurance refund note', () => {
 
   it('adds the refund note naming the salary at $1,500', () => {
     expect(eiHelp(small)).toBe(
-      `${text.ei.help} ${text.eiRefundedNote('CA$1,500.00')}`,
+      `${text.ei.help} ${text.eiRefundedNote('$1,500.00')}`,
     );
   });
 
   it('says the exact sentence at $1,500', () => {
     expect(eiHelp(small)).toBe(
-      `${text.ei.help} On a salary of CA$1,500.00 the premium is refunded when you file, so none is counted in this estimate. A pay slip would still show it withheld during the year, and it comes back at tax time.`,
+      `${text.ei.help} On a salary of $1,500.00 the premium is refunded when you file, so none is counted in this estimate. A pay slip would still show it withheld during the year, and it comes back at tax time.`,
     );
     expect(eiHelp(small)).not.toContain('this small');
   });
@@ -365,7 +365,7 @@ describe('Alberta adapter, Employment Insurance refund note', () => {
   });
 
   it('makes no claim of a check or official status in the note', () => {
-    const note = text.eiRefundedNote('CA$1,500.00');
+    const note = text.eiRefundedNote('$1,500.00');
     expect(note).not.toMatch(/CRA/i);
     expect(note).not.toMatch(/official/i);
     expect(note).not.toContain('this small');

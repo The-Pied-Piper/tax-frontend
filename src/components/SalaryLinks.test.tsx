@@ -1,12 +1,13 @@
 import { render, screen, within } from '@testing-library/react';
-import { displayMoney } from '../money/format';
+import { readUnit } from '../adapters/fallback';
+import { displayWholeMoney } from '../money/format';
 import { strings } from '../strings';
 import { compute70000 } from '../test/syntheticPages';
 import type { SalaryPageLinks } from '../state/useTakeHome';
 import { SalaryLinks } from './SalaryLinks';
 
-const unit = compute70000.unit;
-const money = (salary: string) => displayMoney(salary, 'annually', unit);
+const unit = readUnit(compute70000.unit) ?? strings.fallbackUnit;
+const money = (salary: string) => displayWholeMoney(salary, 'annually', unit);
 
 const links: SalaryPageLinks = {
   calculator: '/',
@@ -25,6 +26,20 @@ function show(value: SalaryPageLinks) {
 }
 
 describe('SalaryLinks', () => {
+  it('writes whole-dollar salaries as $65,000, with no cents and no CA$', () => {
+    show(links);
+    const nav = screen.getByRole('navigation');
+    expect(
+      within(nav).getByRole('link', { name: 'Previous: $65,000' }),
+    ).toBeInTheDocument();
+    expect(
+      within(nav).getByRole('link', { name: 'Next: $75,000' }),
+    ).toBeInTheDocument();
+    expect(within(nav).getByRole('link', { name: '$60,000' })).toBeVisible();
+    expect(nav.textContent).not.toContain('CA$');
+    expect(nav.textContent).not.toContain('.00');
+  });
+
   it('is one named nav landmark', () => {
     show(links);
     expect(

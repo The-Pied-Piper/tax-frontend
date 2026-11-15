@@ -25,6 +25,31 @@ function withPages(pages: unknown) {
   return { groups: [{ ...valid.groups[0], pages }] };
 }
 
+describe('parseSalaryIndex shows the API unit with a plain dollar sign', () => {
+  it('reads CA$ in a group unit as $', () => {
+    const raw = JSON.stringify({
+      groups: [
+        {
+          code: 'CA-ON',
+          name: 'Ontario',
+          unit: {
+            name: 'ca/cad',
+            placement: 'before',
+            singular: 'CA$',
+            plural: 'CA$',
+            spaced: false,
+            as_percentage: false,
+          },
+          pages: [{ salary: '30000', href: '/ca-on/30000/' }],
+        },
+      ],
+    });
+    const group = parseSalaryIndex(raw)?.groups[0];
+    expect(group?.unit.singular).toBe('$');
+    expect(group?.unit.plural).toBe('$');
+  });
+});
+
 describe('parseSalaryIndex', () => {
   it('names the element it is read from', () => {
     expect(SALARY_INDEX_ID).toBe('salary-pages-index');

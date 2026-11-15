@@ -1,6 +1,12 @@
 import type { Unit } from '../api';
 import { cad, months, percent } from '../test/units';
-import { displayMoney, displayRate, groupThousands, withUnit } from './format';
+import {
+  displayMoney,
+  displayRate,
+  displayWholeMoney,
+  groupThousands,
+  withUnit,
+} from './format';
 
 describe('groupThousands', () => {
   it.each([
@@ -130,5 +136,37 @@ describe('displayRate', () => {
   });
   it('shows text it cannot read as sent', () => {
     expect(displayRate('abc', pct)).toBe('abc');
+  });
+});
+
+describe('displayWholeMoney', () => {
+  const dollar: Unit = { ...cad, singular: '$', plural: '$' };
+
+  it.each([
+    ['70000', '$70,000'],
+    ['70000.00', '$70,000'],
+    ['0.00', '$0'],
+    ['1000000', '$1,000,000'],
+    ['-5000.00', '-$5,000'],
+  ])('drops the cents of a whole-dollar %s', (amount, expected) => {
+    expect(displayWholeMoney(amount, 'annually', dollar)).toBe(expected);
+  });
+
+  it.each([
+    ['70000.50', '$70,000.50'],
+    ['70000.05', '$70,000.05'],
+    ['70000.10', '$70,000.10'],
+    ['53468.68', '$53,468.68'],
+  ])('keeps the cents of %s', (amount, expected) => {
+    expect(displayWholeMoney(amount, 'annually', dollar)).toBe(expected);
+  });
+
+  it('works on the amount for the pay period, as displayMoney does', () => {
+    expect(displayWholeMoney('52000', 'weekly', dollar)).toBe('$1,000');
+    expect(displayWholeMoney('70000', 'monthly', dollar)).toBe('$5,833.33');
+  });
+
+  it('shows an amount it cannot read as sent', () => {
+    expect(displayWholeMoney('lots', 'annually', dollar)).toBe('lots');
   });
 });

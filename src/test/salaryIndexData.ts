@@ -1,9 +1,11 @@
 // Test data only: nothing in the build imports this file. A small salary index
 // for the component and App tests (the built one is covered by the build tests).
+import { readUnit } from '../adapters/fallback';
+import { strings } from '../strings';
 import { compute70000 } from './syntheticPages';
 import type { SalaryIndex } from '../state/salaryIndex';
 
-export const indexUnit = compute70000.unit;
+export const indexUnit = readUnit(compute70000.unit) ?? strings.fallbackUnit;
 
 function group(code: string, name: string, slug: string, salaries: number[]) {
   return {

@@ -34,20 +34,20 @@ const expected = [
   {
     salary: '30000',
     n: 30000,
-    takeHome: 'CA$27,550.43',
-    takenOff: 'CA$2,449.57',
+    takeHome: '$27,550.43',
+    takenOff: '$2,449.57',
   },
   {
     salary: '70000',
     n: 70000,
-    takeHome: 'CA$53,786.25',
-    takenOff: 'CA$16,213.75',
+    takeHome: '$53,786.25',
+    takenOff: '$16,213.75',
   },
   {
     salary: '150000',
     n: 150000,
-    takeHome: 'CA$104,319.88',
-    takenOff: 'CA$45,680.12',
+    takeHome: '$104,319.88',
+    takenOff: '$45,680.12',
   },
 ];
 
