@@ -33,6 +33,51 @@ function jsonFetch(body: unknown, init?: ResponseInit) {
   return { fetcher, urls };
 }
 
+describe('hashHtml ignores the build hash in asset addresses', () => {
+  const page = (js: string, css: string, body: string) =>
+    `<html><head><script type="module" crossorigin src="/assets/${js}"></script>` +
+    `<link rel="modulepreload" crossorigin href="/assets/${js}">` +
+    `<link rel="stylesheet" crossorigin href="/assets/${css}"></head>` +
+    `<body><title>Pay</title>${body}</body></html>`;
+
+  it('gives the same hash for the same page built with other asset names', () => {
+    expect(
+      hashHtml(page('index-AAAA1111.js', 'index-BBBB2222.css', '<p>a</p>')),
+    ).toBe(
+      hashHtml(page('index-CCCC3333.js', 'index-DDDD4444.css', '<p>a</p>')),
+    );
+  });
+
+  it('gives another hash when a figure, the title or the text changes', () => {
+    const base = hashHtml(page('index-A.js', 'index-B.css', '<p>$52,000</p>'));
+    expect(
+      hashHtml(page('index-A.js', 'index-B.css', '<p>$52,100</p>')),
+    ).not.toBe(base);
+    expect(
+      hashHtml(page('index-A.js', 'index-B.css', '<p>$52,000 a year</p>')),
+    ).not.toBe(base);
+    expect(
+      hashHtml(
+        page('index-A.js', 'index-B.css', '<p>$52,000</p>').replace(
+          'Pay',
+          'Take-home',
+        ),
+      ),
+    ).not.toBe(base);
+  });
+
+  it('keeps the date of a page when only the asset names change', () => {
+    const before = hashHtml(page('index-A.js', 'index-B.css', '<p>x</p>'));
+    const after = hashHtml(page('index-Z.js', 'index-Y.css', '<p>x</p>'));
+    const live = { '/': { hash: before, lastmod: '2026-01-02' } };
+    expect(
+      nextHashes({ '/': after }, live, () => new Date('2026-11-16T00:00:00Z'))[
+        '/'
+      ]?.lastmod,
+    ).toBe('2026-01-02');
+  });
+});
+
 describe('hashHtml', () => {
   it('is the SHA-256 of the html as lowercase hex', () => {
     const html = '<!doctype html><p>hi</p>';

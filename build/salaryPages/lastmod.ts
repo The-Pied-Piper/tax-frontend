@@ -9,9 +9,21 @@ export type PageHashes = Record<string, { hash: string; lastmod: string }>;
 /** How long to wait for the live site before building without it. */
 const liveTimeoutMs = 10_000;
 
-/** The SHA-256 of a page's final HTML, as lowercase hex. */
+/** The built script, style and preload references: `/assets/<name>-<build hash>.<ext>`. */
+const assetReference = /(\b(?:src|href)=")\/assets\/[^"]*"/g;
+
+/**
+ * The page with its built-file addresses replaced by one fixed token, so the
+ * hash follows what the page says (text, figures, data block, meta) and not
+ * which build produced the script and style files.
+ */
+export function pageContent(html: string): string {
+  return html.replace(assetReference, '$1/assets/"');
+}
+
+/** The SHA-256 of a page's content (see `pageContent`), as lowercase hex. */
 export function hashHtml(html: string): string {
-  return createHash('sha256').update(html).digest('hex');
+  return createHash('sha256').update(pageContent(html)).digest('hex');
 }
 
 function isRecord(value: unknown): value is Record<string, unknown> {
