@@ -8,6 +8,7 @@ import { normalizeSiteUrl } from './seo';
 import { generateSalaryPages } from './salaryPages/generate';
 import { provinces } from './salaryPages/provinces';
 import { rewriteHome } from './salaryPages/home';
+import { writePageHashes } from './salaryPages/lastmod';
 import { rewriteSitemap } from './salaryPages/sitemap';
 import type { SalaryIndex } from '../src/state/salaryIndex';
 import type { SalaryPageData } from '../src/state/useTakeHome';
@@ -97,8 +98,22 @@ export function salaryPages(
           render: renderSalaryApp,
           siteUrl,
         });
-        await rewriteSitemap(outDir, siteUrl, written);
         await rewriteHome(outDir, index, renderSalaryIndexNav);
+        if (siteUrl !== null) {
+          const hashes = await writePageHashes(
+            outDir,
+            siteUrl,
+            ['index.html', ...written],
+            { fetch, now: () => new Date(), warn: console.warn },
+          );
+          const lastmods = Object.fromEntries(
+            Object.entries(hashes).map(([path, { lastmod }]) => [
+              path,
+              lastmod,
+            ]),
+          );
+          await rewriteSitemap(outDir, siteUrl, written, lastmods);
+        }
         console.log(`Salary pages: wrote ${written.length.toString()}`);
         for (const code of skipped) {
           console.log(`Salary pages: ${code} not returned by the API, skipped`);
