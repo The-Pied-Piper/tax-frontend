@@ -1,4 +1,4 @@
-import { useId, useState } from 'react';
+import { useId } from 'react';
 import type { AdvancedGroup, AdvancedLine, Unit } from '../adapters';
 import { groupThousands, withUnit } from '../money/format';
 import { strings } from '../strings';
@@ -13,37 +13,19 @@ type Props = {
 // returned it. Always yearly, so there is no pay period here.
 export function AdvancedView({ groups }: Props) {
   const headingId = useId();
-  const bodyId = useId();
-  const [on, setOn] = useState(false);
   if (groups.length === 0) return null;
   return (
-    <div role="group" aria-labelledby={headingId}>
-      <h3 id={headingId} className={styles.hidden}>
-        {strings.advanced.heading}
-      </h3>
-      <label className={styles.toggle}>
-        <input
-          type="checkbox"
-          className={styles.checkbox}
-          aria-controls={bodyId}
-          checked={on}
-          onChange={(event) => {
-            setOn(event.target.checked);
-          }}
-        />
-        <span>{strings.advanced.toggle}</span>
-      </label>
-      <div id={bodyId}>
-        {on && (
-          <>
-            <p className={styles.note}>{strings.advanced.note}</p>
-            {groups.map((group, index) => (
-              <FormGroup group={group} key={`${group.form}-${String(index)}`} />
-            ))}
-          </>
-        )}
-      </div>
-    </div>
+    <details aria-labelledby={headingId}>
+      <summary className={styles.summary}>
+        <h3 id={headingId} className={styles.heading}>
+          {strings.advanced.toggle}
+        </h3>
+      </summary>
+      <p className={styles.note}>{strings.advanced.note}</p>
+      {groups.map((group, index) => (
+        <FormGroup group={group} key={`${group.form}-${String(index)}`} />
+      ))}
+    </details>
   );
 }
 

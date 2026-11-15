@@ -18,11 +18,11 @@ function show(index: SalaryIndex) {
 }
 
 describe('SalaryIndexNav', () => {
-  it('writes each link as "$30,000 in Ontario", with no cents and no CA$', () => {
+  it('writes each link as "$30,000 after tax in Ontario", with no cents and no CA$', () => {
     show(ontarioIndex);
     const list = screen.getByRole('list', { name: 'Ontario' });
     expect(
-      within(list).getByRole('link', { name: '$30,000 in Ontario' }),
+      within(list).getByRole('link', { name: '$30,000 after tax in Ontario' }),
     ).toHaveAttribute('href', '/ca-on/30000/');
     expect(list.textContent).not.toContain('CA$');
     expect(list.textContent).not.toContain('.00');
@@ -54,7 +54,7 @@ describe('SalaryIndexNav', () => {
       name: strings.salaryIndex.link(money('75000'), 'Ontario'),
     });
     expect(link).toHaveAttribute('href', '/ca-on/75000/');
-    expect(link).toHaveTextContent(`${money('75000')} in Ontario`);
+    expect(link).toHaveTextContent(`${money('75000')} after tax in Ontario`);
   });
 
   it('groups provinces by name, one heading and one list each, in the index order', () => {

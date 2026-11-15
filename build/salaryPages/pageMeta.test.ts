@@ -143,3 +143,18 @@ describe('no hard-coded province or year outside the list and the strings', () =
     expect(text).not.toMatch(/\b20[2-4]\d\b/);
   });
 });
+
+describe('pageMeta: the year in the wording is the data year', () => {
+  it.each([2026, 2027])(
+    'shows %i in the title, heading and description when the fixture year is that year',
+    (year) => {
+      const meta = pageMeta({ ...page70000, year });
+      for (const text of [meta.title, meta.heading, meta.description]) {
+        expect(text).toContain(`(${String(year)} Take-Home Pay)`);
+        expect(text).toContain(`70,000`);
+      }
+      const other = year === 2026 ? '2027' : '2026';
+      expect(meta.title).not.toContain(other);
+    },
+  );
+});

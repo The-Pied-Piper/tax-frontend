@@ -1,4 +1,5 @@
 import { COMING_SOON } from '../adapters/coming-soon';
+import { strings } from '../strings';
 import {
   compute150000,
   compute30000,
@@ -118,14 +119,19 @@ describe('salaryPageText: the text of a page from its own answer', () => {
   });
 });
 
-describe('salaryPageText length limits hold for every province name', () => {
-  const names = ['Ontario', ...COMING_SOON.map((p) => p.name)];
+describe('salaryPageText length limits', () => {
+  // The search phrase is longer than the old wording: at $150,000 a title fits
+  // under 60 characters for the provinces built today, but not for Newfoundland
+  // and Labrador, Prince Edward Island or the Northwest Territories. The build
+  // refuses such a page by name (generate.test.ts), so adding one of them is a
+  // choice then, not a silent cut.
+  const built = ['Ontario', 'Alberta'];
   const answers = [
     ['$30,000', compute30000],
     ['$150,000', compute150000],
   ] as const;
 
-  it.each(names.flatMap((n) => answers.map(([s, r]) => [n, s, r] as const)))(
+  it.each(built.flatMap((n) => answers.map(([s, r]) => [n, s, r] as const)))(
     '%s at %s: title under 60 and description under 160 characters',
     (name, _salary, response) => {
       const { title, description } = salaryPageText(response, name, 2026);
@@ -134,10 +140,95 @@ describe('salaryPageText length limits hold for every province name', () => {
     },
   );
 
+  it.each(COMING_SOON.map((p) => p.name))(
+    'description under 160 characters for %s, whatever the title',
+    (name) => {
+      const text = strings.pageText.description(
+        '$150,000',
+        name,
+        2026,
+        '$104,319.88',
+      );
+      expect(text.length).toBeLessThan(160);
+    },
+  );
+
   it('does not cut a long name: the whole name appears and the limit is passed', () => {
     const long = 'The Very Long Named Province of Somewhere Far Away';
     const { title } = salaryPageText(compute150000, long, 2026);
     expect(title).toContain(long);
     expect(title.length).toBeGreaterThanOrEqual(60);
+  });
+});
+
+// Explicit amounts such as "$75,000" keep these tests valid whatever symbol and
+// decimals the money display later uses; the amount text is handed in as given.
+describe('natural-search wording of the page text', () => {
+  const phrase = (place: string, year: number) =>
+    `$75,000 After Tax in ${place} (${String(year)} Take-Home Pay)`;
+
+  it.each([
+    ['Ontario', 2026],
+    ['Alberta', 2026],
+  ])(
+    'words the title and heading as the search phrase for %s',
+    (place, year) => {
+      expect(strings.pageText.title('$75,000', place, year)).toBe(
+        phrase(place, year),
+      );
+      expect(strings.pageText.heading('$75,000', place, year)).toBe(
+        phrase(place, year),
+      );
+    },
+  );
+
+  it.each(['Ontario', 'Alberta'])(
+    'opens the description with the same phrase, then the take-home (%s)',
+    (place) => {
+      const description = strings.pageText.description(
+        '$75,000',
+        place,
+        2026,
+        '$58,786',
+      );
+      expect(description.startsWith(phrase(place, 2026))).toBe(true);
+      expect(description.slice(phrase(place, 2026).length)).toContain(
+        '$58,786',
+      );
+      expect(description.toLowerCase()).toContain('estimate');
+    },
+  );
+
+  it.each(['Ontario', 'Alberta'])(
+    'words the popular-salaries link as "<salary> after tax in %s"',
+    (place) => {
+      expect(strings.salaryIndex.link('$75,000', place)).toBe(
+        `$75,000 after tax in ${place}`,
+      );
+    },
+  );
+
+  it.each(['Ontario', 'Alberta'])(
+    'gives the assembled title, heading and description for a 75,000 page in %s',
+    (place) => {
+      const text = salaryPageText(syntheticResponse(75000), place, 2026);
+      const tail = ` After Tax in ${place} (2026 Take-Home Pay)`;
+      expect(text.title).toMatch(/^\D*75,000(\.00)?/);
+      expect(text.title.endsWith(tail)).toBe(true);
+      expect(text.heading).toBe(text.title);
+      expect(text.description.startsWith(text.title)).toBe(true);
+      expect(text.description).toContain('58,786.25');
+    },
+  );
+
+  it('takes the year in the title and heading from the data: change the year, the text changes', () => {
+    const response = syntheticResponse(75000);
+    const y2026 = salaryPageText(response, 'Ontario', 2026);
+    const y2027 = salaryPageText(response, 'Ontario', 2027);
+    for (const field of ['title', 'heading', 'description'] as const) {
+      expect(y2026[field]).toContain('(2026 Take-Home Pay)');
+      expect(y2027[field]).toContain('(2027 Take-Home Pay)');
+      expect(y2027[field]).not.toContain('2026');
+    }
   });
 });

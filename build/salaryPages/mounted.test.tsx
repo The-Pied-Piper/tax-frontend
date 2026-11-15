@@ -15,7 +15,7 @@ import { renderSalaryApp } from './prerender';
 // HTML written for that page (section 11: pre-hydration content), and
 // recalculating on it must stay on the same address.
 // A pre-built page carries its links; only such a page shows the summary and
-// the "Take-home pay on" heading.
+// the "After Tax in" heading.
 const links = {
   calculator: '/',
   previous: null,
