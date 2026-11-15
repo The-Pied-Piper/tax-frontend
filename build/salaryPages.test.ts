@@ -1,4 +1,68 @@
+import { mkdir, mkdtemp, readFile, rm, writeFile } from 'node:fs/promises';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
+import type { Plugin } from 'vite';
 import { salaryPages } from './salaryPages';
+
+// Vitest can only import a module built at run time from inside the project,
+// so the temp folders live under node_modules (never committed), and the plugin
+// is given the plain path rather than a file:// address.
+const { scratch } = await vi.hoisted(async () => {
+  const { mkdirSync } = await import('node:fs');
+  const folder = `${process.cwd()}/node_modules/.salary-pages-test`;
+  mkdirSync(folder, { recursive: true });
+  return { scratch: folder };
+});
+
+vi.mock('node:os', () => ({ tmpdir: (): string => scratch }));
+
+vi.mock('node:url', () => ({
+  pathToFileURL: (path: string): { href: string } => ({ href: path }),
+}));
+
+vi.mock('vite', () => ({
+  build: vi.fn(async (config: { build: { outDir: string } }): Promise<void> => {
+    await writeFile(
+      join(config.build.outDir, 'prerender.mjs'),
+      'export const renderSalaryApp = () => "";\nexport const renderSalaryIndexNav = () => "";\n',
+    );
+  }),
+}));
+
+vi.mock('./salaryPages/generate', async () => {
+  const { mkdir: makeDir, writeFile: write } = await import('node:fs/promises');
+  const { join: joinPath } = await import('node:path');
+  return {
+    generateSalaryPages: async ({
+      outDir,
+    }: {
+      outDir: string;
+    }): Promise<{
+      written: string[];
+      skipped: string[];
+      index: { groups: never[] };
+    }> => {
+      const written = ['ca-on/30000/index.html', 'ca-on/35000/index.html'];
+      for (const file of written) {
+        await makeDir(joinPath(outDir, file, '..'), { recursive: true });
+        await write(joinPath(outDir, file), `<html>${file}</html>`);
+      }
+      return { written, skipped: [], index: { groups: [] } };
+    },
+  };
+});
+
+vi.mock('./salaryPages/home', () => ({
+  rewriteHome: vi.fn((): Promise<void> => Promise.resolve()),
+}));
+
+async function runCloseBundle(plugin: Plugin): Promise<void> {
+  const hook = plugin.closeBundle;
+  if (typeof hook !== 'object' || typeof hook.handler !== 'function') {
+    throw new Error('closeBundle has no handler');
+  }
+  await hook.handler.call({} as never);
+}
 
 describe('salaryPages plugin', () => {
   it('writes nothing without an explicit API address (local builds and CI)', () => {
@@ -11,5 +75,61 @@ describe('salaryPages plugin', () => {
     const plugin = salaryPages('https://api.example.com/api/v1');
     expect(plugin.name).toBe('salary-pages');
     expect(plugin.closeBundle).toBeDefined();
+  });
+});
+
+describe('salaryPages closeBundle', () => {
+  let root: string;
+
+  beforeEach(async () => {
+    root = await mkdtemp(join(tmpdir(), 'salary-pages-test-'));
+    await mkdir(join(root, 'dist'));
+    await writeFile(join(root, 'dist', 'index.html'), '<html>home</html>');
+    vi.spyOn(process, 'cwd').mockReturnValue(root);
+    vi.spyOn(console, 'log').mockImplementation(() => undefined);
+    vi.spyOn(console, 'warn').mockImplementation(() => undefined);
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(() => Promise.resolve(new Response('not found', { status: 404 }))),
+    );
+  });
+
+  afterEach(async () => {
+    vi.restoreAllMocks();
+    vi.unstubAllGlobals();
+    await rm(root, { recursive: true, force: true });
+  });
+
+  it('dates every page in the sitemap and keeps the dates in page-hashes.json', async () => {
+    await runCloseBundle(
+      salaryPages('https://api.example.com/api/v1', 'https://example.com'),
+    );
+
+    const hashes = JSON.parse(
+      await readFile(join(root, 'dist', 'page-hashes.json'), 'utf8'),
+    ) as Record<string, unknown>;
+    expect(Object.keys(hashes)).toEqual([
+      '/',
+      '/ca-on/30000/',
+      '/ca-on/35000/',
+    ]);
+
+    const sitemap = await readFile(join(root, 'dist', 'sitemap.xml'), 'utf8');
+    const urls = sitemap.match(/<url>[\s\S]*?<\/url>/g) ?? [];
+    expect(urls).toHaveLength(3);
+    for (const url of urls) {
+      expect(url).toMatch(/<lastmod>\d{4}-\d{2}-\d{2}<\/lastmod>/);
+    }
+  });
+
+  it('writes no page list and no sitemap without a site address', async () => {
+    await runCloseBundle(salaryPages('https://api.example.com/api/v1'));
+
+    await expect(
+      readFile(join(root, 'dist', 'page-hashes.json'), 'utf8'),
+    ).rejects.toThrow();
+    await expect(
+      readFile(join(root, 'dist', 'sitemap.xml'), 'utf8'),
+    ).rejects.toThrow();
   });
 });
