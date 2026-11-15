@@ -18,7 +18,7 @@ function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === 'object' && value !== null && !Array.isArray(value);
 }
 
-/** A real `YYYY-MM-DD` date (not 2026-13-45). */
+/** A real `YYYY-MM-DD` date: month 13 or day 45 is refused. */
 function isCalendarDate(text: string): boolean {
   const date = new Date(text);
   return (
