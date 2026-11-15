@@ -21,7 +21,13 @@ const nearMidnight = () => new Date('2026-11-15T23:30:00-05:00');
 function jsonFetch(body: unknown, init?: ResponseInit) {
   const urls: string[] = [];
   const fetcher: typeof fetch = (input) => {
-    urls.push(typeof input === 'string' ? input : String(input));
+    urls.push(
+      input instanceof Request
+        ? input.url
+        : input instanceof URL
+          ? input.href
+          : input,
+    );
     return Promise.resolve(Response.json(body, init));
   };
   return { fetcher, urls };
