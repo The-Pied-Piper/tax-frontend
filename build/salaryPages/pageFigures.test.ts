@@ -1,3 +1,4 @@
+import { dollarSign } from '../../src/adapters/fallback';
 import { mkdtempSync, readFileSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
@@ -34,20 +35,20 @@ const expected = [
   {
     salary: '30000',
     n: 30000,
-    takeHome: 'CA$27,550.43',
-    takenOff: 'CA$2,449.57',
+    takeHome: '$27,550.43',
+    takenOff: '$2,449.57',
   },
   {
     salary: '70000',
     n: 70000,
-    takeHome: 'CA$53,786.25',
-    takenOff: 'CA$16,213.75',
+    takeHome: '$53,786.25',
+    takenOff: '$16,213.75',
   },
   {
     salary: '150000',
     n: 150000,
-    takeHome: 'CA$104,319.88',
-    takenOff: 'CA$45,680.12',
+    takeHome: '$104,319.88',
+    takenOff: '$45,680.12',
   },
 ];
 
@@ -114,6 +115,11 @@ function answerRow(page: Document, label: string): string | undefined {
   return row?.querySelector('dd')?.textContent;
 }
 
+// The API's answer as the built page carries it: its "CA$" shown as "$".
+function shown<T>(answer: T): T {
+  return JSON.parse(dollarSign(JSON.stringify(answer))) as T;
+}
+
 describe('each built page carries the figures the API gave for its own salary', () => {
   it.each(expected)(
     'shows $takeHome as the take-home on the page for $salary',
@@ -137,7 +143,7 @@ describe('each built page carries the figures the API gave for its own salary', 
       const block = pageOf(salary).getElementById(SALARY_PAGE_DATA_ID);
       const data = parseSalaryPageData(block?.textContent ?? null);
       expect(data).not.toBeNull();
-      expect(data?.response).toEqual(answers.get(salary));
+      expect(data?.response).toEqual(shown(answers.get(salary)));
     },
   );
 

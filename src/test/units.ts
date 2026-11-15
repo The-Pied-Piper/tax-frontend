@@ -1,11 +1,11 @@
 import type { Unit } from '../api';
 
-// Units as the API sends them, read from the saved engine responses.
+// Units as the adapters give them to the page (the API's CA$ is shown as $).
 export const cad: Unit = {
   name: 'ca/cad',
   placement: 'before',
-  singular: 'CA$',
-  plural: 'CA$',
+  singular: '$',
+  plural: '$',
   spaced: false,
   as_percentage: false,
 };

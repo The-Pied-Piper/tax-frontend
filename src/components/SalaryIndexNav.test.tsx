@@ -1,6 +1,6 @@
 import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { displayMoney } from '../money/format';
+import { displayWholeMoney } from '../money/format';
 import { strings } from '../strings';
 import {
   indexUnit,
@@ -10,13 +10,24 @@ import {
 import type { SalaryIndex } from '../state/salaryIndex';
 import { SalaryIndexNav } from './SalaryIndexNav';
 
-const money = (salary: string) => displayMoney(salary, 'annually', indexUnit);
+const money = (salary: string) =>
+  displayWholeMoney(salary, 'annually', indexUnit);
 
 function show(index: SalaryIndex) {
   return render(<SalaryIndexNav index={index} />);
 }
 
 describe('SalaryIndexNav', () => {
+  it('writes each link as "$30,000 after tax in Ontario", with no cents and no CA$', () => {
+    show(ontarioIndex);
+    const list = screen.getByRole('list', { name: 'Ontario' });
+    expect(
+      within(list).getByRole('link', { name: '$30,000 after tax in Ontario' }),
+    ).toHaveAttribute('href', '/ca-on/30000/');
+    expect(list.textContent).not.toContain('CA$');
+    expect(list.textContent).not.toContain('.00');
+  });
+
   it('is one nav landmark named Popular salaries', () => {
     show(ontarioIndex);
     expect(strings.salaryIndex.label).toBe('Popular salaries');

@@ -25,7 +25,7 @@ export function groupThousands(amount: string): string {
 
 const ONE = /^1(\.0+)?$/;
 
-// "53,468.68" + CA$ -> "CA$53,468.68"; "12" + months -> "12 months". The minus
+// "53,468.68" + $ -> "$53,468.68"; "12" + months -> "12 months". The minus
 // sign stays first, the plural is used unless the amount is exactly 1, and a
 // space separates text and number only when the unit says `spaced`. Text that is not a plain decimal is
 // returned as is, with no unit.
@@ -61,6 +61,22 @@ export function displayMoney(
 ): string {
   try {
     return withUnit(groupThousands(amountForPeriod(yearly, period)), unit);
+  } catch {
+    return yearly;
+  }
+}
+
+// Like displayMoney, but a whole-dollar amount has no cents: "$70,000", not
+// "$70,000.00". For headings, titles, descriptions and links; an amount with
+// cents keeps them. Still string work only.
+export function displayWholeMoney(
+  yearly: string,
+  period: PayPeriod,
+  unit: MoneyUnit,
+): string {
+  try {
+    const grouped = groupThousands(amountForPeriod(yearly, period));
+    return withUnit(grouped.replace(/\.00$/, ''), unit);
   } catch {
     return yearly;
   }

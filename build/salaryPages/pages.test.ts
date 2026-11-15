@@ -106,8 +106,8 @@ describe('the 25 written Ontario pages', () => {
       const [whole = '', cents = ''] = takeHome.split('.');
       const grouped = whole.replace(/\B(?=(\d{3})+$)/g, ',');
       const text = pageOf(n).body.textContent;
-      expect(text).toContain(`CA$${grouped}.${cents}`);
-      expect(text).toContain('CA$16,213.75');
+      expect(text).toContain(`$${grouped}.${cents}`);
+      expect(text).toContain('$16,213.75');
       expect(text).toContain('15.91%');
       expect(text).toContain('29.65%');
     }

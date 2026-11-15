@@ -212,12 +212,12 @@ describe('Ontario adapter', () => {
       const result = caOnAdapter.adapt(r2025);
       const rows = [...result.rows, ...result.totals];
       expect(rows.map((r) => [r.id, r.unit?.name, r.unit?.singular])).toEqual(
-        rows.map((r) => [r.id, 'ca/cad', 'CA$']),
+        rows.map((r) => [r.id, 'ca/cad', '$']),
       );
     });
 
     it('carries the response unit on the result', () => {
-      expect(caOnAdapter.adapt(r2025).unit).toEqual(r2025.unit);
+      expect(caOnAdapter.adapt(r2025).unit).toEqual(cad);
       expect(caOnAdapter.adapt({ ...r2025, unit: months }).unit).toEqual(
         months,
       );
@@ -277,7 +277,7 @@ describe('Ontario adapter', () => {
         expect(result.rows).toEqual([]);
         expect(result.totals).toEqual([]);
         expect(result.advanced.length).toBeGreaterThan(0);
-        expect(result.unit).toEqual(r2025.unit);
+        expect(result.unit).toEqual(cad);
       },
     );
 
@@ -339,13 +339,13 @@ describe('Ontario adapter, Employment Insurance help', () => {
 
   it('adds the refund note after the usual text at $1,500', () => {
     expect(eiHelp(r2026Small)).toBe(
-      `${text.ei.help} ${text.eiRefundedNote('CA$1,500.00')}`,
+      `${text.ei.help} ${text.eiRefundedNote('$1,500.00')}`,
     );
   });
 
   it('names the salary in the exact refund sentence at $1,500', () => {
     expect(eiHelp(r2026Small)).toBe(
-      `${text.ei.help} On a salary of CA$1,500.00 the premium is refunded when you file, so none is counted in this estimate. A pay slip would still show it withheld during the year, and it comes back at tax time.`,
+      `${text.ei.help} On a salary of $1,500.00 the premium is refunded when you file, so none is counted in this estimate. A pay slip would still show it withheld during the year, and it comes back at tax time.`,
     );
     expect(eiHelp(r2026Small)).not.toContain('this small');
   });
@@ -394,17 +394,17 @@ describe('Ontario adapter, Employment Insurance help', () => {
 });
 
 describe('Ontario adapter, refund note text', () => {
-  const note = () => strings.adapters.caOn.eiRefundedNote('CA$1,500.00');
+  const note = () => strings.adapters.caOn.eiRefundedNote('$1,500.00');
 
   it('is the exact sentence with the salary in it', () => {
     expect(note()).toBe(
-      'On a salary of CA$1,500.00 the premium is refunded when you file, so none is counted in this estimate. A pay slip would still show it withheld during the year, and it comes back at tax time.',
+      'On a salary of $1,500.00 the premium is refunded when you file, so none is counted in this estimate. A pay slip would still show it withheld during the year, and it comes back at tax time.',
     );
   });
 
   it('puts whatever salary text it is given into the sentence', () => {
-    expect(strings.adapters.caOn.eiRefundedNote('CA$900.00')).toContain(
-      'On a salary of CA$900.00 the premium',
+    expect(strings.adapters.caOn.eiRefundedNote('$900.00')).toContain(
+      'On a salary of $900.00 the premium',
     );
   });
 

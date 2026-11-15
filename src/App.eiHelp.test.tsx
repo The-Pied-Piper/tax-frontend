@@ -34,7 +34,7 @@ describe('Employment Insurance help on the page', () => {
     await openEiHelp(compute1500, '1500');
     expect(
       screen.getByText(
-        `${strings.adapters.caOn.ei.help} On a salary of CA$1,500.00 the premium is refunded when you file, so none is counted in this estimate. A pay slip would still show it withheld during the year, and it comes back at tax time.`,
+        `${strings.adapters.caOn.ei.help} On a salary of $1,500.00 the premium is refunded when you file, so none is counted in this estimate. A pay slip would still show it withheld during the year, and it comes back at tax time.`,
       ),
     ).toBeVisible();
     expect(screen.queryByText(/this small/, { exact: false })).toBeNull();

@@ -2,6 +2,7 @@ import { existsSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import jurisdictions from '../../src/api/fixtures/jurisdictions.json';
 import compute70000 from '../../src/api/fixtures/compute-on-2026-70000.json';
+import { readUnit } from '../../src/adapters/fallback';
 import { parseSalaryIndex } from '../../src/state/salaryIndex';
 import {
   apiBaseUrl,
@@ -51,7 +52,7 @@ describe('generateSalaryPages: the salary-pages-index', () => {
     const [group] = index.groups;
     expect(group?.code).toBe('CA-ON');
     expect(group?.name).toBe('Ontario');
-    expect(group?.unit).toEqual(compute70000.unit);
+    expect(group?.unit).toEqual(readUnit(compute70000.unit));
     expect(group?.pages).toHaveLength(25);
     expect(group?.pages[0]).toEqual({ salary: '30000', href: '/ca-on/30000/' });
     expect(group?.pages[24]).toEqual({
@@ -148,8 +149,9 @@ describe('generateSalaryPages: the salary-pages-index', () => {
         const found = blocks(dir, file);
         expect(found, file).toHaveLength(1);
         expect(found[0]?.getAttribute('type')).toBe('application/json');
+        // The block carries the API's unit; reading it shows the plain $.
         expect(parseSalaryIndex(found[0]?.textContent ?? null), file).toEqual(
-          index,
+          parseSalaryIndex(JSON.stringify(index)),
         );
       }
     },
