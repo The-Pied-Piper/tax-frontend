@@ -158,6 +158,10 @@ describe('fetchLiveHashes(siteUrl, fetcher, warn)', () => {
       'a lastmod with a time',
       { '/': { hash: hashA, lastmod: '2026-01-02T10:00:00Z' } },
     ],
+    [
+      'a lastmod that is not on the calendar',
+      { '/': { hash: hashA, lastmod: '2026-13-45' } },
+    ],
     ['a missing lastmod', { '/': { hash: hashA } }],
     [
       'one bad entry among good ones',

@@ -1,7 +1,7 @@
 import { createHash } from 'node:crypto';
 import { readFile, writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
-import { addressOf } from './sitemap';
+import { addressOf } from './address';
 
 export type Clock = () => Date;
 export type PageHashes = Record<string, { hash: string; lastmod: string }>;
@@ -18,6 +18,12 @@ function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === 'object' && value !== null && !Array.isArray(value);
 }
 
+/** A real `YYYY-MM-DD` date (not 2026-13-45). */
+function isCalendarDate(text: string): boolean {
+  const time = Date.parse(text);
+  return !Number.isNaN(time) && new Date(time).toISOString().startsWith(text);
+}
+
 function isPageHashes(value: unknown): value is PageHashes {
   if (!isRecord(value)) return false;
   return Object.values(value).every(
@@ -26,7 +32,8 @@ function isPageHashes(value: unknown): value is PageHashes {
       typeof entry.hash === 'string' &&
       /^[0-9a-f]{64}$/.test(entry.hash) &&
       typeof entry.lastmod === 'string' &&
-      /^\d{4}-\d{2}-\d{2}$/.test(entry.lastmod),
+      /^\d{4}-\d{2}-\d{2}$/.test(entry.lastmod) &&
+      isCalendarDate(entry.lastmod),
   );
 }
 
@@ -113,4 +120,22 @@ export async function writePageHashes(
     `${JSON.stringify(sorted, null, 2)}\n`,
   );
   return sorted;
+}
+
+/**
+ * The last-modified date of every written page by address, with
+ * dist/page-hashes.json written beside them. With no site address there are no
+ * dates and nothing is written.
+ */
+export async function pageDates(
+  outDir: string,
+  siteUrl: string | null,
+  files: string[],
+  deps: { fetch: typeof fetch; now: Clock; warn: (message: string) => void },
+): Promise<Record<string, string>> {
+  if (siteUrl === null) return {};
+  const hashes = await writePageHashes(outDir, siteUrl, files, deps);
+  return Object.fromEntries(
+    Object.entries(hashes).map(([path, { lastmod }]) => [path, lastmod]),
+  );
 }
