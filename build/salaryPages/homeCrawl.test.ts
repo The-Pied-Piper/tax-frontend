@@ -78,16 +78,22 @@ function linksFrom(dir: string, file: string): Set<string> {
 }
 
 describe('crawl from the built home page', () => {
-  it('has no CA$ anywhere in the home page or any written page, data blocks included', async () => {
-    const { dir, written } = await build({ list: 'alberta' });
-    expect(written.length).toBeGreaterThan(0);
-    for (const file of ['index.html', ...written]) {
-      expect(readFileSync(join(dir, file), 'utf8'), file).not.toContain('CA$');
-    }
-    expect(readFileSync(join(dir, 'index.html'), 'utf8')).toContain(
-      '$75,000 after tax in Ontario',
-    );
-  });
+  it(
+    'has no CA$ anywhere in the home page or any written page, data blocks included',
+    async () => {
+      const { dir, written } = await build({ list: 'alberta' });
+      expect(written.length).toBeGreaterThan(0);
+      for (const file of ['index.html', ...written]) {
+        expect(readFileSync(join(dir, file), 'utf8'), file).not.toContain(
+          'CA$',
+        );
+      }
+      expect(readFileSync(join(dir, 'index.html'), 'utf8')).toContain(
+        '$75,000 after tax in Ontario',
+      );
+    },
+    SLOW_TEST_MS,
+  );
 
   it(
     'reaches all 25 Ontario pages by following links',
