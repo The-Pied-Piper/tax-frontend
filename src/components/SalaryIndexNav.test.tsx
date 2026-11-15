@@ -43,7 +43,7 @@ describe('SalaryIndexNav', () => {
       name: strings.salaryIndex.link(money('75000'), 'Ontario'),
     });
     expect(link).toHaveAttribute('href', '/ca-on/75000/');
-    expect(link).toHaveTextContent(`${money('75000')} in Ontario`);
+    expect(link).toHaveTextContent(`${money('75000')} after tax in Ontario`);
   });
 
   it('groups provinces by name, one heading and one list each, in the index order', () => {

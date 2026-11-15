@@ -92,7 +92,7 @@ describe('App summary on a pre-built salary page', () => {
       />,
     );
     expect(screen.getByRole('heading', { level: 1 }).textContent).toMatch(
-      /^Take-home pay on /,
+      / After Tax in Ontario \(2026 Take-Home Pay\)$/,
     );
     const heading = screen.getByRole('heading', {
       level: 2,
