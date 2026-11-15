@@ -75,16 +75,16 @@ export const strings = {
   // Place and year come from the API's list and the request, never from code.
   pageText: {
     title: (salary: string, place: string, year: number) =>
-      `${salary} after tax in ${place} (${String(year)})`,
+      `${salary} After Tax in ${place} (${String(year)} Take-Home Pay)`,
     description: (
       salary: string,
       place: string,
       year: number,
       takeHome: string,
     ) =>
-      `Estimate: on ${salary} in ${place} for ${String(year)}, your yearly take-home is ${takeHome} after income tax, CPP and EI.`,
+      `${salary} After Tax in ${place} (${String(year)} Take-Home Pay): your estimated yearly take-home is ${takeHome} after income tax, CPP and EI.`,
     heading: (salary: string, place: string, year: number) =>
-      `Take-home pay on ${salary} in ${place}, ${String(year)}`,
+      `${salary} After Tax in ${place} (${String(year)} Take-Home Pay)`,
     paragraph: (
       salary: string,
       place: string,
@@ -107,7 +107,7 @@ export const strings = {
   // The list of pre-built pages on the home page.
   salaryIndex: {
     label: 'Popular salaries',
-    link: (amount: string, place: string) => `${amount} in ${place}`,
+    link: (amount: string, place: string) => `${amount} after tax in ${place}`,
   },
   notices: {
     provisionalTitle: (year: number) =>
