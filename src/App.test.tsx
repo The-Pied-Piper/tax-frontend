@@ -870,3 +870,60 @@ describe('App, Alberta page through the mock service', () => {
     ).toBeVisible();
   });
 });
+
+describe('App default year', () => {
+  const clockAt = (year: number) => () => new Date(year, 5, 15);
+
+  it('opens on the current year and still lists every year', async () => {
+    render(<App client={fixtureClient()} clock={clockAt(2026)} />);
+    const year = await screen.findByRole('combobox', {
+      name: strings.form.year,
+    });
+    await waitFor(() => {
+      expect(year).toHaveValue('2026');
+    });
+    expect(within(year).getAllByRole('option')).toHaveLength(2);
+    expect(screen.getByRole('option', { name: '2025' })).toBeInTheDocument();
+  });
+
+  it('opens on the nearest listed year when the current year is not listed', async () => {
+    render(<App client={fixtureClient()} clock={clockAt(2030)} />);
+    const year = await screen.findByRole('combobox', {
+      name: strings.form.year,
+    });
+    await waitFor(() => {
+      expect(year).toHaveValue('2026');
+    });
+  });
+
+  it('shows the provisional notice after Calculate on a first load that lands on a provisional year', async () => {
+    const user = userEvent.setup();
+    render(
+      <App
+        client={fixtureClient(undefined, compute2026)}
+        registry={new AdapterRegistry()}
+        clock={clockAt(2026)}
+      />,
+    );
+    await waitFor(() => {
+      expect(
+        screen.getByRole('combobox', { name: strings.form.year }),
+      ).toHaveValue('2026');
+    });
+    expect(screen.queryByRole('note')).not.toBeInTheDocument();
+    await user.type(
+      screen.getByRole('textbox', { name: strings.form.salary }),
+      '70000',
+    );
+    await user.click(
+      screen.getByRole('button', { name: strings.form.calculate }),
+    );
+    await screen.findByRole('heading', { name: strings.answer.heading });
+    expect(screen.getByRole('note')).toHaveTextContent(
+      strings.notices.provisionalTitle(2026),
+    );
+    expect(screen.getByRole('note')).toHaveTextContent(
+      strings.notices.provisionalBody(2026),
+    );
+  });
+});
