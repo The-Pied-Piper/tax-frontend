@@ -1,4 +1,4 @@
-import { act, renderHook } from '@testing-library/react';
+import { act, renderHook, waitFor } from '@testing-library/react';
 import type { ApiClient, ComputeTakeHomeCalculationResponse } from '../api';
 import computeFixture from '../api/fixtures/compute-on-2026-70000.json';
 import jurisdictions from '../api/fixtures/jurisdictions.json';
@@ -124,5 +124,100 @@ describe('useTakeHome links of a pre-built page', () => {
     });
     expect(result.current.request.status).toBe('success');
     expect(linksOf(result.current.request)).toBeUndefined();
+  });
+});
+
+describe('useTakeHome default year (the first load and a change of place)', () => {
+  const place = (code: string, ...years: number[]) => ({
+    code,
+    name: code,
+    years: years.map((year) => ({ year, provisional: year > 2025 })),
+  });
+  const clockAt = (year: number) => () => new Date(year, 5, 15);
+
+  function clientListing(...list: ReturnType<typeof place>[]) {
+    const { client } = fakeClient();
+    return {
+      ...client,
+      listJurisdictions: () =>
+        Promise.resolve({ jurisdictions: list, next_page_token: '' }),
+    } satisfies ApiClient;
+  }
+
+  async function load(client: ApiClient, year: number) {
+    const hook = renderHook(() =>
+      useTakeHome(client, undefined, undefined, clockAt(year)),
+    );
+    await waitFor(() => {
+      expect(hook.result.current.jurisdictionsState.status).toBe('ready');
+    });
+    return hook;
+  }
+
+  it('opens on the current year when the place lists it', async () => {
+    const { result } = await load(
+      clientListing(place('CA-ON', 2025, 2026)),
+      2026,
+    );
+    expect(result.current.values.year).toBe(2026);
+  });
+
+  it('opens on the nearest listed year when the current year is not listed', async () => {
+    const { result } = await load(
+      clientListing(place('CA-ON', 2025, 2026)),
+      2027,
+    );
+    expect(result.current.values.year).toBe(2026);
+  });
+
+  it('opens on the only year of a single-year place', async () => {
+    const { result } = await load(clientListing(place('CA-ON', 2025)), 2026);
+    expect(result.current.values.year).toBe(2025);
+  });
+
+  it('picks again for the new place when the place changes', async () => {
+    const { result } = await load(
+      clientListing(place('CA-ON', 2025, 2026), place('CA-AB', 2024, 2025)),
+      2026,
+    );
+    expect(result.current.values.year).toBe(2026);
+    act(() => {
+      result.current.setJurisdictionCode('CA-AB');
+    });
+    expect(result.current.values.year).toBe(2025);
+    act(() => {
+      result.current.setJurisdictionCode('CA-ON');
+    });
+    expect(result.current.values.year).toBe(2026);
+  });
+
+  it('leaves the year of a pre-built page as it was', () => {
+    const { client } = fakeClient();
+    const { result } = renderHook(() =>
+      useTakeHome(client, undefined, initial, clockAt(2025)),
+    );
+    expect(result.current.values.year).toBe(2026);
+  });
+
+  it('does not change a year the visitor picked when the clock changes or the hook re-renders', async () => {
+    const client = clientListing(place('CA-ON', 2025, 2026));
+    const listed = vi.spyOn(client, 'listJurisdictions');
+    let year = 2026;
+    const hook = renderHook(() =>
+      useTakeHome(client, undefined, undefined, () => new Date(year, 5, 15)),
+    );
+    await waitFor(() => {
+      expect(hook.result.current.jurisdictionsState.status).toBe('ready');
+    });
+    act(() => {
+      hook.result.current.setYear(2025);
+    });
+    year = 2027;
+    hook.rerender();
+    await act(async () => {
+      await Promise.resolve();
+    });
+    expect(listed).toHaveBeenCalledTimes(1);
+    expect(hook.result.current.values.year).toBe(2025);
   });
 });

@@ -1,7 +1,8 @@
 import { render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { http, HttpResponse } from 'msw';
-import { App } from './App';
+import type { ComponentProps } from 'react';
+import { App as RealApp } from './App';
 import { AdapterRegistry, advancedGroups, COMING_SOON } from './adapters';
 import { responseUnit } from './adapters/fallback';
 import {
@@ -20,6 +21,13 @@ import jurisdictions from './api/fixtures/jurisdictions.json';
 import { server } from './mocks/server';
 import { strings } from './strings';
 import { fixtureClient } from './test/fixtureClient';
+
+// Most tests below were written when the first listed year, 2025, was the
+// default: App here takes a 2025 clock unless a test passes its own.
+const clock2025 = () => new Date(2025, 5, 15);
+function App(props: ComponentProps<typeof RealApp>) {
+  return <RealApp clock={clock2025} {...props} />;
+}
 
 describe('App form', () => {
   it('shows the page title', () => {
@@ -869,5 +877,62 @@ describe('App, Alberta page through the mock service', () => {
     expect(
       within(details as HTMLElement).getByText('$15,892.80'),
     ).toBeVisible();
+  });
+});
+
+describe('App default year', () => {
+  const clockAt = (year: number) => () => new Date(year, 5, 15);
+
+  it('opens on the current year and still lists every year', async () => {
+    render(<App client={fixtureClient()} clock={clockAt(2026)} />);
+    const year = await screen.findByRole('combobox', {
+      name: strings.form.year,
+    });
+    await waitFor(() => {
+      expect(year).toHaveValue('2026');
+    });
+    expect(within(year).getAllByRole('option')).toHaveLength(2);
+    expect(screen.getByRole('option', { name: '2025' })).toBeInTheDocument();
+  });
+
+  it('opens on the nearest listed year when the current year is not listed', async () => {
+    render(<App client={fixtureClient()} clock={clockAt(2030)} />);
+    const year = await screen.findByRole('combobox', {
+      name: strings.form.year,
+    });
+    await waitFor(() => {
+      expect(year).toHaveValue('2026');
+    });
+  });
+
+  it('shows the provisional notice after Calculate on a first load that lands on a provisional year', async () => {
+    const user = userEvent.setup();
+    render(
+      <App
+        client={fixtureClient(undefined, compute2026)}
+        registry={new AdapterRegistry()}
+        clock={clockAt(2026)}
+      />,
+    );
+    await waitFor(() => {
+      expect(
+        screen.getByRole('combobox', { name: strings.form.year }),
+      ).toHaveValue('2026');
+    });
+    expect(screen.queryByRole('note')).not.toBeInTheDocument();
+    await user.type(
+      screen.getByRole('textbox', { name: strings.form.salary }),
+      '70000',
+    );
+    await user.click(
+      screen.getByRole('button', { name: strings.form.calculate }),
+    );
+    await screen.findByRole('heading', { name: strings.answer.heading });
+    expect(screen.getByRole('note')).toHaveTextContent(
+      strings.notices.provisionalTitle(2026),
+    );
+    expect(screen.getByRole('note')).toHaveTextContent(
+      strings.notices.provisionalBody(2026),
+    );
   });
 });

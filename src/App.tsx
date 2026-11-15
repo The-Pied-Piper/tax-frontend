@@ -21,10 +21,12 @@ type Props = {
   initial?: SalaryPageData;
   /** Every pre-built salary page; none in a plain build. */
   salaryIndex?: SalaryIndex;
+  /** The date the default year is taken from; tests pin it. */
+  clock?: () => Date;
 };
 
-export function App({ client, registry, initial, salaryIndex }: Props) {
-  const page = useTakeHome(client, registry, initial);
+export function App({ client, registry, initial, salaryIndex, clock }: Props) {
+  const page = useTakeHome(client, registry, initial, clock);
   const { request } = page;
   // Only a pre-built page carries a summary; a fresh calculation does not.
   const text =

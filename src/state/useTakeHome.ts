@@ -13,6 +13,7 @@ import {
 } from '../api';
 import type { PayPeriod } from '../money/payPeriod';
 import { languageCode } from '../strings';
+import { pickDefaultYear } from './defaultYear';
 import { describeFailure } from './failure';
 import { placeOptions, type PlaceOption } from './places';
 import { checkSalary, type SalaryCheck } from './salary';
@@ -128,6 +129,8 @@ export function useTakeHome(
   client: ApiClient = defaultClient,
   registry: AdapterRegistry = adapters,
   initial?: SalaryPageData,
+  // Tests pin the date; the visitor's own clock otherwise.
+  clock: () => Date = () => new Date(),
 ) {
   const [seed] = useState(() => seedFrom(initial, registry));
   const [jurisdictionsState, setJurisdictionsState] =
@@ -144,6 +147,8 @@ export function useTakeHome(
   );
   // Only the latest request may write its answer.
   const latest = useRef(0);
+  // The clock is fixed at mount: a new one is not a reason to load the list again.
+  const [now] = useState(() => clock);
 
   // The one effect: the list of places and years is needed to draw the form.
   // Calculating is triggered by submit, never by an effect.
@@ -164,7 +169,7 @@ export function useTakeHome(
           setValues((v) => ({
             ...v,
             jurisdictionCode: first.code,
-            year: first.years[0]?.year ?? null,
+            year: pickDefaultYear(first.years, now().getFullYear()),
           }));
         }
       },
@@ -175,7 +180,7 @@ export function useTakeHome(
     return () => {
       cancelled = true;
     };
-  }, [client, seed]);
+  }, [client, seed, now]);
 
   const jurisdictions =
     jurisdictionsState.status === 'ready'
@@ -183,8 +188,9 @@ export function useTakeHome(
       : [];
 
   function setJurisdictionCode(code: string) {
-    const year = jurisdictions.find((j) => j.code === code)?.years[0]?.year;
-    setValues((v) => ({ ...v, jurisdictionCode: code, year: year ?? null }));
+    const years = jurisdictions.find((j) => j.code === code)?.years ?? [];
+    const year = pickDefaultYear(years, now().getFullYear());
+    setValues((v) => ({ ...v, jurisdictionCode: code, year }));
   }
 
   function setYear(year: number) {
