@@ -120,7 +120,6 @@ export const strings = {
     helpButton: (name: string) => `What is ${name}?`,
   },
   advanced: {
-    heading: 'Advanced view',
     toggle: 'Advanced view: every line from the tax forms',
     note: 'Advanced view shows yearly amounts, as printed on the forms.',
     lineCount: (count: number) =>
