@@ -54,11 +54,21 @@ function escapeXml(text: string): string {
     .replace(/'/g, '&apos;');
 }
 
-/** The calculator plus the given page paths (each with a leading slash). */
-export function sitemapXml(siteUrl: string, paths: string[] = []): string {
-  const urls = ['/', ...paths].map(
-    (path) => `  <url><loc>${escapeXml(`${siteUrl}${path}`)}</loc></url>\n`,
-  );
+/**
+ * The calculator plus the given page paths (each with a leading slash), each
+ * followed by its `<lastmod>` (YYYY-MM-DD) when `lastmods` has one for its path.
+ */
+export function sitemapXml(
+  siteUrl: string,
+  paths: string[] = [],
+  lastmods: Record<string, string> = {},
+): string {
+  const urls = ['/', ...paths].map((path) => {
+    const lastmod = lastmods[path];
+    const stamp =
+      lastmod === undefined ? '' : `<lastmod>${escapeXml(lastmod)}</lastmod>`;
+    return `  <url><loc>${escapeXml(`${siteUrl}${path}`)}</loc>${stamp}</url>\n`;
+  });
   return (
     '<?xml version="1.0" encoding="UTF-8"?>\n' +
     '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n' +

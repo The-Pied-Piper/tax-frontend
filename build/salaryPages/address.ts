@@ -11,3 +11,12 @@ export function pageUrl(
 ): string {
   return `${origin}${pagePath(slug, salary)}`;
 }
+
+/** The address of a written page, from its path such as `ca-on/70000/index.html`. */
+export function addressOf(file: string): string {
+  const [slug, salary, name, ...rest] = file.split('/');
+  if (!slug || !salary || name !== 'index.html' || rest.length > 0) {
+    throw new Error(`Sitemap: unexpected page path ${file}`);
+  }
+  return pagePath(slug, salary);
+}

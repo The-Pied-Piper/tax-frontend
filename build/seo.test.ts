@@ -146,3 +146,41 @@ describe('seo plugin without a site URL', () => {
     expect(files['robots.txt']).not.toContain('Sitemap');
   });
 });
+
+describe('sitemapXml with lastmods', () => {
+  const site = 'https://aftertaxlens.com';
+
+  it('puts <lastmod> straight after <loc> for the calculator and each page', () => {
+    const xml = sitemapXml(site, ['/ca-on/65000/', '/ca-on/70000/'], {
+      '/': '2026-01-02',
+      '/ca-on/65000/': '2026-03-04',
+      '/ca-on/70000/': '2026-11-16',
+    });
+    expect(xml).toContain(`<loc>${site}/</loc><lastmod>2026-01-02</lastmod>`);
+    expect(xml).toContain(
+      `<loc>${site}/ca-on/65000/</loc><lastmod>2026-03-04</lastmod>`,
+    );
+    expect(xml).toContain(
+      `<loc>${site}/ca-on/70000/</loc><lastmod>2026-11-16</lastmod>`,
+    );
+    expect(xml.match(/<lastmod>/g)).toHaveLength(3);
+  });
+
+  it('emits <lastmod> only for paths that have one', () => {
+    const xml = sitemapXml(site, ['/ca-on/65000/'], {
+      '/ca-on/65000/': '2026-03-04',
+    });
+    expect(xml.match(/<lastmod>/g)).toHaveLength(1);
+    expect(xml).toContain(`<loc>${site}/</loc></url>`);
+  });
+
+  it('emits no <lastmod> when none are given, as before', () => {
+    expect(sitemapXml(site, ['/ca-on/65000/'])).not.toContain('<lastmod>');
+    expect(sitemapXml(site)).not.toContain('<lastmod>');
+  });
+
+  it('the bundle hook early sitemap carries no <lastmod> (the pages step rewrites it)', () => {
+    const { files } = run(site);
+    expect(files['sitemap.xml'] ?? '').not.toContain('<lastmod>');
+  });
+});
