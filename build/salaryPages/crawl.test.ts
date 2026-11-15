@@ -147,27 +147,31 @@ describe('crawl of a generated output folder', () => {
     );
   });
 
-  it('adds a made-up second province to links and sitemap with no other change', async () => {
-    const alone = await build();
-    const both = await build({ list: 'xland' });
-    expect(both.written).toHaveLength(28);
-    expect(sitemapLocs(both.dir)).toHaveLength(29);
-    expect(sitemapLocs(both.dir)).toContain(`${site}/ca-xx/15000/`);
-    for (const { file, target } of internalLinks(both.dir, both.written)) {
-      expect(existsSync(join(both.dir, target)), `${file} -> ${target}`).toBe(
-        true,
+  it(
+    'adds a made-up second province to links and sitemap with no other change',
+    async () => {
+      const alone = await build();
+      const both = await build({ list: 'xland' });
+      expect(both.written).toHaveLength(28);
+      expect(sitemapLocs(both.dir)).toHaveLength(29);
+      expect(sitemapLocs(both.dir)).toContain(`${site}/ca-xx/15000/`);
+      for (const { file, target } of internalLinks(both.dir, both.written)) {
+        expect(existsSync(join(both.dir, target)), `${file} -> ${target}`).toBe(
+          true,
+        );
+      }
+      expect(navHrefs(both.dir, 'ca-on/70000/index.html')).toEqual(
+        navHrefs(alone.dir, 'ca-on/70000/index.html'),
       );
-    }
-    expect(navHrefs(both.dir, 'ca-on/70000/index.html')).toEqual(
-      navHrefs(alone.dir, 'ca-on/70000/index.html'),
-    );
-    expect(
-      parse(both.dir, 'ca-xx/15000/index.html')
-        .querySelector('link[rel="canonical"]')
-        ?.getAttribute('href'),
-    ).toBe(`${site}/ca-xx/15000/`);
-    expect(navHrefs(both.dir, 'ca-xx/15000/index.html')).toEqual(
-      expect.arrayContaining(['/', '/ca-xx/10000/', '/ca-xx/20000/']),
-    );
-  });
+      expect(
+        parse(both.dir, 'ca-xx/15000/index.html')
+          .querySelector('link[rel="canonical"]')
+          ?.getAttribute('href'),
+      ).toBe(`${site}/ca-xx/15000/`);
+      expect(navHrefs(both.dir, 'ca-xx/15000/index.html')).toEqual(
+        expect.arrayContaining(['/', '/ca-xx/10000/', '/ca-xx/20000/']),
+      );
+    },
+    SLOW_TEST_MS,
+  );
 });

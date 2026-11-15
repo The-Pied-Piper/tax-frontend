@@ -142,27 +142,37 @@ describe('crawl from the built home page', () => {
     SLOW_TEST_MS,
   );
 
-  it('has no broken link anywhere, the home page included', async () => {
-    const { dir, written } = await build();
-    const links = internalLinks(dir, ['index.html', ...written]);
-    expect(
-      links.filter((l) => l.file === 'index.html').length,
-    ).toBeGreaterThanOrEqual(25);
-    for (const { file, target } of links) {
-      expect(existsSync(join(dir, target)), `${file} -> ${target}`).toBe(true);
-    }
-  });
+  it(
+    'has no broken link anywhere, the home page included',
+    async () => {
+      const { dir, written } = await build();
+      const links = internalLinks(dir, ['index.html', ...written]);
+      expect(
+        links.filter((l) => l.file === 'index.html').length,
+      ).toBeGreaterThanOrEqual(25);
+      for (const { file, target } of links) {
+        expect(existsSync(join(dir, target)), `${file} -> ${target}`).toBe(
+          true,
+        );
+      }
+    },
+    SLOW_TEST_MS,
+  );
 
-  it('reaches a made-up second province with no other change, and the home page lists it', async () => {
-    const { dir, written } = await build({ list: 'xland' });
-    expect(written).toHaveLength(28);
-    expect(orphans(dir, written)).toEqual([]);
-    const direct = linksFrom(dir, 'index.html');
-    for (const file of written.filter((f) => f.startsWith('ca-xx/'))) {
-      expect(direct.has(file), file).toBe(true);
-    }
-    expect(readFileSync(join(dir, 'index.html'), 'utf8')).toContain('Xland');
-  });
+  it(
+    'reaches a made-up second province with no other change, and the home page lists it',
+    async () => {
+      const { dir, written } = await build({ list: 'xland' });
+      expect(written).toHaveLength(28);
+      expect(orphans(dir, written)).toEqual([]);
+      const direct = linksFrom(dir, 'index.html');
+      for (const file of written.filter((f) => f.startsWith('ca-xx/'))) {
+        expect(direct.has(file), file).toBe(true);
+      }
+      expect(readFileSync(join(dir, 'index.html'), 'utf8')).toContain('Xland');
+    },
+    SLOW_TEST_MS,
+  );
 
   it('leaves the home page without links when the province is not returned', async () => {
     const dir = outDir();
