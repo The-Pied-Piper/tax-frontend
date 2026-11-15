@@ -15,7 +15,7 @@ export function AdvancedView({ groups }: Props) {
   const headingId = useId();
   if (groups.length === 0) return null;
   return (
-    <details className={styles.fold} aria-labelledby={headingId}>
+    <details aria-labelledby={headingId}>
       <summary className={styles.summary}>
         <h3 id={headingId} className={styles.heading}>
           {strings.advanced.toggle}
