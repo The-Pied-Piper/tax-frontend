@@ -114,20 +114,16 @@ describe('advanced view in the written CA-ON page', () => {
     for (const d of nested) expect(d.hasAttribute('open')).toBe(false);
   });
 
-  it('hides nothing with display:none, visibility:hidden or the hidden attribute', () => {
+  it('hides no group or line with display:none, visibility:hidden or the hidden attribute', () => {
+    // (A line's own help bubble keeps the hidden attribute until its ? is pressed.)
     const details = fold();
-    const hiders = [
-      details,
-      ...Array.from(details.querySelectorAll('*')),
-    ].filter(
-      (el) =>
-        el.hasAttribute('hidden') ||
-        /display:\s*none|visibility:\s*hidden/i.test(
-          el.getAttribute('style') ?? '',
-        ),
-    );
-    expect(hiders).toEqual([]);
-    expect(details.closest('[hidden], [style*="display"]')).toBeNull();
+    const shown = Array.from(details.querySelectorAll('summary, dl, dt, dd'));
+    expect(shown.length).toBeGreaterThan(groups.length);
+    for (const el of [details, ...shown]) {
+      expect(el.closest('[hidden]')).toBeNull();
+      expect(el.closest('[style]')).toBeNull();
+    }
+    expect(html).not.toMatch(/display:\s*none|visibility:\s*hidden/i);
   });
 
   it('does not render a checkbox for the advanced view', () => {

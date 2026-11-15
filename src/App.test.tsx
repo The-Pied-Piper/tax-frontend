@@ -828,6 +828,14 @@ describe('App, Alberta page through the mock service', () => {
     return user;
   }
 
+  function breakdownOf() {
+    return within(
+      screen
+        .getByText(strings.breakdown.toggle)
+        .closest('details') as HTMLElement,
+    );
+  }
+
   it('shows the breakdown card with Alberta tax and take-home for 2025', async () => {
     const user = await calculateAlberta();
     expect(screen.getAllByText('CA$53,782.01')).toHaveLength(2);
@@ -836,8 +844,8 @@ describe('App, Alberta page through the mock service', () => {
     expect(
       screen.getByText(strings.adapters.caAb.albertaTax.name),
     ).toBeVisible();
-    expect(screen.getByText('CA$3,598.12')).toBeVisible();
-    expect(screen.getByText('CA$7,585.64')).toBeVisible();
+    expect(breakdownOf().getByText('CA$3,598.12')).toBeVisible();
+    expect(breakdownOf().getByText('CA$7,585.64')).toBeVisible();
     const details = screen
       .getByText(strings.breakdown.toggle)
       .closest('details');
@@ -853,7 +861,7 @@ describe('App, Alberta page through the mock service', () => {
       strings.notices.provisionalTitle(2026),
     );
     await user.click(screen.getByText(strings.breakdown.toggle));
-    expect(screen.getByText('CA$3,534.79')).toBeVisible();
+    expect(breakdownOf().getByText('CA$3,534.79')).toBeVisible();
     const details = screen
       .getByText(strings.breakdown.toggle)
       .closest('details');

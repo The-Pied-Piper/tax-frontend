@@ -1,58 +1,16 @@
-.toggle {
-  display: flex;
-  align-items: center;
-  gap: 8px;
+.summary {
+  cursor: pointer;
+  border-radius: var(--radius-control);
+}
+
+.heading {
+  display: inline;
+  margin: 0;
   font-size: 14px;
   font-weight: 500;
-  cursor: pointer;
 }
 
-.checkbox {
-  appearance: none;
-  margin: 0;
-  flex: none;
-  width: 18px;
-  height: 18px;
-  display: grid;
-  place-content: center;
-  border: 1px solid var(--edge);
-  border-radius: 4px;
-  background: var(--surface);
-  cursor: pointer;
-}
-
-.checkbox::after {
-  content: '';
-  width: 10px;
-  height: 6px;
-  border-left: 2px solid var(--btn-fg);
-  border-bottom: 2px solid var(--btn-fg);
-  transform: rotate(-45deg) translate(1px, -1px);
-  opacity: 0;
-}
-
-.checkbox:checked {
-  background: var(--accent);
-  border-color: var(--accent);
-}
-
-.checkbox:checked::after {
-  opacity: 1;
-}
-
-@media (forced-colors: active) {
-  .checkbox:checked {
-    forced-color-adjust: none;
-    background: Highlight;
-    border-color: Highlight;
-  }
-
-  .checkbox::after {
-    border-color: HighlightText;
-  }
-}
-
-.checkbox:focus-visible,
+.summary:focus-visible,
 .formSummary:focus-visible {
   outline: 2px solid var(--accent);
   outline-offset: 2px;
