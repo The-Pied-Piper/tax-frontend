@@ -1,4 +1,11 @@
 /* Page shell styles. Colours come only from tokens.css. */
+
+/* Always reserve the scrollbar's width, so the centred layout does not move
+   sideways when the page grows past the window (e.g. the advanced view opens). */
+html {
+  scrollbar-gutter: stable;
+}
+
 body {
   margin: 0;
   background: var(--bg);
