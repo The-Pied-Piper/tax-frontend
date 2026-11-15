@@ -13,6 +13,7 @@ import {
 } from '../api';
 import type { PayPeriod } from '../money/payPeriod';
 import { languageCode } from '../strings';
+import { pickDefaultYear } from './defaultYear';
 import { describeFailure } from './failure';
 import { placeOptions, type PlaceOption } from './places';
 import { checkSalary, type SalaryCheck } from './salary';
@@ -128,6 +129,8 @@ export function useTakeHome(
   client: ApiClient = defaultClient,
   registry: AdapterRegistry = adapters,
   initial?: SalaryPageData,
+  // Tests pin the date; the visitor's own clock otherwise.
+  clock: () => Date = () => new Date(),
 ) {
   const [seed] = useState(() => seedFrom(initial, registry));
   const [jurisdictionsState, setJurisdictionsState] =
@@ -164,7 +167,7 @@ export function useTakeHome(
           setValues((v) => ({
             ...v,
             jurisdictionCode: first.code,
-            year: first.years[0]?.year ?? null,
+            year: pickDefaultYear(first.years, clock().getFullYear()),
           }));
         }
       },
@@ -175,6 +178,8 @@ export function useTakeHome(
     return () => {
       cancelled = true;
     };
+    // The clock is read once, when the list arrives.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [client, seed]);
 
   const jurisdictions =
@@ -183,8 +188,9 @@ export function useTakeHome(
       : [];
 
   function setJurisdictionCode(code: string) {
-    const year = jurisdictions.find((j) => j.code === code)?.years[0]?.year;
-    setValues((v) => ({ ...v, jurisdictionCode: code, year: year ?? null }));
+    const years = jurisdictions.find((j) => j.code === code)?.years ?? [];
+    const year = pickDefaultYear(years, clock().getFullYear());
+    setValues((v) => ({ ...v, jurisdictionCode: code, year }));
   }
 
   function setYear(year: number) {

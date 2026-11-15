@@ -20,6 +20,15 @@ import { server } from './mocks/server';
 import { strings } from './strings';
 import { fixtureClient } from './test/fixtureClient';
 
+// The tests below were written when the first listed year, 2025, was the
+// default: pin the date to match. The default-year tests pass their own clock.
+beforeEach(() => {
+  vi.useFakeTimers({ toFake: ['Date'], now: new Date(2025, 5, 15) });
+});
+afterEach(() => {
+  vi.useRealTimers();
+});
+
 describe('App form', () => {
   it('shows the page title', () => {
     render(<App client={fixtureClient()} />);
