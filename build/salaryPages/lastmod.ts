@@ -20,8 +20,10 @@ function isRecord(value: unknown): value is Record<string, unknown> {
 
 /** A real `YYYY-MM-DD` date (not 2026-13-45). */
 function isCalendarDate(text: string): boolean {
-  const time = Date.parse(text);
-  return !Number.isNaN(time) && new Date(time).toISOString().startsWith(text);
+  const date = new Date(text);
+  return (
+    date.toString() !== 'Invalid Date' && date.toISOString().startsWith(text)
+  );
 }
 
 function isPageHashes(value: unknown): value is PageHashes {
