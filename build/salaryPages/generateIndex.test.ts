@@ -16,6 +16,10 @@ import { generateSalaryPages } from './generate';
 import { provinces } from './provinces';
 import { renderSalaryApp } from './prerender';
 
+// Each page carries the advanced lines, so building and parsing many pages
+// outlasts the 5 s default when the whole suite runs in parallel.
+const SLOW_TEST_MS = 20_000;
+
 // What the generator adds for the link index: the result's `index`, and the
 // same data block in every page it writes.
 const outDir = tmpDirs('salary-index');
@@ -134,19 +138,23 @@ describe('generateSalaryPages: the salary-pages-index', () => {
     expect(result.index).toEqual({ groups: [] });
   });
 
-  it('writes the same block, once, into every page', async () => {
-    const dir = outDir();
-    const { index, written } = await run(dir, { all: true });
-    expect(written).toHaveLength(28);
-    for (const file of written) {
-      const found = blocks(dir, file);
-      expect(found, file).toHaveLength(1);
-      expect(found[0]?.getAttribute('type')).toBe('application/json');
-      expect(parseSalaryIndex(found[0]?.textContent ?? null), file).toEqual(
-        index,
-      );
-    }
-  });
+  it(
+    'writes the same block, once, into every page',
+    async () => {
+      const dir = outDir();
+      const { index, written } = await run(dir, { all: true });
+      expect(written).toHaveLength(28);
+      for (const file of written) {
+        const found = blocks(dir, file);
+        expect(found, file).toHaveLength(1);
+        expect(found[0]?.getAttribute('type')).toBe('application/json');
+        expect(parseSalaryIndex(found[0]?.textContent ?? null), file).toEqual(
+          index,
+        );
+      }
+    },
+    SLOW_TEST_MS,
+  );
 
   it('cannot be ended early by a province name that is markup', async () => {
     const dir = outDir();
