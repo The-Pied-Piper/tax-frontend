@@ -62,6 +62,12 @@ function section() {
   return screen.getByRole('group', { name: strings.advanced.toggle });
 }
 
+function summary() {
+  const el = section().querySelector(':scope > summary');
+  if (!el) throw new Error('no summary');
+  return el;
+}
+
 function open() {
   return userEvent.click(screen.getByText(strings.advanced.toggle));
 }
@@ -405,6 +411,38 @@ describe('AdvancedView', () => {
     it('shows a bare amount for a line with no unit', async () => {
       await openForm();
       expect(screen.getByText('0.0915')).toBeVisible();
+    });
+  });
+
+  // The row is drawn like the checkbox it replaced (#124 made it a caret); the
+  // look is checked in a browser, jsdom has no layout. These pin the behaviour.
+  describe('checkbox row', () => {
+    it('uses the native summary: no fake input, no hand-made aria state', () => {
+      render(<AdvancedView groups={groups} />);
+      const el = summary();
+      expect(el.querySelector('input')).toBeNull();
+      expect(el).not.toHaveAttribute('aria-expanded');
+      expect(el).not.toHaveAttribute('role');
+    });
+
+    it('keeps the label text in the summary', () => {
+      render(<AdvancedView groups={groups} />);
+      expect(summary()).toHaveTextContent(strings.advanced.toggle);
+    });
+
+    it('leaves Enter and Space to the browser to toggle it, and a click toggles it', async () => {
+      render(<AdvancedView groups={groups} />);
+      await userEvent.tab();
+      const prevented: boolean[] = [];
+      summary().addEventListener('keydown', (event) => {
+        prevented.push(event.defaultPrevented);
+      });
+      await userEvent.keyboard('{Enter}');
+      await userEvent.keyboard(' ');
+      expect(prevented).toEqual([false, false]);
+      // jsdom does not run the browser's key-to-click step; a click toggles it.
+      await userEvent.click(summary());
+      expect(section()).toHaveAttribute('open');
     });
   });
 });
