@@ -59,7 +59,14 @@ export function parseSalaryIndex(text: string | null): SalaryIndex | null {
   if (text === null || text.trim() === '') return null;
   try {
     const parsed: unknown = JSON.parse(text);
-    return isSalaryIndex(parsed) ? parsed : null;
+    if (!isSalaryIndex(parsed)) return null;
+    // The unit is read as the adapters read it, so the links show "$".
+    return {
+      groups: parsed.groups.map((group) => ({
+        ...group,
+        unit: readUnit(group.unit) ?? group.unit,
+      })),
+    };
   } catch {
     return null;
   }

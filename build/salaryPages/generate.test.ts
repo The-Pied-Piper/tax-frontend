@@ -1,3 +1,4 @@
+import { dollarSign } from '../../src/adapters/fallback';
 import { mkdtempSync, readFileSync, readdirSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
@@ -106,6 +107,11 @@ const withXland = {
 const ontarioOnly = provinces.filter((p) => p.code === 'CA-ON');
 
 const albertaOnly = provinces.filter((p) => p.code === 'CA-AB');
+
+// The API's answer as the built page carries it: its "CA$" shown as "$".
+function shown<T>(answer: T): T {
+  return JSON.parse(dollarSign(JSON.stringify(answer))) as T;
+}
 
 describe('generateSalaryPages for Ontario', () => {
   it('writes 25 pages, one per $5,000 step, at <slug>/<salary>/index.html', async () => {
@@ -217,7 +223,7 @@ describe('generateSalaryPages for Ontario', () => {
     ) as SalaryPageData;
     expect(data).toEqual({
       jurisdictions: jurisdictions.jurisdictions,
-      response: compute70000,
+      response: shown(compute70000),
       jurisdictionCode: 'CA-ON',
       year: 2026,
       salary: '70000',
@@ -313,7 +319,7 @@ describe('generateSalaryPages for Alberta', () => {
     ) as SalaryPageData;
     expect(data).toEqual({
       jurisdictions: withAlberta.jurisdictions,
-      response: alberta70000,
+      response: shown(alberta70000),
       jurisdictionCode: 'CA-AB',
       year: 2026,
       salary: '70000',

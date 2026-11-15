@@ -17,8 +17,29 @@ describe('salaryPageText: the text of a page from its own answer', () => {
     for (const text of [title, heading]) {
       expect(text).toContain('Ontario');
       expect(text).toContain('2026');
-      expect(text).toContain('70,000');
+      expect(text).toContain('$70,000 ');
+      expect(text).not.toContain('70,000.00');
     }
+  });
+
+  it('shows whole-dollar salaries without cents and never says CA$', () => {
+    const text = salaryPageText(compute70000, 'Ontario', 2026);
+    for (const value of Object.values(text)) {
+      expect(value).not.toContain('CA$');
+    }
+    expect(text.title).toContain('$70,000');
+    expect(text.description).toContain('$70,000');
+    expect(text.paragraph).toContain('$70,000 ');
+  });
+
+  it('keeps cents on the take-home and deductions', () => {
+    const { description, paragraph } = salaryPageText(
+      compute70000,
+      'Ontario',
+      2026,
+    );
+    expect(description).toContain('$53,786.25');
+    expect(paragraph).toContain('$16,213.75');
   });
 
   it('trims stray spaces from the place name', () => {
@@ -34,20 +55,20 @@ describe('salaryPageText: the text of a page from its own answer', () => {
 
   it("states the page's own figures in the paragraph, as the API printed them", () => {
     const { paragraph } = salaryPageText(compute70000, 'Ontario', 2026);
-    expect(paragraph).toContain('CA$53,786.25');
-    expect(paragraph).toContain('CA$16,213.75');
+    expect(paragraph).toContain('$53,786.25');
+    expect(paragraph).toContain('$16,213.75');
     expect(paragraph).toContain('15.91%');
     expect(paragraph).toContain('29.65%');
     expect(paragraph.toLowerCase()).toContain('estimate');
   });
 
   it.each([
-    [compute30000, 'CA$27,550.43'],
-    [compute150000, 'CA$104,319.88'],
+    [compute30000, '$27,550.43'],
+    [compute150000, '$104,319.88'],
   ])('uses the real take-home on the edge pages (%#)', (response, takeHome) => {
     const text = salaryPageText(response, 'Ontario', 2026);
     expect(text.paragraph).toContain(takeHome);
-    expect(text.description).toContain(takeHome.replace('CA$', ''));
+    expect(text.description).toContain(takeHome.replace('$', ''));
   });
 
   it('takes the place and year from its arguments, never from the code', () => {

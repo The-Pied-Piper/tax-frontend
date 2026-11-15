@@ -42,14 +42,24 @@ function show(data: SalaryPageData) {
 describe('renderSalaryApp (the static body of a salary page)', () => {
   it('has the answer in the HTML without JavaScript', () => {
     const html = renderSalaryApp(dataFor(compute70000, '70000'));
-    expect(html).toContain('CA$53,786.25');
-    expect(html).toContain('CA$16,213.75');
-    expect(html).toContain('CA$70,000.00');
+    expect(html).toContain('$53,786.25');
+    expect(html).toContain('$16,213.75');
+    expect(html).toContain('$70,000.00');
+  });
+
+  it('shows no CA$ in the text a visitor reads', () => {
+    for (const response of [compute30000, compute70000, compute150000]) {
+      const html = renderSalaryApp(dataFor(response, '70000'));
+      // The data block is the API's answer as sent; only text on the page counts.
+      show(dataFor(response, '70000'));
+      expect(document.body.textContent).not.toContain('CA$');
+      expect(html).not.toMatch(/CA\$\d/);
+    }
   });
 
   it.each([
-    [compute30000, '30000', 'CA$27,550.43'],
-    [compute150000, '150000', 'CA$104,319.88'],
+    [compute30000, '30000', '$27,550.43'],
+    [compute150000, '150000', '$104,319.88'],
   ])(
     'has the real figure on the edge page for $%s',
     (response, salary, takeHome) => {
@@ -66,7 +76,7 @@ describe('renderSalaryApp (the static body of a salary page)', () => {
       }),
     ).toBeInTheDocument();
     const card = screen.getByRole('region', { name: strings.answer.heading });
-    expect(within(card).getAllByText('CA$53,786.25').length).toBeGreaterThan(0);
+    expect(within(card).getAllByText('$53,786.25').length).toBeGreaterThan(0);
     expect(screen.getByRole('contentinfo')).toHaveTextContent(strings.footer);
   });
 

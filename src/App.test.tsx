@@ -3,6 +3,7 @@ import userEvent from '@testing-library/user-event';
 import { http, HttpResponse } from 'msw';
 import { App } from './App';
 import { AdapterRegistry, advancedGroups, COMING_SOON } from './adapters';
+import { responseUnit } from './adapters/fallback';
 import {
   ApiError,
   NetworkError,
@@ -312,7 +313,7 @@ describe('App form', () => {
       expect(
         screen.queryByRole('heading', { name: strings.answer.heading }),
       ).not.toBeInTheDocument();
-      expect(screen.queryByText('CA$53,468.68')).not.toBeInTheDocument();
+      expect(screen.queryByText('$53,468.68')).not.toBeInTheDocument();
     });
 
     it('puts a salary problem under the salary box', async () => {
@@ -511,20 +512,20 @@ describe('App answer card', () => {
 
   it('shows the 2025 figures with no provisional notice', async () => {
     await calculate(fixtureClient());
-    expect(screen.getAllByText('CA$53,468.68')).toHaveLength(2);
-    expect(screen.getAllByText('CA$70,000.00')[0]).toBeVisible();
-    expect(screen.getByText('CA$16,531.32')).toBeInTheDocument();
+    expect(screen.getAllByText('$53,468.68')).toHaveLength(2);
+    expect(screen.getAllByText('$70,000.00')[0]).toBeVisible();
+    expect(screen.getByText('$16,531.32')).toBeInTheDocument();
     expect(screen.queryByRole('note')).not.toBeInTheDocument();
   });
 
-  it('shows the unit the API sent, before the amount, a year or a month', async () => {
+  it('shows a plain dollar sign before the amount, a year or a month', async () => {
     const user = await calculate(fixtureClient());
-    expect(screen.getAllByText('CA$53,468.68')).toHaveLength(2);
+    expect(screen.getAllByText('$53,468.68')).toHaveLength(2);
     await user.click(
       screen.getByRole('radio', { name: strings.payPeriod.monthly }),
     );
-    expect(screen.getAllByText('CA$4,455.72')).toHaveLength(2);
-    expect(document.body.textContent).not.toMatch(/(?<!CA)\$\d/);
+    expect(screen.getAllByText('$4,455.72')).toHaveLength(2);
+    expect(document.body.textContent).not.toContain('CA$');
   });
 
   it('still renders a response without a unit, with the fallback unit', async () => {
@@ -547,14 +548,14 @@ describe('App answer card', () => {
   it('names the place and year that were asked', async () => {
     await calculate(fixtureClient());
     expect(
-      screen.getByText('out of CA$70,000.00, Ontario, 2025'),
+      screen.getByText('out of $70,000.00, Ontario, 2025'),
     ).toBeInTheDocument();
   });
 
   it('shows the 2026 figures with the provisional notice', async () => {
     await calculate(fixtureClient(undefined, compute2026), '2026');
-    expect(screen.getAllByText('CA$53,786.25')).toHaveLength(2);
-    expect(screen.getByText('CA$16,213.75')).toBeInTheDocument();
+    expect(screen.getAllByText('$53,786.25')).toHaveLength(2);
+    expect(screen.getByText('$16,213.75')).toBeInTheDocument();
     expect(screen.getByRole('note')).toHaveTextContent(
       strings.notices.provisionalTitle(2026),
     );
@@ -568,9 +569,9 @@ describe('App answer card', () => {
     await user.click(
       screen.getByRole('radio', { name: strings.payPeriod.monthly }),
     );
-    expect(screen.getAllByText('CA$4,455.72')).toHaveLength(2);
-    expect(screen.getByText('CA$5,833.33')).toBeInTheDocument();
-    expect(screen.getByText('CA$1,377.61')).toBeInTheDocument();
+    expect(screen.getAllByText('$4,455.72')).toHaveLength(2);
+    expect(screen.getByText('$5,833.33')).toBeInTheDocument();
+    expect(screen.getByText('$1,377.61')).toBeInTheDocument();
     expect(screen.getByText(strings.answer.label.monthly)).toBeInTheDocument();
   });
 
@@ -603,7 +604,7 @@ describe('App answer card', () => {
     expect(
       screen.getByRole('radio', { name: strings.payPeriod.monthly }),
     ).toBeChecked();
-    expect(screen.getAllByText('CA$4,455.72')).toHaveLength(2);
+    expect(screen.getAllByText('$4,455.72')).toHaveLength(2);
   });
 });
 
@@ -619,7 +620,7 @@ describe('App breakdown', () => {
           name: 'Salary before tax',
           help: 'What you earn before anything is taken off.',
           amount: response.salary,
-          unit: response.unit,
+          unit: responseUnit(response),
         },
       ],
       totals: [
@@ -628,11 +629,11 @@ describe('App breakdown', () => {
           name: 'Total taken off',
           help: 'Tax and contributions together.',
           amount: response.total_deductions,
-          unit: response.unit,
+          unit: responseUnit(response),
         },
       ],
       advanced: advancedGroups(response),
-      unit: response.unit,
+      unit: responseUnit(response),
     }),
   });
 
@@ -660,7 +661,7 @@ describe('App breakdown', () => {
     expect(details).toHaveAttribute('open');
     expect(screen.getByText('Total taken off')).toBeVisible();
     expect(
-      within(details as HTMLElement).getByText('CA$16,531.32'),
+      within(details as HTMLElement).getByText('$16,531.32'),
     ).toBeVisible();
   });
 
@@ -768,7 +769,7 @@ describe('App advanced view', () => {
     await user.click(screen.getByText('Return summary'));
     const form = screen.getByText('Return summary').closest('details');
     expect(form).not.toBeNull();
-    expect(within(form as HTMLElement).getByText('CA$11,497.09')).toBeVisible();
+    expect(within(form as HTMLElement).getByText('$11,497.09')).toBeVisible();
   });
 });
 
@@ -838,35 +839,35 @@ describe('App, Alberta page through the mock service', () => {
 
   it('shows the breakdown card with Alberta tax and take-home for 2025', async () => {
     const user = await calculateAlberta();
-    expect(screen.getAllByText('CA$53,782.01')).toHaveLength(2);
+    expect(screen.getAllByText('$53,782.01')).toHaveLength(2);
     expect(screen.queryByRole('note')).not.toBeInTheDocument();
     await user.click(screen.getByText(strings.breakdown.toggle));
     expect(
       screen.getByText(strings.adapters.caAb.albertaTax.name),
     ).toBeVisible();
-    expect(breakdownOf().getByText('CA$3,598.12')).toBeVisible();
-    expect(breakdownOf().getByText('CA$7,585.64')).toBeVisible();
+    expect(breakdownOf().getByText('$3,598.12')).toBeVisible();
+    expect(breakdownOf().getByText('$7,585.64')).toBeVisible();
     const details = screen
       .getByText(strings.breakdown.toggle)
       .closest('details');
     expect(
-      within(details as HTMLElement).getByText('CA$16,217.99'),
+      within(details as HTMLElement).getByText('$16,217.99'),
     ).toBeVisible();
   });
 
   it('shows the 2026 take-home with the provisional notice', async () => {
     const user = await calculateAlberta('2026');
-    expect(screen.getAllByText('CA$54,107.20')).toHaveLength(2);
+    expect(screen.getAllByText('$54,107.20')).toHaveLength(2);
     expect(screen.getByRole('note')).toHaveTextContent(
       strings.notices.provisionalTitle(2026),
     );
     await user.click(screen.getByText(strings.breakdown.toggle));
-    expect(breakdownOf().getByText('CA$3,534.79')).toBeVisible();
+    expect(breakdownOf().getByText('$3,534.79')).toBeVisible();
     const details = screen
       .getByText(strings.breakdown.toggle)
       .closest('details');
     expect(
-      within(details as HTMLElement).getByText('CA$15,892.80'),
+      within(details as HTMLElement).getByText('$15,892.80'),
     ).toBeVisible();
   });
 });

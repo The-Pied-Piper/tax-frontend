@@ -6,6 +6,7 @@ import {
   type ComputeTakeHomeCalculationResponse,
   type ListJurisdictionsResponse,
 } from '../../src/api';
+import { dollarSign } from '../../src/adapters/fallback';
 import { languageCode } from '../../src/strings';
 import type { SalaryIndex } from '../../src/state/salaryIndex';
 import type { SalaryPageData } from '../../src/state/useTakeHome';
@@ -77,14 +78,18 @@ export async function generateSalaryPages(
     for (const salary of steps) {
       const page = `${province.slug}/${salary}`;
       try {
+        const answer = await client.computeTakeHomeCalculation({
+          jurisdiction_code: province.code,
+          year: province.year,
+          salary,
+          language_code: languageCode,
+          include_trace: true,
+        });
+        // The page, its data block and the index carry "$", never the API's "CA$".
         responses.push(
-          await client.computeTakeHomeCalculation({
-            jurisdiction_code: province.code,
-            year: province.year,
-            salary,
-            language_code: languageCode,
-            include_trace: true,
-          }),
+          JSON.parse(
+            dollarSign(JSON.stringify(answer)),
+          ) as ComputeTakeHomeCalculationResponse,
         );
       } catch (error) {
         throw new Error(`Salary pages: ${page} failed: ${reason(error)}`, {

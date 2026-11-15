@@ -1,6 +1,6 @@
 import { useId } from 'react';
 import type { Unit } from '../adapters';
-import { displayMoney } from '../money/format';
+import { displayWholeMoney } from '../money/format';
 import type { SalaryPageLinks } from '../state/useTakeHome';
 import { strings } from '../strings';
 import styles from './SalaryLinks.module.css';
@@ -15,7 +15,7 @@ type Props = {
 /** Plain links to the neighbouring salary pages, the calculator and other pages. */
 export function SalaryLinks({ links, unit }: Props) {
   const headingId = useId();
-  const money = (salary: string) => displayMoney(salary, 'annually', unit);
+  const money = (salary: string) => displayWholeMoney(salary, 'annually', unit);
   return (
     <nav className={styles.nav} aria-label={strings.salaryLinks.label}>
       <div className={styles.row}>
