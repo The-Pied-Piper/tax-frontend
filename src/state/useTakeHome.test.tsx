@@ -199,14 +199,25 @@ describe('useTakeHome default year (the first load and a change of place)', () =
     expect(result.current.values.year).toBe(2026);
   });
 
-  it('does not change a year the visitor picked when the list is not read again', async () => {
-    const { result } = await load(
-      clientListing(place('CA-ON', 2025, 2026)),
-      2026,
+  it('does not change a year the visitor picked when the clock changes or the hook re-renders', async () => {
+    const client = clientListing(place('CA-ON', 2025, 2026));
+    const listed = vi.spyOn(client, 'listJurisdictions');
+    let year = 2026;
+    const hook = renderHook(() =>
+      useTakeHome(client, undefined, undefined, () => new Date(year, 5, 15)),
     );
-    act(() => {
-      result.current.setYear(2025);
+    await waitFor(() => {
+      expect(hook.result.current.jurisdictionsState.status).toBe('ready');
     });
-    expect(result.current.values.year).toBe(2025);
+    act(() => {
+      hook.result.current.setYear(2025);
+    });
+    year = 2027;
+    hook.rerender();
+    await act(async () => {
+      await Promise.resolve();
+    });
+    expect(listed).toHaveBeenCalledTimes(1);
+    expect(hook.result.current.values.year).toBe(2025);
   });
 });

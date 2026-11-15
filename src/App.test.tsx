@@ -1,7 +1,8 @@
 import { render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { http, HttpResponse } from 'msw';
-import { App } from './App';
+import type { ComponentProps } from 'react';
+import { App as RealApp } from './App';
 import { AdapterRegistry, advancedGroups, COMING_SOON } from './adapters';
 import {
   ApiError,
@@ -20,14 +21,12 @@ import { server } from './mocks/server';
 import { strings } from './strings';
 import { fixtureClient } from './test/fixtureClient';
 
-// The tests below were written when the first listed year, 2025, was the
-// default: pin the date to match. The default-year tests pass their own clock.
-beforeEach(() => {
-  vi.useFakeTimers({ toFake: ['Date'], now: new Date(2025, 5, 15) });
-});
-afterEach(() => {
-  vi.useRealTimers();
-});
+// Most tests below were written when the first listed year, 2025, was the
+// default: App here takes a 2025 clock unless a test passes its own.
+const clock2025 = () => new Date(2025, 5, 15);
+function App(props: ComponentProps<typeof RealApp>) {
+  return <RealApp clock={clock2025} {...props} />;
+}
 
 describe('App form', () => {
   it('shows the page title', () => {

@@ -147,6 +147,8 @@ export function useTakeHome(
   );
   // Only the latest request may write its answer.
   const latest = useRef(0);
+  // The clock is fixed at mount: a new one is not a reason to load the list again.
+  const [now] = useState(() => clock);
 
   // The one effect: the list of places and years is needed to draw the form.
   // Calculating is triggered by submit, never by an effect.
@@ -167,7 +169,7 @@ export function useTakeHome(
           setValues((v) => ({
             ...v,
             jurisdictionCode: first.code,
-            year: pickDefaultYear(first.years, clock().getFullYear()),
+            year: pickDefaultYear(first.years, now().getFullYear()),
           }));
         }
       },
@@ -178,9 +180,7 @@ export function useTakeHome(
     return () => {
       cancelled = true;
     };
-    // The clock is read once, when the list arrives.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [client, seed]);
+  }, [client, seed, now]);
 
   const jurisdictions =
     jurisdictionsState.status === 'ready'
@@ -189,7 +189,7 @@ export function useTakeHome(
 
   function setJurisdictionCode(code: string) {
     const years = jurisdictions.find((j) => j.code === code)?.years ?? [];
-    const year = pickDefaultYear(years, clock().getFullYear());
+    const year = pickDefaultYear(years, now().getFullYear());
     setValues((v) => ({ ...v, jurisdictionCode: code, year }));
   }
 
