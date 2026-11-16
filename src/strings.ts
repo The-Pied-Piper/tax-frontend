@@ -197,5 +197,16 @@ export const strings = {
         help: 'Federal and Alberta income tax added together.',
       },
     },
+    caBc: {
+      cpp2Zero: 'nothing',
+      britishColumbiaTax: {
+        name: 'British Columbia income tax',
+        help: 'Income tax owed to British Columbia after the British Columbia credits that apply to you.',
+      },
+      totalTax: {
+        name: 'Total income tax',
+        help: 'Federal and British Columbia income tax added together.',
+      },
+    },
   },
 };

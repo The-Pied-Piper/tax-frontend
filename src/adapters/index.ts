@@ -1,4 +1,5 @@
 import { caAbAdapter } from './ca-ab';
+import { caBcAdapter } from './ca-bc';
 import { caOnAdapter } from './ca-on';
 import { AdapterRegistry } from './registry';
 
@@ -10,4 +11,5 @@ export { AdapterRegistry } from './registry';
 /** The registry the page uses. Adding a jurisdiction means registering one adapter here. */
 export const adapters = new AdapterRegistry();
 adapters.register(caAbAdapter);
+adapters.register(caBcAdapter);
 adapters.register(caOnAdapter);

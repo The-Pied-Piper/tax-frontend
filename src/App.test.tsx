@@ -16,6 +16,7 @@ import compute2026 from './api/fixtures/compute-on-2026-70000.json';
 import compute2025 from './api/fixtures/compute-on-2025-70000.json';
 import computeAb2025 from './api/fixtures/compute-ab-2025-70000.json';
 import computeAb2026 from './api/fixtures/compute-ab-2026-70000.json';
+import computeBc2025 from './api/fixtures/compute-bc-2025-70000.json';
 import invalidSalary from './api/fixtures/error-invalid-salary.json';
 import jurisdictions from './api/fixtures/jurisdictions.json';
 import { server } from './mocks/server';
@@ -475,7 +476,7 @@ describe('App form', () => {
     ).toBeEnabled();
     expect(
       within(place).getByRole('option', {
-        name: 'British Columbia (Coming Soon)',
+        name: 'Manitoba (Coming Soon)',
       }),
     ).toBeDisabled();
   });
@@ -934,5 +935,55 @@ describe('App default year', () => {
     expect(screen.getByRole('note')).toHaveTextContent(
       strings.notices.provisionalBody(2026),
     );
+  });
+});
+
+describe('App, British Columbia page through the mock service', () => {
+  it('shows the breakdown card with British Columbia tax and take-home for 2025', async () => {
+    server.use(
+      http.get('*/api/v1/jurisdictions', () =>
+        HttpResponse.json({
+          jurisdictions: [
+            {
+              code: 'CA-BC',
+              name: 'British Columbia',
+              years: [{ year: 2025, provisional: false }],
+            },
+          ],
+          next_page_token: '',
+        }),
+      ),
+      http.post('*/api/v1/take-home-calculations\\:compute', () =>
+        HttpResponse.json(computeBc2025),
+      ),
+    );
+    const user = userEvent.setup();
+    render(<App />);
+    const place = await screen.findByRole('combobox', {
+      name: strings.form.place,
+    });
+    await within(place).findByRole('option', { name: 'British Columbia' });
+    await user.selectOptions(place, 'CA-BC');
+    await user.type(
+      screen.getByRole('textbox', { name: strings.form.salary }),
+      '70000',
+    );
+    await user.click(
+      screen.getByRole('button', { name: strings.form.calculate }),
+    );
+    await screen.findByRole('heading', { name: strings.answer.heading });
+    expect(screen.getAllByText('$54,217.74')).toHaveLength(2);
+    expect(screen.queryByRole('note')).not.toBeInTheDocument();
+    await user.click(screen.getByText(strings.breakdown.toggle));
+    const card = within(
+      screen
+        .getByText(strings.breakdown.toggle)
+        .closest('details') as HTMLElement,
+    );
+    expect(
+      screen.getByText(strings.adapters.caBc.britishColumbiaTax.name),
+    ).toBeVisible();
+    expect(card.getByText('$3,162.39')).toBeVisible();
+    expect(card.getByText('$15,782.26')).toBeVisible();
   });
 });

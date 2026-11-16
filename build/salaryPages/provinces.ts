@@ -30,6 +30,15 @@ export const provinces: Province[] = [
     to: 150000,
     step: 5000,
   },
+  {
+    // British Columbia has 2025 datasets only for now, so its pages are 2025.
+    code: 'CA-BC',
+    slug: 'ca-bc',
+    year: 2025,
+    from: 30000,
+    to: 150000,
+    step: 5000,
+  },
 ];
 
 export function salaries(province: Province): number[] {
