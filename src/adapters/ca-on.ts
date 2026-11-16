@@ -7,6 +7,7 @@ const ONTARIO: ProvincialLine = {
   wanted: { form: 'ca-on/on428', label: 'on428_ontario_tax_line_90' },
   id: 'ontario-tax',
   text: {
+    cpp2Zero: strings.adapters.caOn.cpp2Zero,
     tax: strings.adapters.caOn.ontarioTax,
     totalTax: strings.adapters.caOn.totalTax,
   },

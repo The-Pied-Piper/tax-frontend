@@ -21,6 +21,8 @@ export type ProvincialLine = {
   /** Row id for the province's tax, for example `ontario-tax`. */
   id: string;
   text: {
+    /** How the province words a zero second CPP contribution, for the shared help text. */
+    cpp2Zero: string;
     tax: { name: string; help: string };
     totalTax: { name: string; help: string };
   };
@@ -129,7 +131,7 @@ export function adaptCanadian(
       ),
       row(
         'cpp2',
-        text.cpp2,
+        { name: text.cpp2.name, help: text.cpp2.help(province.text.cpp2Zero) },
         { amount: cpp2Exact, unit: cpp2.unit },
         text.groups.pension,
       ),

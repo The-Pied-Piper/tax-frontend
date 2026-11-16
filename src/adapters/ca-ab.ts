@@ -7,6 +7,7 @@ const ALBERTA: ProvincialLine = {
   wanted: { form: 'ca-ab/ab428', label: 'ab428_alberta_tax_line_75' },
   id: 'alberta-tax',
   text: {
+    cpp2Zero: strings.adapters.caAb.cpp2Zero,
     tax: strings.adapters.caAb.albertaTax,
     totalTax: strings.adapters.caAb.totalTax,
   },

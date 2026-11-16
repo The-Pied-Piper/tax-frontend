@@ -157,7 +157,8 @@ export const strings = {
       },
       cpp2: {
         name: 'Canada Pension Plan, second additional contribution',
-        help: 'An extra Canada Pension Plan contribution on earnings above the first yearly ceiling. It is nothing if your pay is below that ceiling.',
+        help: (zero: string) =>
+          `An extra Canada Pension Plan contribution on earnings above the first yearly ceiling. It is ${zero} if your pay is below that ceiling.`,
       },
       ei: {
         name: 'Employment Insurance',
@@ -175,6 +176,7 @@ export const strings = {
       },
     },
     caOn: {
+      cpp2Zero: '$0.00',
       ontarioTax: {
         name: 'Ontario income tax',
         help: 'Income tax owed to Ontario, including the Ontario Health Premium, after the Ontario credits that apply to you.',
@@ -185,6 +187,7 @@ export const strings = {
       },
     },
     caAb: {
+      cpp2Zero: 'nothing',
       albertaTax: {
         name: 'Alberta income tax',
         help: 'Income tax owed to Alberta after the Alberta credits that apply to you.',
