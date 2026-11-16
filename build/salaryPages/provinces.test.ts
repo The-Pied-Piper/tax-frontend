@@ -1,7 +1,7 @@
 import { provinces, salaries, TAX_YEAR } from './provinces';
 
 describe('the province list', () => {
-  it('has Ontario then Alberta, each from $30,000 to $150,000 in $5,000 steps', () => {
+  it('has Ontario, Alberta then British Columbia, each from $30,000 to $150,000 in $5,000 steps', () => {
     expect(provinces).toEqual([
       {
         code: 'CA-ON',
@@ -19,12 +19,22 @@ describe('the province list', () => {
         to: 150000,
         step: 5000,
       },
+      {
+        code: 'CA-BC',
+        slug: 'ca-bc',
+        year: 2025,
+        from: 30000,
+        to: 150000,
+        step: 5000,
+      },
     ]);
   });
 
-  it('takes the year from the one build setting, 2026 now', () => {
+  it('takes the year from the one build setting, 2026 now, except British Columbia (2025 only for now)', () => {
     expect(TAX_YEAR).toBe(2026);
-    for (const province of provinces) expect(province.year).toBe(TAX_YEAR);
+    for (const province of provinces) {
+      expect(province.year).toBe(province.code === 'CA-BC' ? 2025 : TAX_YEAR);
+    }
   });
 });
 
