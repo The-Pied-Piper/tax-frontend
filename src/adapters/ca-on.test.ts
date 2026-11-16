@@ -328,7 +328,7 @@ describe('Ontario adapter', () => {
 describe('Ontario adapter, Employment Insurance help', () => {
   const eiHelp = (response: ComputeTakeHomeCalculationResponse) =>
     caOnAdapter.adapt(response).rows.find((r) => r.id === 'ei')?.help;
-  const text = strings.adapters.caOn;
+  const text = strings.adapters.caFederal;
 
   it('has the saved $1,500 answer with EI 0.00 and a trace', () => {
     expect(r2026Small.salary).toBe('1500.00');
@@ -394,7 +394,7 @@ describe('Ontario adapter, Employment Insurance help', () => {
 });
 
 describe('Ontario adapter, refund note text', () => {
-  const note = () => strings.adapters.caOn.eiRefundedNote('$1,500.00');
+  const note = () => strings.adapters.caFederal.eiRefundedNote('$1,500.00');
 
   it('is the exact sentence with the salary in it', () => {
     expect(note()).toBe(
@@ -403,7 +403,7 @@ describe('Ontario adapter, refund note text', () => {
   });
 
   it('puts whatever salary text it is given into the sentence', () => {
-    expect(strings.adapters.caOn.eiRefundedNote('$900.00')).toContain(
+    expect(strings.adapters.caFederal.eiRefundedNote('$900.00')).toContain(
       'On a salary of $900.00 the premium',
     );
   });

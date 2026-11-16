@@ -1,0 +1,149 @@
+import type { ComputeTakeHomeCalculationResponse, Unit } from '../api';
+import { displayMoney } from '../money/format';
+import { isPositive, isZero } from '../money/sign';
+import { sumAmounts } from '../money/sum';
+import { strings } from '../strings';
+import {
+  advancedGroups,
+  fallbackResult,
+  readUnit,
+  responseUnit,
+} from './fallback';
+import type { AdaptedResult, DisplayRow } from './types';
+
+/** A trace line named by its form and label. */
+export type Wanted = { form: string; label: string };
+
+/** What a province adds to the shared federal rows: its own tax line and its total. */
+export type ProvincialLine = {
+  /** Trace line holding the province's tax. */
+  wanted: Wanted;
+  /** Row id for the province's tax, for example `ontario-tax`. */
+  id: string;
+  text: {
+    tax: { name: string; help: string };
+    totalTax: { name: string; help: string };
+  };
+};
+
+type Found = { amount: string; unit: Unit | null };
+
+/** Exact trace labels read from the real $70,000 and $90,000 responses for 2025 and 2026. */
+const LABELS = {
+  cppBase: {
+    form: 'ca/schedule_8',
+    label: 'schedule_8_cpp_base_contributions_on_return',
+  },
+  // Enhanced contributions on the first earnings ceiling (line 12). The
+  // "enhanced on return" total also holds CPP2, so it is not used here.
+  cppEnhancedFirst: { form: 'ca/schedule_8', label: 'cpp_part_3_line_12' },
+  // Second additional contribution on earnings above the first ceiling (line 22).
+  cpp2: { form: 'ca/schedule_8', label: 'cpp_part_3_line_22' },
+  ei: { form: 'ca/t1_tax_and_credits', label: 'ei_premiums_line_88' },
+  federalTax: { form: 'ca/t1_tax_and_credits', label: 'net_federal_tax' },
+  totalTax: { form: 'ca/t1_tax_and_credits', label: 'total_payable' },
+} as const;
+
+function find(
+  response: ComputeTakeHomeCalculationResponse,
+  wanted: Wanted,
+): Found | undefined {
+  const line = response.trace
+    ?.filter((f) => f.form === wanted.form)
+    .flatMap((f) => f.lines)
+    .find((l) => l.label === wanted.label);
+  if (line?.amount === undefined) return undefined;
+  return { amount: line.amount, unit: readUnit(line.unit) };
+}
+
+function sameUnit(a: Unit | null, b: Unit | null): boolean {
+  return a === null || b === null ? a === b : a.name === b.name;
+}
+
+function row(
+  id: string,
+  text: { name: string; help: string },
+  found: Found,
+  group?: string,
+): DisplayRow {
+  const { amount, unit } = found;
+  return group === undefined
+    ? { id, name: text.name, help: text.help, amount, unit }
+    : { id, name: text.name, help: text.help, amount, unit, group };
+}
+
+/**
+ * Builds the result for a Canadian province: the federal rows (CPP, CPP2, EI, federal tax)
+ * are the same everywhere, the province supplies only its own tax line and total.
+ */
+export function adaptCanadian(
+  response: ComputeTakeHomeCalculationResponse,
+  province: ProvincialLine,
+): AdaptedResult {
+  const cppBase = find(response, LABELS.cppBase);
+  const cppEnhancedFirst = find(response, LABELS.cppEnhancedFirst);
+  const cpp2 = find(response, LABELS.cpp2);
+  const ei = find(response, LABELS.ei);
+  const federalTax = find(response, LABELS.federalTax);
+  const provincialTax = find(response, province.wanted);
+  const totalTax = find(response, LABELS.totalTax);
+  if (
+    cppBase === undefined ||
+    cppEnhancedFirst === undefined ||
+    cpp2 === undefined ||
+    ei === undefined ||
+    federalTax === undefined ||
+    provincialTax === undefined ||
+    totalTax === undefined
+  ) {
+    // A label we rely on is missing: show nothing half-right, keep the advanced view.
+    return fallbackResult(response);
+  }
+  // Two lines in different units cannot be added: same rule as an unreadable amount.
+  if (!sameUnit(cppBase.unit, cppEnhancedFirst.unit)) {
+    return fallbackResult(response);
+  }
+  const text = strings.adapters.caFederal;
+  let cpp: string;
+  let cpp2Exact: string;
+  let eiHelp = text.ei.help;
+  try {
+    cpp = sumAmounts([cppBase.amount, cppEnhancedFirst.amount]);
+    cpp2Exact = sumAmounts([cpp2.amount]);
+    // No premium counted on a real salary: say why, since a pay slip shows one.
+    if (isZero(ei.amount) && isPositive(response.salary)) {
+      eiHelp = `${eiHelp} ${text.eiRefundedNote(displayMoney(response.salary, 'annually', responseUnit(response)))}`;
+    }
+  } catch {
+    // An amount we cannot add exactly: same rule, show nothing half-right.
+    return fallbackResult(response);
+  }
+  return {
+    unit: responseUnit(response),
+    rows: [
+      row(
+        'cpp',
+        text.cpp,
+        { amount: cpp, unit: cppBase.unit },
+        text.groups.pension,
+      ),
+      row(
+        'cpp2',
+        text.cpp2,
+        { amount: cpp2Exact, unit: cpp2.unit },
+        text.groups.pension,
+      ),
+      row('ei', { name: text.ei.name, help: eiHelp }, ei, text.groups.ei),
+      row('federal-tax', text.federalTax, federalTax, text.groups.incomeTax),
+      row(province.id, province.text.tax, provincialTax, text.groups.incomeTax),
+    ],
+    totals: [
+      row('total-tax', province.text.totalTax, totalTax, text.groups.incomeTax),
+      row('total-taken-off', text.totalTakenOff, {
+        amount: response.total_deductions,
+        unit: responseUnit(response),
+      }),
+    ],
+    advanced: advancedGroups(response),
+  };
+}

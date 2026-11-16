@@ -276,7 +276,7 @@ describe('Alberta adapter', () => {
 });
 
 describe('Alberta adapter, help text', () => {
-  const text = strings.adapters.caAb;
+  const text = { ...strings.adapters.caFederal, ...strings.adapters.caAb };
 
   /** Every string leaf of the Alberta text, names and help alike. */
   function leaves(value: unknown): string[] {
@@ -326,7 +326,7 @@ describe('Alberta adapter, help text', () => {
 });
 
 describe('Alberta adapter, Employment Insurance refund note', () => {
-  const text = strings.adapters.caAb;
+  const text = strings.adapters.caFederal;
   const eiHelp = (response: ComputeTakeHomeCalculationResponse) =>
     caAbAdapter.adapt(response).rows.find((r) => r.id === 'ei')?.help;
 
