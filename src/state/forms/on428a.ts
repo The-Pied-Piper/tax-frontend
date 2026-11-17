@@ -35,7 +35,7 @@ export const on428a: FormPageSpec = {
       heading: 'Less credit as income rises',
       lines: 'Lines 6–20',
       paragraph:
-        'The credit shrinks as your income goes up. Once your income is over {threshold}, the form takes away {rate} of the part above it. If that takes away all of the credit, you get nothing.',
+        "The credit shrinks as your income goes up. Once your income is over {threshold}, the form takes away {rate} of the part above it. If that takes away all of the credit, you get nothing. These are the amounts for a single person. With a spouse or partner, the form uses your family's income and a different threshold. The credit goes onto line 85 of Form ON428.",
       example:
         'Your income is {income}, which is {over} over {threshold}. {rate} of that is {cut}. {max} less {cut} is below zero, so the credit is {credit}.',
       figures: {
