@@ -20,9 +20,9 @@ export const bc428: FormPageSpec = {
       heading: 'Your taxable income',
       lines: 'Line 1',
       paragraph:
-        'Taxable income is the part of your pay that tax is charged on. This form does not work it out. It copies the number from the federal part of your return. Some things are taken off first, like part of your pension plan payments.',
+        'Taxable income is the part of your income that tax is charged on. This form does not work it out. It copies the number from the federal part of your return. Some things are taken off first, like part of your pension plan payments.',
       example:
-        'Taxable income is {income}, because {taken}, the extra part of your pension plan payments, is taken off first.',
+        '{taken}, the extra part of your pension plan payments, is taken off first. That leaves a taxable income of {income}.',
       figures: {
         income: result('$69,335', 'bc428_taxable_income_line_1'),
         taken: result(
@@ -37,9 +37,9 @@ export const bc428: FormPageSpec = {
       heading: 'Tax on your income, slice by slice',
       lines: 'Lines 3–8',
       paragraph:
-        'British Columbia does not tax all of your income at one rate. It cuts your income into slices, called brackets, and each slice has its own rate. The form finds the highest slice your income reaches, adds the tax on all the slices below it, then charges that slice’s rate on the rest.',
+        'British Columbia does not tax all of your income at one rate. It cuts your income into slices, called brackets, and each slice has its own rate. The form finds the top slice your income reaches. It adds up the tax on all the slices below that one, then charges the top slice’s rate on the rest of your income.',
       example:
-        'Your income reaches the slice that starts at {start}, taxed at {rate}. The slices below it come to {below}. The {above} above {start} adds {added}. British Columbia tax on your income: {tax}.',
+        'Your income reaches the slice that starts at {start}. That slice is taxed at {rate}. The tax on the slices below it comes to {below}. The {above} of your income above {start} adds {added}. British Columbia tax before credits: {tax}.',
       figures: {
         start: result('$49,279', 'bc428_bracket_lower_bound_line_3'),
         rate: result('7.7%', 'bc428_bracket_rate_line_5'),
@@ -57,7 +57,7 @@ export const bc428: FormPageSpec = {
       heading: 'Credits that lower your tax',
       lines: 'Lines 16–60',
       paragraph:
-        'A credit is a discount on your tax bill. Everyone gets a basic personal amount ({basic} in 2025). You also get credit for the main part of your pension plan payments and for your EI payments. The form adds these amounts up, then takes {rate} of the total. That is your discount.',
+        'A credit lowers your tax bill. The form starts with a list of amounts: the basic personal amount that everyone gets ({basic} in 2025), the main part of your pension plan payments, and your EI payments. It adds them up, then takes {rate} of the total. That is your discount.',
       example:
         'The basic amount, {cpp} for the main part of your pension plan payments and {ei} of EI payments add up to {total}. {rate} of that is {discount}.',
       figures: {
@@ -87,9 +87,9 @@ export const bc428: FormPageSpec = {
       heading: 'Reduction for lower income',
       lines: 'Lines 73–80',
       paragraph:
-        'British Columbia can reduce the tax of people on lower income. The reduction starts at {set}. The form then takes your net income above {base} and charges {rate} on it. It takes that away from the reduction. If the answer is below zero, the reduction is zero. It is also zero once your net income is high enough that this charge is bigger than the starting amount.',
+        'British Columbia lowers the tax of people on lower incomes. The reduction starts at {set}. The form then takes your net income over {base} and charges {rate} on it. That amount is taken away from the reduction. If nothing is left, the reduction is zero. So the higher your income, the smaller the reduction, until it reaches zero.',
       example:
-        'Your net income is {over} above {base}. {rate} of that is {clawback}, which is more than {set}. The reduction is {reduction}.',
+        'Your net income is {over} over {base}. {rate} of that is {clawback}, which is more than {set}, so the reduction is {reduction}.',
       figures: {
         set: result('$562', 'bc428_basic_reduction_line_73'),
         base: result('$25,020', 'bc428_base_amount_line_75'),

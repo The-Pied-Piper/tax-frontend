@@ -91,11 +91,26 @@ describe('bc479 copy', () => {
     expect(page('bc479').intro).toMatch(/only the sales tax credit/i);
   });
 
-  it("says the renter's credit can still pay at higher incomes, if you paid rent", () => {
-    const { paragraph, example } = section('bc479', 'total');
-    const total = `${paragraph} ${example}`;
-    expect(total).toMatch(/higher incomes/i);
-    expect(total).toMatch(/paid rent/i);
+  it("says the renter's credit is for people who paid rent", () => {
+    expect(section('bc479', 'total').paragraph).toMatch(
+      /renter['\u2019]s credit is for people who paid rent/i,
+    );
+  });
+
+  it("says the renter's credit gets smaller as income rises and stops at a set income", () => {
+    const { paragraph } = section('bc479', 'total');
+    expect(paragraph).toMatch(/gets smaller as income rises/i);
+    expect(paragraph).toMatch(/stops at a set income/i);
+  });
+
+  it("does not say the renter's credit can still pay at higher incomes", () => {
+    const total = text();
+    expect(total).not.toMatch(/higher incomes/i);
+    expect(total).not.toMatch(/can still pay/i);
+  });
+
+  it("names no dollar figure for the renter's credit cut-off", () => {
+    expect(section('bc479', 'total').paragraph).not.toMatch(/\$|\d{2},\d{3}/);
   });
 
   it("names the renter's credit as left out", () => {
@@ -300,5 +315,69 @@ describe('on428 lift section links', () => {
       if (s.id === 'lift') continue;
       expect(s.links ?? [], s.id).toHaveLength(0);
     }
+  });
+});
+
+// Exact proposed wording for ticket #189. Curly and straight apostrophes
+// are treated alike, so the file's own convention may stand.
+const plain = (value: string) => value.replace(/\u2019/g, "'");
+
+describe.each([
+  [
+    'bc428',
+    'income',
+    'Taxable income is the part of your income that tax is charged on. This form does not work it out. It copies the number from the federal part of your return. Some things are taken off first, like part of your pension plan payments.',
+    '{taken}, the extra part of your pension plan payments, is taken off first. That leaves a taxable income of {income}.',
+  ],
+  [
+    'bc428',
+    'brackets',
+    "British Columbia does not tax all of your income at one rate. It cuts your income into slices, called brackets, and each slice has its own rate. The form finds the top slice your income reaches. It adds up the tax on all the slices below that one, then charges the top slice's rate on the rest of your income.",
+    'Your income reaches the slice that starts at {start}. That slice is taxed at {rate}. The tax on the slices below it comes to {below}. The {above} of your income above {start} adds {added}. British Columbia tax before credits: {tax}.',
+  ],
+  [
+    'bc428',
+    'credits',
+    'A credit lowers your tax bill. The form starts with a list of amounts: the basic personal amount that everyone gets ({basic} in 2025), the main part of your pension plan payments, and your EI payments. It adds them up, then takes {rate} of the total. That is your discount.',
+    undefined,
+  ],
+  [
+    'bc428',
+    'reduction',
+    'British Columbia lowers the tax of people on lower incomes. The reduction starts at {set}. The form then takes your net income over {base} and charges {rate} on it. That amount is taken away from the reduction. If nothing is left, the reduction is zero. So the higher your income, the smaller the reduction, until it reaches zero.',
+    'Your net income is {over} over {base}. {rate} of that is {clawback}, which is more than {set}, so the reduction is {reduction}.',
+  ],
+  [
+    'bc479',
+    'income',
+    'The form starts with your income. It takes off {threshold}, because the sales tax credit only starts to shrink once your income is over that amount.',
+    'Your income is {income}. Take off {threshold} and {over} is left.',
+  ],
+  [
+    'bc479',
+    'sales-tax',
+    'The sales tax credit starts at {credit}. It shrinks by {rate} of your income over {threshold}. It can be paid to you even if you owe no BC tax. At very low incomes, that can make your take-home pay higher than your salary.',
+    undefined,
+  ],
+  [
+    'bc479',
+    'total',
+    "The form adds up your credits. We count only the sales tax credit. The form has other credits too: for renters, home renovation, venture capital, mining exploration, clean buildings and training. We do not use those. The renter's credit is for people who paid rent. It gets smaller as income rises and stops at a set income. The total goes onto line 47900 of your return.",
+    undefined,
+  ],
+])('%s %s section wording (#189)', (id, sectionId, paragraph, example) => {
+  it('has the proposed paragraph', () => {
+    expect(plain(section(id, sectionId).paragraph)).toBe(plain(paragraph));
+  });
+
+  if (example !== undefined) {
+    it('has the proposed example', () => {
+      expect(plain(section(id, sectionId).example)).toBe(plain(example));
+    });
+  }
+
+  it('keeps sentences to 40 words', () => {
+    const { paragraph: p, example: e } = section(id, sectionId);
+    expect(longestSentence(`${p} ${e}`)).toBeLessThanOrEqual(40);
   });
 });
