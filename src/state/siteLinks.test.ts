@@ -8,6 +8,7 @@ import {
   HOME_PATH,
   isContentSlug,
   METHODOLOGY_SLUG,
+  NOT_FOUND_FILE,
 } from './siteLinks';
 
 // The one place that says where a content page lives.
@@ -111,5 +112,11 @@ describe('formSlug', () => {
     expect(isContentSlug(formSlug('t1-income'))).toBe(true);
     expect(contentPath(formSlug('bc428'))).toBe('/forms/bc428/');
     expect(contentFile(formSlug('bc428'))).toBe('forms/bc428/index.html');
+  });
+});
+
+describe('NOT_FOUND_FILE', () => {
+  it('is the file at the top of the output that the host serves for a missing page', () => {
+    expect(NOT_FOUND_FILE).toBe('404.html');
   });
 });

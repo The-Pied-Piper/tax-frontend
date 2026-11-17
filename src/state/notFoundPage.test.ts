@@ -7,10 +7,9 @@ import {
   FOOTER_PROVINCE_SLUGS,
   HOME_PATH,
   METHODOLOGY_SLUG,
-  NOT_FOUND_FILE,
   contentPath,
 } from './siteLinks';
-import { everyString } from '../test/copyRules';
+import { copyRules, everyString } from '../test/copyRules';
 
 type LinksBlock = Extract<ContentBlock, { kind: 'links' }>;
 
@@ -19,12 +18,6 @@ function grid(): LinksBlock | undefined {
     .flatMap((s) => s.blocks)
     .find((b): b is LinksBlock => b.kind === 'links');
 }
-
-describe('the not-found file name', () => {
-  it('is 404.html', () => {
-    expect(NOT_FOUND_FILE).toBe('404.html');
-  });
-});
 
 describe('notFoundPage', () => {
   it('has its own slug and no trail', () => {
@@ -68,6 +61,12 @@ describe('notFoundPage', () => {
     const copy = everyString(notFoundPage).join(' ');
     expect(copy.length).toBeGreaterThan(0);
     expect(copy).not.toMatch(/\d|\$/);
+  });
+
+  it.each(copyRules)('holds no %s', (_name, pattern) => {
+    for (const words of everyString(notFoundPage)) {
+      expect(words).not.toMatch(pattern);
+    }
   });
 
   it('is not listed among the content pages', () => {

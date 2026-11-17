@@ -2,7 +2,8 @@ import { writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
 import type { ContentPageSpec } from '../../src/state/contentPages';
 import { NOT_FOUND_FILE } from '../../src/state/siteLinks';
-import { pageShell, withoutAddress } from '../salaryPages/pageHtml';
+import { withoutAddress } from '../salaryPages/pageHtml';
+import { buildContentPageHtml } from './html';
 
 export type NotFoundOptions = {
   outDir: string;
@@ -24,7 +25,9 @@ export async function generateNotFoundPage({
   render,
   spec,
 }: NotFoundOptions): Promise<string> {
-  const html = withoutAddress(pageShell(template, render(spec), spec, null));
+  const html = withoutAddress(
+    buildContentPageHtml(template, render(spec), spec, null),
+  );
   if (!html.includes('</head>')) {
     throw new Error('The template has no </head>');
   }
