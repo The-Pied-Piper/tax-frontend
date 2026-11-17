@@ -1,17 +1,16 @@
 import { copyRules, everyString } from '../../test/copyRules';
-import { pageOf, sectionOf, shownText } from '../../test/formText';
+import {
+  longestSentence,
+  pageOf,
+  placeholdersIn,
+  sectionOf,
+  shownText,
+} from '../../test/formText';
 
 /** A section's paragraph, with each `{name}` shown as its figure. */
 function paragraphOf(pageId: string, sectionId: string): string {
   const section = sectionOf(pageId, sectionId);
   return shownText(section, section.paragraph);
-}
-
-/** Every `{name}` a piece of text uses. */
-function placeholdersIn(...texts: string[]): string[] {
-  return texts.flatMap((text) =>
-    [...text.matchAll(/\{([a-z][a-zA-Z0-9]*)\}/g)].map((m) => m[1] ?? ''),
-  );
 }
 
 const ab428Wording = {
@@ -156,6 +155,14 @@ describe('ab428 copy', () => {
     expect([...usedInSupplement].sort()).toEqual(
       Object.keys(supplement.figures).sort(),
     );
+  });
+
+  it('ab428 changed sections keep every sentence to 40 words or fewer', () => {
+    for (const id of ['income', 'brackets', 'credits', 'supplement']) {
+      const section = sectionOf('ab428', id);
+      expect(longestSentence(section.paragraph), id).toBeLessThanOrEqual(40);
+      expect(longestSentence(section.example), id).toBeLessThanOrEqual(40);
+    }
   });
 
   it('supplement says unused tuition is taken off first', () => {
