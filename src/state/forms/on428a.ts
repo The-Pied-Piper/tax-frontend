@@ -22,7 +22,7 @@ export const on428a: FormPageSpec = {
       paragraph:
         'The LIFT credit starts at {rate} of what you earned from work. It can never be more than {max}.',
       example:
-        '{rate} of {pay} is {before}. That is more than the most, so the credit before income is checked is {max}.',
+        '{rate} of {pay} is {before}. That is more than the top amount of {max}, so the credit, before your income is taken into account, is {max}.',
       figures: {
         rate: printed('5.05%', '5.05% of line 3'),
         max: result('$875', 'lift_maximum_credit'),
