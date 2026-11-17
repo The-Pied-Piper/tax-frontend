@@ -56,13 +56,14 @@ describe('salaryPageText: the text of a page from its own answer', () => {
     expect(description).not.toContain(title);
     expect(description).not.toContain('After Tax in');
     expect(description).not.toContain('Take-Home Pay');
-    expect(description).toContain('income tax, CPP and EI');
+    expect(description).toContain(
+      'income tax, pension plan and Employment Insurance',
+    );
   });
 
-  it('puts the take-home in the description, as an estimate', () => {
+  it('puts the take-home in the description, as an approximate figure', () => {
     const { description } = salaryPageText(compute70000, 'Ontario', 2026);
-    expect(description).toContain('53,786.25');
-    expect(description.toLowerCase()).toContain('estimate');
+    expect(description).toContain('about $53,786.25');
   });
 
   it("states the page's own figures in the paragraph, as the API printed them", () => {
@@ -204,9 +205,9 @@ describe('natural-search wording of the page text', () => {
         '$58,786',
       );
       expect(description).toBe(
-        `On a $75,000 salary in ${place} in 2026, you take home an estimated $58,786 a year after income tax, CPP and EI. See where the rest goes.`,
+        `On a $75,000 salary in ${place} in 2026, you take home about $58,786 a year after income tax, pension plan and Employment Insurance.`,
       );
-      expect(description.toLowerCase()).toContain('estimate');
+      expect(description).toContain('about $58,786');
     },
   );
 
