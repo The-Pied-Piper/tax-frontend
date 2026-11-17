@@ -71,7 +71,7 @@ describe.each(formPages)('the $name page', (form) => {
   it('has a heading, line numbers, one paragraph and an example in each section', () => {
     for (const section of form.sections) {
       expect(section.heading, section.id).not.toBe('');
-      expect(section.lines, section.id).toMatch(/^Lines? \d/);
+      expect(section.lines, section.id).toMatch(/^(Lines?|Boxes|Box) [A-Z\d]/);
       expect(section.paragraph, section.id).not.toContain('\n');
       expect(section.example, section.id).not.toBe('');
     }
