@@ -9,6 +9,7 @@ import { join } from 'node:path';
 import {
   apiBaseUrl,
   fakeFetch,
+  listedIn,
   siteUrl as site,
   template,
   tmpDirs,
@@ -40,17 +41,21 @@ const outDir = tmpDirs('salary-crawl');
 async function build(options: { list?: 'xland' | 'alberta' } = {}) {
   const dir = outDir();
   writeFileSync(join(dir, 'index.html'), template);
+  const list =
+    options.list === 'xland'
+      ? withXland
+      : options.list === 'alberta'
+        ? withAlberta
+        : undefined;
   const { written } = await generateSalaryPages({
     published: withoutForms,
-    fetch: fakeFetch(
-      options.list === 'xland'
-        ? withXland
-        : options.list === 'alberta'
-          ? withAlberta
-          : undefined,
-    ),
+    fetch: fakeFetch(list),
     baseUrl: apiBaseUrl,
-    provinces: options.list === 'xland' ? [...provinces, xland] : provinces,
+    // Only the provinces the fake API lists: a site-URL build fails on any other.
+    provinces: listedIn(
+      options.list === 'xland' ? [...provinces, xland] : provinces,
+      list,
+    ),
     outDir: dir,
     template,
     render: renderSalaryApp,

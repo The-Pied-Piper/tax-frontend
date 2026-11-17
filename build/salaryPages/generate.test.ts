@@ -428,6 +428,98 @@ describe('a listed province the API does not return', () => {
   });
 });
 
+describe('a listed province the API does not return, with a site URL', () => {
+  const siteUrl = 'https://aftertaxlens.com';
+  const alberta = { ...xland, code: 'CA-AB', slug: 'ca-ab', from: 30000 };
+  const computes = (api: { calls: Call[] }) =>
+    api.calls.filter((c) => c.method === 'POST');
+
+  it('fails the build before fetching or writing anything', async () => {
+    const api = fakeApi(seventyThousand);
+    const dir = outDir();
+    const run = generateSalaryPages({
+      published: publishedSlugs,
+      fetch: api.fetch,
+      baseUrl,
+      siteUrl,
+      provinces: [...ontarioOnly, alberta],
+      outDir: dir,
+      template,
+      render,
+    });
+    await expect(run).rejects.toThrow(/CA-AB/);
+    await expect(run).rejects.toThrow(/Alberta/);
+    await expect(run).rejects.toThrow(baseUrl);
+    await expect(run).rejects.toThrow(
+      `Alberta (CA-AB) is listed in build/salaryPages/provinces.ts but the API at ${baseUrl} does not return it. Release the service with it first, or take it out of the list.`,
+    );
+    expect(readdirSync(dir)).toEqual([]);
+    expect(computes(api)).toHaveLength(0);
+  });
+
+  it('names every missing province in one error', async () => {
+    const api = fakeApi(seventyThousand);
+    const dir = outDir();
+    const error = await generateSalaryPages({
+      published: publishedSlugs,
+      fetch: api.fetch,
+      baseUrl,
+      siteUrl,
+      provinces: [
+        ...ontarioOnly,
+        alberta,
+        { ...xland, code: 'CA-BC', slug: 'ca-bc' },
+      ],
+      outDir: dir,
+      template,
+      render,
+    }).then(
+      () => null,
+      (e: unknown) => e as Error,
+    );
+    expect(error).toBeInstanceOf(Error);
+    expect(error?.message).toContain('Alberta (CA-AB)');
+    expect(error?.message).toContain('British Columbia (CA-BC)');
+    expect(readdirSync(dir)).toEqual([]);
+    expect(computes(api)).toHaveLength(0);
+  });
+
+  it('still skips and reports when the site URL is null', async () => {
+    const api = fakeApi(seventyThousand);
+    const dir = outDir();
+    const result = await generateSalaryPages({
+      published: publishedSlugs,
+      fetch: api.fetch,
+      baseUrl,
+      siteUrl: null,
+      provinces: [...ontarioOnly, alberta],
+      outDir: dir,
+      template,
+      render,
+    });
+    expect(result.skipped).toEqual(['CA-AB']);
+    expect(readdirSync(dir)).toEqual(['ca-on']);
+  });
+
+  it('builds as before when the API returns every listed province', async () => {
+    const api = fakeApi(seventyThousand, () => Response.json(withXland));
+    const dir = outDir();
+    const result = await generateSalaryPages({
+      published: publishedSlugs,
+      fetch: api.fetch,
+      baseUrl,
+      siteUrl,
+      provinces: [...ontarioOnly, xland],
+      outDir: dir,
+      template,
+      render,
+    });
+    expect(result.skipped).toEqual([]);
+    expect(files(dir, 'ca-xx')).toEqual(['10000', '15000', '20000']);
+    expect(files(dir, 'ca-on')).toHaveLength(25);
+  });
+});
+
 describe('the build fails clearly', () => {
   it('names the page when the API answers an error for it', async () => {
     const api = fakeApi((body) =>
