@@ -1,27 +1,13 @@
-import { formPages } from '../formPages';
-
-function pageOf(id: string) {
-  const form = formPages.find((entry) => entry.id === id);
-  if (!form) throw new Error(`No form page with id ${id}`);
-  return form;
-}
-
-function sectionOf(pageId: string, sectionId: string) {
-  const section = pageOf(pageId).sections.find((s) => s.id === sectionId);
-  if (!section) throw new Error(`No section ${sectionId} on ${pageId}`);
-  return section;
-}
+import { copyRules, everyString } from '../../test/copyRules';
+import { pageOf, sectionOf, shownText } from '../../test/formText';
 
 /** A section's paragraph, with each `{name}` shown as its figure. */
 function paragraphOf(pageId: string, sectionId: string): string {
   const section = sectionOf(pageId, sectionId);
-  return section.paragraph.replace(
-    /\{([a-z][a-zA-Z0-9]*)\}/g,
-    (whole, name: string) => section.figures[name]?.shown ?? whole,
-  );
+  return shownText(section, section.paragraph);
 }
 
-describe('form page labels and copy (ticket 168)', () => {
+describe('form page labels and copy', () => {
   it('ab428 names its supplement section "Alberta supplemental tax credit"', () => {
     const section = sectionOf('ab428', 'supplement');
     expect(section.heading).toMatch(/^Alberta supplemental tax credit$/i);
@@ -73,5 +59,19 @@ describe('form page labels and copy (ticket 168)', () => {
     expect(text).toMatch(/net income/i);
     expect(text).toMatch(/\$40,807/);
     expect(text).not.toMatch(/your income/i);
+  });
+
+  describe.each([
+    'ab428',
+    'bc428',
+    'on428',
+    'schedule-8',
+    't1-income',
+    't1-tax',
+    't4',
+  ])('the %s page', (id) => {
+    it.each(copyRules)('holds no %s in any field', (_what, pattern) => {
+      expect(everyString(pageOf(id)).join('\n')).not.toMatch(pattern);
+    });
   });
 });

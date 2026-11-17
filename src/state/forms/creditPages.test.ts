@@ -6,6 +6,7 @@ import { copyRules, everyString } from '../../test/copyRules';
 import { formContentPage } from '../formPage';
 import { formPages } from '../formPages';
 import { formSlug } from '../siteLinks';
+import { pageOf, shownText } from '../../test/formText';
 
 const EXPECTED: Record<string, { province: string; sections: string[] }> = {
   t2204: { province: 'ca-on', sections: ['earnings', 'premiums', 'refund'] },
@@ -27,15 +28,10 @@ const FACT: Record<string, RegExp> = {
 
 /** A page's paragraphs and examples, each `{name}` shown as its figure. */
 function bodyOf(id: string): string {
-  const form = formPages.find((entry) => entry.id === id);
-  if (!form) throw new Error(`No form page with id ${id}`);
-  return form.sections
-    .flatMap((section) =>
+  return pageOf(id)
+    .sections.flatMap((section) =>
       [section.paragraph, section.example].map((text) =>
-        text.replace(
-          /\{([a-z][a-zA-Z0-9]*)\}/g,
-          (whole, name: string) => section.figures[name]?.shown ?? whole,
-        ),
+        shownText(section, text),
       ),
     )
     .join(' ');

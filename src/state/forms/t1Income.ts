@@ -33,7 +33,7 @@ export const t1Income: FormPageSpec = {
       heading: 'What you take off',
       lines: 'Lines 22215 and 23300',
       paragraph:
-        'A deduction is an amount you are allowed to take off your income before tax is worked out. Here, the form takes off the extra part of your pension plan payments, plus any second payment, copied from Schedule 8. The extra part, plus any second payment, goes on line 22215. Line 23300 is the total of all your deductions.',
+        'A deduction is an amount you are allowed to take off your income before tax is worked out. Here, the form takes off the extra part of your pension plan payments, plus any second payment, copied from Schedule 8. It goes on line 22215. Line 23300 is the total of all your deductions.',
       example: 'The amount taken off is {taken}.',
       figures: {
         taken: result('$665', 'deductions_from_total_income'),
