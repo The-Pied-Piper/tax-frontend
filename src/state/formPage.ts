@@ -48,7 +48,10 @@ export type FormPageSpec = {
 export type FormBody = Pick<
   FormPageSpec,
   'province' | 'year' | 'exampleSalary' | 'sections'
->;
+> & {
+  /** Set by the build: true when the example salary page was written. Unset or false means no salary link. */
+  salaryPageWritten?: boolean;
+};
 
 /** The page entry for a form. */
 export function formContentPage(form: FormPageSpec): ContentPageSpec {

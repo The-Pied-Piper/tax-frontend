@@ -42,6 +42,7 @@ export function FormSections({
   year,
   exampleSalary,
   sections,
+  salaryPageWritten,
 }: FormBody) {
   const salary = displayWholeMoney(
     exampleSalary,
@@ -99,9 +100,11 @@ export function FormSections({
         <a href={contentPath(METHODOLOGY_SLUG)}>
           {strings.siteNav.methodology}
         </a>
-        <a href={salaryPagePath(province, exampleSalary)}>
-          {strings.formPage.salaryExample(salary)}
-        </a>
+        {salaryPageWritten === true && (
+          <a href={salaryPagePath(province, exampleSalary)}>
+            {strings.formPage.salaryExample(salary)}
+          </a>
+        )}
       </nav>
     </>
   );
