@@ -18,13 +18,12 @@ export const t1Income: FormPageSpec = {
     {
       id: 'total-income',
       heading: 'Your total income',
-      lines: 'Lines 10100 and 15000',
+      lines: 'Lines 10100, 10400 and 15000',
       paragraph:
-        'Total income is all the money you earned in the year. Pay from your job goes on one line. Other work income goes on another. The form adds them together.',
+        'Total income is all the money you earned in the year. Your pay from your job goes on one line. Other work income goes on another. The form adds them together.',
       example:
-        'Your pay is {pay} and your other work income is {other}. Total income: {total}.',
+        'Your pay and other work income together come to {total}, and {other} of that is other work income. Total income: {total}.',
       figures: {
-        pay: result('$70,000', 'total_income'),
         other: result('$0', 'other_employment_income'),
         total: result('$70,000', 'total_income'),
       },
@@ -34,7 +33,7 @@ export const t1Income: FormPageSpec = {
       heading: 'What you take off',
       lines: 'Line 23300',
       paragraph:
-        'A deduction is an amount you are allowed to take off your income before tax is worked out. Here, the form takes off the extra part of your pension plan payments, copied from Schedule 8.',
+        'A deduction is an amount you are allowed to take off your income before tax is worked out. Here, the form takes off the extra part of your pension plan payments, plus any second payment, copied from Schedule 8.',
       example: 'The amount taken off is {taken}.',
       figures: {
         taken: result('$665', 'deductions_from_total_income'),
@@ -45,7 +44,7 @@ export const t1Income: FormPageSpec = {
       heading: 'Your net income',
       lines: 'Lines 23400–23600',
       paragraph:
-        'Net income is your total income less what you take off. The form can also take off a few other amounts. If the answer would be below zero, it is shown as zero.',
+        'Net income is your total income less what you take off. The form can also take off money you had to pay back from certain government benefits. If the answer would be below zero, it is shown as zero.',
       example:
         '{total} less {taken} is {net}. No other amounts apply, so net income stays {net}.',
       figures: {
@@ -59,7 +58,7 @@ export const t1Income: FormPageSpec = {
       heading: 'Your taxable income',
       lines: 'Lines 25700 and 26000',
       paragraph:
-        'Some people take off a few more amounts at this step. What is left is your taxable income. It is the amount your federal tax and your Ontario tax are worked out from.',
+        'Some people take off a few more amounts at this step. What is left is your taxable income, and it cannot be below zero. It is the amount your federal tax and your Ontario tax are worked out from.',
       example:
         'The other amounts are {other}, so your taxable income is {taxable}.',
       figures: {

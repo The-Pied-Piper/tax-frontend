@@ -13,12 +13,12 @@ export const schedule8: FormPageSpec = {
   description:
     'What Schedule 8 is for and what each part asks, in plain words, with a worked example for a $70,000 salary.',
   intro:
-    'This form works out how much you paid into the Canada Pension Plan, the pension everyone who works pays into. It also says where those payments go on your tax return.',
+    'This form works out how much you paid into the Canada Pension Plan, the pension plan that most people who work outside Quebec pay into. It also says where those payments go on your tax return.',
   sections: [
     {
       id: 'months',
       heading: 'Months you paid in',
-      lines: 'Line 1, with lines A–E',
+      lines: 'Lines A, B, D and E',
       paragraph:
         'The form starts with how many months you paid into the pension plan. For a full year that is {months}. The number of months sets three limits. One is the most pay the plan counts. The next is a higher limit for extra payments. The last is a first slice of pay that is not counted.',
       example:
@@ -67,11 +67,12 @@ export const schedule8: FormPageSpec = {
       heading: 'Your main payment',
       lines: 'Lines 5–12',
       paragraph:
-        'The first {exemption} of your pay is not counted. The rest is charged at {baseRate}. That is your base payment. A further {extraRate} of the same amount is the extra part, which is treated differently on your return.',
+        'The first {exemption} of your pay is not counted. The rest, up to {first}, is charged at {baseRate}. That is your base payment. A further {extraRate} of the same amount is the extra part, which is treated differently on your return.',
       example:
-        'Your pay less {exemption} is {rest}. {baseRate} of that is {base}. {extraRate} of it is {extra}.',
+        'Your pay less {exemption} is {rest}, which is under {first}. {baseRate} of that is {base}. {extraRate} of it is {extra}.',
       figures: {
         exemption: result('$3,500', 'cpp_basic_exemption'),
+        first: result('$71,300', 'cpp_maximum_pensionable_earnings'),
         baseRate: printed('4.95%', '4.95% of the part of line 7'),
         extraRate: printed('1%', '1% of the part of line 7'),
         rest: result('$66,500', 'cpp_part_3_line_7'),

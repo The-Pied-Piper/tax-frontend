@@ -2,7 +2,7 @@ import {
   DESCRIPTION_LIMIT,
   TITLE_LIMIT,
 } from '../../../build/salaryPages/limits';
-import { everyString } from '../../test/copyRules';
+import { copyRules, everyString } from '../../test/copyRules';
 import { formContentPage } from '../formPage';
 import { formPages } from '../formPages';
 import { formSlug } from '../siteLinks';
@@ -24,14 +24,6 @@ const EXPECTED_SECTIONS: Record<string, string[]> = {
     'balance',
   ],
 };
-
-// Built from pieces so this file does not hold the words it forbids.
-const FORBIDDEN: [string, RegExp][] = [
-  ['a third-party site', new RegExp(['tax', 'tips'].join('\\s*'), 'i')],
-  ['an agency calculator', new RegExp(['cra', 'calculator'].join('\\s+'), 'i')],
-  ['the agency calculator tool', new RegExp(['pd', 'oc'].join(''), 'i')],
-  ['the agency formulas', new RegExp(['t', '4127'].join(''), 'i')],
-];
 
 function longestSentence(text: string): number {
   return Math.max(
@@ -64,7 +56,7 @@ describe.each(Object.keys(EXPECTED_SECTIONS))('the %s page', (id) => {
 
   it('gives each section its own line numbers', () => {
     const lines = need().sections.map((section) => section.lines);
-    for (const line of lines) expect(line).toMatch(/^Lines? \d/);
+    for (const line of lines) expect(line).toMatch(/^Lines? [A-Z\d]/);
     expect(new Set(lines).size).toBe(lines.length);
   });
 
@@ -79,11 +71,8 @@ describe.each(Object.keys(EXPECTED_SECTIONS))('the %s page', (id) => {
     }
   });
 
-  it('names no other site, calculator or agency tool in any field', () => {
-    const words = everyString(need()).join('\n');
-    for (const [what, pattern] of FORBIDDEN) {
-      expect(words, what).not.toMatch(pattern);
-    }
+  it.each(copyRules)('holds no %s in any field', (_what, pattern) => {
+    expect(everyString(need()).join('\n')).not.toMatch(pattern);
   });
 
   it('holds no markup or link in its words', () => {

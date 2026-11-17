@@ -41,7 +41,7 @@ export const t1Tax: FormPageSpec = {
       heading: 'Credits that lower your tax',
       lines: 'Lines 30000–35000',
       paragraph:
-        'A credit is a discount on your tax bill. You get one for a basic personal amount, for the pension plan and EI payments you made, and for the Canada employment amount. The form adds the amounts up and takes {rate} of the total.',
+        'A credit is a discount on your tax bill. You get one for a basic personal amount, for the base part of your pension plan payments, for your Employment Insurance (EI) payments, and for the Canada employment amount, a set amount for people with job income. The basic personal amount is one everyone gets, and it shrinks at high incomes. The form adds the amounts up and takes {rate} of the total.',
       example:
         'The amounts are {basic}, {cpp}, {ei} and {job}. They add up to {total}. {rate} of that is {discount}.',
       figures: {
@@ -57,14 +57,14 @@ export const t1Tax: FormPageSpec = {
     {
       id: 'after-credits',
       heading: 'Federal tax after credits',
-      lines: 'Lines 42900 and 42000',
+      lines: 'Lines 40400, 125 and 42900',
       paragraph:
         'The form takes your credit discount away from your federal tax. The answer cannot go below zero. What is left is your federal tax.',
       example: '{tax} less {discount} leaves a federal tax of {after}.',
       figures: {
-        tax: result('$10,771.18', 'federal_tax_on_taxable_income_line_76'),
+        tax: result('$10,771.18', 'federal_tax_with_split_income'),
         discount: result('$3,185.54', 'credits_against_basic_federal_tax'),
-        after: result('$7,585.64', 'federal_tax_with_surtax'),
+        after: result('$7,585.64', 'federal_tax_after_credits'),
       },
     },
     {
@@ -81,13 +81,13 @@ export const t1Tax: FormPageSpec = {
     {
       id: 'balance',
       heading: 'Your total tax',
-      lines: 'Lines 43500 and 167',
+      lines: 'Lines 43500, 48200 and 167',
       paragraph:
-        'The form adds your federal tax and your Ontario tax. That is your total tax. Some credits are paid out even if you owe no tax, and they would be taken off here.',
+        'The form adds your federal tax and your Ontario tax. That is your total tax. Line 167 then takes off credits that are paid out even if you owe no tax. This page does not look at tax already taken off your pay during the year.',
       example:
-        '{federal} plus {ontario} is {total}. Those credits are {refundable} here, so the total stays {total}.',
+        '{federal} plus {ontario} is {total}. Those paid-out credits are {refundable} here, so the amount on line 167 is {total}.',
       figures: {
-        federal: result('$7,585.64', 'federal_tax_with_surtax'),
+        federal: result('$7,585.64', 'federal_tax_after_credits'),
         ontario: result('$3,911.45', 'provincial_tax_line_42800'),
         total: result('$11,497.09', 'total_payable'),
         refundable: result('$0', 'total_credits'),
