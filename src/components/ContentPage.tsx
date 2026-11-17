@@ -3,10 +3,9 @@ import styles from './ContentPage.module.css';
 import { FormSections } from './FormSections';
 import { SiteFooter } from './SiteFooter';
 import { ThemeToggle } from './ThemeToggle';
+import { contentBreadcrumb } from '../state/breadcrumbs';
 import type { ContentBlock, ContentPageSpec } from '../state/contentPages';
 import { THEME_TOGGLE_SLOT_ID } from '../state/themeSlot';
-import { contentPath, HOME_PATH } from '../state/siteLinks';
-import { strings } from '../strings';
 
 /** One block of a section: a paragraph, a list of forms, a group of links or a table. */
 function ContentBlockView({ block }: { block: ContentBlock }) {
@@ -104,16 +103,7 @@ export function ContentPage({
             <ThemeToggle />
           </div>
         </header>
-        <Breadcrumb
-          steps={[
-            { label: strings.siteNav.home, href: HOME_PATH },
-            ...trail.map((step) => ({
-              label: step.label,
-              href: contentPath(step.slug),
-            })),
-          ]}
-          current={heading}
-        />
+        <Breadcrumb {...contentBreadcrumb({ heading, trail })} />
         {form && <FormSections {...form} />}
         {sections.map((section, at) => (
           <section key={at} className={styles.section}>

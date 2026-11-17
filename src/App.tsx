@@ -13,9 +13,9 @@ import { SiteFooter } from './components/SiteFooter';
 import { StarLink } from './components/StarLink';
 import { ThemeToggle } from './components/ThemeToggle';
 import { displayWholeMoney } from './money/format';
+import { salaryBreadcrumb } from './state/breadcrumbs';
 import { salaryPageText } from './state/salaryPageText';
 import { useTakeHome, type SalaryPageData } from './state/useTakeHome';
-import { HOME_PATH } from './state/siteLinks';
 import { strings } from './strings';
 
 type Props = {
@@ -43,14 +43,13 @@ export function App({ client, registry, initial, clock }: Props) {
       <main>
         {request.status === 'success' && request.links && (
           <Breadcrumb
-            steps={[
-              { label: strings.siteNav.calculator, href: HOME_PATH },
+            {...salaryBreadcrumb(
               request.links.hub,
-            ]}
-            current={displayWholeMoney(
-              request.response.salary,
-              'annually',
-              request.adapted.unit,
+              displayWholeMoney(
+                request.response.salary,
+                'annually',
+                request.adapted.unit,
+              ),
             )}
           />
         )}

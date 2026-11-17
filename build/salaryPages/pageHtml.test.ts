@@ -255,3 +255,19 @@ describe('withoutAddress', () => {
     expect(out).toContain('og:type');
   });
 });
+
+describe('buildPageHtml with a head block', () => {
+  const block = '<script type="application/ld+json">{"a":1}</script>';
+
+  it('puts the block at the end of the head', () => {
+    const out = parse(
+      buildPageHtml(template, '<main></main>', data, null, block),
+    );
+    expect(out.head.lastElementChild?.outerHTML).toBe(block);
+  });
+
+  it('adds nothing when there is no block', () => {
+    const out = parse(buildPageHtml(template, '<main></main>', data, null));
+    expect(out.querySelector('script[type="application/ld+json"]')).toBeNull();
+  });
+});
