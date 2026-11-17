@@ -57,11 +57,14 @@
   scroll-margin-top: 16px;
 }
 
-.section h2 {
+.heading {
   display: flex;
   flex-wrap: wrap;
   align-items: baseline;
   gap: 8px;
+}
+
+.section h2 {
   margin: 0;
   font-size: 18px;
   font-weight: 600;
@@ -76,7 +79,7 @@
   text-decoration: none;
 }
 
-.section h2:hover .permalink,
+.heading:hover .permalink,
 .permalink:focus-visible {
   color: var(--accent);
 }
