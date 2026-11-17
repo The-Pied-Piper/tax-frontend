@@ -10,7 +10,8 @@ import type { Province } from '../salaryPages/provinces';
 /**
  * One hub page per listed province, in list order. Its salary links are the
  * salary pages that were built, so none points at a missing file; a province
- * the API did not return still gets its hub, with no salary section.
+ * the API did not return still gets its hub in a build without a site URL
+ * (with one, the salary build has already failed), with no salary section.
  * `published` holds the slugs of the other content pages: forms with a page
  * there are linked, and every hub counts as published.
  */

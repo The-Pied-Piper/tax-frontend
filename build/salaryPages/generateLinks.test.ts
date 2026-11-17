@@ -10,6 +10,7 @@ import type { SalaryPageData } from '../../src/state/useTakeHome';
 import {
   apiBaseUrl,
   fakeFetch,
+  listedIn,
   siteUrl,
   template,
   tmpDirs,
@@ -33,11 +34,16 @@ function run(
     list?: unknown;
   } = {},
 ) {
+  const all = options.all ? [...provinces, xland] : provinces;
+  const listOf = options.list as
+    { jurisdictions: { code: string }[] } | undefined;
   return generateSalaryPages({
     published: options.published ?? publishedSlugs,
     fetch: fakeFetch(options.list),
     baseUrl: apiBaseUrl,
-    provinces: options.all ? [...provinces, xland] : provinces,
+    // With a site URL the build fails on a listed province the fake API does not
+    // return, so such a build passes only the provinces the fake API lists.
+    provinces: options.siteUrl ? listedIn(all, listOf) : all,
     outDir: dir,
     template,
     render,
