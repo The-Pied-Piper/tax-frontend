@@ -114,13 +114,16 @@ describe('salaryPages closeBundle', () => {
       '/forms/ab428/',
       '/forms/bc428/',
       '/forms/on428/',
+      '/forms/schedule-8/',
+      '/forms/t1-income/',
+      '/forms/t1-tax/',
       '/forms/t4/',
       '/methodology/',
     ]);
 
     const sitemap = await readFile(join(root, 'dist', 'sitemap.xml'), 'utf8');
     const urls = sitemap.match(/<url>[\s\S]*?<\/url>/g) ?? [];
-    expect(urls).toHaveLength(11);
+    expect(urls).toHaveLength(14);
     for (const url of urls) {
       expect(url).toMatch(/<lastmod>\d{4}-\d{2}-\d{2}<\/lastmod>/);
     }
