@@ -23,7 +23,7 @@ const FACT: Record<string, RegExp> = {
   t2204: /\$2,000/,
   'schedule-6': /Canada Workers Benefit/,
   'on428-a': /LIFT/,
-  bc479: /refundable/i,
+  bc479: /paid to you even if you owe no BC tax/i,
 };
 
 /** A page's paragraphs and examples, each `{name}` shown as its figure. */
