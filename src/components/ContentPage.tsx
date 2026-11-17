@@ -1,10 +1,9 @@
+import { ContentBlocks } from './ContentBlocks';
 import styles from './ContentPage.module.css';
 import { SiteFooter } from './SiteFooter';
 import { ThemeToggle } from './ThemeToggle';
-import {
-  THEME_TOGGLE_SLOT_ID,
-  type ContentPageSpec,
-} from '../state/contentPages';
+import type { ContentPageSpec } from '../state/contentPages';
+import { THEME_TOGGLE_SLOT_ID } from '../state/themeToggleSlot';
 import { contentPath, HOME_PATH } from '../state/siteLinks';
 import { strings } from '../strings';
 
@@ -23,7 +22,7 @@ export function ContentPage({
             <h1>{heading}</h1>
             {lede && <p className="lede">{lede}</p>}
           </div>
-          <div id={THEME_TOGGLE_SLOT_ID}>
+          <div id={THEME_TOGGLE_SLOT_ID} className={styles.themeSlot}>
             <ThemeToggle />
           </div>
         </header>
@@ -46,6 +45,7 @@ export function ContentPage({
             {section.paragraphs.map((text, line) => (
               <p key={line}>{text}</p>
             ))}
+            {section.blocks && <ContentBlocks blocks={section.blocks} />}
           </section>
         ))}
       </main>

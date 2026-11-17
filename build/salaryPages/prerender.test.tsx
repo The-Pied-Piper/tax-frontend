@@ -3,10 +3,9 @@ import userEvent from '@testing-library/user-event';
 import {
   renderContentPage,
   renderSalaryApp,
-  renderSalaryIndexNav,
+  renderSiteFooter,
 } from './prerender';
 import { sampleSpec } from '../../src/test/contentPageData';
-import { ontarioIndex } from '../../src/test/salaryIndexData';
 import { pageMeta } from './pageMeta';
 import { salaryLinks } from './links';
 import { App } from '../../src/App';
@@ -279,11 +278,16 @@ describe('salary links in the static page and the mounted page (#81)', () => {
   });
 });
 
-describe('renderSalaryIndexNav (the static nav of the home page)', () => {
-  it('is the real Popular salaries nav as a string, with a plain link to every page', () => {
-    document.body.innerHTML = renderSalaryIndexNav(ontarioIndex);
-    const nav = screen.getByRole('navigation', { name: 'Popular salaries' });
-    expect(within(nav).getAllByRole('link')).toHaveLength(25);
+describe('renderSiteFooter (the static footer of the home page)', () => {
+  it('is the real footer as a string, with the plain links and the disclaimer', () => {
+    document.body.innerHTML = renderSiteFooter();
+    const nav = screen.getByRole('navigation', { name: strings.siteNav.label });
+    expect(
+      within(nav)
+        .getAllByRole('link')
+        .map((a) => a.getAttribute('href')),
+    ).toEqual(['/methodology/', '/ca-on/', '/ca-ab/', '/ca-bc/']);
+    expect(document.body.textContent).toContain(strings.footer);
   });
 });
 

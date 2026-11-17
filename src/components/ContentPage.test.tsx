@@ -3,7 +3,7 @@ import { renderToString } from 'react-dom/server';
 import { ContentPage } from './ContentPage';
 import { strings } from '../strings';
 import { THEME_STORAGE_KEY } from '../theme/theme';
-import { plainSpec, sampleSpec } from '../test/contentPageData';
+import { blocksSpec, plainSpec, sampleSpec } from '../test/contentPageData';
 
 afterEach(() => {
   delete document.documentElement.dataset.theme;
@@ -113,5 +113,24 @@ describe('ContentPage theme switch', () => {
     const html = renderToString(<ContentPage {...sampleSpec} />);
     expect(html).toContain('id="content-theme-toggle"');
     expect(html).toContain(sampleSpec.heading);
+  });
+});
+
+describe('ContentPage sections with blocks', () => {
+  it('draws the paragraphs and then the blocks of a section, inside it', () => {
+    const { container } = render(<ContentPage {...blocksSpec} />);
+    const section = container.querySelector('section');
+    expect(section).not.toBeNull();
+    const kids = [...(section as Element).children].map((c) => c.tagName);
+    expect(kids).toEqual(['H2', 'P', 'H3', 'UL', 'NAV', 'NAV', 'TABLE']);
+  });
+
+  it('draws a section with no blocks exactly as before', () => {
+    const { container } = render(<ContentPage {...plainSpec} />);
+    expect(
+      [...(container.querySelector('section') as Element).children].map(
+        (c) => c.tagName,
+      ),
+    ).toEqual(['H2', 'P']);
   });
 });

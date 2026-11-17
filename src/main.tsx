@@ -2,13 +2,13 @@ import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import { App } from './App';
 import { ThemeToggle } from './components/ThemeToggle';
-import { THEME_TOGGLE_SLOT_ID } from './state/contentPages';
+import { THEME_TOGGLE_SLOT_ID } from './state/themeToggleSlot';
 import { sendVisitBeacon } from './beacon/visitBeacon';
 import {
   parseSalaryPageData,
   SALARY_PAGE_DATA_ID,
 } from './state/salaryPageData';
-import { parseSalaryIndex, SALARY_INDEX_ID } from './state/salaryIndex';
+import contentPageStyles from './components/ContentPage.module.css';
 import './styles/fonts.css';
 import './styles/tokens.css';
 import './styles/global.css';
@@ -28,15 +28,9 @@ async function start(root: HTMLElement) {
   const initial = parseSalaryPageData(
     document.getElementById(SALARY_PAGE_DATA_ID)?.textContent ?? null,
   );
-  const salaryIndex = parseSalaryIndex(
-    document.getElementById(SALARY_INDEX_ID)?.textContent ?? null,
-  );
   createRoot(root).render(
     <StrictMode>
-      <App
-        initial={initial ?? undefined}
-        salaryIndex={salaryIndex ?? undefined}
-      />
+      <App initial={initial ?? undefined} />
     </StrictMode>,
   );
   sendVisitBeacon(initial ? 'salary' : 'home');
@@ -46,6 +40,11 @@ async function start(root: HTMLElement) {
 // else to run: mount the switch there, with no calculator and no beacon.
 const toggleSlot = document.getElementById(THEME_TOGGLE_SLOT_ID);
 if (toggleSlot) {
+  // The page itself is drawn at build time, so nothing else here imports its
+  // styles; using the slot's class keeps them in the bundle (a bare import of
+  // a CSS module is dropped).
+  const slotClass = contentPageStyles.themeSlot;
+  if (slotClass) toggleSlot.classList.add(slotClass);
   createRoot(toggleSlot).render(
     <StrictMode>
       <ThemeToggle />

@@ -52,3 +52,123 @@
   line-height: 1.65;
   color: var(--muted);
 }
+
+/* The slot of the Light/Dark switch: the switch keeps its size beside a long heading. */
+.themeSlot {
+  flex: none;
+}
+
+/* Blocks inside a section. */
+.subheading {
+  margin: 18px 0 6px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--muted);
+}
+
+.list {
+  margin: 0 0 10px;
+  padding: 0;
+  list-style: none;
+}
+
+.list li {
+  padding: 10px 0;
+  border-top: 1px solid var(--line);
+}
+
+.list a,
+.name {
+  font-size: 15px;
+  font-weight: 500;
+}
+
+.list a {
+  color: var(--accent);
+}
+
+.list a:hover {
+  color: var(--fg);
+}
+
+.name {
+  color: var(--fg);
+}
+
+.list p {
+  margin: 2px 0 0;
+  font-size: 14px;
+}
+
+.row,
+.grid {
+  margin: 8px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 16px;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(92px, 1fr));
+  gap: 10px 8px;
+}
+
+.row a,
+.grid a {
+  color: var(--accent);
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.grid a {
+  display: block;
+  padding: 7px 0;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-control);
+  background: var(--surface);
+  font-family: var(--font-mono);
+  font-size: 13px;
+  text-align: center;
+  text-decoration: none;
+}
+
+.row a:hover,
+.grid a:hover {
+  color: var(--fg);
+}
+
+.list a:focus-visible,
+.row a:focus-visible,
+.grid a:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.table {
+  width: 100%;
+  margin: 8px 0 12px;
+  border-collapse: collapse;
+  font-size: 14px;
+  color: var(--muted);
+}
+
+.table caption {
+  padding-bottom: 6px;
+  text-align: left;
+  font-weight: 600;
+  color: var(--fg);
+}
+
+.table th,
+.table td {
+  padding: 6px 10px 6px 0;
+  border-top: 1px solid var(--line);
+  text-align: left;
+  vertical-align: top;
+}

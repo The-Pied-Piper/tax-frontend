@@ -1,8 +1,19 @@
 import type { Unit } from '../../src/adapters';
 import type { ListJurisdictionsResponse } from '../../src/api';
-import type { SalaryIndex } from '../../src/state/salaryIndex';
 import { pagePath } from './address';
 import type { Province } from './provinces';
+
+/** One province's pre-built pages, lowest salary first. */
+export type SalaryIndexGroup = {
+  /** The API's jurisdiction code. */
+  code: string;
+  name: string;
+  unit: Unit;
+  pages: { salary: string; href: string }[];
+};
+
+/** Every pre-built salary page of the site, by province: what the hub pages link to. */
+export type SalaryIndex = { groups: SalaryIndexGroup[] };
 
 /** What was built for one province: its salary steps, lowest first, and the unit of its answers. */
 export type BuiltProvince = {

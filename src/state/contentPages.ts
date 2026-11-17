@@ -1,5 +1,37 @@
 import { METHODOLOGY_SLUG } from './siteLinks';
 
+/** A link to an address on this site, such as `/ca-on/75000/`. */
+export type ContentLink = { label: string; href: string };
+
+/** One entry of a list: a name that is a link when it has an address, and an optional plain line under it. */
+export type ContentListItem = { label: string; href?: string; text?: string };
+
+/**
+ * What a section can hold after its paragraphs. Plain data only: the page
+ * draws each kind itself, so no text carries markup.
+ */
+export type ContentBlock =
+  /** A smaller heading inside the section. */
+  | { kind: 'subheading'; text: string }
+  /** A list; an entry with an address is a link. */
+  | { kind: 'list'; items: ContentListItem[] }
+  /** A row of links, or a grid of short ones, in a `nav` named by `label`. */
+  | {
+      kind: 'links';
+      label: string;
+      layout: 'row' | 'grid';
+      links: ContentLink[];
+    }
+  /** A table with a caption and a header row; every row has one cell per column. */
+  | { kind: 'table'; caption: string; columns: string[]; rows: string[][] };
+
+/** One section of a page: a heading, its paragraphs, then any blocks. */
+export type ContentSection = {
+  heading: string;
+  paragraphs: string[];
+  blocks?: ContentBlock[];
+};
+
 /** One reading page of the site. Adding a page is one entry in `contentPages`. */
 export type ContentPageSpec = {
   /** Where the page lives: `ca-on`, `methodology`, `forms/bc428`. */
@@ -14,11 +46,8 @@ export type ContentPageSpec = {
   lede?: string;
   /** The pages between Home and this one, nearest to Home first. Each is itself a listed page. */
   trail: { label: string; slug: string }[];
-  sections: { heading: string; paragraphs: string[] }[];
+  sections: ContentSection[];
 };
-
-/** The id of the slot in a pre-built content page where the Light/Dark switch is mounted. */
-export const THEME_TOGGLE_SLOT_ID = 'content-theme-toggle';
 
 export const contentPages: ContentPageSpec[] = [
   {

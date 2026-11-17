@@ -10,15 +10,18 @@ import {
   withXland,
   xland,
 } from '../../src/test/generatedSite';
-import {
-  fileFor,
-  internalLinks,
-  linksToWrittenFiles,
-  parse,
-} from '../../src/test/crawlSite';
+import { fileFor, internalLinks, parse } from '../../src/test/crawlSite';
+import { contentPages } from '../../src/state/contentPages';
+import { provinceHubs } from '../../src/state/provinceHubs';
+import { generateContentPages } from '../contentPages/generate';
+import { hubPages } from '../contentPages/hubs';
 import { generateSalaryPages } from './generate';
-import { rewriteHome } from './home';
-import { renderSalaryApp, renderSalaryIndexNav } from './prerender';
+import { rewriteHomeFooter } from './home';
+import {
+  renderContentPage,
+  renderSalaryApp,
+  renderSiteFooter,
+} from './prerender';
 import { provinces } from './provinces';
 import { rewriteSitemap } from './sitemap';
 
@@ -26,14 +29,15 @@ import { rewriteSitemap } from './sitemap';
 // outlasts the 5 s default when the whole suite runs in parallel.
 const SLOW_TEST_MS = 20_000;
 
-// The crawl from the built home page (the order of the build plugin): every page
-// of the province list is reachable by following <a href> links from index.html.
-// Sits beside crawl.test.ts, which keeps the checks on the pages themselves.
+// The crawl from the built home page, in the order of the build plugin: every
+// page is reachable by following <a href> links from index.html, and the salary
+// pages are reached through the province pages, not listed on the home page.
 const outDir = tmpDirs('salary-home-crawl');
 
 async function build(options: { list?: 'xland' | 'alberta' } = {}) {
   const dir = outDir();
   writeFileSync(join(dir, 'index.html'), template);
+  const built = options.list === 'xland' ? [...provinces, xland] : provinces;
   const { written, index } = await generateSalaryPages({
     fetch: fakeFetch(
       options.list === 'xland'
@@ -43,15 +47,39 @@ async function build(options: { list?: 'xland' | 'alberta' } = {}) {
           : undefined,
     ),
     baseUrl: apiBaseUrl,
-    provinces: options.list === 'xland' ? [...provinces, xland] : provinces,
+    provinces: built,
     outDir: dir,
     template,
     render: renderSalaryApp,
     siteUrl: site,
   });
-  await rewriteSitemap(dir, site, written);
-  await rewriteHome(dir, index, renderSalaryIndexNav);
-  return { dir, written };
+  await rewriteHomeFooter(dir, renderSiteFooter());
+  const content = await generateContentPages({
+    outDir: dir,
+    template,
+    pages: [
+      ...contentPages,
+      ...hubPages({
+        provinces: built,
+        hubs:
+          options.list === 'xland'
+            ? [...provinceHubs, { slug: 'ca-xx', forms: [] }]
+            : provinceHubs,
+        index,
+        published: contentPages.map((page) => page.slug),
+        names: {
+          'ca-on': 'Ontario',
+          'ca-ab': 'Alberta',
+          'ca-bc': 'British Columbia',
+          'ca-xx': 'Xland',
+        },
+      }),
+    ],
+    render: renderContentPage,
+    siteUrl: site,
+  });
+  await rewriteSitemap(dir, site, [...written, ...content.written]);
+  return { dir, written, content: content.written };
 }
 
 /** The files reachable from index.html by following only <a href> links. */
@@ -71,10 +99,10 @@ function reachable(dir: string): Set<string> {
   return seen;
 }
 
-/** The pages of the list that no chain of links from the home page reaches. */
-function orphans(dir: string, written: string[]): string[] {
+/** The pages that no chain of links from the home page reaches. */
+function orphans(dir: string, files: string[]): string[] {
   const seen = reachable(dir);
-  return written.filter((file) => !seen.has(file));
+  return files.filter((file) => !seen.has(file));
 }
 
 /** The files a page links to directly. */
@@ -84,93 +112,94 @@ function linksFrom(dir: string, file: string): Set<string> {
 
 describe('crawl from the built home page', () => {
   it(
-    'has no CA$ anywhere in the home page or any written page, data blocks included',
+    'has no CA$ anywhere in the home page or any written page',
     async () => {
-      const { dir, written } = await build({ list: 'alberta' });
-      expect(written.length).toBeGreaterThan(0);
-      for (const file of ['index.html', ...written]) {
+      const { dir, written, content } = await build({ list: 'alberta' });
+      for (const file of ['index.html', ...written, ...content]) {
         expect(readFileSync(join(dir, file), 'utf8'), file).not.toContain(
           'CA$',
         );
       }
-      expect(readFileSync(join(dir, 'index.html'), 'utf8')).toContain(
-        '$75,000 after tax in Ontario',
-      );
     },
     SLOW_TEST_MS,
   );
 
   it(
-    'reaches all 25 Ontario pages by following links',
+    'reaches all 25 Ontario pages, and every content page, by following links',
     async () => {
-      const { dir, written } = await build();
+      const { dir, written, content } = await build();
       expect(written).toHaveLength(25);
-      expect(orphans(dir, written)).toEqual([]);
+      expect(orphans(dir, [...written, ...content])).toEqual([]);
     },
     SLOW_TEST_MS,
   );
 
   it(
-    'lists Ontario then Alberta on the home page, 25 links each, and reaches all 50 pages',
+    'reaches all 50 Ontario and Alberta pages',
     async () => {
       const { dir, written } = await build({ list: 'alberta' });
       expect(written).toHaveLength(50);
       expect(orphans(dir, written)).toEqual([]);
-      const home = parse(dir, 'index.html');
-      const hrefs = [...home.querySelectorAll('details a')].map((a) =>
-        a.getAttribute('href'),
+    },
+    SLOW_TEST_MS,
+  );
+
+  it(
+    'does not list any salary page on the home page; it links to the hubs and the methodology page',
+    async () => {
+      const { dir, written } = await build();
+      const direct = linksFrom(dir, 'index.html');
+      for (const file of written) {
+        expect(direct.has(file), `index.html -> ${file}`).toBe(false);
+      }
+      for (const file of [
+        'methodology/index.html',
+        'ca-on/index.html',
+        'ca-ab/index.html',
+        'ca-bc/index.html',
+      ]) {
+        expect(direct.has(file), `index.html -> ${file}`).toBe(true);
+      }
+      expect(readFileSync(join(dir, 'index.html'), 'utf8')).not.toContain(
+        'Popular salaries',
       );
-      const steps = Array.from({ length: 25 }, (_, i) => 30000 + i * 5000);
-      expect(hrefs).toEqual([
-        ...steps.map((s) => `/ca-on/${s.toString()}/`),
-        ...steps.map((s) => `/ca-ab/${s.toString()}/`),
-      ]);
-      expect(home.querySelector('details')?.textContent).toContain('Alberta');
-    },
-    SLOW_TEST_MS,
-  );
-
-  it('would fail on a page nothing points at: without the home links nothing is reached', async () => {
-    const { dir, written } = await build();
-    writeFileSync(join(dir, 'index.html'), template);
-    expect(orphans(dir, written)).toHaveLength(25);
-  });
-
-  it('links to every page directly from the home page', async () => {
-    const { dir, written } = await build();
-    const direct = linksFrom(dir, 'index.html');
-    for (const file of written) {
-      expect(direct.has(file), `index.html -> ${file}`).toBe(true);
-    }
-  });
-
-  it(
-    'links every page from both neighbours (the ends from one)',
-    async () => {
-      const { dir, written } = await build();
-      // Written in ascending order, so the list order is the neighbour order.
-      const files = written;
-      files.forEach((file, i) => {
-        for (const neighbour of [files[i - 1], files[i + 1]]) {
-          if (neighbour === undefined) continue;
-          expect(
-            linksFrom(dir, neighbour).has(file),
-            `${neighbour} -> ${file}`,
-          ).toBe(true);
-        }
-      });
-      expect(files).toHaveLength(25);
     },
     SLOW_TEST_MS,
   );
 
   it(
-    'has no broken link anywhere, the home page included',
+    'links each hub to every salary page of its province and to no other province',
+    async () => {
+      const { dir, written } = await build({ list: 'alberta' });
+      for (const slug of ['ca-on', 'ca-ab']) {
+        const direct = linksFrom(dir, `${slug}/index.html`);
+        const own = written.filter((f) => f.startsWith(`${slug}/`));
+        expect(own).toHaveLength(25);
+        for (const file of own) expect(direct.has(file), file).toBe(true);
+        const others = written.filter((f) => !f.startsWith(`${slug}/`));
+        for (const file of others) expect(direct.has(file), file).toBe(false);
+      }
+    },
+    SLOW_TEST_MS,
+  );
+
+  it(
+    'would fail on a page nothing points at: without the home footer nothing is reached',
     async () => {
       const { dir, written } = await build();
-      const links = linksToWrittenFiles(dir, ['index.html', ...written]);
+      writeFileSync(join(dir, 'index.html'), template);
+      expect(orphans(dir, written)).toHaveLength(25);
+    },
+    SLOW_TEST_MS,
+  );
+
+  it(
+    'has no broken link anywhere, the home page and the hubs included',
+    async () => {
+      const { dir, written, content } = await build();
+      const links = internalLinks(dir, ['index.html', ...written, ...content]);
       expect(
-        links.filter((l) => l.file === 'index.html').length,
+        links.filter((l) => l.file === 'ca-on/index.html').length,
       ).toBeGreaterThanOrEqual(25);
       for (const { file, target } of links) {
         expect(existsSync(join(dir, target)), `${file} -> ${target}`).toBe(
@@ -182,21 +211,24 @@ describe('crawl from the built home page', () => {
   );
 
   it(
-    'reaches a made-up second province with no other change, and the home page lists it',
+    'reaches a made-up second province with no other change, from the other hubs',
     async () => {
-      const { dir, written } = await build({ list: 'xland' });
+      const { dir, written, content } = await build({ list: 'xland' });
       expect(written).toHaveLength(28);
-      expect(orphans(dir, written)).toEqual([]);
-      const direct = linksFrom(dir, 'index.html');
+      expect(content).toContain('ca-xx/index.html');
+      expect(orphans(dir, [...written, ...content])).toEqual([]);
+      const direct = linksFrom(dir, 'ca-xx/index.html');
       for (const file of written.filter((f) => f.startsWith('ca-xx/'))) {
         expect(direct.has(file), file).toBe(true);
       }
-      expect(readFileSync(join(dir, 'index.html'), 'utf8')).toContain('Xland');
+      expect(linksFrom(dir, 'ca-on/index.html').has('ca-xx/index.html')).toBe(
+        true,
+      );
     },
     SLOW_TEST_MS,
   );
 
-  it('leaves the home page without links when the province is not returned', async () => {
+  it('writes a hub with no salary links when the API does not return the province', async () => {
     const dir = outDir();
     writeFileSync(join(dir, 'index.html'), template);
     const { written, index } = await generateSalaryPages({
@@ -208,8 +240,31 @@ describe('crawl from the built home page', () => {
       render: renderSalaryApp,
       siteUrl: site,
     });
-    await rewriteHome(dir, index, renderSalaryIndexNav);
+    const content = await generateContentPages({
+      outDir: dir,
+      template,
+      pages: hubPages({
+        provinces,
+        hubs: provinceHubs,
+        index,
+        published: [],
+      }),
+      render: renderContentPage,
+      siteUrl: site,
+    });
     expect(written).toEqual([]);
-    expect(linksFrom(dir, 'index.html').size).toBe(0);
+    expect(content.written).toEqual([
+      'ca-on/index.html',
+      'ca-ab/index.html',
+      'ca-bc/index.html',
+    ]);
+    const direct = linksFrom(dir, 'ca-on/index.html');
+    expect([...direct].filter((file) => /\/\d+\//.test(file))).toEqual([]);
+    expect(direct.has('ca-ab/index.html')).toBe(true);
+    expect(
+      parse(dir, 'ca-on/index.html').querySelector(
+        'nav[aria-label^="Salary pages"]',
+      ),
+    ).toBeNull();
   });
 });

@@ -1,4 +1,3 @@
-import { SALARY_INDEX_ID, type SalaryIndex } from '../../src/state/salaryIndex';
 import { SALARY_PAGE_DATA_ID } from '../../src/state/salaryPageData';
 import type { SalaryPageData } from '../../src/state/useTakeHome';
 import { pageMeta } from './pageMeta';
@@ -102,18 +101,16 @@ export function pageShell(
     : withAddress(described, canonicalUrl);
 }
 
-/** The template with `#root` holding the rendered page, plus the data blocks for React (the page's, and the link index when given). */
+/** The template with `#root` holding the rendered page, plus the data block for React. */
 export function buildPageHtml(
   template: string,
   appHtml: string,
   data: SalaryPageData,
   canonicalUrl: string | null = null,
-  index: SalaryIndex | null = null,
 ): string {
-  const blocks = [
-    dataBlock(SALARY_PAGE_DATA_ID, data),
-    ...(index === null ? [] : [dataBlock(SALARY_INDEX_ID, index)]),
-  ].join('\n    ');
   const addressed = pageShell(template, appHtml, pageMeta(data), canonicalUrl);
-  return addressed.replace('</body>', () => `${blocks}\n  </body>`);
+  return addressed.replace(
+    '</body>',
+    () => `${dataBlock(SALARY_PAGE_DATA_ID, data)}\n  </body>`,
+  );
 }

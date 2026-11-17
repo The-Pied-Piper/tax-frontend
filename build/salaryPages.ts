@@ -8,16 +8,17 @@ import { normalizeSiteUrl } from './seo';
 import { generateSalaryPages } from './salaryPages/generate';
 import { generateContentPages } from './contentPages/generate';
 import { provinces } from './salaryPages/provinces';
-import { rewriteHome } from './salaryPages/home';
+import { rewriteHomeFooter } from './salaryPages/home';
 import { pageDates } from './salaryPages/lastmod';
 import { rewriteSitemap } from './salaryPages/sitemap';
+import { hubPages } from './contentPages/hubs';
 import { contentPages, type ContentPageSpec } from '../src/state/contentPages';
-import type { SalaryIndex } from '../src/state/salaryIndex';
+import { provinceHubs } from '../src/state/provinceHubs';
 import type { SalaryPageData } from '../src/state/useTakeHome';
 
 type Prerender = {
   renderSalaryApp: (data: SalaryPageData) => string;
-  renderSalaryIndexNav: (index: SalaryIndex) => string;
+  renderSiteFooter: () => string;
   renderContentPage: (spec: ContentPageSpec) => string;
 };
 
@@ -25,9 +26,9 @@ function isAppRenderer(value: unknown): value is Prerender['renderSalaryApp'] {
   return typeof value === 'function';
 }
 
-function isNavRenderer(
+function isFooterRenderer(
   value: unknown,
-): value is Prerender['renderSalaryIndexNav'] {
+): value is Prerender['renderSiteFooter'] {
   return typeof value === 'function';
 }
 
@@ -60,19 +61,19 @@ async function loadRenderer(tempDir: string): Promise<Prerender> {
     loaded !== null &&
     'renderSalaryApp' in loaded &&
     isAppRenderer(loaded.renderSalaryApp) &&
-    'renderSalaryIndexNav' in loaded &&
-    isNavRenderer(loaded.renderSalaryIndexNav) &&
+    'renderSiteFooter' in loaded &&
+    isFooterRenderer(loaded.renderSiteFooter) &&
     'renderContentPage' in loaded &&
     isContentRenderer(loaded.renderContentPage)
   ) {
     return {
       renderSalaryApp: loaded.renderSalaryApp,
-      renderSalaryIndexNav: loaded.renderSalaryIndexNav,
+      renderSiteFooter: loaded.renderSiteFooter,
       renderContentPage: loaded.renderContentPage,
     };
   }
   throw new Error(
-    'The prerender build did not export renderSalaryApp, renderSalaryIndexNav and renderContentPage',
+    'The prerender build did not export renderSalaryApp, renderSiteFooter and renderContentPage',
   );
 }
 
@@ -80,8 +81,8 @@ async function loadRenderer(tempDir: string): Promise<Prerender> {
  * Writes dist/<slug>/<salary>/index.html for every listed province and step.
  * With the site address set it also lists them in dist/sitemap.xml, each with a
  * last-modified date kept in dist/page-hashes.json, and gives each its own
- * canonical address. The content pages in src/state/contentPages.ts are
- * written the same way, after them. Only when the API address is set (deploy builds); local
+ * canonical address. The content pages in src/state/contentPages.ts, and a
+ * hub page for each province, are written the same way, after them. Only when the API address is set (deploy builds); local
  * builds and CI write no salary pages.
  */
 export function salaryPages(
@@ -100,7 +101,7 @@ export function salaryPages(
       const outDir = resolve('dist');
       const tempDir = await mkdtemp(join(tmpdir(), 'salary-pages-ssr-'));
       try {
-        const { renderSalaryApp, renderSalaryIndexNav, renderContentPage } =
+        const { renderSalaryApp, renderSiteFooter, renderContentPage } =
           await loadRenderer(tempDir);
         const template = await readFile(join(outDir, 'index.html'), 'utf8');
         const { written, skipped, index } = await generateSalaryPages({
@@ -112,11 +113,19 @@ export function salaryPages(
           render: renderSalaryApp,
           siteUrl,
         });
-        await rewriteHome(outDir, index, renderSalaryIndexNav);
+        await rewriteHomeFooter(outDir, renderSiteFooter());
         const content = await generateContentPages({
           outDir,
           template,
-          pages: contentPages,
+          pages: [
+            ...contentPages,
+            ...hubPages({
+              provinces,
+              hubs: provinceHubs,
+              index,
+              published: contentPages.map((page) => page.slug),
+            }),
+          ],
           render: renderContentPage,
           siteUrl,
         });

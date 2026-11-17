@@ -6,11 +6,15 @@ import {
   tmpDirs,
 } from '../../src/test/generatedSite';
 import {
+  blocksSpec,
   parentSpec,
   plainSpec,
   sampleSpec,
 } from '../../src/test/contentPageData';
-import type { ContentPageSpec } from '../../src/state/contentPages';
+import type {
+  ContentBlock,
+  ContentPageSpec,
+} from '../../src/state/contentPages';
 import { DESCRIPTION_LIMIT, TITLE_LIMIT } from '../salaryPages/limits';
 import { generateContentPages } from './generate';
 
@@ -198,5 +202,65 @@ describe('generateContentPages validation', () => {
       run(dir, [parentSpec, sampleSpec], { render: failing }),
     ).rejects.toThrow(/render broke/);
     expect(files(dir)).toEqual([]);
+  });
+});
+
+describe('generateContentPages block validation', () => {
+  const withBlock = (block: ContentBlock): ContentPageSpec => ({
+    ...plainSpec,
+    sections: [{ heading: 'Part', paragraphs: [], blocks: [block] }],
+  });
+
+  it('accepts a page with every kind of block', async () => {
+    const { written } = await run(outDir(), [blocksSpec]);
+    expect(written).toEqual(['blocks-page/index.html']);
+  });
+
+  it.each(['https://example.com/', '//example.com/', 'ca-on/', '/a b/', ''])(
+    'rejects a link to "%s", which is not an address on this site',
+    async (href) => {
+      const dir = outDir();
+      await expect(
+        run(dir, [
+          withBlock({
+            kind: 'links',
+            label: 'Links',
+            layout: 'row',
+            links: [{ label: 'Link', href }],
+          }),
+        ]),
+      ).rejects.toThrow('not an address on this site');
+      expect(files(dir)).toEqual([]);
+    },
+  );
+
+  it('rejects a list item link that is not an address on this site', async () => {
+    await expect(
+      run(outDir(), [
+        withBlock({
+          kind: 'list',
+          items: [{ label: 'Item', href: 'https://example.com/' }],
+        }),
+      ]),
+    ).rejects.toThrow('plain-page links to "https://example.com/"');
+  });
+
+  it('accepts a list item with no link', async () => {
+    await expect(
+      run(outDir(), [withBlock({ kind: 'list', items: [{ label: 'Item' }] })]),
+    ).resolves.toBeDefined();
+  });
+
+  it('rejects a table row with the wrong number of cells and names the table', async () => {
+    await expect(
+      run(outDir(), [
+        withBlock({
+          kind: 'table',
+          caption: 'Rates',
+          columns: ['A', 'B'],
+          rows: [['only one']],
+        }),
+      ]),
+    ).rejects.toThrow('table "Rates" has a row of 1 cells for 2 columns');
   });
 });

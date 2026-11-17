@@ -38,3 +38,52 @@ export const plainSpec: ContentPageSpec = {
   trail: [],
   sections: [{ heading: 'Only part', paragraphs: ['Some words.'] }],
 };
+
+/** A page whose one section holds every kind of block. */
+export const blocksSpec: ContentPageSpec = {
+  slug: 'blocks-page',
+  title: 'Blocks page',
+  description: 'A made-up page with one of every kind of block.',
+  heading: 'Blocks heading',
+  trail: [],
+  sections: [
+    {
+      heading: 'Everything',
+      paragraphs: ['Words before the blocks.'],
+      blocks: [
+        { kind: 'subheading', text: 'A smaller heading' },
+        {
+          kind: 'list',
+          items: [
+            { label: 'Linked item', href: '/plain-page/', text: 'Its line.' },
+            { label: 'Item with no page yet', text: 'Another line.' },
+          ],
+        },
+        {
+          kind: 'links',
+          label: 'Some pages',
+          layout: 'grid',
+          links: [
+            { label: '$30,000', href: '/sample-hub/30000/' },
+            { label: '$35,000', href: '/sample-hub/35000/' },
+          ],
+        },
+        {
+          kind: 'links',
+          label: 'More pages',
+          layout: 'row',
+          links: [{ label: 'Calculator', href: '/' }],
+        },
+        {
+          kind: 'table',
+          caption: 'A small table',
+          columns: ['Name', 'Amount'],
+          rows: [
+            ['First', '$1'],
+            ['Second', '$2'],
+          ],
+        },
+      ],
+    },
+  ],
+};

@@ -116,10 +116,28 @@ export const strings = {
     calculator: 'Back to the calculator',
     others: 'Other salaries',
   },
-  // The list of pre-built pages on the home page.
-  salaryIndex: {
-    label: 'Popular salaries',
-    link: (amount: string, place: string) => `${amount} after tax in ${place}`,
+  // The reading page of each province: its forms and its salary pages.
+  provinceHub: {
+    heading: (place: string) => `${place}: forms and take-home examples`,
+    title: (place: string) => `${place} tax forms and take-home examples`,
+    description: (place: string) =>
+      `The forms behind the take-home estimate for ${place}, each explained in plain words, with a full example for every salary step.`,
+    lede: (place: string) =>
+      `Everything this site uses to work out take-home pay in ${place}, in one place. Each form is explained in plain words, and each salary page shows a full example.`,
+    howHeading: (place: string) => `How your ${place} take-home is worked out`,
+    how: (place: string) =>
+      `Take-home pay is your salary minus three things. The first is income tax, which you pay partly to the federal government and partly to ${place}. The second is your Canada Pension Plan payments, which build up your future pension. The third is Employment Insurance, or EI, which pays you if you lose your job. The forms below are where each of those is worked out.`,
+    formsHeading: 'The forms we follow',
+    formsIntro:
+      'Our calculator follows the published forms, line by line. A form with a link has its own page that explains what it is for and what each part asks you.',
+    federalHeading: (place: string) => `Federal forms ${place} also uses`,
+    salariesHeading: 'Take-home pay by salary',
+    salariesIntro:
+      'Pick a salary to see the whole breakdown, step by step. If yours is not listed, use the calculator.',
+    salariesLabel: (place: string) => `Salary pages for ${place}`,
+    moreHeading: 'More pages',
+    moreLabel: 'More pages',
+    calculator: 'Calculator',
   },
   notices: {
     provisionalTitle: (year: number) =>

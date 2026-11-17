@@ -8,7 +8,6 @@ import {
 } from '../../src/api';
 import { dollarSign } from '../../src/adapters/fallback';
 import { languageCode } from '../../src/strings';
-import type { SalaryIndex } from '../../src/state/salaryIndex';
 import type { SalaryPageData } from '../../src/state/useTakeHome';
 import { pageUrl } from './address';
 import { buildPageHtml } from './pageHtml';
@@ -16,7 +15,11 @@ import { pageMeta } from './pageMeta';
 import { DESCRIPTION_LIMIT, TITLE_LIMIT } from './limits';
 import { salaryLinks } from './links';
 import { salaries, type Province } from './provinces';
-import { salaryIndex, type BuiltProvince } from './salaryIndex';
+import {
+  salaryIndex,
+  type BuiltProvince,
+  type SalaryIndex,
+} from './salaryIndex';
 
 export type GenerateOptions = {
   fetch: typeof fetch;
@@ -143,7 +146,6 @@ export async function generateSalaryPages(
           options.siteUrl
             ? pageUrl(options.siteUrl, province.slug, salary)
             : null,
-          index,
         ),
       });
     });

@@ -3,7 +3,7 @@
 import { readUnit } from '../adapters/fallback';
 import { strings } from '../strings';
 import { compute70000 } from './syntheticPages';
-import type { SalaryIndex } from '../state/salaryIndex';
+import type { SalaryIndex } from '../../build/salaryPages/salaryIndex';
 
 export const indexUnit = readUnit(compute70000.unit) ?? strings.fallbackUnit;
 
