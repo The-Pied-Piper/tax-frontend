@@ -219,15 +219,22 @@ describe('salary links in the static page and the mounted page (#81)', () => {
 
   it('has no nav in the static HTML for data without links', () => {
     show(base);
-    expect(screen.queryByRole('navigation')).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole('navigation', { name: strings.salaryLinks.label }),
+    ).not.toBeInTheDocument();
   });
 
   it('renders the same nav when mounted from the same data (the pre-hydration rule)', () => {
     show(withLinks);
-    const staticNav = screen.getByRole('navigation').outerHTML;
+    const staticNav = screen.getByRole('navigation', {
+      name: strings.salaryLinks.label,
+    }).outerHTML;
     document.body.innerHTML = '';
     render(<App initial={withLinks} />);
-    expect(screen.getByRole('navigation').outerHTML).toBe(staticNav);
+    expect(
+      screen.getByRole('navigation', { name: strings.salaryLinks.label })
+        .outerHTML,
+    ).toBe(staticNav);
   });
 
   it('shows the nav only while the answer is the one the page was built with', async () => {
@@ -263,7 +270,9 @@ describe('salary links in the static page and the mounted page (#81)', () => {
         screen.getByRole('heading', { name: strings.title, level: 1 }),
       ).toBeInTheDocument();
     });
-    expect(screen.queryByRole('navigation')).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole('navigation', { name: strings.salaryLinks.label }),
+    ).not.toBeInTheDocument();
     expect(
       screen.queryByRole('link', { name: strings.salaryLinks.calculator }),
     ).not.toBeInTheDocument();

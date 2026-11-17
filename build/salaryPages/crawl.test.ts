@@ -12,7 +12,7 @@ import {
 } from '../../src/test/generatedSite';
 import {
   fileFor,
-  internalLinks,
+  linksToWrittenFiles,
   navHrefs,
   parse,
   sitemapLocs,
@@ -58,7 +58,7 @@ describe('crawl of a generated output folder', () => {
     'resolves every internal link on every page to a written file',
     async () => {
       const { dir, written } = await build();
-      const links = internalLinks(dir, written);
+      const links = linksToWrittenFiles(dir, written);
       expect(links.length).toBeGreaterThan(written.length * 3);
       for (const { file, target } of links) {
         expect(existsSync(join(dir, target)), `${file} -> ${target}`).toBe(
@@ -130,7 +130,7 @@ describe('crawl of a generated output folder', () => {
       expect(sitemapLocs(dir)).toHaveLength(51);
       expect(sitemapLocs(dir)).toContain(`${site}/ca-ab/30000/`);
       expect(sitemapLocs(dir)).toContain(`${site}/ca-ab/150000/`);
-      for (const { file, target } of internalLinks(dir, written)) {
+      for (const { file, target } of linksToWrittenFiles(dir, written)) {
         expect(existsSync(join(dir, target)), `${file} -> ${target}`).toBe(
           true,
         );
@@ -155,7 +155,10 @@ describe('crawl of a generated output folder', () => {
       expect(both.written).toHaveLength(28);
       expect(sitemapLocs(both.dir)).toHaveLength(29);
       expect(sitemapLocs(both.dir)).toContain(`${site}/ca-xx/15000/`);
-      for (const { file, target } of internalLinks(both.dir, both.written)) {
+      for (const { file, target } of linksToWrittenFiles(
+        both.dir,
+        both.written,
+      )) {
         expect(existsSync(join(both.dir, target)), `${file} -> ${target}`).toBe(
           true,
         );

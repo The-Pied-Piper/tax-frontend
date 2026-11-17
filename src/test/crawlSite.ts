@@ -3,6 +3,11 @@
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { siteUrl as site } from './generatedSite';
+import {
+  contentFile,
+  FOOTER_PROVINCES,
+  METHODOLOGY_SLUG,
+} from '../state/siteLinks';
 
 export { site };
 
@@ -33,12 +38,28 @@ export function navHrefs(dir: string, file: string): (string | null)[] {
   );
 }
 
-/** Every internal link on every written page, as [page, target file]. */
+/**
+ * The pages the footer links to. The hubs and the methodology page come from
+ * later tickets, so a built folder without them is allowed to lack these files.
+ */
+export const FOOTER_TARGETS: string[] = [
+  contentFile(METHODOLOGY_SLUG),
+  ...FOOTER_PROVINCES.map((p) => contentFile(p.slug)),
+];
+
+/** Every internal link on every written page, as [page, target file]; the footer links are included. */
 export function internalLinks(dir: string, written: string[]) {
   return written.flatMap((file) =>
     [...parse(dir, file).querySelectorAll('a[href]')].flatMap((a) => {
       const target = fileFor(a.getAttribute('href') ?? '');
       return target === null ? [] : [{ file, target }];
     }),
+  );
+}
+
+/** The internal links that must resolve to a written file: every link except the footer's. */
+export function linksToWrittenFiles(dir: string, written: string[]) {
+  return internalLinks(dir, written).filter(
+    ({ target }) => !FOOTER_TARGETS.includes(target),
   );
 }
