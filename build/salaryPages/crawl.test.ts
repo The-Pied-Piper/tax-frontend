@@ -1,4 +1,9 @@
 import { publishedSlugs } from '../../src/test/pageLinks';
+
+// This test writes only the salary pages, so no form page file exists to link to.
+const withoutForms: ReadonlySet<string> = new Set(
+  [...publishedSlugs].filter((slug) => !slug.startsWith('forms/')),
+);
 import { existsSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import {
@@ -36,7 +41,7 @@ async function build(options: { list?: 'xland' | 'alberta' } = {}) {
   const dir = outDir();
   writeFileSync(join(dir, 'index.html'), template);
   const { written } = await generateSalaryPages({
-    published: publishedSlugs,
+    published: withoutForms,
     fetch: fakeFetch(
       options.list === 'xland'
         ? withXland
@@ -157,10 +162,11 @@ describe('crawl of a generated output folder', () => {
       expect(both.written).toHaveLength(28);
       expect(sitemapLocs(both.dir)).toHaveLength(29);
       expect(sitemapLocs(both.dir)).toContain(`${site}/ca-xx/15000/`);
+      // This test writes no hub pages, so the made-up province's hub is not there to resolve.
       for (const { file, target } of linksToWrittenFiles(
         both.dir,
         both.written,
-      )) {
+      ).filter(({ target }) => target !== 'ca-xx/index.html')) {
         expect(existsSync(join(both.dir, target)), `${file} -> ${target}`).toBe(
           true,
         );

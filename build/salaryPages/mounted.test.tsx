@@ -153,8 +153,10 @@ describe('the breadcrumb and Learn more links before the bundle loads match thos
       `nav[aria-label="${strings.siteNav.breadcrumb}"]`,
     );
     const h1 = container.querySelector('h1');
+    expect(crumbs).not.toBeNull();
+    expect(h1).not.toBeNull();
     expect(
-      crumbs?.compareDocumentPosition(h1 as Node) &
+      (crumbs as Node).compareDocumentPosition(h1 as Node) &
         Node.DOCUMENT_POSITION_FOLLOWING,
     ).toBeTruthy();
   });

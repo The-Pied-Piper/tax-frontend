@@ -15,6 +15,7 @@ import { buildPageHtml } from './pageHtml';
 import { pageMeta } from './pageMeta';
 import { DESCRIPTION_LIMIT, TITLE_LIMIT } from './limits';
 import { salaryLinks } from './links';
+import { provinceLinks } from '../../src/state/salaryPageLinks';
 import { salaries, type Province } from './provinces';
 
 /** What was built for one province: its salary steps, lowest first, and the unit of its answers. */
@@ -29,6 +30,8 @@ export type GenerateOptions = {
   baseUrl: string;
   provinces: Province[];
   outDir: string;
+  /** The slugs of the content pages in the build, such as `methodology` and `forms/on428`. */
+  published: ReadonlySet<string>;
   /** The built index.html. */
   template: string;
   /** The real App as a string for one page's data. */
@@ -115,6 +118,9 @@ export async function generateSalaryPages(
   );
   const pages: { path: string; html: string }[] = [];
   for (const { province, steps, responses } of fetched) {
+    const placeName =
+      list.jurisdictions.find((j) => j.code === province.code)?.name ??
+      province.code;
     // Links go only to the pages of this province that are about to be written.
     steps.forEach((salary, at) => {
       const response = responses[at];
@@ -126,7 +132,10 @@ export async function generateSalaryPages(
         jurisdictionCode: province.code,
         year: province.year,
         salary,
-        links: salaryLinks(province.slug, steps, salary),
+        links: {
+          ...salaryLinks(province.slug, steps, salary),
+          ...provinceLinks(province.slug, placeName, options.published),
+        },
       };
       const meta = pageMeta(data);
       if (meta.title.length >= TITLE_LIMIT) {

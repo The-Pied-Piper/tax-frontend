@@ -16,7 +16,7 @@ export function salaryLinks(
   slug: string,
   salaries: string[],
   salary: string,
-): SalaryPageLinks {
+): Omit<SalaryPageLinks, 'hub' | 'learnMore'> {
   const index = salaries.indexOf(salary);
   if (index < 0) {
     throw new Error(`Salary ${salary} is not one of the pages of ${slug}`);
