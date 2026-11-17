@@ -2,6 +2,8 @@ import { render, screen, within } from '@testing-library/react';
 import { renderToString } from 'react-dom/server';
 import { ContentPage } from './ContentPage';
 import { formContentPage } from '../state/formPage';
+import { formPages } from '../state/formPages';
+import { isSitePath } from '../state/salaryPageData';
 import { sampleFormSpec } from '../test/contentPageData';
 import { strings } from '../strings';
 
@@ -85,3 +87,25 @@ describe('a form page', () => {
     expect(html).toContain('href="#second"');
   });
 });
+
+// Clean addresses are served by a rewrite, so the browser's address may have no
+// trailing slash: a link that is not a site path (or a fragment of the page
+// itself) would resolve against the wrong base.
+describe.each([sampleFormSpec, ...formPages])(
+  'links on the $name page',
+  (spec) => {
+    it('are all site paths or fragments of the page', () => {
+      const { container } = render(<ContentPage {...formContentPage(spec)} />);
+      const hrefs = [...container.querySelectorAll('a')].map((a) =>
+        a.getAttribute('href'),
+      );
+      expect(hrefs.length).toBeGreaterThan(0);
+      for (const href of hrefs) {
+        expect(
+          href !== null && (href.startsWith('#') || isSitePath(href)),
+          href ?? 'no href',
+        ).toBe(true);
+      }
+    });
+  },
+);
