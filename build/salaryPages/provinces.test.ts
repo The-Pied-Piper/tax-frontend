@@ -28,7 +28,7 @@ describe('the province list', () => {
       {
         code: 'CA-BC',
         slug: 'ca-bc',
-        year: 2025,
+        year: TAX_YEAR,
         from: 30000,
         to: 150000,
         step: 5000,
@@ -36,10 +36,10 @@ describe('the province list', () => {
     ]);
   });
 
-  it('takes the year from the one build setting, 2026 now, except British Columbia (2025 only for now)', () => {
+  it('takes the year from the one build setting, 2026 now', () => {
     expect(TAX_YEAR).toBe(2026);
     for (const province of provinces) {
-      expect(province.year).toBe(province.code === 'CA-BC' ? 2025 : TAX_YEAR);
+      expect(province.year).toBe(TAX_YEAR);
     }
   });
 });

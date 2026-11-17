@@ -31,10 +31,9 @@ export const provinces: Province[] = [
     step: 5000,
   },
   {
-    // British Columbia has 2025 datasets only for now, so its pages are 2025.
     code: 'CA-BC',
     slug: 'ca-bc',
-    year: 2025,
+    year: TAX_YEAR,
     from: 30000,
     to: 150000,
     step: 5000,
