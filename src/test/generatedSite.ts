@@ -48,6 +48,20 @@ export const withAlberta = {
   ],
 };
 
+/**
+ * The provinces of the list that the API's list returns: a build with a site URL
+ * fails on a listed province the API does not return, so a test that builds
+ * with one passes only the provinces its fake API lists.
+ */
+export function listedIn(
+  provinces: Province[],
+  list: { jurisdictions: { code: string }[] } = jurisdictions,
+): Province[] {
+  return provinces.filter((p) =>
+    list.jurisdictions.some((j) => j.code === p.code),
+  );
+}
+
 function urlOf(input: Parameters<typeof fetch>[0]): string {
   return typeof input === 'string'
     ? input

@@ -1,6 +1,6 @@
 import { formContentPage, type FormBody } from './formPage';
 import { formPages } from './formPages';
-import { METHODOLOGY_SLUG } from './siteLinks';
+import { ENGINE_REPO_URL, METHODOLOGY_SLUG } from './siteLinks';
 
 /** A link in a page: its words and where it goes. */
 export type ContentLink = { label: string; href: string };
@@ -58,7 +58,7 @@ export const contentPages: ContentPageSpec[] = [
     slug: METHODOLOGY_SLUG,
     title: 'How the take-home estimates are worked out',
     description:
-      'How the take-home estimate is produced: the published forms followed line by line, exact arithmetic, and how the results are checked.',
+      'How we work out your take-home pay: we follow the published forms line by line, use exact math, and check the results.',
     heading: 'How the estimates are worked out',
     lede: 'What the calculator does with your salary, how we check it, and where it stops being reliable.',
     trail: [],
@@ -67,10 +67,10 @@ export const contentPages: ContentPageSpec[] = [
         heading: 'It follows the published forms',
         blocks: [
           paragraph(
-            'The calculation is done by an open-source engine that follows the published federal and provincial forms line by line. Each line on a form, from the pension and EI amounts to the credits and the tax on each bracket, is one step in the engine, in the same order as the form. The advanced view under your answer lists those steps with the form and line each one comes from, so you can follow the figure on paper.',
+            'A program that anyone can read, called an open-source engine, does the math. It follows the published federal and provincial tax forms line by line. Each line on a form is one step in the engine, in the same order. That covers everything from your pension and EI amounts to your credits and the tax on each slice of income. Under your answer, the advanced view lists every step and the form line it comes from, so you can follow along on paper.',
           ),
           paragraph(
-            'Every rate, threshold and maximum comes from the published forms and tables for that place and year.',
+            'Every rate, limit and top amount comes from the published forms and tables for that province and year.',
           ),
         ],
       },
@@ -78,7 +78,7 @@ export const contentPages: ContentPageSpec[] = [
         heading: 'Exact arithmetic',
         blocks: [
           paragraph(
-            "Money is never held as an ordinary floating-point number, which can be off by a fraction of a cent. The engine works in exact decimals. It rounds only where a form's own instructions say to round, and each such step rounds the way the form says. Nothing is rounded along the way for convenience, so the cents you see are the cents the forms give.",
+            'Computers often store money in a way that can be off by a tiny fraction of a cent. Our engine does not. It does its math with exact numbers. It rounds only where a form says to round, and it rounds the way the form says. It never rounds early to make things easier, so the cents you see are the cents the forms give.',
           ),
         ],
       },
@@ -86,7 +86,7 @@ export const contentPages: ContentPageSpec[] = [
         heading: 'How we check it',
         blocks: [
           paragraph(
-            "We check the engine's results for each province and tax year over more than a hundred salaries, chosen to cover every tax bracket edge and the ceilings for the Canada Pension Plan and EI, because that is where mistakes hide.",
+            'For each province and tax year, we run more than a hundred salaries through the engine and check the results. We pick salaries at the edge of every tax slice and at the yearly limits for the Canada Pension Plan and EI, because that is where mistakes hide.',
           ),
         ],
       },
@@ -94,13 +94,13 @@ export const contentPages: ContentPageSpec[] = [
         heading: 'What it does not do',
         blocks: [
           paragraph(
-            'It estimates take-home pay from employment income for Ontario, Alberta and British Columbia. Other places are listed as coming soon.',
+            'It estimates take-home pay for a single person whose only income is a salary, in Ontario, Alberta and British Columbia. Other places show as coming soon.',
           ),
           paragraph(
-            'The 2026 figures are provisional. They use the rates published so far and are replaced as the final rates are published. The page says so whenever you ask for a provisional year.',
+            'The 2026 figures are provisional. That means they use the rates published so far, and we replace them when the final rates come out. The calculator tells you whenever you pick a provisional year.',
           ),
           paragraph(
-            'It is an estimate, not tax advice. Your own situation and what your employer withholds decide what you actually take home.',
+            'It is an estimate, not tax advice. What you actually take home depends on your own situation and on how much tax your employer takes off each paycheque.',
           ),
         ],
       },
@@ -108,7 +108,12 @@ export const contentPages: ContentPageSpec[] = [
         heading: 'Look for yourself',
         blocks: [
           paragraph(
-            'The engine is open source, so anyone can read how each line is worked out and run it. Nothing you enter on this site is saved.',
+            'Because the engine is open source, anyone can read how each line is worked out and run it themselves. Nothing you enter on this site is saved. ',
+            {
+              label: "Read the engine's code on GitHub",
+              href: ENGINE_REPO_URL,
+            },
+            '.',
           ),
         ],
       },

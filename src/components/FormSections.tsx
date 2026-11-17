@@ -4,6 +4,7 @@ import { displayWholeMoney } from '../money/format';
 import { splitFigures, type FormBody } from '../state/formPage';
 import {
   contentPath,
+  FOOTER_PROVINCE_SLUGS,
   METHODOLOGY_SLUG,
   salaryPagePath,
 } from '../state/siteLinks';
@@ -43,6 +44,7 @@ export function FormSections({
   exampleSalary,
   sections,
   salaryPageWritten,
+  federal,
 }: FormBody) {
   const salary = displayWholeMoney(
     exampleSalary,
@@ -73,8 +75,8 @@ export function FormSections({
           aria-labelledby={`${section.id}-heading`}
           className={styles.section}
         >
-          <h2>
-            <span id={`${section.id}-heading`}>{section.heading}</span>{' '}
+          <div className={styles.heading}>
+            <h2 id={`${section.id}-heading`}>{section.heading}</h2>
             <a
               className={styles.permalink}
               href={`#${section.id}`}
@@ -83,7 +85,7 @@ export function FormSections({
               #
             </a>
             <span className={styles.pill}>{section.lines}</span>
-          </h2>
+          </div>
           <p>
             <Words text={section.paragraph} figures={section.figures} />
           </p>
@@ -93,16 +95,35 @@ export function FormSections({
             </span>
             <Words text={section.example} figures={section.figures} />
           </div>
+          {section.links !== undefined && section.links.length > 0 && (
+            <div className={styles.links}>
+              {section.links.map((link, at) => (
+                <a key={`${at.toString()}-${link.href}`} href={link.href}>
+                  {link.label}
+                </a>
+              ))}
+            </div>
+          )}
         </section>
       ))}
       <nav aria-label={strings.formPage.related} className={styles.related}>
-        <a href={contentPath(province)}>{strings.formPage.hub(place)}</a>
+        {federal === true ? (
+          FOOTER_PROVINCE_SLUGS.map((slug) => (
+            <a key={slug} href={contentPath(slug)}>
+              {strings.formPage.hub(strings.siteNav.provinceNames[slug])}
+            </a>
+          ))
+        ) : (
+          <a href={contentPath(province)}>{strings.formPage.hub(place)}</a>
+        )}
         <a href={contentPath(METHODOLOGY_SLUG)}>
           {strings.siteNav.methodology}
         </a>
         {salaryPageWritten === true && (
           <a href={salaryPagePath(province, exampleSalary)}>
-            {strings.formPage.salaryExample(salary)}
+            {federal === true
+              ? strings.formPage.federalSalaryExample(salary)
+              : strings.formPage.salaryExample(salary)}
           </a>
         )}
       </nav>

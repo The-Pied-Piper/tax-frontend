@@ -92,9 +92,9 @@ describe('useTakeHome with an initial state (a pre-built salary page)', () => {
 describe('useTakeHome links of a pre-built page', () => {
   const links = {
     calculator: '/',
-    previous: { salary: '65000', href: '/ca-on/65000/' },
-    next: { salary: '75000', href: '/ca-on/75000/' },
-    others: [{ salary: '60000', href: '/ca-on/60000/' }],
+    previous: { salary: '65000', href: '/ca-on/65000/', takeHome: '49976.45' },
+    next: { salary: '75000', href: '/ca-on/75000/', takeHome: '57611.80' },
+    others: [{ salary: '60000', href: '/ca-on/60000/', takeHome: '46000.10' }],
     ...ontarioTargets,
   };
   const withLinks: SalaryPageData = { ...initial, links };

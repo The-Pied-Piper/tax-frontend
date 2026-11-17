@@ -4,6 +4,7 @@ import { join } from 'node:path';
 import {
   apiBaseUrl,
   fakeFetch,
+  listedIn,
   siteUrl as site,
   template,
   tmpDirs,
@@ -49,21 +50,24 @@ async function build(
 ) {
   const dir = outDir();
   writeFileSync(join(dir, 'index.html'), template);
+  const list =
+    options.list === 'alberta'
+      ? withAlberta
+      : options.list === 'none'
+        ? { jurisdictions: [] }
+        : undefined;
   const { written: salaryFiles, built } = await generateSalaryPages({
     published: publishedSlugs,
-    fetch: fakeFetch(
-      options.list === 'alberta'
-        ? withAlberta
-        : options.list === 'none'
-          ? { jurisdictions: [] }
-          : undefined,
-    ),
+    fetch: fakeFetch(list),
     baseUrl: apiBaseUrl,
-    provinces,
+    // Only the provinces the fake API lists: a site-URL build fails on any
+    // other. The hubs below still take every province. With no province
+    // returned the build is the no-site-URL one, which skips them instead.
+    provinces: listedIn(provinces, list),
     outDir: dir,
     template,
     render: renderSalaryApp,
-    siteUrl: site,
+    siteUrl: options.list === 'none' ? null : site,
   });
   const base = new Set(contentPages.map((page) => page.slug));
   const hubs =

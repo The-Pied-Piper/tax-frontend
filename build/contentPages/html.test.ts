@@ -124,3 +124,27 @@ describe('buildContentPageHtml', () => {
     );
   });
 });
+
+describe('buildContentPageHtml with a head block', () => {
+  const block = '<script type="application/ld+json">{"a":1}</script>';
+
+  it('puts the block at the end of the head', () => {
+    const out = parse(
+      buildContentPageHtml(
+        template,
+        '<main></main>',
+        sampleSpec,
+        canonical,
+        block,
+      ),
+    );
+    expect(out.head.lastElementChild?.outerHTML).toBe(block);
+  });
+
+  it('adds nothing when there is no block', () => {
+    const out = parse(
+      buildContentPageHtml(template, '<main></main>', sampleSpec, canonical),
+    );
+    expect(out.querySelector('script[type="application/ld+json"]')).toBeNull();
+  });
+});

@@ -7,9 +7,12 @@ import type {
 import {
   contentFile,
   contentPath,
+  ENGINE_REPO_URL,
   isContentSlug,
 } from '../../src/state/siteLinks';
 import { isSitePath } from '../../src/state/salaryPageData';
+import { contentBreadcrumb } from '../../src/state/breadcrumbs';
+import { breadcrumbJsonLd } from '../breadcrumbJsonLd';
 import { isSalaryPageSlug } from '../salaryPages/address';
 import { DESCRIPTION_LIMIT, TITLE_LIMIT } from '../salaryPages/limits';
 import { buildContentPageHtml } from './html';
@@ -28,7 +31,9 @@ export type ContentOptions = {
 /** Why a block cannot be drawn, or null when it can. */
 function blockProblem(block: ContentBlock): string | null {
   const badAddress = (href: string) =>
-    isSitePath(href) ? null : `has a link to ${href}, which is not a site path`;
+    isSitePath(href) || href === ENGINE_REPO_URL
+      ? null
+      : `has a link to ${href}, which is not a site path`;
   switch (block.kind) {
     case 'paragraph':
       for (const part of block.content) {
@@ -112,6 +117,13 @@ export async function generateContentPages(
       render(spec),
       spec,
       siteUrl === null ? null : `${siteUrl}${contentPath(spec.slug)}`,
+      siteUrl === null
+        ? null
+        : breadcrumbJsonLd(
+            contentBreadcrumb(spec),
+            siteUrl,
+            contentPath(spec.slug),
+          ),
     ),
   }));
   for (const { path, html } of built) {

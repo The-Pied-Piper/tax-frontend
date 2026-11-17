@@ -9,6 +9,7 @@ export const schedule8: FormPageSpec = {
   province: 'ca-on',
   year: 2025,
   exampleSalary: '70000',
+  federal: true,
   title: 'Schedule 8: Canada Pension Plan, in plain words',
   description:
     'What Schedule 8 is for and what each part asks, in plain words, with a worked example for a $70,000 salary.',
@@ -52,11 +53,15 @@ export const schedule8: FormPageSpec = {
       heading: 'The second, smaller payment',
       lines: 'Lines 4 and 22',
       paragraph:
-        'Pay above the first limit of {limit} is charged a second payment at {rate}. It only applies to the part of your pay above that limit. If your pay is below the limit, there is nothing to pay here.',
+        'Pay above the first limit of {limit}, up to the higher limit of {higher}, is charged a second payment at {rate}. Pay above the higher limit is not charged. If your pay is under the first limit, there is nothing to pay here.',
       example:
         'Your pay is under {limit}, so the part above it is {above}. The second payment is {second}.',
       figures: {
         limit: result('$71,300', 'cpp_maximum_pensionable_earnings'),
+        higher: result(
+          '$81,200',
+          'cpp_additional_maximum_pensionable_earnings',
+        ),
         rate: printed('4%', '4% of the part of line 4'),
         above: result('$0', 'cpp_part_3_line_4'),
         second: result('$0', 'cpp_part_3_line_22'),

@@ -6,11 +6,14 @@ import {
   type ComputeTakeHomeCalculationResponse,
   type ListJurisdictionsResponse,
 } from '../../src/api';
-import { dollarSign } from '../../src/adapters/fallback';
+import { dollarSign, responseUnit } from '../../src/adapters/fallback';
+import { displayWholeMoney } from '../../src/money/format';
+import { salaryBreadcrumb } from '../../src/state/breadcrumbs';
+import { breadcrumbJsonLd } from '../breadcrumbJsonLd';
 import { languageCode, strings } from '../../src/strings';
 import type { Unit } from '../../src/adapters';
 import type { SalaryPageData } from '../../src/state/useTakeHome';
-import { pageUrl } from './address';
+import { pagePath, pageUrl } from './address';
 import { buildPageHtml } from './pageHtml';
 import { pageMeta } from './pageMeta';
 import { DESCRIPTION_LIMIT, TITLE_LIMIT } from './limits';
@@ -36,14 +39,18 @@ export type GenerateOptions = {
   template: string;
   /** The real App as a string for one page's data. */
   render: (data: SalaryPageData) => string;
-  /** The normalized site origin; null leaves canonical and og:url as the template has them. */
+  /**
+   * The normalized site origin; null leaves canonical and og:url as the template has them.
+   * When set (a prod-shaped build), a listed province the API does not return fails the
+   * build before anything is fetched or written; without it such a province is skipped.
+   */
   siteUrl?: string | null;
 };
 
 export type GenerateResult = {
   /** Paths written, relative to outDir. */
   written: string[];
-  /** Listed provinces the API did not return, so got no pages. */
+  /** Listed provinces the API did not return, so got no pages (only without a site URL; with one, generating throws instead). */
   skipped: string[];
   /** What was written, by province: the one list the hub pages' salary links come from. */
   built: BuiltProvince[];
@@ -71,6 +78,24 @@ export async function generateSalaryPages(
     );
   }
 
+  const placeNames = strings.siteNav.provinceNames as Record<
+    string,
+    string | undefined
+  >;
+  const missing = provinces.filter(
+    (p) => !list.jurisdictions.some((j) => j.code === p.code),
+  );
+  if (options.siteUrl && missing.length > 0) {
+    throw new Error(
+      missing
+        .map(
+          (p) =>
+            `${placeNames[p.slug] ?? p.code} (${p.code}) is listed in build/salaryPages/provinces.ts but the API at ${baseUrl} does not return it. Release the service with it first, or take it out of the list.`,
+        )
+        .join('\n'),
+    );
+  }
+
   const fetched: {
     province: Province;
     steps: string[];
@@ -78,7 +103,7 @@ export async function generateSalaryPages(
   }[] = [];
   const skipped: string[] = [];
   for (const province of provinces) {
-    if (!list.jurisdictions.some((j) => j.code === province.code)) {
+    if (missing.includes(province)) {
       skipped.push(province.code);
       continue;
     }
@@ -120,26 +145,32 @@ export async function generateSalaryPages(
   for (const { province, steps, responses } of fetched) {
     // The name the hubs use, so the breadcrumb and the hub's own title agree.
     const placeName =
-      (strings.siteNav.provinceNames as Record<string, string | undefined>)[
-        province.slug
-      ] ??
+      placeNames[province.slug] ??
       list.jurisdictions.find((j) => j.code === province.code)?.name ??
       province.code;
+    // Each link shows the take_home of the page it points to: this province's own responses.
+    const takeHomes: Record<string, string> = {};
+    steps.forEach((step, at) => {
+      const answer = responses[at];
+      if (!answer) throw new Error(`Salary pages: no answer for ${step}`);
+      takeHomes[step] = answer.take_home;
+    });
     // Links go only to the pages of this province that are about to be written.
     steps.forEach((salary, at) => {
       const response = responses[at];
       if (!response) throw new Error(`Salary pages: no answer for ${salary}`);
       const page = `${province.slug}/${salary}`;
+      const links = {
+        ...salaryLinks(province.slug, steps, salary, takeHomes),
+        ...provinceLinks(province.slug, placeName, options.published),
+      };
       const data: SalaryPageData = {
         jurisdictions: list.jurisdictions,
         response,
         jurisdictionCode: province.code,
         year: province.year,
         salary,
-        links: {
-          ...salaryLinks(province.slug, steps, salary),
-          ...provinceLinks(province.slug, placeName, options.published),
-        },
+        links,
       };
       const meta = pageMeta(data);
       if (meta.title.length >= TITLE_LIMIT) {
@@ -160,6 +191,20 @@ export async function generateSalaryPages(
           data,
           options.siteUrl
             ? pageUrl(options.siteUrl, province.slug, salary)
+            : null,
+          options.siteUrl
+            ? breadcrumbJsonLd(
+                salaryBreadcrumb(
+                  links.hub,
+                  displayWholeMoney(
+                    response.salary,
+                    'annually',
+                    responseUnit(response),
+                  ),
+                ),
+                options.siteUrl,
+                pagePath(province.slug, salary),
+              )
             : null,
         ),
       });

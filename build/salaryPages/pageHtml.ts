@@ -2,9 +2,14 @@ import { SALARY_PAGE_DATA_ID } from '../../src/state/salaryPageData';
 import type { SalaryPageData } from '../../src/state/useTakeHome';
 import { pageMeta } from './pageMeta';
 
+/** JSON for the text of a script element: no `<`, so it cannot end the element or start a comment inside it. */
+export function jsonText(value: unknown): string {
+  return JSON.stringify(value).replace(/</g, '\\u003c');
+}
+
 /** A JSON data block for React to read: its text cannot end the script element or start a comment inside it. */
 export function dataBlock(id: string, value: unknown): string {
-  const json = JSON.stringify(value).replace(/</g, '\\u003c');
+  const json = jsonText(value);
   return `<script type="application/json" id="${id}">${json}</script>`;
 }
 
@@ -42,6 +47,17 @@ function attributeWords(tag: string, name: string): string[] {
   return value.toLowerCase().split(/\s+/);
 }
 
+/** The page with every canonical link and og:url tag removed. */
+export function withoutAddress(html: string): string {
+  return html
+    .replace(LINK_TAG, (tag) =>
+      attributeWords(tag, 'rel').includes('canonical') ? '' : tag,
+    )
+    .replace(META_TAG, (tag) =>
+      attributeWords(tag, 'property').includes('og:url') ? '' : tag,
+    );
+}
+
 /**
  * Gives the page its own canonical link and og:url: every canonical link and
  * og:url tag the template has (the calculator's, from the site build) is
@@ -66,13 +82,15 @@ function withAddress(html: string, address: string): string {
 /**
  * The template with `#root` holding the rendered page, the page's own title
  * and description in every tag that carries them, and, when given, its own
- * canonical link and og:url. Shared by salary pages and content pages.
+ * canonical link and og:url, and, when given, a block (such as structured
+ * data) at the end of the head. Shared by salary pages and content pages.
  */
 export function pageShell(
   template: string,
   appHtml: string,
   meta: { title: string; description: string },
   canonicalUrl: string | null,
+  headBlock: string | null = null,
 ): string {
   // #root ends at the </div> that is followed by a script or the end of the body.
   const root = /(<div id="root">)[\s\S]*?(?=<\/div>\s*(?:<script|<\/body>))/;
@@ -96,9 +114,11 @@ export function pageShell(
     (html, [key, text]) => withContent(html, key, text),
     head,
   );
-  return canonicalUrl === null
-    ? described
-    : withAddress(described, canonicalUrl);
+  const addressed =
+    canonicalUrl === null ? described : withAddress(described, canonicalUrl);
+  return headBlock === null
+    ? addressed
+    : addressed.replace('</head>', () => `${headBlock}\n  </head>`);
 }
 
 /** The template with `#root` holding the rendered page, plus the data block for React. */
@@ -107,8 +127,15 @@ export function buildPageHtml(
   appHtml: string,
   data: SalaryPageData,
   canonicalUrl: string | null = null,
+  headBlock: string | null = null,
 ): string {
   const block = dataBlock(SALARY_PAGE_DATA_ID, data);
-  const addressed = pageShell(template, appHtml, pageMeta(data), canonicalUrl);
+  const addressed = pageShell(
+    template,
+    appHtml,
+    pageMeta(data),
+    canonicalUrl,
+    headBlock,
+  );
   return addressed.replace('</body>', () => `${block}\n  </body>`);
 }

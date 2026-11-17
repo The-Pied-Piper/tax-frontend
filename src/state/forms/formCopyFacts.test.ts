@@ -1,4 +1,5 @@
 import { pageOf as page, sectionOf as section } from '../../test/formText';
+import { contentPath, formSlug } from '../siteLinks';
 
 function longestSentence(text: string): number {
   return Math.max(
@@ -30,7 +31,9 @@ describe('t1-tax balance section copy', () => {
   });
 
   it('says tax already taken off pay is left out', () => {
-    expect(balance().paragraph).toMatch(/already taken off|already deducted/i);
+    expect(balance().paragraph).toMatch(
+      /already took off|already taken off|already deducted/i,
+    );
   });
 
   it('keeps sentences short', () => {
@@ -64,13 +67,231 @@ describe('on428 total section copy', () => {
     expect(paragraph).not.toMatch(/a set amount, not/i);
   });
 
-  it('says the premium steps up with income and phases in', () => {
-    expect(paragraph).toMatch(/steps? up/i);
-    expect(paragraph).toMatch(/phase/i);
+  it('says the premium goes up in steps as income rises', () => {
+    expect(paragraph).toMatch(/goes up in steps as income rises/i);
+    expect(paragraph).toMatch(/little or nothing/i);
+  });
+
+  it('adds the premium to the tax after all the earlier steps, not "after credits"', () => {
+    expect(paragraph).toMatch(
+      /adds it to your tax after all the earlier steps/,
+    );
+    expect(paragraph).not.toMatch(/after credits/);
   });
 
   it('keeps sentences short', () => {
     expect(longestSentence(paragraph)).toBeLessThanOrEqual(40);
+  });
+});
+
+describe('on428 plain-English copy', () => {
+  it('income says income, not pay, and puts the cause before the result', () => {
+    const { paragraph, example } = section('on428', 'income');
+    expect(paragraph).toMatch(/part of your income that tax is charged on/);
+    expect(example).toMatch(
+      /^\{taken\}.*That leaves a taxable income of \{income\}\.$/,
+    );
+  });
+
+  it('brackets calls the result the Ontario tax before credits', () => {
+    const { paragraph, example } = section('on428', 'brackets');
+    expect(paragraph).toMatch(/finds the top slice your income reaches/);
+    expect(example).toMatch(/Ontario tax before credits: \{tax\}\.$/);
+  });
+
+  it('credits starts from a list of amounts', () => {
+    expect(section('on428', 'credits').paragraph).toMatch(
+      /^A credit lowers your tax bill\. The form starts with a list of amounts/,
+    );
+  });
+
+  it('keeps every changed section short in sentences', () => {
+    for (const id of ['income', 'brackets', 'credits', 'surtax', 'reduction']) {
+      const { paragraph, example } = section('on428', id);
+      expect(longestSentence(`${paragraph} ${example}`)).toBeLessThanOrEqual(
+        40,
+      );
+    }
+  });
+});
+
+describe('on428 corrections', () => {
+  it('surtax says the form tests Ontario tax after credits, before the health premium', () => {
+    const { paragraph, example } = section('on428', 'surtax');
+    expect(paragraph).toMatch(
+      /tests your Ontario tax after credits, before the health premium/,
+    );
+    expect(example).toMatch(/^Your Ontario tax after credits is \{tax\}\./);
+  });
+
+  it('reduction says it takes away Ontario tax after credits and surtax', () => {
+    const { paragraph, example } = section('on428', 'reduction');
+    expect(paragraph).toMatch(
+      /takes away your Ontario tax after credits and surtax/,
+    );
+    expect(example).toMatch(/less your tax of \{tax\}/);
+  });
+});
+
+describe('bc428 copy', () => {
+  const text = () =>
+    page('bc428')
+      .sections.map((s) => `${s.paragraph} ${s.example}`)
+      .join(' ');
+  const income = () => section('bc428', 'income');
+  const brackets = () => section('bc428', 'brackets');
+  const credits = () => section('bc428', 'credits');
+  const reduction = () => section('bc428', 'reduction');
+
+  it('says taxable income is the part of your income that tax is charged on', () => {
+    expect(income().paragraph).toMatch(
+      /taxable income is the part of your income that tax is charged on/i,
+    );
+  });
+
+  it('says the form copies taxable income and does not work it out', () => {
+    expect(income().paragraph).toMatch(/does not work it out/i);
+    expect(income().paragraph).toMatch(
+      /copies the number from the federal part/i,
+    );
+  });
+
+  it('says some things are taken off first, like pension plan payments', () => {
+    expect(income().paragraph).toMatch(
+      /taken off first, like part of your pension plan payments/i,
+    );
+  });
+
+  it('shows the amount taken off first and the taxable income left', () => {
+    expect(income().example).toMatch(
+      /\{taken\}[^.]*pension plan payments[^.]*taken off first/i,
+    );
+    expect(income().example).toMatch(
+      /That leaves a taxable income of \{income\}/,
+    );
+  });
+
+  it('says British Columbia does not tax all income at one rate', () => {
+    expect(brackets().paragraph).toMatch(
+      /does not tax all of your income at one rate/i,
+    );
+  });
+
+  it('says income is cut into slices called brackets, each with its own rate', () => {
+    expect(brackets().paragraph).toMatch(
+      /cuts your income into slices, called brackets, and each slice has its own rate/i,
+    );
+  });
+
+  it('says the form finds the top slice your income reaches', () => {
+    expect(brackets().paragraph).toMatch(
+      /finds the top slice your income reaches/i,
+    );
+  });
+
+  it("adds the tax on the slices below, then charges the top slice's rate on the rest", () => {
+    expect(brackets().paragraph).toMatch(
+      /adds up the tax on all the slices below that one/i,
+    );
+    expect(brackets().paragraph).toMatch(
+      /top slice['\u2019]s rate on the rest of your income/i,
+    );
+  });
+
+  it('shows the slice the income reaches and its rate', () => {
+    expect(brackets().example).toMatch(
+      /reaches the slice that starts at \{start\}\. That slice is taxed at \{rate\}/,
+    );
+  });
+
+  it('shows the tax on the slices below', () => {
+    expect(brackets().example).toMatch(
+      /tax on the slices below it comes to \{below\}/i,
+    );
+  });
+
+  it('shows the income above the slice start and the tax it adds', () => {
+    expect(brackets().example).toMatch(
+      /\{above\} of your income above \{start\} adds \{added\}/,
+    );
+  });
+
+  it('shows the tax before credits', () => {
+    expect(brackets().example).toMatch(
+      /British Columbia tax before credits: \{tax\}/,
+    );
+  });
+
+  it('says a credit lowers your tax bill', () => {
+    expect(credits().paragraph).toMatch(/a credit lowers your tax bill/i);
+  });
+
+  it('lists the basic personal amount that everyone gets', () => {
+    expect(credits().paragraph).toMatch(
+      /basic personal amount that everyone gets \(\{basic\} in 2025\)/i,
+    );
+  });
+
+  it('lists the pension plan payments and EI payments', () => {
+    expect(credits().paragraph).toMatch(
+      /main part of your pension plan payments/i,
+    );
+    expect(credits().paragraph).toMatch(/your EI payments/);
+  });
+
+  it('adds the amounts up and takes the credit rate of the total as the discount', () => {
+    expect(credits().paragraph).toMatch(
+      /adds them up, then takes \{rate\} of the total/i,
+    );
+    expect(credits().paragraph).toMatch(/That is your discount/);
+  });
+
+  it('says the reduction helps people on lower incomes', () => {
+    expect(reduction().paragraph).toMatch(
+      /lowers the tax of people on lower incomes/i,
+    );
+  });
+
+  it('says the reduction starts at a set amount', () => {
+    expect(reduction().paragraph).toMatch(/reduction starts at \{set\}/i);
+  });
+
+  it('says the form charges a rate on net income over the base', () => {
+    expect(reduction().paragraph).toMatch(
+      /takes your net income over \{base\} and charges \{rate\} on it/i,
+    );
+  });
+
+  it('says that amount is taken away from the reduction', () => {
+    expect(reduction().paragraph).toMatch(/taken away from the reduction/i);
+  });
+
+  it('says the reduction is zero if nothing is left', () => {
+    expect(reduction().paragraph).toMatch(
+      /If nothing is left, the reduction is zero/,
+    );
+  });
+
+  it('says the higher your income, the smaller the reduction', () => {
+    expect(reduction().paragraph).toMatch(
+      /the higher your income, the smaller the reduction, until it reaches zero/i,
+    );
+  });
+
+  it('shows the net income over the base and the clawback', () => {
+    expect(reduction().example).toMatch(
+      /net income is \{over\} over \{base\}\. \{rate\} of that is \{clawback\}/,
+    );
+  });
+
+  it('shows a clawback bigger than the starting reduction giving the final reduction', () => {
+    expect(reduction().example).toMatch(
+      /more than \{set\}, so the reduction is \{reduction\}/,
+    );
+  });
+
+  it('keeps sentences short', () => {
+    expect(longestSentence(text())).toBeLessThanOrEqual(40);
   });
 });
 
@@ -90,11 +311,26 @@ describe('bc479 copy', () => {
     expect(page('bc479').intro).toMatch(/only the sales tax credit/i);
   });
 
-  it("says the renter's credit can still pay at higher incomes, if you paid rent", () => {
-    const { paragraph, example } = section('bc479', 'total');
-    const total = `${paragraph} ${example}`;
-    expect(total).toMatch(/higher incomes/i);
-    expect(total).toMatch(/paid rent/i);
+  it("says the renter's credit is for people who paid rent", () => {
+    expect(section('bc479', 'total').paragraph).toMatch(
+      /renter['\u2019]s credit is for people who paid rent/i,
+    );
+  });
+
+  it("says the renter's credit gets smaller as income rises and stops at a set income", () => {
+    const { paragraph } = section('bc479', 'total');
+    expect(paragraph).toMatch(/gets smaller as income rises/i);
+    expect(paragraph).toMatch(/stops at a set income/i);
+  });
+
+  it("does not say the renter's credit can still pay at higher incomes", () => {
+    const total = text();
+    expect(total).not.toMatch(/higher incomes/i);
+    expect(total).not.toMatch(/can still pay/i);
+  });
+
+  it("names no dollar figure for the renter's credit cut-off", () => {
+    expect(section('bc479', 'total').paragraph).not.toMatch(/\$|\d{2},\d{3}/);
   });
 
   it("names the renter's credit as left out", () => {
@@ -124,6 +360,48 @@ describe('bc479 copy', () => {
   it('no longer calls the sales tax credit the main one', () => {
     expect(page('bc479').intro).not.toMatch(/main one/i);
     expect(text()).not.toMatch(/the main one/i);
+  });
+
+  it('says the form starts with your income and takes off the threshold', () => {
+    const { paragraph } = section('bc479', 'income');
+    expect(paragraph).toMatch(/starts with your income/i);
+    expect(paragraph).toMatch(/takes off \{threshold\}/i);
+  });
+
+  it('says the sales tax credit only starts to shrink above the threshold', () => {
+    expect(section('bc479', 'income').paragraph).toMatch(
+      /sales tax credit only starts to shrink once your income is over that amount/i,
+    );
+  });
+
+  it('shows the income, the amount taken off and what is left', () => {
+    const { example } = section('bc479', 'income');
+    expect(example).toMatch(/Your income is \{income\}/);
+    expect(example).toMatch(/Take off \{threshold\} and \{over\} is left/);
+  });
+
+  it('says the sales tax credit starts at a set amount', () => {
+    expect(section('bc479', 'sales-tax').paragraph).toMatch(
+      /sales tax credit starts at \{credit\}/i,
+    );
+  });
+
+  it('says the sales tax credit shrinks by a rate of income over the threshold', () => {
+    expect(section('bc479', 'sales-tax').paragraph).toMatch(
+      /shrinks by \{rate\} of your income over \{threshold\}/i,
+    );
+  });
+
+  it('says the sales tax credit can be paid even if you owe no BC tax', () => {
+    expect(section('bc479', 'sales-tax').paragraph).toMatch(
+      /It can be paid to you even if you owe no BC tax/,
+    );
+  });
+
+  it('says very low incomes can see take-home pay above salary', () => {
+    expect(section('bc479', 'sales-tax').paragraph).toMatch(
+      /very low incomes[^.]*take-home pay higher than your salary/i,
+    );
   });
 
   it('says the total goes to line 47900', () => {
@@ -167,9 +445,44 @@ describe('t2204 copy', () => {
     expect(earnings()).toMatch(/under[^.]*(zero|\$0)|(zero|\$0)[^.]*under/i);
   });
 
-  it('limits the zero rule to employer pay, not self-employment', () => {
+  it('limits the zero rule to people with no self-employment income', () => {
+    expect(earnings()).toMatch(/no self-employment income/i);
+    expect(earnings()).not.toMatch(/only work for an employer/i);
+  });
+
+  it('says insured pay is added up from all T4 slips', () => {
     expect(earnings()).toMatch(
-      /under[^.]*(self-employ|only (work|earn)|employer)[^.]*\.|(self-employ|only (work|earn)|employer)[^.]*under/i,
+      /insured pay[^.]*added up from all your T4 slips/i,
+    );
+  });
+
+  it('says the premiums are capped at a top amount, then compared', () => {
+    const { paragraph } = section('t2204', 'premiums');
+    expect(paragraph).toMatch(/top amount for the year/i);
+    expect(paragraph).toMatch(/Then it compares/);
+    expect(paragraph).not.toMatch(/set most/i);
+  });
+
+  it('says there may still be a refund when nothing was overpaid, pointing to the first section', () => {
+    const { paragraph } = section('t2204', 'refund');
+    expect(paragraph).toMatch(
+      /there may still be a refund, as the first section explains/i,
+    );
+    expect(paragraph).not.toMatch(/there is no refund/i);
+  });
+
+  it('says line 16 is a different amount, the EI credit figure', () => {
+    const { paragraph } = section('t2204', 'refund');
+    expect(paragraph).toMatch(/line 16 is a different amount/i);
+    expect(paragraph).toMatch(/EI credit figure/i);
+    expect(paragraph).toMatch(/smallest of three amounts/i);
+    expect(paragraph).toMatch(/line 31200 of your return/i);
+    expect(paragraph).toMatch(/line 58300 of your provincial form/i);
+  });
+
+  it('words the refund example as three plain sentences', () => {
+    expect(section('t2204', 'refund').example).toBe(
+      'Your employer took off {taken}. The most you owe is {most}. The difference, your overpayment, is {extra}.',
     );
   });
 
@@ -206,6 +519,51 @@ describe('schedule-6 copy', () => {
 
   it('says a spouse gives other amounts', () => {
     expect(text()).toMatch(/spouse/i);
+  });
+
+  const earnings = () => {
+    const { paragraph, example } = section('schedule-6', 'earnings');
+    return `${paragraph} ${example}`;
+  };
+  const benefit = () => {
+    const { paragraph, example } = section('schedule-6', 'benefit');
+    return `${paragraph} ${example}`;
+  };
+
+  it('says who the benefit is for: a full year in Canada, 19 or older', () => {
+    expect(earnings()).toMatch(/lived in Canada all year/i);
+    expect(earnings()).toMatch(
+      /19 or older[^.]*lived with a spouse, partner or child/i,
+    );
+  });
+
+  it('names an approved school or college and more than 13 weeks', () => {
+    expect(earnings()).toMatch(
+      /full-time student at a school or college the government has approved/i,
+    );
+    expect(earnings()).toMatch(/studied for more than 13 weeks/i);
+  });
+
+  it('extends the diplomat rule to family members and employees', () => {
+    expect(earnings()).toMatch(
+      /diplomats, the family members who lived with them, and their employees/i,
+    );
+  });
+
+  it('keeps the 90 day prison rule in the earnings section', () => {
+    expect(earnings()).toMatch(/prison for 90 days or more/i);
+  });
+
+  it('says the first amount does not count, up to a top amount', () => {
+    expect(benefit()).toMatch(/does not count/i);
+    expect(benefit()).toMatch(/top amount of \{max\}/);
+    expect(benefit()).not.toMatch(/nothing on the first/i);
+  });
+
+  it('words the benefit example against the top amount', () => {
+    const { example } = section('schedule-6', 'benefit');
+    expect(example).toMatch(/which is more than \{max\}/);
+    expect(example).toMatch(/before your income is taken into account/i);
   });
 
   it('says full-time students cannot claim, after 13 weeks', () => {
@@ -277,5 +635,27 @@ describe('on428-a copy', () => {
 
   it('keeps sentences short', () => {
     expect(longestSentence(text())).toBeLessThanOrEqual(40);
+  });
+});
+
+describe('on428 lift section links', () => {
+  const lift = () => section('on428', 'lift');
+
+  it('has exactly one link, to the ON428-A page', () => {
+    expect(lift().links).toHaveLength(1);
+    expect(lift().links?.[0]?.href).toBe(contentPath(formSlug('on428-a')));
+  });
+
+  it('words the link without digits', () => {
+    const label = lift().links?.[0]?.label ?? '';
+    expect(label.trim()).not.toBe('');
+    expect(label).not.toMatch(/\d/);
+  });
+
+  it('gives no other on428 section a link', () => {
+    for (const s of page('on428').sections) {
+      if (s.id === 'lift') continue;
+      expect(s.links ?? [], s.id).toHaveLength(0);
+    }
   });
 });

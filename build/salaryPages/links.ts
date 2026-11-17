@@ -16,15 +16,19 @@ export function salaryLinks(
   slug: string,
   salaries: string[],
   salary: string,
+  takeHomes: Readonly<Record<string, string>>,
 ): Omit<SalaryPageLinks, 'hub' | 'learnMore'> {
   const index = salaries.indexOf(salary);
   if (index < 0) {
     throw new Error(`Salary ${salary} is not one of the pages of ${slug}`);
   }
-  const link = (other: string) => ({
-    salary: other,
-    href: pagePath(slug, other),
-  });
+  const link = (other: string) => {
+    const takeHome = takeHomes[other];
+    if (takeHome === undefined) {
+      throw new Error(`No take-home for salary ${other} of ${slug}`);
+    }
+    return { salary: other, href: pagePath(slug, other), takeHome };
+  };
   const before = salaries[index - 1];
   const after = salaries[index + 1];
   const others = salaries

@@ -9,6 +9,7 @@ export const t1Income: FormPageSpec = {
   province: 'ca-on',
   year: 2025,
   exampleSalary: '70000',
+  federal: true,
   title: 'T1 return, steps 2 to 4, in plain words',
   description:
     'How the T1 tax return finds your taxable income, step by step in plain words, with a worked example for a $70,000 salary.',
@@ -20,9 +21,9 @@ export const t1Income: FormPageSpec = {
       heading: 'Your total income',
       lines: 'Lines 10100, 10400 and 15000',
       paragraph:
-        'Total income is all the money you earned in the year. Your pay from your job goes on one line. Other work income goes on another. The form adds them together.',
+        'Total income is all the income you report for the year. For someone with only a salary, that is your pay. Your pay from your job goes on one line. Other work income goes on another. The form adds them together.',
       example:
-        'Your pay and other work income together come to {total}, and {other} of that is other work income. Total income: {total}.',
+        'Your pay plus other work income is {total}. Of that, {other} is other work income. Total income: {total}.',
       figures: {
         other: result('$0', 'other_employment_income'),
         total: result('$70,000', 'total_income'),
@@ -58,7 +59,7 @@ export const t1Income: FormPageSpec = {
       heading: 'Your taxable income',
       lines: 'Lines 25700 and 26000',
       paragraph:
-        'Some people take off a few more amounts at this step. What is left is your taxable income, and it cannot be below zero. It is the amount your federal tax and your Ontario tax are worked out from.',
+        'Some people take off a few more amounts at this step. What is left is your taxable income, and it cannot be below zero. Your federal tax and your provincial tax are both worked out from it.',
       example:
         'The other amounts are {other}, so your taxable income is {taxable}.',
       figures: {

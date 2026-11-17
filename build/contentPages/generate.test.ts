@@ -5,6 +5,7 @@ import {
   contentTemplate as template,
   tmpDirs,
 } from '../../src/test/generatedSite';
+import { ENGINE_REPO_URL } from '../../src/state/siteLinks';
 import {
   blocksSpec,
   parentSpec,
@@ -253,11 +254,25 @@ describe('generateContentPages validation', () => {
       expect(files(dir)).toEqual([]);
     });
 
+    it('accepts a link to the engine repository, the one address off the site', async () => {
+      const dir = outDir();
+      await run(dir, [
+        withBlocks({
+          kind: 'paragraph',
+          content: ['See ', { label: 'x', href: ENGINE_REPO_URL }],
+        }),
+      ]);
+      expect(files(dir).length).toBeGreaterThan(0);
+    });
+
     it.each([
       ['https://example.com/x/'],
       ['//example.com/x/'],
       ['x/relative/'],
       ['/has space/'],
+      ['https://github.com/The-Pied-Piper/tax-service'],
+      [`${ENGINE_REPO_URL}-evil`],
+      [`${ENGINE_REPO_URL}/`],
     ])('rejects a link to %s, which is not a site path', async (href) => {
       const dir = outDir();
       const links: ContentBlock[] = [

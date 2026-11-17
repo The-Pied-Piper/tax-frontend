@@ -9,6 +9,7 @@ export const schedule6: FormPageSpec = {
   province: 'ca-on',
   year: 2025,
   exampleSalary: '70000',
+  federal: true,
   title: 'Schedule 6: Canada Workers Benefit, in plain words',
   description:
     'What Schedule 6 is for and what each part asks, in plain words, with a worked example for a $70,000 salary.',
@@ -20,7 +21,7 @@ export const schedule6: FormPageSpec = {
       heading: 'What you earned from work',
       lines: 'Lines 1–6',
       paragraph:
-        "The Canada Workers Benefit starts with what you earned from working. The form uses this to work out how much benefit you could get. Someone who was a full-time student for more than 13 weeks in the year cannot claim, unless they had an eligible dependant. An eligible dependant is a child of yours or your spouse's who was under 19, lived with you on December 31, and was not eligible for the benefit themselves. Someone who was in prison for 90 days or more cannot claim. A diplomat or their family cannot claim either.",
+        "The Canada Workers Benefit is for people who lived in Canada all year, earned money from working, and were 19 or older at the end of the year or lived with a spouse, partner or child. The form starts with what you earned from working and uses it to work out how much benefit you could get. Some people cannot claim it even then. That includes a full-time student at a school or college the government has approved, if they studied for more than 13 weeks, unless they had an eligible dependant. It also includes anyone who was in prison for 90 days or more in the year, and diplomats, the family members who lived with them, and their employees. An eligible dependant is a child of yours or your spouse's who was under 19, lived with you on December 31, and was not eligible for the benefit themselves.",
       example: 'Your pay from work is {pay}.',
       figures: {
         pay: result('$70,000', 'cwb_family_working_income'),
@@ -31,9 +32,9 @@ export const schedule6: FormPageSpec = {
       heading: 'The most you could get',
       lines: 'Lines 17–22',
       paragraph:
-        'You get nothing on the first {base} you earn. After that, the form gives you {rate} of the rest, up to a most of {max}.',
+        'The first {base} you earn does not count. After that, you get {rate} of the rest of your pay, up to a top amount of {max}.',
       example:
-        'Your pay less {base} is {over}. {rate} of that is {share}, which is more than the most. So the benefit before income is checked is {basic}.',
+        'Your pay less {base} is {over}. {rate} of that is {share}, which is more than {max}. So before your income is taken into account, the benefit is {basic}.',
       figures: {
         base: result('$3,000', 'cwb_base_amount'),
         rate: printed('27%', '27% of line 18'),

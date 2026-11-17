@@ -149,12 +149,16 @@ describe('pageMeta: the year in the wording is the data year', () => {
     'shows %i in the title, heading and description when the fixture year is that year',
     (year) => {
       const meta = pageMeta({ ...page70000, year });
-      for (const text of [meta.title, meta.heading, meta.description]) {
+      for (const text of [meta.title, meta.heading]) {
         expect(text).toContain(`(${String(year)} Take-Home Pay)`);
+      }
+      for (const text of [meta.title, meta.heading, meta.description]) {
         expect(text).toContain(`70,000`);
       }
+      expect(meta.description).toContain(`in ${String(year)}, `);
       const other = year === 2026 ? '2027' : '2026';
       expect(meta.title).not.toContain(other);
+      expect(meta.description).not.toContain(other);
     },
   );
 });
