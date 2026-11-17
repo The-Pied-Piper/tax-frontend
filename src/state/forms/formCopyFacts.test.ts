@@ -1,4 +1,5 @@
 import { pageOf as page, sectionOf as section } from '../../test/formText';
+import { contentPath, formSlug } from '../siteLinks';
 
 function longestSentence(text: string): number {
   return Math.max(
@@ -277,5 +278,27 @@ describe('on428-a copy', () => {
 
   it('keeps sentences short', () => {
     expect(longestSentence(text())).toBeLessThanOrEqual(40);
+  });
+});
+
+describe('on428 lift section links', () => {
+  const lift = () => section('on428', 'lift');
+
+  it('has exactly one link, to the ON428-A page', () => {
+    expect(lift().links).toHaveLength(1);
+    expect(lift().links?.[0]?.href).toBe(contentPath(formSlug('on428-a')));
+  });
+
+  it('words the link without digits', () => {
+    const label = lift().links?.[0]?.label ?? '';
+    expect(label.trim()).not.toBe('');
+    expect(label).not.toMatch(/\d/);
+  });
+
+  it('gives no other on428 section a link', () => {
+    for (const s of page('on428').sections) {
+      if (s.id === 'lift') continue;
+      expect(s.links ?? [], s.id).toHaveLength(0);
+    }
   });
 });

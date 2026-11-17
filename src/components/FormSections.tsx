@@ -95,6 +95,15 @@ export function FormSections({
             </span>
             <Words text={section.example} figures={section.figures} />
           </div>
+          {section.links !== undefined && section.links.length > 0 && (
+            <div className={styles.links}>
+              {section.links.map((link, at) => (
+                <a key={`${at.toString()}-${link.href}`} href={link.href}>
+                  {link.label}
+                </a>
+              ))}
+            </div>
+          )}
         </section>
       ))}
       <nav aria-label={strings.formPage.related} className={styles.related}>

@@ -125,14 +125,20 @@
   font-size: 13px;
 }
 
-.related {
+.related,
+.links {
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
   margin: 28px 0 0;
 }
 
-.related a {
+.links {
+  margin-top: 12px;
+}
+
+.related a,
+.links a {
   padding: 5px 12px;
   border: 1px solid var(--edge);
   border-radius: 999px;
@@ -141,12 +147,14 @@
   text-decoration: none;
 }
 
-.related a:hover {
+.related a:hover,
+.links a:hover {
   border-color: var(--accent);
   color: var(--accent);
 }
 
 .related a:focus-visible,
+.links a:focus-visible,
 .contentsList a:focus-visible {
   outline: 2px solid var(--accent);
   outline-offset: 2px;

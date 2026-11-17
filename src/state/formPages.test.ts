@@ -3,7 +3,8 @@ import { formContentPage, splitFigures } from './formPage';
 import { contentPages } from './contentPages';
 import { displayWholeMoney, type MoneyUnit } from '../money/format';
 import { strings } from '../strings';
-import { formSlug, isContentSlug } from './siteLinks';
+import { isSitePath } from './salaryPageData';
+import { contentPath, formSlug, isContentSlug } from './siteLinks';
 
 type Line = {
   label: string;
@@ -53,6 +54,27 @@ describe.each(formPages)('the $name page', (form) => {
     const ids = form.sections.map((section) => section.id);
     expect(ids).not.toContain('form-contents');
     for (const id of ids) expect(ids).not.toContain(`${id}-heading`);
+  });
+
+  it('has section links that are absolute paths or fragments only', () => {
+    for (const section of form.sections) {
+      for (const link of section.links ?? []) {
+        expect(
+          isSitePath(link.href) || link.href.startsWith('#'),
+          `${section.id}: ${link.href}`,
+        ).toBe(true);
+      }
+    }
+  });
+
+  it('links to a form page only where that page exists in formPages', () => {
+    const formPaths = formPages.map((page) => contentPath(formSlug(page.id)));
+    for (const section of form.sections) {
+      for (const link of section.links ?? []) {
+        if (!link.href.startsWith('/forms/')) continue;
+        expect(formPaths, `${section.id}: ${link.href}`).toContain(link.href);
+      }
+    }
   });
 
   it('names no year in its words but the one it quotes', () => {
