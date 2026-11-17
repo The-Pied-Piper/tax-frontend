@@ -40,14 +40,16 @@ export function App({ client, registry, initial, clock }: Props) {
       : answerFirst && request.status === 'loading'
         ? request.previous
         : undefined;
-  // Only a pre-built page carries a summary; a fresh calculation does not.
-  const text = shown?.links
-    ? salaryPageText(
-        shown.response,
-        shown.asked.jurisdictionName,
-        shown.asked.year,
-      )
-    : null;
+  // A salary page writes its heading and paragraph from whatever answer is on
+  // screen, pre-built or freshly calculated; the calculator page has none.
+  const text =
+    shown && answerFirst
+      ? salaryPageText(
+          shown.response,
+          shown.asked.jurisdictionName,
+          shown.asked.year,
+        )
+      : null;
   // A pre-built salary page leads with its answer, so the first thing read, on
   // screen and in the source, is the figure; the provisional note sits just
   // under it and the form below. The calculator page has no answer yet, so its

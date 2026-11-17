@@ -288,4 +288,44 @@ describe('while a mounted salary page recalculates', () => {
     expect(container.querySelector('[inert]')).toBeNull();
     expect(screen.getByRole('status')).toBeEmptyDOMElement();
   });
+
+  it('keeps the paragraph of a freshly calculated answer, faded, on the next Calculate', async () => {
+    const base = fixtureClient(undefined, compute30000);
+    let calls = 0;
+    let release: () => void = () => {};
+    const client: ApiClient = {
+      listJurisdictions: (query) => base.listJurisdictions(query),
+      computeTakeHomeCalculation: (body) => {
+        calls += 1;
+        if (calls === 1) return base.computeTakeHomeCalculation(body);
+        return new Promise((resolve) => {
+          release = () => {
+            resolve(base.computeTakeHomeCalculation(body));
+          };
+        });
+      },
+    };
+    const user = userEvent.setup();
+    const { container } = render(
+      <App
+        client={client}
+        initial={withLinks(pageData(compute70000, '70000'))}
+      />,
+    );
+    const calculate = () =>
+      user.click(screen.getByRole('button', { name: strings.form.calculate }));
+    await calculate();
+    await waitFor(() => {
+      expect(container.querySelector('.page-summary')).toHaveTextContent(
+        /\$30,000/,
+      );
+    });
+    await calculate();
+    const paragraph = container.querySelector('.page-summary');
+    expect(paragraph).toHaveTextContent(/\$30,000/);
+    expect(container.querySelector('[inert]')).toContainElement(
+      paragraph as HTMLElement,
+    );
+    release();
+  });
 });
