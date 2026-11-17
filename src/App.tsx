@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import type { AdapterRegistry } from './adapters';
 import type { ApiClient } from './api';
 import { AdvancedView } from './components/AdvancedView';
@@ -40,8 +41,22 @@ export function App({ client, registry, initial, clock }: Props) {
       : answerFirst && request.status === 'loading'
         ? request.previous
         : undefined;
-  // A salary page writes its heading and paragraph from whatever answer is on
-  // screen, pre-built or freshly calculated; the calculator page has none.
+  // The breadcrumb is the one the page was built with and stays through every
+  // Calculate, so it keeps matching the page's address.
+  const [crumb] = useState(() =>
+    shown?.links
+      ? salaryBreadcrumb(
+          shown.links.hub,
+          displayWholeMoney(
+            shown.response.salary,
+            'annually',
+            shown.adapted.unit,
+          ),
+        )
+      : null,
+  );
+  // A salary page writes its paragraph from whatever answer is on screen,
+  // pre-built or freshly calculated; the calculator page has none.
   const text =
     shown && answerFirst
       ? salaryPageText(
@@ -54,9 +69,11 @@ export function App({ client, registry, initial, clock }: Props) {
   // screen and in the source, is the figure; the provisional note sits just
   // under it and the form below. The calculator page has no answer yet, so its
   // form and note keep their old places. The order is fixed for the life of the
-  // page: after Calculate the answer is a fresh one with no links (the heading
-  // and paragraph are written again), and the form stays below it, so the
+  // page: after Calculate the answer is a fresh one with no links (the paragraph is
+  // written again), and the form stays below it, so the
   // layout does not flip.
+  // The heading, like the breadcrumb, stays the one the page was built with.
+  const [heading] = useState(() => (text ? text.heading : strings.title));
   const notice = shown?.response.provisional ? (
     <ProvisionalNotice year={shown.asked.year} />
   ) : null;
@@ -110,21 +127,10 @@ export function App({ client, registry, initial, clock }: Props) {
   return (
     <>
       <main>
-        {shown?.links && (
-          <Breadcrumb
-            {...salaryBreadcrumb(
-              shown.links.hub,
-              displayWholeMoney(
-                shown.response.salary,
-                'annually',
-                shown.adapted.unit,
-              ),
-            )}
-          />
-        )}
+        {crumb && <Breadcrumb {...crumb} />}
         <header className="page-header">
           <div className="page-header-text">
-            <h1>{text ? text.heading : strings.title}</h1>
+            <h1>{heading}</h1>
             <p className="lede">{strings.intro}</p>
           </div>
           <ThemeToggle />
