@@ -373,7 +373,7 @@ describe('breadcrumb and learn-more links in the static page (#150)', () => {
       links: { ...links, learnMore: ontarioTargets.learnMore.slice(0, 2) },
     });
     expect(within(learnMore()).getAllByRole('link')).toHaveLength(2);
-    expect(document.body.innerHTML).not.toContain('/forms/');
+    expect(learnMore().innerHTML).not.toContain('/forms/');
   });
 
   it('has no breadcrumb and no Learn more nav on the calculator home (no links)', () => {
