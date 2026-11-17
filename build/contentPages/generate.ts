@@ -7,6 +7,7 @@ import type {
 import {
   contentFile,
   contentPath,
+  ENGINE_REPO_URL,
   isContentSlug,
 } from '../../src/state/siteLinks';
 import { isSitePath } from '../../src/state/salaryPageData';
@@ -28,7 +29,9 @@ export type ContentOptions = {
 /** Why a block cannot be drawn, or null when it can. */
 function blockProblem(block: ContentBlock): string | null {
   const badAddress = (href: string) =>
-    isSitePath(href) ? null : `has a link to ${href}, which is not a site path`;
+    isSitePath(href) || href === ENGINE_REPO_URL
+      ? null
+      : `has a link to ${href}, which is not a site path`;
   switch (block.kind) {
     case 'paragraph':
       for (const part of block.content) {
