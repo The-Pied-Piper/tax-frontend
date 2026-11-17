@@ -75,6 +75,168 @@ describe('on428 total section copy', () => {
   });
 });
 
+describe('bc428 copy', () => {
+  const text = () =>
+    page('bc428')
+      .sections.map((s) => `${s.paragraph} ${s.example}`)
+      .join(' ');
+  const income = () => section('bc428', 'income');
+  const brackets = () => section('bc428', 'brackets');
+  const credits = () => section('bc428', 'credits');
+  const reduction = () => section('bc428', 'reduction');
+
+  it('says taxable income is the part of your income that tax is charged on', () => {
+    expect(income().paragraph).toMatch(
+      /taxable income is the part of your income that tax is charged on/i,
+    );
+  });
+
+  it('says the form copies taxable income and does not work it out', () => {
+    expect(income().paragraph).toMatch(/does not work it out/i);
+    expect(income().paragraph).toMatch(
+      /copies the number from the federal part/i,
+    );
+  });
+
+  it('says some things are taken off first, like pension plan payments', () => {
+    expect(income().paragraph).toMatch(
+      /taken off first, like part of your pension plan payments/i,
+    );
+  });
+
+  it('shows the amount taken off first and the taxable income left', () => {
+    expect(income().example).toMatch(
+      /\{taken\}[^.]*pension plan payments[^.]*taken off first/i,
+    );
+    expect(income().example).toMatch(
+      /That leaves a taxable income of \{income\}/,
+    );
+  });
+
+  it('says British Columbia does not tax all income at one rate', () => {
+    expect(brackets().paragraph).toMatch(
+      /does not tax all of your income at one rate/i,
+    );
+  });
+
+  it('says income is cut into slices called brackets, each with its own rate', () => {
+    expect(brackets().paragraph).toMatch(
+      /cuts your income into slices, called brackets, and each slice has its own rate/i,
+    );
+  });
+
+  it('says the form finds the top slice your income reaches', () => {
+    expect(brackets().paragraph).toMatch(
+      /finds the top slice your income reaches/i,
+    );
+  });
+
+  it("adds the tax on the slices below, then charges the top slice's rate on the rest", () => {
+    expect(brackets().paragraph).toMatch(
+      /adds up the tax on all the slices below that one/i,
+    );
+    expect(brackets().paragraph).toMatch(
+      /top slice['\u2019]s rate on the rest of your income/i,
+    );
+  });
+
+  it('shows the slice the income reaches and its rate', () => {
+    expect(brackets().example).toMatch(
+      /reaches the slice that starts at \{start\}\. That slice is taxed at \{rate\}/,
+    );
+  });
+
+  it('shows the tax on the slices below', () => {
+    expect(brackets().example).toMatch(
+      /tax on the slices below it comes to \{below\}/i,
+    );
+  });
+
+  it('shows the income above the slice start and the tax it adds', () => {
+    expect(brackets().example).toMatch(
+      /\{above\} of your income above \{start\} adds \{added\}/,
+    );
+  });
+
+  it('shows the tax before credits', () => {
+    expect(brackets().example).toMatch(
+      /British Columbia tax before credits: \{tax\}/,
+    );
+  });
+
+  it('says a credit lowers your tax bill', () => {
+    expect(credits().paragraph).toMatch(/a credit lowers your tax bill/i);
+  });
+
+  it('lists the basic personal amount that everyone gets', () => {
+    expect(credits().paragraph).toMatch(
+      /basic personal amount that everyone gets \(\{basic\} in 2025\)/i,
+    );
+  });
+
+  it('lists the pension plan payments and EI payments', () => {
+    expect(credits().paragraph).toMatch(
+      /main part of your pension plan payments/i,
+    );
+    expect(credits().paragraph).toMatch(/your EI payments/);
+  });
+
+  it('adds the amounts up and takes the credit rate of the total as the discount', () => {
+    expect(credits().paragraph).toMatch(
+      /adds them up, then takes \{rate\} of the total/i,
+    );
+    expect(credits().paragraph).toMatch(/That is your discount/);
+  });
+
+  it('says the reduction helps people on lower incomes', () => {
+    expect(reduction().paragraph).toMatch(
+      /lowers the tax of people on lower incomes/i,
+    );
+  });
+
+  it('says the reduction starts at a set amount', () => {
+    expect(reduction().paragraph).toMatch(/reduction starts at \{set\}/i);
+  });
+
+  it('says the form charges a rate on net income over the base', () => {
+    expect(reduction().paragraph).toMatch(
+      /takes your net income over \{base\} and charges \{rate\} on it/i,
+    );
+  });
+
+  it('says that amount is taken away from the reduction', () => {
+    expect(reduction().paragraph).toMatch(/taken away from the reduction/i);
+  });
+
+  it('says the reduction is zero if nothing is left', () => {
+    expect(reduction().paragraph).toMatch(
+      /If nothing is left, the reduction is zero/,
+    );
+  });
+
+  it('says the higher your income, the smaller the reduction', () => {
+    expect(reduction().paragraph).toMatch(
+      /the higher your income, the smaller the reduction, until it reaches zero/i,
+    );
+  });
+
+  it('shows the net income over the base and the clawback', () => {
+    expect(reduction().example).toMatch(
+      /net income is \{over\} over \{base\}\. \{rate\} of that is \{clawback\}/,
+    );
+  });
+
+  it('shows a clawback bigger than the starting reduction giving the final reduction', () => {
+    expect(reduction().example).toMatch(
+      /more than \{set\}, so the reduction is \{reduction\}/,
+    );
+  });
+
+  it('keeps sentences short', () => {
+    expect(longestSentence(text())).toBeLessThanOrEqual(40);
+  });
+});
+
 describe('bc479 copy', () => {
   const text = () =>
     page('bc479')
@@ -140,6 +302,48 @@ describe('bc479 copy', () => {
   it('no longer calls the sales tax credit the main one', () => {
     expect(page('bc479').intro).not.toMatch(/main one/i);
     expect(text()).not.toMatch(/the main one/i);
+  });
+
+  it('says the form starts with your income and takes off the threshold', () => {
+    const { paragraph } = section('bc479', 'income');
+    expect(paragraph).toMatch(/starts with your income/i);
+    expect(paragraph).toMatch(/takes off \{threshold\}/i);
+  });
+
+  it('says the sales tax credit only starts to shrink above the threshold', () => {
+    expect(section('bc479', 'income').paragraph).toMatch(
+      /sales tax credit only starts to shrink once your income is over that amount/i,
+    );
+  });
+
+  it('shows the income, the amount taken off and what is left', () => {
+    const { example } = section('bc479', 'income');
+    expect(example).toMatch(/Your income is \{income\}/);
+    expect(example).toMatch(/Take off \{threshold\} and \{over\} is left/);
+  });
+
+  it('says the sales tax credit starts at a set amount', () => {
+    expect(section('bc479', 'sales-tax').paragraph).toMatch(
+      /sales tax credit starts at \{credit\}/i,
+    );
+  });
+
+  it('says the sales tax credit shrinks by a rate of income over the threshold', () => {
+    expect(section('bc479', 'sales-tax').paragraph).toMatch(
+      /shrinks by \{rate\} of your income over \{threshold\}/i,
+    );
+  });
+
+  it('says the sales tax credit can be paid even if you owe no BC tax', () => {
+    expect(section('bc479', 'sales-tax').paragraph).toMatch(
+      /It can be paid to you even if you owe no BC tax/,
+    );
+  });
+
+  it('says very low incomes can see take-home pay above salary', () => {
+    expect(section('bc479', 'sales-tax').paragraph).toMatch(
+      /very low incomes[^.]*take-home pay higher than your salary/i,
+    );
   });
 
   it('says the total goes to line 47900', () => {
@@ -315,69 +519,5 @@ describe('on428 lift section links', () => {
       if (s.id === 'lift') continue;
       expect(s.links ?? [], s.id).toHaveLength(0);
     }
-  });
-});
-
-// Exact proposed wording for ticket #189. Curly and straight apostrophes
-// are treated alike, so the file's own convention may stand.
-const plain = (value: string) => value.replace(/\u2019/g, "'");
-
-describe.each([
-  [
-    'bc428',
-    'income',
-    'Taxable income is the part of your income that tax is charged on. This form does not work it out. It copies the number from the federal part of your return. Some things are taken off first, like part of your pension plan payments.',
-    '{taken}, the extra part of your pension plan payments, is taken off first. That leaves a taxable income of {income}.',
-  ],
-  [
-    'bc428',
-    'brackets',
-    "British Columbia does not tax all of your income at one rate. It cuts your income into slices, called brackets, and each slice has its own rate. The form finds the top slice your income reaches. It adds up the tax on all the slices below that one, then charges the top slice's rate on the rest of your income.",
-    'Your income reaches the slice that starts at {start}. That slice is taxed at {rate}. The tax on the slices below it comes to {below}. The {above} of your income above {start} adds {added}. British Columbia tax before credits: {tax}.',
-  ],
-  [
-    'bc428',
-    'credits',
-    'A credit lowers your tax bill. The form starts with a list of amounts: the basic personal amount that everyone gets ({basic} in 2025), the main part of your pension plan payments, and your EI payments. It adds them up, then takes {rate} of the total. That is your discount.',
-    undefined,
-  ],
-  [
-    'bc428',
-    'reduction',
-    'British Columbia lowers the tax of people on lower incomes. The reduction starts at {set}. The form then takes your net income over {base} and charges {rate} on it. That amount is taken away from the reduction. If nothing is left, the reduction is zero. So the higher your income, the smaller the reduction, until it reaches zero.',
-    'Your net income is {over} over {base}. {rate} of that is {clawback}, which is more than {set}, so the reduction is {reduction}.',
-  ],
-  [
-    'bc479',
-    'income',
-    'The form starts with your income. It takes off {threshold}, because the sales tax credit only starts to shrink once your income is over that amount.',
-    'Your income is {income}. Take off {threshold} and {over} is left.',
-  ],
-  [
-    'bc479',
-    'sales-tax',
-    'The sales tax credit starts at {credit}. It shrinks by {rate} of your income over {threshold}. It can be paid to you even if you owe no BC tax. At very low incomes, that can make your take-home pay higher than your salary.',
-    undefined,
-  ],
-  [
-    'bc479',
-    'total',
-    "The form adds up your credits. We count only the sales tax credit. The form has other credits too: for renters, home renovation, venture capital, mining exploration, clean buildings and training. We do not use those. The renter's credit is for people who paid rent. It gets smaller as income rises and stops at a set income. The total goes onto line 47900 of your return.",
-    undefined,
-  ],
-])('%s %s section wording (#189)', (id, sectionId, paragraph, example) => {
-  it('has the proposed paragraph', () => {
-    expect(plain(section(id, sectionId).paragraph)).toBe(plain(paragraph));
-  });
-
-  if (example !== undefined) {
-    it('has the proposed example', () => {
-      expect(plain(section(id, sectionId).example)).toBe(plain(example));
-    });
-  }
-
-  it('keeps sentences to 40 words', () => {
-    const { paragraph: p, example: e } = section(id, sectionId);
-    expect(longestSentence(`${p} ${e}`)).toBeLessThanOrEqual(40);
   });
 });
