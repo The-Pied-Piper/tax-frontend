@@ -17,6 +17,7 @@ import {
 import { contentPages } from '../../src/state/contentPages';
 import { contentPath, FOOTER_PROVINCE_SLUGS } from '../../src/state/siteLinks';
 import { generateContentPages } from '../contentPages/generate';
+import { withSalaryLinks } from '../contentPages/forms';
 import { hubPages } from '../contentPages/hubs';
 import { generateSalaryPages } from './generate';
 import { rewriteHome } from './home';
@@ -40,7 +41,10 @@ const SLOW_TEST_MS = 20_000;
 const outDir = tmpDirs('salary-home-crawl');
 
 async function build(
-  options: { list?: 'alberta' | 'none'; withHubs?: boolean } = {},
+  options: {
+    list?: 'alberta' | 'none';
+    withHubs?: boolean;
+  } = {},
 ) {
   const dir = outDir();
   writeFileSync(join(dir, 'index.html'), template);
@@ -65,7 +69,7 @@ async function build(
   const { written: pageFiles } = await generateContentPages({
     outDir: dir,
     template,
-    pages: [...contentPages, ...hubs],
+    pages: [...withSalaryLinks(contentPages, built), ...hubs],
     render: renderContentPage,
     siteUrl: site,
   });
@@ -187,6 +191,25 @@ describe('crawl from the built home page', () => {
           ).toBe(true);
         }
       });
+    },
+    SLOW_TEST_MS,
+  );
+
+  it(
+    'links a form to its salary page only when that page was written: no link to the missing British Columbia page',
+    async () => {
+      const { dir, pageFiles } = await build({ list: 'alberta' });
+      expect(pageFiles).toContain('forms/bc428/index.html');
+      expect(
+        parse(dir, 'forms/bc428/index.html').querySelectorAll(
+          'a[href="/ca-bc/70000/"]',
+        ),
+      ).toHaveLength(0);
+      expect(
+        parse(dir, 'forms/on428/index.html').querySelectorAll(
+          'a[href="/ca-on/70000/"]',
+        ),
+      ).toHaveLength(1);
     },
     SLOW_TEST_MS,
   );
