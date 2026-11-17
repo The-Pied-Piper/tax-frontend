@@ -55,6 +55,10 @@ describe('App form', () => {
     expect(
       form.compareDocumentPosition(answer) & Node.DOCUMENT_POSITION_FOLLOWING,
     ).toBeTruthy();
+    expect(
+      screen.getByRole('heading', { level: 1, name: strings.title }),
+    ).toBeInTheDocument();
+    expect(document.querySelector('.page-summary')).toBeNull();
   });
 
   it('shows the intro and the estimate footer', () => {

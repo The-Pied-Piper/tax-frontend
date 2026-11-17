@@ -54,7 +54,7 @@ describe('App links on a pre-built salary page', () => {
     ['another salary', '80000', () => clientAnswering({ ...compute70000 })],
     ['the same salary', '70000', sameObjectClient],
   ])(
-    'turns into the plain calculator after %s is calculated',
+    'drops the links and keeps the answer text after %s is calculated',
     async (_name, salary, makeClient) => {
       render(<App client={makeClient()} initial={seeded} />);
       await calculate(salary);
@@ -63,9 +63,9 @@ describe('App links on a pre-built salary page', () => {
         expect(pageLinks()).not.toBeInTheDocument();
       });
       expect(nearby()).not.toBeInTheDocument();
-      expect(document.querySelector('.page-summary')).not.toBeInTheDocument();
+      expect(document.querySelector('.page-summary')).toBeInTheDocument();
       expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent(
-        strings.title,
+        /After Tax in Ontario/,
       );
     },
   );

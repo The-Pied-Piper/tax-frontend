@@ -186,13 +186,15 @@ describe('the h1 and paragraph of a salary page', () => {
       screen.getByRole('button', { name: strings.form.calculate }),
     );
     await waitFor(() => {
-      expect(
-        screen.getByRole('heading', { name: strings.title, level: 1 }),
-      ).toBeInTheDocument();
+      expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent(
+        /^\$30,000 After Tax in Ontario/,
+      );
     });
     expect(screen.getAllByRole('heading', { level: 1 })).toHaveLength(1);
     expect(screen.queryByText(before.paragraph)).not.toBeInTheDocument();
-    expect(document.querySelector('.page-summary')).not.toBeInTheDocument();
+    expect(document.querySelector('.page-summary')).toHaveTextContent(
+      /^On a salary of \$30,000 in Ontario/,
+    );
   });
 });
 
@@ -316,9 +318,9 @@ describe('salary links in the static page and the mounted page (#81)', () => {
       screen.getByRole('button', { name: strings.form.calculate }),
     );
     await waitFor(() => {
-      expect(
-        screen.getByRole('heading', { name: strings.title, level: 1 }),
-      ).toBeInTheDocument();
+      expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent(
+        /^\$30,000 After Tax in Ontario/,
+      );
     });
     expect(
       screen.queryByRole('navigation', { name: strings.salaryLinks.label }),
