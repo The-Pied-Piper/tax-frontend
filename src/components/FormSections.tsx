@@ -1,7 +1,7 @@
 import { Fragment } from 'react';
 import styles from './FormSections.module.css';
-import type { FormBody } from '../state/formPage';
-import { exampleSalaryText, splitFigures } from '../state/formPage';
+import { displayWholeMoney } from '../money/format';
+import { splitFigures, type FormBody } from '../state/formPage';
 import {
   contentPath,
   METHODOLOGY_SLUG,
@@ -43,7 +43,11 @@ export function FormSections({
   exampleSalary,
   sections,
 }: FormBody) {
-  const salary = exampleSalaryText(exampleSalary);
+  const salary = displayWholeMoney(
+    exampleSalary,
+    'annually',
+    strings.fallbackUnit,
+  );
   const place = strings.siteNav.provinceNames[province];
   return (
     <>
@@ -54,7 +58,7 @@ export function FormSections({
           {sections.map((section) => (
             <li key={section.id}>
               <a href={`#${section.id}`}>
-                <span className={styles.lines}>{section.lines}</span>
+                <span className={styles.lines}>{section.lines}</span>{' '}
                 {section.heading}
               </a>
             </li>
@@ -68,12 +72,12 @@ export function FormSections({
           aria-labelledby={`${section.id}-heading`}
           className={styles.section}
         >
-          <h2 id={`${section.id}-heading`}>
-            {section.heading}{' '}
+          <h2>
+            <span id={`${section.id}-heading`}>{section.heading}</span>{' '}
             <a
               className={styles.permalink}
               href={`#${section.id}`}
-              aria-label={strings.formPage.permalink}
+              aria-label={strings.formPage.permalink(section.heading)}
             >
               #
             </a>

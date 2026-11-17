@@ -1,7 +1,8 @@
 import { formPages } from './formPages';
 import { FORM_SLUG_PREFIX, formContentPage, splitFigures } from './formPage';
 import { contentPages } from './contentPages';
-import { groupThousands, type MoneyUnit } from '../money/format';
+import { displayWholeMoney, type MoneyUnit } from '../money/format';
+import { strings } from '../strings';
 import { isContentSlug } from './siteLinks';
 
 type Line = {
@@ -18,8 +19,8 @@ const saved = import.meta.glob<Answer>('../api/fixtures/compute-*.json', {
   import: 'default',
 });
 
-function answerFor(province: string, year: number, salary: number): Answer {
-  const key = `../api/fixtures/compute-${province.replace('ca-', '')}-${year.toString()}-${salary.toString()}.json`;
+function answerFor(province: string, year: number, salary: string): Answer {
+  const key = `../api/fixtures/compute-${province.replace('ca-', '')}-${year.toString()}-${salary}.json`;
   const answer = saved[key];
   if (!answer) throw new Error(`No saved answer ${key}`);
   return answer;
@@ -27,7 +28,7 @@ function answerFor(province: string, year: number, salary: number): Answer {
 
 /** The money as the pages write it: no cents when they are .00. */
 function shownMoney(amount: string): string {
-  return `$${groupThousands(amount).replace(/\.00$/, '')}`;
+  return displayWholeMoney(amount, 'annually', strings.fallbackUnit);
 }
 
 describe.each(formPages)('the $name page', (form) => {
@@ -46,6 +47,23 @@ describe.each(formPages)('the $name page', (form) => {
     const ids = form.sections.map((section) => section.id);
     for (const id of ids) expect(id).toMatch(/^[a-z][a-z0-9-]*$/);
     expect(new Set(ids).size).toBe(ids.length);
+  });
+
+  it('keeps each id apart from the contents and from every heading id', () => {
+    const ids = form.sections.map((section) => section.id);
+    expect(ids).not.toContain('form-contents');
+    for (const id of ids) expect(ids).not.toContain(`${id}-heading`);
+  });
+
+  it('names no year in its words but the one it quotes', () => {
+    for (const section of form.sections) {
+      const years = `${section.paragraph} ${section.example}`.match(
+        /\b20\d\d\b/g,
+      );
+      for (const year of years ?? []) {
+        expect(year, section.id).toBe(form.year.toString());
+      }
+    }
   });
 
   it('has a heading, line numbers, one paragraph and an example in each section', () => {
@@ -83,7 +101,9 @@ describe.each(formPages)('the $name page', (form) => {
           for (const line of lines) {
             // A rate has no unit in the answer: its own words carry it.
             if (figure.shown.endsWith('%')) {
-              expect(line.text, at).toContain(figure.shown);
+              expect(line.text, at).toMatch(
+                new RegExp(`(^|[^\\d.])${figure.shown.replace('.', '\\.')}`),
+              );
             } else {
               expect(figure.shown, at).toBe(shownMoney(line.amount));
             }
@@ -92,10 +112,16 @@ describe.each(formPages)('the $name page', (form) => {
           const words = stepsOf(figure.printed.form)
             .flatMap((step) => step.lines)
             .map((line) => line.text);
-          expect(
-            words.some((text) => text.includes(figure.printed.text)),
-            at,
-          ).toBe(true);
+          const hit = words.filter((text) =>
+            text.includes(figure.printed.text),
+          );
+          expect(hit.length, at).toBeGreaterThan(0);
+          // The words must carry the very number that is shown.
+          const digits = figure.shown.replace(/[$,]/g, '').replace('%', '');
+          const number = new RegExp(
+            `(^|[^\\d.])${digits.replace('.', '\\.')}(\\.0+)?(?!\\d)`,
+          );
+          expect(figure.printed.text, at).toMatch(number);
         }
       }
     }

@@ -21,7 +21,7 @@ export const strings = {
   },
   formPage: {
     contents: 'On this page',
-    permalink: 'Link to this section',
+    permalink: (heading: string) => `Link to ${heading}`,
     notice: (year: number, salary: string) =>
       `Our calculator follows the published form for a single person with a salary and no other income. This page covers the parts it uses, with figures from the ${year.toString()} form. Examples use a ${salary} salary. It is an estimate, not tax advice.`,
     example: (salary: string) => `At ${salary}`,

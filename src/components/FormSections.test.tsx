@@ -1,40 +1,11 @@
 import { render, screen, within } from '@testing-library/react';
 import { renderToString } from 'react-dom/server';
 import { ContentPage } from './ContentPage';
-import { formContentPage, type FormPageSpec } from '../state/formPage';
+import { formContentPage } from '../state/formPage';
+import { sampleFormSpec } from '../test/contentPageData';
 import { strings } from '../strings';
 
-const spec: FormPageSpec = {
-  id: 'sample-form',
-  name: 'Form SAMPLE: A made-up form',
-  province: 'ca-on',
-  year: 2025,
-  exampleSalary: 70000,
-  title: 'Form SAMPLE in plain words',
-  description: 'A made-up form page that the tests use.',
-  intro: 'What the made-up form is for.',
-  sections: [
-    {
-      id: 'first',
-      heading: 'First part',
-      lines: 'Line 1',
-      paragraph: 'You get {credit} off.',
-      example: 'That is {credit} less tax.',
-      figures: {
-        credit: { shown: '$100', trace: { form: 'x/y', label: 'z' } },
-      },
-    },
-    {
-      id: 'second',
-      heading: 'Second part',
-      lines: 'Lines 2–4',
-      paragraph: 'Only words here.',
-      example: 'No figure.',
-      figures: {},
-    },
-  ],
-};
-const page = formContentPage(spec);
+const page = formContentPage(sampleFormSpec);
 
 describe('a form page', () => {
   it('shows the notice with the year and the example salary', () => {
@@ -54,8 +25,8 @@ describe('a form page', () => {
         .getAllByRole('link')
         .map((a) => [a.textContent, a.getAttribute('href')]),
     ).toEqual([
-      ['Line 1First part', '#first'],
-      ['Lines 2–4Second part', '#second'],
+      ['Line 1 First part', '#first'],
+      ['Lines 2–4 Second part', '#second'],
     ]);
   });
 
@@ -68,7 +39,9 @@ describe('a form page', () => {
       part.getByRole('heading', { level: 2, name: /First part/ }),
     ).toBeInTheDocument();
     expect(
-      part.getByRole('link', { name: strings.formPage.permalink }),
+      part.getByRole('link', {
+        name: strings.formPage.permalink('First part'),
+      }),
     ).toHaveAttribute('href', '#first');
     expect(part.getByText('Line 1')).toBeInTheDocument();
     expect(part.getByText('At $70,000')).toBeInTheDocument();

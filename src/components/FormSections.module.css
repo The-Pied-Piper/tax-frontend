@@ -72,7 +72,7 @@
 .permalink {
   font-family: var(--font-mono);
   font-weight: 400;
-  color: var(--edge);
+  color: var(--faint);
   text-decoration: none;
 }
 

@@ -1,7 +1,5 @@
 import type { ContentPageSpec } from './contentPages';
 import type { FOOTER_PROVINCE_SLUGS } from './siteLinks';
-import { groupThousands, withUnit } from '../money/format';
-import { strings } from '../strings';
 
 /**
  * A figure shown in a form page's words, taken from a saved answer. Either it
@@ -38,7 +36,7 @@ export type FormPageSpec = {
   /** The tax year of the figures the page quotes. */
   year: number;
   /** The salary the examples use, in whole dollars. */
-  exampleSalary: number;
+  exampleSalary: string;
   title: string;
   description: string;
   /** What the form is for, in plain words. */
@@ -87,7 +85,19 @@ export function splitFigures(
     .filter((part) => part.value !== '');
 }
 
-/** The money text of the page's salary, such as `$70,000`. */
-export function exampleSalaryText(salary: number): string {
-  return withUnit(groupThousands(salary.toString()), strings.fallbackUnit);
+/**
+ * The two kinds of figure for a form's file: a result of the saved answer, and a
+ * figure the form prints. `form` is the trace form the page's own steps are in.
+ */
+export function figuresOf(form: string) {
+  return {
+    result: (shown: string, label: string, of = form): FormFigure => ({
+      shown,
+      trace: { form: of, label },
+    }),
+    printed: (shown: string, text: string): FormFigure => ({
+      shown,
+      printed: { form, text },
+    }),
+  };
 }

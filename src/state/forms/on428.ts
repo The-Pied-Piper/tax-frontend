@@ -1,18 +1,6 @@
-import type { FormFigure, FormPageSpec } from '../formPage';
+import { figuresOf, type FormPageSpec } from '../formPage';
 
-const FORM = 'ca-on/on428';
-
-/** A result of this form, as the calculator printed it. */
-const result = (shown: string, label: string, form = FORM): FormFigure => ({
-  shown,
-  trace: { form, label },
-});
-
-/** A figure the form prints, which must appear in the words of this form's steps. */
-const printed = (shown: string, text: string): FormFigure => ({
-  shown,
-  printed: { form: FORM, text },
-});
+const { result, printed } = figuresOf('ca-on/on428');
 
 /** Form ON428 in plain words. The figures are the 2025 form's, at a $70,000 salary. */
 export const on428: FormPageSpec = {
@@ -20,7 +8,7 @@ export const on428: FormPageSpec = {
   name: 'Form ON428: Ontario Tax',
   province: 'ca-on',
   year: 2025,
-  exampleSalary: 70000,
+  exampleSalary: '70000',
   title: 'Form ON428: Ontario Tax, in plain words',
   description:
     'What Form ON428 is for and what each part asks, in plain words, with a worked example for a $70,000 salary.',
@@ -34,7 +22,7 @@ export const on428: FormPageSpec = {
       paragraph:
         'Taxable income is the part of your pay that tax is charged on. This form does not work it out. It copies the number from the federal part of your return. Some things are taken off first, like part of your pension plan payments.',
       example:
-        'Taxable income is {income}, because {taken} of your pension plan payments is taken off first.',
+        'Taxable income is {income}, because {taken}, the extra part of your pension plan payments, is taken off first.',
       figures: {
         income: result('$69,335', 'on428_taxable_income_line_1'),
         taken: result(
@@ -122,8 +110,7 @@ export const on428: FormPageSpec = {
       lines: 'Line 85',
       paragraph:
         'LIFT stands for Low-income Individuals and Families Tax credit. It lowers the tax of people on lower pay. This line copies the amount from Schedule ON428-A.',
-      example:
-        'Pay is above the range for this credit, so the amount is {credit}.',
+      example: 'At this pay the amount is {credit}.',
       figures: {
         credit: result('$0', 'on428_lift_credit_line_85'),
       },

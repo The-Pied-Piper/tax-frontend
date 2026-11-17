@@ -1,6 +1,7 @@
 // Test data only: nothing in the build imports this file. Made-up content
 // pages for the tests of the shared page shell and its build step.
 import type { ContentPageSpec } from '../state/contentPages';
+import type { FormPageSpec } from '../state/formPage';
 
 /** A parent page: no trail, one section. */
 export const parentSpec: ContentPageSpec = {
@@ -37,4 +38,36 @@ export const plainSpec: ContentPageSpec = {
   heading: 'Plain heading',
   trail: [],
   sections: [{ heading: 'Only part', paragraphs: ['Some words.'] }],
+};
+
+/** A made-up form page, for the tests of the form template. */
+export const sampleFormSpec: FormPageSpec = {
+  id: 'sample-form',
+  name: 'Form SAMPLE: A made-up form',
+  province: 'ca-on',
+  year: 2025,
+  exampleSalary: '70000',
+  title: 'Form SAMPLE in plain words',
+  description: 'A made-up form page that the tests use.',
+  intro: 'What the made-up form is for.',
+  sections: [
+    {
+      id: 'first',
+      heading: 'First part',
+      lines: 'Line 1',
+      paragraph: 'You get {credit} off.',
+      example: 'That is {credit} less tax.',
+      figures: {
+        credit: { shown: '$100', trace: { form: 'x/y', label: 'z' } },
+      },
+    },
+    {
+      id: 'second',
+      heading: 'Second part',
+      lines: 'Lines 2–4',
+      paragraph: 'Only words here.',
+      example: 'No figure.',
+      figures: {},
+    },
+  ],
 };
