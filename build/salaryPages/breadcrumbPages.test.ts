@@ -1,31 +1,31 @@
 import { mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
-import { contentPages } from '../src/state/contentPages';
-import { METHODOLOGY_SLUG } from '../src/state/siteLinks';
-import { notFoundPage } from '../src/state/notFoundPage';
-import { publishedSlugs } from '../src/test/pageLinks';
+import { contentPages } from '../../src/state/contentPages';
+import { METHODOLOGY_SLUG } from '../../src/state/siteLinks';
+import { notFoundPage } from '../../src/state/notFoundPage';
+import { publishedSlugs } from '../../src/test/pageLinks';
 import {
   apiBaseUrl,
   fakeFetch,
   siteUrl as site,
   contentTemplate,
   template,
-} from '../src/test/generatedSite';
-import { withSalaryLinks } from './contentPages/forms';
-import { generateContentPages } from './contentPages/generate';
-import { hubPages } from './contentPages/hubs';
-import { generateNotFoundPage } from './contentPages/notFound';
-import { generateSalaryPages } from './salaryPages/generate';
-import { rewriteHome } from './salaryPages/home';
+} from '../../src/test/generatedSite';
+import { withSalaryLinks } from '../contentPages/forms';
+import { generateContentPages } from '../contentPages/generate';
+import { hubPages } from '../contentPages/hubs';
+import { generateNotFoundPage } from '../contentPages/notFound';
+import { generateSalaryPages } from './generate';
+import { rewriteHome } from './home';
 import {
   renderContentPage,
   renderSalaryApp,
   renderSiteFooter,
-} from './salaryPages/prerender';
-import { provinces } from './salaryPages/provinces';
+} from './prerender';
+import { provinces } from './provinces';
 
-// The built pages, read back: the structured data in each head equals the
+// Built once for the whole file (not per test, so no tmpDirs); the built pages, read back: the structured data in each head equals the
 // breadcrumb a visitor sees on the same page.
 const SLOW_TEST_MS = 60_000;
 
