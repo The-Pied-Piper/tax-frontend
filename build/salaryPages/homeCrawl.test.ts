@@ -7,7 +7,6 @@ import {
   template,
   tmpDirs,
   withAlberta,
-  withAlbertaAndBc,
 } from '../../src/test/generatedSite';
 import {
   fileFor,
@@ -18,6 +17,7 @@ import {
 import { contentPages } from '../../src/state/contentPages';
 import { contentPath, FOOTER_PROVINCE_SLUGS } from '../../src/state/siteLinks';
 import { generateContentPages } from '../contentPages/generate';
+import { withSalaryLinks } from '../contentPages/forms';
 import { hubPages } from '../contentPages/hubs';
 import { generateSalaryPages } from './generate';
 import { rewriteHome } from './home';
@@ -42,7 +42,7 @@ const outDir = tmpDirs('salary-home-crawl');
 
 async function build(
   options: {
-    list?: 'alberta' | 'alberta-bc' | 'none';
+    list?: 'alberta' | 'none';
     withHubs?: boolean;
   } = {},
 ) {
@@ -52,11 +52,9 @@ async function build(
     fetch: fakeFetch(
       options.list === 'alberta'
         ? withAlberta
-        : options.list === 'alberta-bc'
-          ? withAlbertaAndBc
-          : options.list === 'none'
-            ? { jurisdictions: [] }
-            : undefined,
+        : options.list === 'none'
+          ? { jurisdictions: [] }
+          : undefined,
     ),
     baseUrl: apiBaseUrl,
     provinces,
@@ -71,7 +69,7 @@ async function build(
   const { written: pageFiles } = await generateContentPages({
     outDir: dir,
     template,
-    pages: [...contentPages, ...hubs],
+    pages: [...withSalaryLinks(contentPages, built), ...hubs],
     render: renderContentPage,
     siteUrl: site,
   });
@@ -198,9 +196,28 @@ describe('crawl from the built home page', () => {
   );
 
   it(
+    'links a form to its salary page only when that page was written: no link to the missing British Columbia page',
+    async () => {
+      const { dir, pageFiles } = await build({ list: 'alberta' });
+      expect(pageFiles).toContain('forms/bc428/index.html');
+      expect(
+        parse(dir, 'forms/bc428/index.html').querySelectorAll(
+          'a[href="/ca-bc/70000/"]',
+        ),
+      ).toHaveLength(0);
+      expect(
+        parse(dir, 'forms/on428/index.html').querySelectorAll(
+          'a[href="/ca-on/70000/"]',
+        ),
+      ).toHaveLength(1);
+    },
+    SLOW_TEST_MS,
+  );
+
+  it(
     'has no broken link on any written page, the home page and the footers included',
     async () => {
-      const { dir, written } = await build({ list: 'alberta-bc' });
+      const { dir, written } = await build({ list: 'alberta' });
       const links = internalLinks(dir, ['index.html', ...written]);
       expect(links.filter((l) => l.file === 'index.html')).toHaveLength(4);
       for (const { file, target } of links) {

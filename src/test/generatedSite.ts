@@ -48,18 +48,6 @@ export const withAlberta = {
   ],
 };
 
-/** The API's list with Alberta and British Columbia added, 2026 provisional. */
-export const withAlbertaAndBc = {
-  jurisdictions: [
-    ...withAlberta.jurisdictions,
-    {
-      code: 'CA-BC',
-      name: 'British Columbia',
-      years: [{ year: 2026, provisional: true }],
-    },
-  ],
-};
-
 function urlOf(input: Parameters<typeof fetch>[0]): string {
   return typeof input === 'string'
     ? input

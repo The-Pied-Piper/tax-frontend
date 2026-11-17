@@ -1,6 +1,7 @@
 import { render, screen, within } from '@testing-library/react';
 import { renderToString } from 'react-dom/server';
 import { ContentPage } from './ContentPage';
+import type { ContentPageSpec } from '../state/contentPages';
 import { formContentPage } from '../state/formPage';
 import { formPages } from '../state/formPages';
 import { isSitePath } from '../state/salaryPageData';
@@ -8,6 +9,14 @@ import { sampleFormSpec } from '../test/contentPageData';
 import { strings } from '../strings';
 
 const page = formContentPage(sampleFormSpec);
+const form = page.form;
+if (!form) throw new Error('the sample form has no body');
+
+/** The page as the build hands it over, with the salary link flag set or not. */
+const pageWith = (salaryPageWritten?: boolean): ContentPageSpec => ({
+  ...page,
+  form: { ...form, salaryPageWritten },
+});
 
 describe('a form page', () => {
   it('shows the notice with the year and the example salary', () => {
@@ -58,7 +67,7 @@ describe('a form page', () => {
   });
 
   it('ends with the related links: the province page, the methodology and a salary page', () => {
-    render(<ContentPage {...page} />);
+    render(<ContentPage {...pageWith(true)} />);
     const related = screen.getByRole('navigation', {
       name: strings.formPage.related,
     });
@@ -70,6 +79,24 @@ describe('a form page', () => {
       ['Ontario forms and salary pages', '/ca-on/'],
       ['How we calculate', '/methodology/'],
       ['See a $70,000 example', '/ca-on/70000/'],
+    ]);
+  });
+
+  it.each([
+    ['is false', false],
+    ['is not set', undefined],
+  ])('has no salary link when the salary page flag %s', (_, flag) => {
+    render(<ContentPage {...pageWith(flag)} />);
+    const related = screen.getByRole('navigation', {
+      name: strings.formPage.related,
+    });
+    expect(
+      within(related)
+        .getAllByRole('link')
+        .map((a) => [a.textContent, a.getAttribute('href')]),
+    ).toEqual([
+      ['Ontario forms and salary pages', '/ca-on/'],
+      ['How we calculate', '/methodology/'],
     ]);
   });
 
