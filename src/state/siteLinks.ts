@@ -7,12 +7,11 @@ const INDEX = '/index.html';
 /** The page the footer's "How we calculate" link goes to. */
 export const METHODOLOGY_SLUG = 'methodology';
 
-/** The provinces the footer links to, in the order shown. */
-export const FOOTER_PROVINCES: { name: string; slug: string }[] = [
-  { name: 'Ontario', slug: 'ca-on' },
-  { name: 'Alberta', slug: 'ca-ab' },
-  { name: 'British Columbia', slug: 'ca-bc' },
-];
+/** The address of the calculator. */
+export const HOME_PATH = '/';
+
+/** The province pages the footer links to, in the order shown. Their names are in `strings.siteNav.provinceNames`. */
+export const FOOTER_PROVINCE_SLUGS = ['ca-on', 'ca-ab', 'ca-bc'] as const;
 
 /** Whether this is a slug: lower-case letters, digits and hyphens, in segments separated by "/". */
 export function isContentSlug(slug: string): boolean {

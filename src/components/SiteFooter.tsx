@@ -2,7 +2,7 @@ import styles from './SiteFooter.module.css';
 import { strings } from '../strings';
 import {
   contentPath,
-  FOOTER_PROVINCES,
+  FOOTER_PROVINCE_SLUGS,
   METHODOLOGY_SLUG,
 } from '../state/siteLinks';
 
@@ -14,9 +14,9 @@ export function SiteFooter() {
           {strings.siteNav.methodology}
         </a>
         <span className={styles.label}>{strings.siteNav.provinces}</span>
-        {FOOTER_PROVINCES.map((province) => (
-          <a key={province.slug} href={contentPath(province.slug)}>
-            {province.name}
+        {FOOTER_PROVINCE_SLUGS.map((slug) => (
+          <a key={slug} href={contentPath(slug)}>
+            {strings.siteNav.provinceNames[slug]}
           </a>
         ))}
       </nav>

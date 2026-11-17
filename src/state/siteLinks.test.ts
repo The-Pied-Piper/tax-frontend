@@ -2,7 +2,8 @@ import {
   contentFile,
   contentPath,
   contentSlugOfFile,
-  FOOTER_PROVINCES,
+  FOOTER_PROVINCE_SLUGS,
+  HOME_PATH,
   isContentSlug,
   METHODOLOGY_SLUG,
 } from './siteLinks';
@@ -79,15 +80,15 @@ describe('footer targets', () => {
   });
 
   it('lists Ontario, Alberta and British Columbia, in that order', () => {
-    expect(FOOTER_PROVINCES).toEqual([
-      { name: 'Ontario', slug: 'ca-on' },
-      { name: 'Alberta', slug: 'ca-ab' },
-      { name: 'British Columbia', slug: 'ca-bc' },
-    ]);
+    expect([...FOOTER_PROVINCE_SLUGS]).toEqual(['ca-on', 'ca-ab', 'ca-bc']);
+  });
+
+  it('gives the calculator the root address', () => {
+    expect(HOME_PATH).toBe('/');
   });
 
   it('uses valid slugs only', () => {
-    for (const { slug } of FOOTER_PROVINCES) {
+    for (const slug of FOOTER_PROVINCE_SLUGS) {
       expect(isContentSlug(slug)).toBe(true);
     }
     expect(isContentSlug(METHODOLOGY_SLUG)).toBe(true);

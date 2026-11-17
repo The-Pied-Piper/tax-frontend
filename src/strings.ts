@@ -13,6 +13,11 @@ export const strings = {
     home: 'Home',
     methodology: 'How we calculate',
     provinces: 'Provinces:',
+    provinceNames: {
+      'ca-on': 'Ontario',
+      'ca-ab': 'Alberta',
+      'ca-bc': 'British Columbia',
+    },
   },
   summaryHeading: 'About this estimate',
   themeLabel: 'Theme',

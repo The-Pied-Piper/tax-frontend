@@ -132,6 +132,12 @@ describe('generateContentPages validation', () => {
     await expect(run(outDir(), [bad])).rejects.toThrow(/Not Valid/);
   });
 
+  it('rejects a slug that is the address of a salary page', async () => {
+    await expect(
+      run(outDir(), [{ ...plainSpec, slug: 'ca-on/70000' }]),
+    ).rejects.toThrow(/ca-on\/70000/);
+  });
+
   it('rejects a repeated slug and names it', async () => {
     await expect(
       run(outDir(), [plainSpec, { ...plainSpec, title: 'Other' }]),

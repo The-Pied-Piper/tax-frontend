@@ -26,6 +26,11 @@ function check(pages: ContentPageSpec[]): void {
     if (!isContentSlug(slug)) {
       throw new Error(`Content pages: "${slug}" is not a valid slug`);
     }
+    if (/^[a-z0-9-]+\/\d+$/.test(slug)) {
+      throw new Error(
+        `Content pages: "${slug}" is the address of a salary page`,
+      );
+    }
     if (seen.has(slug)) {
       throw new Error(`Content pages: ${slug} is listed twice`);
     }

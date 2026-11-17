@@ -7,33 +7,18 @@ import {
   tmpDirs,
 } from '../../src/test/generatedSite';
 import {
+  FOOTER_TARGETS,
   fileFor,
   internalLinks,
   parse,
   sitemapLocs,
 } from '../../src/test/crawlSite';
 import { plainSpec } from '../../src/test/contentPageData';
-import {
-  contentFile,
-  contentPath,
-  FOOTER_PROVINCES,
-  METHODOLOGY_SLUG,
-} from '../../src/state/siteLinks';
+import { contentPath } from '../../src/state/siteLinks';
 import { rewriteSitemap } from '../salaryPages/sitemap';
 import { generateContentPages } from './generate';
 
 const outDir = tmpDirs('content-crawl');
-
-/**
- * The footer links to pages that later tickets add. They are the one allowed
- * exception to "every link goes to a file that exists".
- */
-const FOOTER_TARGETS = [
-  'methodology/index.html',
-  'ca-on/index.html',
-  'ca-ab/index.html',
-  'ca-bc/index.html',
-];
 
 async function build() {
   const dir = outDir();
@@ -50,10 +35,12 @@ async function build() {
 }
 
 describe('crawl of a built one-entry content page folder', () => {
-  it('names the footer targets from the one place that knows them', () => {
+  it('names the footer targets', () => {
     expect(FOOTER_TARGETS).toEqual([
-      contentFile(METHODOLOGY_SLUG),
-      ...FOOTER_PROVINCES.map((p) => contentFile(p.slug)),
+      'methodology/index.html',
+      'ca-on/index.html',
+      'ca-ab/index.html',
+      'ca-bc/index.html',
     ]);
   });
 

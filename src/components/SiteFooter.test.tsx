@@ -3,7 +3,7 @@ import { SiteFooter } from './SiteFooter';
 import { strings } from '../strings';
 import {
   contentPath,
-  FOOTER_PROVINCES,
+  FOOTER_PROVINCE_SLUGS,
   METHODOLOGY_SLUG,
 } from '../state/siteLinks';
 
@@ -50,11 +50,11 @@ describe.each(['light', 'dark'] as const)(
         ['Alberta', '/ca-ab/'],
         ['British Columbia', '/ca-bc/'],
       ]);
-      expect(FOOTER_PROVINCES.map((p) => p.name)).toEqual([
-        'Ontario',
-        'Alberta',
-        'British Columbia',
-      ]);
+      expect(
+        FOOTER_PROVINCE_SLUGS.map(
+          (slug) => strings.siteNav.provinceNames[slug],
+        ),
+      ).toEqual(['Ontario', 'Alberta', 'British Columbia']);
     });
 
     it('puts the disclaimer word for word below the links', () => {

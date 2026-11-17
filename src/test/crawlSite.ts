@@ -5,7 +5,7 @@ import { join } from 'node:path';
 import { siteUrl as site } from './generatedSite';
 import {
   contentFile,
-  FOOTER_PROVINCES,
+  FOOTER_PROVINCE_SLUGS,
   METHODOLOGY_SLUG,
 } from '../state/siteLinks';
 
@@ -44,7 +44,7 @@ export function navHrefs(dir: string, file: string): (string | null)[] {
  */
 export const FOOTER_TARGETS: string[] = [
   contentFile(METHODOLOGY_SLUG),
-  ...FOOTER_PROVINCES.map((p) => contentFile(p.slug)),
+  ...FOOTER_PROVINCE_SLUGS.map((slug) => contentFile(slug)),
 ];
 
 /** Every internal link on every written page, as [page, target file]; the footer links are included. */
