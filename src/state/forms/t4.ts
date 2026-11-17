@@ -34,7 +34,7 @@ export const t4: FormPageSpec = {
       paragraph:
         'Box 16 shows what was taken off your pay for the Canada Pension Plan. It adds two parts together: a main part and an extra part. Box 26 shows the pay that pension plan payments are charged on. If box 26 is blank, use box 14. Two rates apply to the same pay: {rate} for the main part and {extraRate} for the extra part.',
       example:
-        'Your pay is {earnings}. The first $3,500 of it is not charged, so {charged} is. {rate} of that is {main}, and {extraRate} of that is {extra}.',
+        'Your pay is {earnings}. The first {exempt} of it is not charged, so {charged} is. {rate} of that is {main}, and {extraRate} of that is {extra}.',
       figures: {
         rate: printed('4.95%', '4.95% of the part of line 7'),
         extraRate: printed('1%', '1% of the part of line 7'),
@@ -42,6 +42,7 @@ export const t4: FormPageSpec = {
           '$70,000',
           't4_cpp_pensionable_earnings_outside_quebec',
         ),
+        exempt: result('$3,500', 'cpp_basic_exemption'),
         charged: result('$66,500', 'cpp_part_3_line_7'),
         main: result('$3,291.75', 'cpp_part_3_line_11'),
         extra: result('$665', 'cpp_part_3_line_12'),

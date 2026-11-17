@@ -56,9 +56,9 @@ export const ab428: FormPageSpec = {
       heading: 'Credits that lower your tax',
       lines: 'Lines 16–58',
       paragraph:
-        'A credit is a discount on your tax bill. Everyone gets a basic personal amount ({basic} in 2025). You also get credit for the pension plan and EI payments you made. The form adds these amounts up, then takes {rate} of the total. That is your discount.',
+        'A credit is a discount on your tax bill. Everyone gets a basic personal amount ({basic} in 2025). You also get credit for the main part of your pension plan payments and for your EI payments. The form adds these amounts up, then takes {rate} of the total. That is your discount.',
       example:
-        'The basic amount, {cpp} of pension plan payments and {ei} of EI payments add up to {total}. {rate} of that is {discount}.',
+        'The basic amount, {cpp} for the main part of your pension plan payments and {ei} of EI payments add up to {total}. {rate} of that is {discount}.',
       figures: {
         basic: result('$22,323', 'basic_personal_amount'),
         rate: printed('8%', '8% of line 52'),

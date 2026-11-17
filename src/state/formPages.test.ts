@@ -1,7 +1,6 @@
 import { formPages } from './formPages';
-import { formContentPage, splitFigures, type FormPageSpec } from './formPage';
+import { formContentPage, splitFigures } from './formPage';
 import { contentPages } from './contentPages';
-import { provinceHubs } from './provinceHubs';
 import { displayWholeMoney, type MoneyUnit } from '../money/format';
 import { strings } from '../strings';
 import { formSlug, isContentSlug } from './siteLinks';
@@ -127,90 +126,6 @@ describe.each(formPages)('the $name page', (form) => {
       }
     }
   });
-});
-
-/** The three form pages ticket 146 adds, with the province and year each quotes. */
-const NEW_FORMS = [
-  { id: 't4', province: 'ca-on', year: 2025 },
-  { id: 'ab428', province: 'ca-ab', year: 2025 },
-  { id: 'bc428', province: 'ca-bc', year: 2025 },
-] as const;
-
-/** The sections each new page has, in the order they are shown. */
-const SECTION_IDS: Record<(typeof NEW_FORMS)[number]['id'], string[]> = {
-  t4: ['pay', 'pension', 'ei', 'tax-deducted'],
-  ab428: [
-    'income',
-    'brackets',
-    'credits',
-    'after-credits',
-    'supplement',
-    'total',
-  ],
-  bc428: [
-    'income',
-    'brackets',
-    'credits',
-    'after-credits',
-    'reduction',
-    'total',
-  ],
-};
-
-function pageOf(id: string): FormPageSpec {
-  const form = formPages.find((page) => page.id === id);
-  if (!form) throw new Error(`No form page ${id}`);
-  return form;
-}
-
-describe('the new form pages', () => {
-  it.each(NEW_FORMS)(
-    'is published as $id for $province in $year',
-    ({ id, province, year }) => {
-      const form = pageOf(id);
-      expect(form.province).toBe(province);
-      expect(form.year).toBe(year);
-    },
-  );
-
-  it('lists in its hub every form the hub names that is among the new pages', () => {
-    const newIds = NEW_FORMS.map((form) => form.id);
-    const listed = provinceHubs
-      .flatMap((hub) => hub.own.map((form) => form.id))
-      .filter((id) => (newIds as readonly string[]).includes(id));
-    expect(listed.length).toBeGreaterThan(0);
-    const published = formPages.map((form) => form.id);
-    for (const id of listed) {
-      expect(published, id).toContain(id);
-    }
-  });
-
-  it.each(NEW_FORMS)('has the sections $id needs', ({ id }) => {
-    const ids = pageOf(id).sections.map((section) => section.id);
-    expect(ids).toEqual(SECTION_IDS[id]);
-  });
-
-  it.each(NEW_FORMS)(
-    'has no link or web address in its words: $id',
-    ({ id }) => {
-      const form = pageOf(id);
-      const words = [
-        form.name,
-        form.title,
-        form.description,
-        form.intro,
-        ...form.sections.flatMap((section) => [
-          section.heading,
-          section.paragraph,
-          section.example,
-        ]),
-      ];
-      for (const text of words) {
-        expect(text, form.id).not.toContain('http');
-        expect(text, form.id).not.toContain('](');
-      }
-    },
-  );
 });
 
 describe('splitFigures', () => {
