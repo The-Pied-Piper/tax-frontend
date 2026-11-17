@@ -9,6 +9,7 @@ import {
   contentPath,
   isContentSlug,
 } from '../../src/state/siteLinks';
+import { isSitePath } from '../../src/state/salaryPageData';
 import { isSalaryPageSlug } from '../salaryPages/address';
 import { DESCRIPTION_LIMIT, TITLE_LIMIT } from '../salaryPages/limits';
 import { buildContentPageHtml } from './html';
@@ -26,15 +27,29 @@ export type ContentOptions = {
 
 /** Why a block cannot be drawn, or null when it can. */
 function blockProblem(block: ContentBlock): string | null {
+  const badAddress = (href: string) =>
+    isSitePath(href) ? null : `has a link to ${href}, which is not a site path`;
   switch (block.kind) {
     case 'paragraph':
+      for (const part of block.content) {
+        const problem = typeof part === 'string' ? null : badAddress(part.href);
+        if (problem) return problem;
+      }
       return null;
     case 'list':
-      return block.items.length === 0 ? 'has a list with no items' : null;
+      if (block.items.length === 0) return 'has a list with no items';
+      for (const item of block.items) {
+        const problem = item.href === undefined ? null : badAddress(item.href);
+        if (problem) return problem;
+      }
+      return null;
     case 'links':
-      return block.links.length === 0
-        ? 'has a links block with no links'
-        : null;
+      if (block.links.length === 0) return 'has a links block with no links';
+      for (const link of block.links) {
+        const problem = badAddress(link.href);
+        if (problem) return problem;
+      }
+      return null;
     case 'table':
       if (block.rows.length === 0) return 'has a table with no rows';
       return block.rows.some((row) => row.length !== block.head.length)

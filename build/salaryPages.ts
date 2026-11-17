@@ -15,6 +15,9 @@ import { contentPages, type ContentPageSpec } from '../src/state/contentPages';
 import { hubPages } from './contentPages/hubs';
 import type { SalaryPageData } from '../src/state/useTakeHome';
 
+/** The built template of the content pages: it loads only the theme switch, and is removed from dist once they are written. */
+const CONTENT_TEMPLATE = 'content.html';
+
 type Prerender = {
   renderSalaryApp: (data: SalaryPageData) => string;
   renderSiteFooter: () => string;
@@ -91,13 +94,18 @@ export function salaryPages(
   const siteUrl = normalizeSiteUrl(siteUrlValue);
   const baseUrl = (apiBaseUrl ?? '').trim().replace(/\/+$/, '');
   const plugin: Plugin = { name: 'salary-pages' };
-  if (baseUrl === '') return plugin;
   plugin.apply = 'build';
   plugin.closeBundle = {
     order: 'post',
     sequential: true,
     async handler() {
       const outDir = resolve('dist');
+      const contentFile = join(outDir, CONTENT_TEMPLATE);
+      if (baseUrl === '') {
+        // No pages to write; the content template is not part of the site.
+        await rm(contentFile, { force: true });
+        return;
+      }
       const tempDir = await mkdtemp(join(tmpdir(), 'salary-pages-ssr-'));
       try {
         const { renderSalaryApp, renderSiteFooter, renderContentPage } =
@@ -120,7 +128,7 @@ export function salaryPages(
         );
         const content = await generateContentPages({
           outDir,
-          template,
+          template: await readFile(contentFile, 'utf8'),
           pages: [...contentPages, ...hubs],
           render: renderContentPage,
           siteUrl,
@@ -142,6 +150,7 @@ export function salaryPages(
         }
       } finally {
         await rm(tempDir, { recursive: true, force: true });
+        await rm(contentFile, { force: true });
       }
     },
   };

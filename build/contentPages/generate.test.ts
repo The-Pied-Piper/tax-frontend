@@ -2,7 +2,7 @@ import { existsSync, readFileSync, readdirSync } from 'node:fs';
 import { join } from 'node:path';
 import {
   siteUrl as site,
-  template,
+  contentTemplate as template,
   tmpDirs,
 } from '../../src/test/generatedSite';
 import {
@@ -250,6 +250,31 @@ describe('generateContentPages validation', () => {
     ] as [string, ContentBlock][])('rejects %s', async (_name, block) => {
       const dir = outDir();
       await expect(run(dir, [withBlocks(block)])).rejects.toThrow(/plain-page/);
+      expect(files(dir)).toEqual([]);
+    });
+
+    it.each([
+      ['https://example.com/x/'],
+      ['//example.com/x/'],
+      ['x/relative/'],
+      ['/has space/'],
+    ])('rejects a link to %s, which is not a site path', async (href) => {
+      const dir = outDir();
+      const links: ContentBlock[] = [
+        {
+          kind: 'links',
+          label: 'More',
+          layout: 'row',
+          links: [{ label: 'x', href }],
+        },
+        { kind: 'list', items: [{ label: 'x', href, description: 'y' }] },
+        { kind: 'paragraph', content: ['See ', { label: 'x', href }] },
+      ];
+      for (const block of links) {
+        await expect(run(dir, [withBlocks(block)])).rejects.toThrow(
+          /plain-page.*not a site path/,
+        );
+      }
       expect(files(dir)).toEqual([]);
     });
   });

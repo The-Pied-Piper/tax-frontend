@@ -1,7 +1,7 @@
 import { readFileSync } from 'node:fs';
 import { renderContentPage } from '../salaryPages/prerender';
 import { hubPages } from './hubs';
-import { template } from '../../src/test/generatedSite';
+import { contentTemplate as template } from '../../src/test/generatedSite';
 import { plainSpec } from '../../src/test/contentPageData';
 import { provinces } from '../salaryPages/provinces';
 import { buildContentPageHtml } from './html';

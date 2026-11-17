@@ -18,7 +18,6 @@ type Props = {
   client?: ApiClient;
   registry?: AdapterRegistry;
   initial?: SalaryPageData;
-  /** Every pre-built salary page; none in a plain build. */
   /** The date the default year is taken from; tests pin it. */
   clock?: () => Date;
 };

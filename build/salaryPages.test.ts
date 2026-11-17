@@ -2,7 +2,7 @@ import { mkdir, mkdtemp, readFile, rm, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import type { Plugin } from 'vite';
-import { template } from '../src/test/generatedSite';
+import { contentTemplate, template } from '../src/test/generatedSite';
 import { salaryPages } from './salaryPages';
 
 // Vitest can only import a module built at run time from inside the project,
@@ -66,12 +66,6 @@ async function runCloseBundle(plugin: Plugin): Promise<void> {
 }
 
 describe('salaryPages plugin', () => {
-  it('writes nothing without an explicit API address (local builds and CI)', () => {
-    expect(salaryPages(undefined).closeBundle).toBeUndefined();
-    expect(salaryPages('').closeBundle).toBeUndefined();
-    expect(salaryPages('  ').closeBundle).toBeUndefined();
-  });
-
   it('runs after the bundle is written when the API address is set', () => {
     const plugin = salaryPages('https://api.example.com/api/v1');
     expect(plugin.name).toBe('salary-pages');
@@ -86,6 +80,7 @@ describe('salaryPages closeBundle', () => {
     root = await mkdtemp(join(tmpdir(), 'salary-pages-test-'));
     await mkdir(join(root, 'dist'));
     await writeFile(join(root, 'dist', 'index.html'), template);
+    await writeFile(join(root, 'dist', 'content.html'), contentTemplate);
     vi.spyOn(process, 'cwd').mockReturnValue(root);
     vi.spyOn(console, 'log').mockImplementation(() => undefined);
     vi.spyOn(console, 'warn').mockImplementation(() => undefined);
@@ -135,6 +130,43 @@ describe('salaryPages closeBundle', () => {
     ).rejects.toThrow();
     await expect(
       readFile(join(root, 'dist', 'sitemap.xml'), 'utf8'),
+    ).rejects.toThrow();
+  });
+
+  it('writes no pages without an explicit API address (local builds and CI)', async () => {
+    for (const address of [undefined, '', '  ']) {
+      await runCloseBundle(salaryPages(address));
+    }
+
+    await expect(
+      readFile(join(root, 'dist', 'sitemap.xml'), 'utf8'),
+    ).rejects.toThrow();
+    await expect(
+      readFile(join(root, 'dist', 'methodology', 'index.html'), 'utf8'),
+    ).rejects.toThrow();
+  });
+
+  it('writes the content pages from the content template, which loads no calculator', async () => {
+    await runCloseBundle(salaryPages('https://api.example.com/api/v1'));
+
+    const page = await readFile(
+      join(root, 'dist', 'methodology', 'index.html'),
+      'utf8',
+    );
+    expect(page).toContain('/src/contentMain.tsx');
+    expect(page).not.toContain('/src/main.tsx');
+  });
+
+  it('leaves no content template in dist, with or without an API address', async () => {
+    await runCloseBundle(salaryPages('https://api.example.com/api/v1'));
+    await expect(
+      readFile(join(root, 'dist', 'content.html'), 'utf8'),
+    ).rejects.toThrow();
+
+    await writeFile(join(root, 'dist', 'content.html'), contentTemplate);
+    await runCloseBundle(salaryPages(undefined));
+    await expect(
+      readFile(join(root, 'dist', 'content.html'), 'utf8'),
     ).rejects.toThrow();
   });
 });
