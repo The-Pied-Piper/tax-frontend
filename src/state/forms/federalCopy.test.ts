@@ -163,7 +163,7 @@ describe('t4 tax-deducted copy', () => {
   });
 });
 
-describe('ticket 191 federal form wording', () => {
+describe('federal form page wording', () => {
   it('t4 pension paragraph', () => {
     expect(section('t4', 'pension').paragraph).toBe(
       'Box 16 shows what was taken off your pay for the Canada Pension Plan. It has two parts added together: a main part and an extra part. Box 16A shows a second, smaller payment. It only applies to pay above the main limit, so for most people it is blank. Box 26 shows the pay that pension plan payments are charged on. If box 26 is blank, use box 14. Two rates apply to the same pay: {rate} for the main part and {extraRate} for the extra part.',
