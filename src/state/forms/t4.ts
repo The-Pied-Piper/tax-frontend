@@ -69,7 +69,7 @@ export const t4: FormPageSpec = {
       heading: 'Income tax already taken off',
       lines: 'Line 43700',
       paragraph:
-        'Your employer takes some income tax off each paycheque and sends it to the government. The slip shows the total in the box called Income tax deducted. You copy it to line 43700 of your return. It counts as tax you already paid. Our calculator does not use it. The tax you owe for the year is federal plus provincial, and it depends on the province you live in.',
+        'Your employer takes some income tax off each paycheque and sends it to the government. The slip shows the total in the box called Income tax deducted. You copy it to line 43700 of your return. It counts as tax you already paid. Our calculator does not use it. Our number is the tax you owe for the whole year, not what your employer already took off. That is federal plus provincial tax, and it depends on the province you live in.',
       example:
         'Take Ontario as the example. At this pay, the federal tax plus Ontario tax you owe for the year is {owed}.',
       figures: {

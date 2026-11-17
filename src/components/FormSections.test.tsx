@@ -2,7 +2,7 @@ import { render, screen, within } from '@testing-library/react';
 import { renderToString } from 'react-dom/server';
 import { ContentPage } from './ContentPage';
 import type { ContentPageSpec } from '../state/contentPages';
-import { formContentPage, type FormPageSpec } from '../state/formPage';
+import { formContentPage } from '../state/formPage';
 import { formPages } from '../state/formPages';
 import { isSitePath } from '../state/salaryPageData';
 import { sampleFormSpec } from '../test/contentPageData';
@@ -23,7 +23,7 @@ const federalPageWith = (salaryPageWritten?: boolean): ContentPageSpec => {
   const federal = formContentPage({
     ...sampleFormSpec,
     federal: true,
-  } as FormPageSpec);
+  });
   if (!federal.form) throw new Error('the federal sample has no body');
   return { ...federal, form: { ...federal.form, salaryPageWritten } };
 };

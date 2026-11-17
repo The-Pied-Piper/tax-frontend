@@ -38,6 +38,7 @@ const LABELLED_ONTARIO = [
   /\bIn Ontario\b/g,
   /\bOntario's\b/g,
   /\bTake Ontario as the example\./g,
+  /\bfederal tax plus Ontario tax\b/g,
 ];
 
 function hasUnlabelledOntario(text: string): boolean {
