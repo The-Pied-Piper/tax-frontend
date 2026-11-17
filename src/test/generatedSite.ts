@@ -10,8 +10,10 @@ import type { Province } from '../../build/salaryPages/provinces';
 
 export const apiBaseUrl = 'https://api.test/api/v1';
 export const siteUrl = 'https://aftertaxlens.com';
-/** The calculator's index.html, the template of every page. */
+/** The calculator's index.html, the template of the calculator and salary pages. */
 export const template = readFileSync('index.html', 'utf8');
+/** The template of the content pages: the same head, and the switch-only script. */
+export const contentTemplate = readFileSync('content.html', 'utf8');
 
 /** A made-up second province, to show that adding one is one list entry. */
 export const xland: Province = {

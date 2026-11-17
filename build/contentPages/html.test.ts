@@ -5,7 +5,7 @@ import { ContentPage } from '../../src/components/ContentPage';
 import { plainSpec, sampleSpec } from '../../src/test/contentPageData';
 import { buildContentPageHtml } from './html';
 
-const template = readFileSync('index.html', 'utf8');
+const template = readFileSync('content.html', 'utf8');
 const canonical = 'https://aftertaxlens.com/sample-page/';
 
 function parse(html: string) {
@@ -92,9 +92,9 @@ describe('buildContentPageHtml', () => {
     const scripts = [...page.querySelectorAll('script[src]')];
     const srcs = scripts.map((s) => s.getAttribute('src'));
     expect(srcs).toContain('/theme-init.js');
-    expect(srcs).toContain('/src/main.tsx');
+    expect(srcs).toContain('/src/contentMain.tsx');
     expect(srcs.indexOf('/theme-init.js')).toBeLessThan(
-      srcs.indexOf('/src/main.tsx'),
+      srcs.indexOf('/src/contentMain.tsx'),
     );
   });
 

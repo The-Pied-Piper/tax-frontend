@@ -126,11 +126,6 @@ export const strings = {
     calculator: 'Back to the calculator',
     others: 'Other salaries',
   },
-  // The list of pre-built pages on the home page.
-  salaryIndex: {
-    label: 'Popular salaries',
-    link: (amount: string, place: string) => `${amount} after tax in ${place}`,
-  },
   notices: {
     provisionalTitle: (year: number) =>
       `${String(year)} figures are provisional.`,

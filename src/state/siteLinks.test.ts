@@ -3,6 +3,8 @@ import {
   contentPath,
   contentSlugOfFile,
   FOOTER_PROVINCE_SLUGS,
+  FORMS_SEGMENT,
+  formSlug,
   HOME_PATH,
   isContentSlug,
   METHODOLOGY_SLUG,
@@ -92,5 +94,22 @@ describe('footer targets', () => {
       expect(isContentSlug(slug)).toBe(true);
     }
     expect(isContentSlug(METHODOLOGY_SLUG)).toBe(true);
+  });
+});
+
+describe('formSlug', () => {
+  it('names the folder the form pages live in', () => {
+    expect(FORMS_SEGMENT).toBe('forms');
+  });
+
+  it('puts the form id below that folder', () => {
+    expect(formSlug('on428')).toBe('forms/on428');
+    expect(formSlug('on428-a')).toBe('forms/on428-a');
+  });
+
+  it('gives a valid slug and the address a form page is served at', () => {
+    expect(isContentSlug(formSlug('t1-income'))).toBe(true);
+    expect(contentPath(formSlug('bc428'))).toBe('/forms/bc428/');
+    expect(contentFile(formSlug('bc428'))).toBe('forms/bc428/index.html');
   });
 });

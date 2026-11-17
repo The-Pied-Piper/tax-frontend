@@ -1,9 +1,9 @@
 import { formPages } from './formPages';
-import { FORM_SLUG_PREFIX, formContentPage, splitFigures } from './formPage';
+import { formContentPage, splitFigures } from './formPage';
 import { contentPages } from './contentPages';
 import { displayWholeMoney, type MoneyUnit } from '../money/format';
 import { strings } from '../strings';
-import { isContentSlug } from './siteLinks';
+import { formSlug, isContentSlug } from './siteLinks';
 
 type Line = {
   label: string;
@@ -38,7 +38,7 @@ describe.each(formPages)('the $name page', (form) => {
 
   it('is served at /forms/<id>/ and listed with the content pages', () => {
     const entry = formContentPage(form);
-    expect(entry.slug).toBe(`${FORM_SLUG_PREFIX}/${form.id}`);
+    expect(entry.slug).toBe(formSlug(form.id));
     expect(isContentSlug(entry.slug)).toBe(true);
     expect(contentPages.map((page) => page.slug)).toContain(entry.slug);
   });

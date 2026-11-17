@@ -3,7 +3,7 @@ import { renderToString } from 'react-dom/server';
 import { ContentPage } from './ContentPage';
 import { strings } from '../strings';
 import { THEME_STORAGE_KEY } from '../theme/theme';
-import { plainSpec, sampleSpec } from '../test/contentPageData';
+import { blocksSpec, plainSpec, sampleSpec } from '../test/contentPageData';
 
 afterEach(() => {
   delete document.documentElement.dataset.theme;
@@ -37,8 +37,12 @@ describe.each(['light', 'dark'] as const)(
         expect(
           screen.getByRole('heading', { level: 2, name: section.heading }),
         ).toBeInTheDocument();
-        for (const paragraph of section.paragraphs) {
-          expect(screen.getByText(paragraph)).toBeInTheDocument();
+        for (const block of section.blocks) {
+          if (block.kind !== 'paragraph') continue;
+          const text = block.content
+            .map((part) => (typeof part === 'string' ? part : part.label))
+            .join('');
+          expect(screen.getByText(text)).toBeInTheDocument();
         }
       }
     });
@@ -113,5 +117,99 @@ describe('ContentPage theme switch', () => {
     const html = renderToString(<ContentPage {...sampleSpec} />);
     expect(html).toContain('id="content-theme-toggle"');
     expect(html).toContain(sampleSpec.heading);
+  });
+});
+
+describe('ContentPage blocks', () => {
+  it('renders a paragraph with a link inside the words', () => {
+    render(<ContentPage {...blocksSpec} />);
+    const link = screen.getByRole('link', { name: 'the link' });
+    expect(link).toHaveAttribute('href', '/sample-hub/');
+    expect(link.closest('p')).toHaveTextContent('Before the link after.');
+  });
+
+  it('renders a list with its title as an h3 and each item with its description', () => {
+    render(<ContentPage {...blocksSpec} />);
+    expect(
+      screen.getByRole('heading', { level: 3, name: 'Listed forms' }),
+    ).toBeInTheDocument();
+    const linked = screen.getByRole('link', { name: 'Linked form' });
+    expect(linked).toHaveAttribute('href', '/forms/linked/');
+    expect(linked.closest('li')).toHaveTextContent('The one with a page.');
+    const plain = screen.getByText('Plain form');
+    expect(plain.closest('a')).toBeNull();
+    expect(plain.closest('li')).toHaveTextContent('The one without a page.');
+  });
+
+  it('renders a list with no title without an h3', () => {
+    render(<ContentPage {...blocksSpec} />);
+    expect(screen.getAllByRole('heading', { level: 3 })).toHaveLength(1);
+    expect(screen.getByText('Untitled item').closest('li')).toHaveTextContent(
+      'No title above.',
+    );
+  });
+
+  it.each([
+    ['Grid of links', ['/one/', '/two/']],
+    ['Row of links', ['/three/']],
+  ])(
+    'renders the links block %s as a labelled nav with a list',
+    (label, hrefs) => {
+      render(<ContentPage {...blocksSpec} />);
+      const nav = screen.getByRole('navigation', { name: label });
+      expect(within(nav).getByRole('list')).toBeInTheDocument();
+      expect(
+        within(nav)
+          .getAllByRole('link')
+          .map((a) => a.getAttribute('href')),
+      ).toEqual(hrefs);
+    },
+  );
+
+  it('gives the grid and the row different classes', () => {
+    render(<ContentPage {...blocksSpec} />);
+    const grid = screen.getByRole('navigation', { name: 'Grid of links' });
+    const row = screen.getByRole('navigation', { name: 'Row of links' });
+    const classes = (nav: HTMLElement) =>
+      `${nav.className} ${nav.querySelector('ul')?.className ?? ''}`;
+    expect(classes(grid)).not.toBe(classes(row));
+  });
+
+  it('renders a table with a caption and column header cells', () => {
+    render(<ContentPage {...blocksSpec} />);
+    const table = screen.getByRole('table', { name: 'Sample rates' });
+    expect(table.querySelector('caption')).toHaveTextContent('Sample rates');
+    const heads = within(table).getAllByRole('columnheader');
+    expect(heads.map((h) => h.textContent)).toEqual(['Band', 'Rate']);
+    for (const head of heads) expect(head).toHaveAttribute('scope', 'col');
+    expect(
+      within(table)
+        .getAllByRole('row')
+        .map((r) => r.textContent),
+    ).toEqual(['BandRate', 'First5%', 'Second10%']);
+  });
+
+  it('writes the page on the server with the same blocks and no raw markup', () => {
+    const html = renderToString(<ContentPage {...blocksSpec} />);
+    expect(html).toContain('<caption');
+    expect(html).toContain('scope="col"');
+    expect(html).toContain('aria-label="Grid of links"');
+  });
+
+  it('shows a word with a tag in it as plain text, never as markup', () => {
+    const spec = {
+      ...plainSpec,
+      sections: [
+        {
+          heading: 'Odd',
+          blocks: [
+            { kind: 'paragraph' as const, content: ['a <b>bold</b> b'] },
+          ],
+        },
+      ],
+    };
+    const { container } = render(<ContentPage {...spec} />);
+    expect(container.querySelector('b')).toBeNull();
+    expect(screen.getByText('a <b>bold</b> b')).toBeInTheDocument();
   });
 });

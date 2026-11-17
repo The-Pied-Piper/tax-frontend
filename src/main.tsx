@@ -1,25 +1,21 @@
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import { App } from './App';
-import { ThemeToggle } from './components/ThemeToggle';
-import { THEME_TOGGLE_SLOT_ID } from './state/contentPages';
-import { sendVisitBeacon } from './beacon/visitBeacon';
+import { sendVisitBeacon, type VisitKind } from './beacon/visitBeacon';
 import {
   parseSalaryPageData,
   SALARY_PAGE_DATA_ID,
 } from './state/salaryPageData';
-import { parseSalaryIndex, SALARY_INDEX_ID } from './state/salaryIndex';
 import './styles/fonts.css';
 import './styles/tokens.css';
 import './styles/global.css';
-import { contentPageStyles } from './components/contentPageStyles';
 
 const root = document.getElementById('root');
 if (!root) {
   throw new Error('Missing #root element');
 }
 
-async function start(root: HTMLElement) {
+async function start(root: HTMLElement): Promise<VisitKind> {
   // `npm run dev:mock` serves the saved responses in src/api/fixtures instead
   // of calling a real tax-service. The dynamic import keeps it out of builds.
   if (import.meta.env.MODE === 'mock') {
@@ -29,32 +25,15 @@ async function start(root: HTMLElement) {
   const initial = parseSalaryPageData(
     document.getElementById(SALARY_PAGE_DATA_ID)?.textContent ?? null,
   );
-  const salaryIndex = parseSalaryIndex(
-    document.getElementById(SALARY_INDEX_ID)?.textContent ?? null,
-  );
   createRoot(root).render(
     <StrictMode>
-      <App
-        initial={initial ?? undefined}
-        salaryIndex={salaryIndex ?? undefined}
-      />
+      <App initial={initial ?? undefined} />
     </StrictMode>,
   );
-  sendVisitBeacon(initial ? 'salary' : 'home');
+  return initial ? 'salary' : 'home';
 }
 
-// A pre-built content page has a slot for the Light/Dark switch and nothing
-// else to run: mount the switch there, with no calculator and no beacon.
-const toggleSlot = document.getElementById(THEME_TOGGLE_SLOT_ID);
-if (toggleSlot) {
-  if (contentPageStyles.length === 0) {
-    throw new Error('Missing content page styles');
-  }
-  createRoot(toggleSlot).render(
-    <StrictMode>
-      <ThemeToggle />
-    </StrictMode>,
-  );
-} else {
-  void start(root);
-}
+// The calculator and the pre-built salary pages. The visit beacon is its own
+// module, sent once the page is up; content pages (src/contentMain.tsx) load
+// neither the calculator nor the beacon.
+void start(root).then(sendVisitBeacon);

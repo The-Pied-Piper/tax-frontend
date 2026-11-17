@@ -1,6 +1,6 @@
 // Test data only: nothing in the build imports this file. Made-up content
 // pages for the tests of the shared page shell and its build step.
-import type { ContentPageSpec } from '../state/contentPages';
+import { paragraph, type ContentPageSpec } from '../state/contentPages';
 import type { FormPageSpec } from '../state/formPage';
 
 /** A parent page: no trail, one section. */
@@ -10,7 +10,7 @@ export const parentSpec: ContentPageSpec = {
   description: 'A made-up hub page that the tests use as a parent.',
   heading: 'Sample hub',
   trail: [],
-  sections: [{ heading: 'First part', paragraphs: ['Hub text.'] }],
+  sections: [{ heading: 'First part', blocks: [paragraph('Hub text.')] }],
 };
 
 /** A page with a lede, a one-step trail and two sections. */
@@ -24,9 +24,12 @@ export const sampleSpec: ContentPageSpec = {
   sections: [
     {
       heading: 'How it works',
-      paragraphs: ['First paragraph of the first part.', 'Second paragraph.'],
+      blocks: [
+        paragraph('First paragraph of the first part.'),
+        paragraph('Second paragraph.'),
+      ],
     },
-    { heading: 'Another part', paragraphs: ['Only paragraph.'] },
+    { heading: 'Another part', blocks: [paragraph('Only paragraph.')] },
   ],
 };
 
@@ -37,7 +40,83 @@ export const plainSpec: ContentPageSpec = {
   description: 'A made-up page with no lede and no trail.',
   heading: 'Plain heading',
   trail: [],
-  sections: [{ heading: 'Only part', paragraphs: ['Some words.'] }],
+  sections: [{ heading: 'Only part', blocks: [paragraph('Some words.')] }],
+};
+
+/** A page with one block of every kind. */
+export const blocksSpec: ContentPageSpec = {
+  slug: 'blocks-page',
+  title: 'Blocks page',
+  description: 'A made-up page with one block of every kind.',
+  heading: 'Blocks heading',
+  trail: [],
+  sections: [
+    {
+      heading: 'Words and a link',
+      blocks: [
+        paragraph(
+          'Before ',
+          { label: 'the link', href: '/sample-hub/' },
+          ' after.',
+        ),
+      ],
+    },
+    {
+      heading: 'A list',
+      blocks: [
+        {
+          kind: 'list',
+          title: 'Listed forms',
+          items: [
+            {
+              label: 'Linked form',
+              href: '/forms/linked/',
+              description: 'The one with a page.',
+            },
+            { label: 'Plain form', description: 'The one without a page.' },
+          ],
+        },
+        {
+          kind: 'list',
+          items: [{ label: 'Untitled item', description: 'No title above.' }],
+        },
+      ],
+    },
+    {
+      heading: 'Links',
+      blocks: [
+        {
+          kind: 'links',
+          label: 'Grid of links',
+          layout: 'grid',
+          links: [
+            { label: 'One', href: '/one/' },
+            { label: 'Two', href: '/two/' },
+          ],
+        },
+        {
+          kind: 'links',
+          label: 'Row of links',
+          layout: 'row',
+          links: [{ label: 'Three', href: '/three/' }],
+        },
+      ],
+    },
+    {
+      heading: 'A table',
+      blocks: [
+        {
+          kind: 'table',
+          caption: 'Sample rates',
+          head: ['Band', 'Rate'],
+          rows: [
+            ['First', '5%'],
+            ['Second', '10%'],
+          ],
+        },
+      ],
+    },
+  ],
 };
 
 /** A made-up form page, for the tests of the form template. */

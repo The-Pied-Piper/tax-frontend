@@ -1,0 +1,281 @@
+import { DESCRIPTION_LIMIT, TITLE_LIMIT } from '../../build/salaryPages/limits';
+import { strings } from '../strings';
+import type {
+  ContentBlock,
+  ContentLink,
+  ContentPageSpec,
+} from './contentPages';
+import { copyRules, everyString } from '../test/copyRules';
+import { hubPage, provinceHubs } from './provinceHubs';
+import {
+  contentPath,
+  FOOTER_PROVINCE_SLUGS,
+  formSlug,
+  HOME_PATH,
+  METHODOLOGY_SLUG,
+} from './siteLinks';
+
+type ListBlock = Extract<ContentBlock, { kind: 'list' }>;
+type LinksBlock = Extract<ContentBlock, { kind: 'links' }>;
+type Slug = (typeof FOOTER_PROVINCE_SLUGS)[number];
+
+const FEDERAL = [
+  ['t4', 'T4 slip'],
+  ['t1-income', 'T1 return, steps 2 to 4'],
+  ['t1-tax', 'T1 return, steps 5 and 6'],
+  ['schedule-8', 'Schedule 8: Canada Pension Plan'],
+  ['t2204', 'Form T2204: EI overpayment'],
+  ['schedule-6', 'Schedule 6: Canada Workers Benefit'],
+] as const;
+
+const OWN: Record<Slug, (readonly [string, string])[]> = {
+  'ca-on': [
+    ['on428', 'Form ON428: Ontario Tax'],
+    ['on428-a', 'Schedule ON428-A: LIFT credit'],
+  ],
+  'ca-ab': [['ab428', 'Form AB428: Alberta Tax']],
+  'ca-bc': [
+    ['bc428', 'Form BC428: British Columbia Tax'],
+    ['bc479', 'Form BC479: British Columbia credits'],
+  ],
+};
+
+const SALARIES = ['30000', '35000', '40000'];
+const salaryLinks: ContentLink[] = SALARIES.map((s) => ({
+  label: `$${s}`,
+  href: `/x/${s}/`,
+}));
+
+function textOf(slug: Slug) {
+  const text = provinceHubs.find((hub) => hub.slug === slug);
+  if (!text) throw new Error(`no hub text for ${slug}`);
+  return text;
+}
+
+function build(
+  slug: Slug,
+  published: string[] = [],
+  links: ContentLink[] = salaryLinks,
+): ContentPageSpec {
+  const name = strings.siteNav.provinceNames[slug];
+  const others = FOOTER_PROVINCE_SLUGS.filter((s) => s !== slug).map((s) => ({
+    label: strings.siteNav.provinceNames[s],
+    href: contentPath(s),
+  }));
+  return hubPage(textOf(slug), name, links, new Set(published), others);
+}
+
+function section(page: ContentPageSpec, heading: string) {
+  return page.sections.find((s) => s.heading === heading);
+}
+
+function lists(page: ContentPageSpec): ListBlock[] {
+  const blocks = section(page, 'The forms we follow')?.blocks ?? [];
+  return blocks.filter((b): b is ListBlock => b.kind === 'list');
+}
+
+describe('provinceHubs', () => {
+  it('has one entry for each province the footer lists, in that order', () => {
+    expect(provinceHubs.map((hub) => hub.slug)).toEqual([
+      ...FOOTER_PROVINCE_SLUGS,
+    ]);
+  });
+});
+
+describe.each(FOOTER_PROVINCE_SLUGS)('the hub page for %s', (slug) => {
+  const name = strings.siteNav.provinceNames[slug];
+  const page = build(slug, [], salaryLinks);
+
+  it('lives at the province slug, with no trail', () => {
+    expect(page.slug).toBe(slug);
+    expect(page.trail).toEqual([]);
+  });
+
+  it('names the province in the title and the heading, within the limits', () => {
+    expect(page.title).toBe(`${name}: forms and take-home examples`);
+    expect(page.heading).toBe(`${name}: forms and take-home examples`);
+    expect(page.title.length).toBeLessThan(TITLE_LIMIT);
+    expect(page.description.length).toBeGreaterThan(0);
+    expect(page.description.length).toBeLessThan(DESCRIPTION_LIMIT);
+    expect(page.description).toContain(name);
+  });
+
+  it('has the lede with the province name', () => {
+    expect(page.lede).toBe(
+      `Everything this site uses to work out take-home pay in ${name}, in one place. Each form is explained in plain words, and each salary page shows a full example.`,
+    );
+  });
+
+  it('explains how the take-home is worked out, with the province name in it', () => {
+    const how = section(page, `How your ${name} take-home is worked out`);
+    expect(how).toBeDefined();
+    const words = everyString(how?.blocks).join(' ');
+    expect(words).toContain(
+      `income tax, which has a federal part and a ${name} part`,
+    );
+    expect(words).toContain('Canada Pension Plan');
+    expect(words).toContain('EI');
+  });
+
+  it('lists the province forms first, titled with its name', () => {
+    const [own] = lists(page);
+    expect(own?.title).toBe(name);
+    expect(own?.items.map((item) => item.label)).toEqual(
+      OWN[slug].map(([, label]) => label),
+    );
+    for (const item of own?.items ?? []) {
+      expect(item.description.length).toBeGreaterThan(0);
+    }
+  });
+
+  it('then lists the six federal forms, titled for the province', () => {
+    const federal = lists(page)[1];
+    expect(lists(page)).toHaveLength(2);
+    expect(federal?.title).toBe(`Federal forms ${name} also uses`);
+    expect(federal?.items.map((item) => item.label)).toEqual(
+      FEDERAL.map(([, label]) => label),
+    );
+    for (const item of federal?.items ?? []) {
+      expect(item.description.length).toBeGreaterThan(0);
+    }
+  });
+
+  it('links every salary, one link each, to the address given', () => {
+    const salaries = section(page, 'Take-home pay by salary');
+    const grid = salaries?.blocks.find(
+      (b): b is LinksBlock => b.kind === 'links',
+    );
+    expect(grid?.layout).toBe('grid');
+    expect(grid?.label).toBe(`${name} take-home pay by salary`);
+    expect(grid?.links).toEqual(salaryLinks);
+    expect(salaries?.blocks[0]).toEqual({
+      kind: 'paragraph',
+      content: [
+        'Pick a salary to see the whole breakdown, step by step. Salary not listed? Use the ',
+        { label: 'calculator', href: HOME_PATH },
+        '.',
+      ],
+    });
+  });
+
+  it('leaves out the salary section when there are no salary links', () => {
+    const bare = build(slug, [], []);
+    expect(section(bare, 'Take-home pay by salary')).toBeUndefined();
+    expect(bare.sections.map((s) => s.heading)).toEqual(
+      page.sections
+        .map((s) => s.heading)
+        .filter((h) => h !== 'Take-home pay by salary'),
+    );
+  });
+
+  it('ends with a row of links: the methodology page, then the other two hubs', () => {
+    const last = page.sections.at(-1);
+    expect(last?.heading).toBe('Keep reading');
+    const row = last?.blocks.find((b): b is LinksBlock => b.kind === 'links');
+    expect(row?.layout).toBe('row');
+    expect(row?.label).toBe('More');
+    expect(row?.links).toEqual([
+      {
+        label: strings.siteNav.methodology,
+        href: contentPath(METHODOLOGY_SLUG),
+      },
+      ...FOOTER_PROVINCE_SLUGS.filter((s) => s !== slug).map((s) => ({
+        label: strings.siteNav.provinceNames[s],
+        href: contentPath(s),
+      })),
+    ]);
+  });
+
+  it('has no link on any form while no form page is published', () => {
+    for (const list of lists(page)) {
+      for (const item of list.items) {
+        expect(item.href, item.label).toBeUndefined();
+      }
+    }
+  });
+
+  it('links a form only when its page is published', () => {
+    const [first] = OWN[slug];
+    const id = first?.[0] ?? '';
+    const published = build(slug, [formSlug(id)]);
+    for (const item of lists(published).flatMap((list) => list.items)) {
+      expect(item.href, item.label).toBe(
+        item.label === first?.[1] ? contentPath(formSlug(id)) : undefined,
+      );
+    }
+  });
+
+  it('links a federal form when its page is published', () => {
+    const published = build(
+      slug,
+      FEDERAL.map(([id]) => formSlug(id)),
+    );
+    expect(lists(published)[1]?.items.map((item) => item.href)).toEqual(
+      FEDERAL.map(([id]) => contentPath(formSlug(id))),
+    );
+    expect(lists(published)[0]?.items.every((i) => i.href === undefined)).toBe(
+      true,
+    );
+  });
+
+  it('ignores published slugs that are not its forms', () => {
+    const other = build(slug, ['methodology', 'forms/not-a-form', 'ca-on']);
+    for (const list of lists(other)) {
+      for (const item of list.items) {
+        expect(item.href, item.label).toBeUndefined();
+      }
+    }
+  });
+});
+
+describe('province names', () => {
+  it('are not written into the hub text: the name is always the one given', () => {
+    const page = hubPage(textOf('ca-on'), 'Zedland', [], new Set(), []);
+    expect(page.heading).toBe('Zedland: forms and take-home examples');
+    expect(page.lede).not.toContain('Ontario');
+    expect(page.description).not.toContain('Ontario');
+    const shared = page.sections.filter(
+      (s) => s.heading !== 'The forms we follow',
+    );
+    const words = everyString(shared).join(' ');
+    expect(words).toContain('Zedland');
+    expect(words).not.toContain('Ontario');
+  });
+});
+
+describe.each(FOOTER_PROVINCE_SLUGS)('the copy of the hub for %s', (slug) => {
+  const text = provinceHubs.find((hub) => hub.slug === slug);
+  const page = text
+    ? hubPage(
+        text,
+        strings.siteNav.provinceNames[slug],
+        [{ label: '$30,000', href: `/${slug}/30000/` }],
+        new Set(),
+        [],
+      )
+    : null;
+
+  it.each(copyRules)('holds no %s', (_name, pattern) => {
+    expect(page).not.toBeNull();
+    for (const words of everyString(page)) {
+      expect(words, words).not.toMatch(pattern);
+    }
+  });
+});
+
+describe('the copy rules', () => {
+  it('catch what they are for', () => {
+    const samples = [
+      'It was checked against the agency',
+      'Only in Canada',
+      'a Canada-only site',
+      'Written by an AI',
+      `the ${['CRA', 'calculator'].join(' ')}`,
+      `see ${['Tax', 'Tips'].join('')}`,
+      'see docs/readme',
+    ];
+    samples.forEach((text, at) => {
+      expect(text).toMatch(copyRules[at]?.[1] ?? /^$/);
+    });
+  });
+});

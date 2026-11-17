@@ -1,5 +1,5 @@
 import type { ContentPageSpec } from './contentPages';
-import type { FOOTER_PROVINCE_SLUGS } from './siteLinks';
+import { formSlug, type FooterProvinceSlug } from './siteLinks';
 
 /**
  * A figure shown in a form page's words, taken from a saved answer. Either it
@@ -32,7 +32,7 @@ export type FormPageSpec = {
   /** The form's name as people know it, such as `Form ON428: Ontario Tax`. */
   name: string;
   /** The province page this form belongs to. */
-  province: (typeof FOOTER_PROVINCE_SLUGS)[number];
+  province: FooterProvinceSlug;
   /** The tax year of the figures the page quotes. */
   year: number;
   /** The salary the examples use, in whole dollars. */
@@ -50,13 +50,10 @@ export type FormBody = Pick<
   'province' | 'year' | 'exampleSalary' | 'sections'
 >;
 
-/** Where forms live on the site. */
-export const FORM_SLUG_PREFIX = 'forms';
-
 /** The page entry for a form. */
 export function formContentPage(form: FormPageSpec): ContentPageSpec {
   return {
-    slug: `${FORM_SLUG_PREFIX}/${form.id}`,
+    slug: formSlug(form.id),
     title: form.title,
     description: form.description,
     heading: form.name,

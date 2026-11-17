@@ -1,5 +1,6 @@
 import { DESCRIPTION_LIMIT, TITLE_LIMIT } from '../../build/salaryPages/limits';
-import { contentPages } from './contentPages';
+import { copyRules, everyString } from '../test/copyRules';
+import { contentPages, paragraph } from './contentPages';
 import { isContentSlug, METHODOLOGY_SLUG } from './siteLinks';
 
 // Adding a page is one entry in the list; these checks keep every entry sound.
@@ -35,7 +36,7 @@ describe('contentPages', () => {
       }
       for (const section of page.sections) {
         expect(section.heading.length).toBeGreaterThan(0);
-        expect(section.paragraphs.length).toBeGreaterThan(0);
+        expect(section.blocks.length).toBeGreaterThan(0);
       }
     }
   });
@@ -65,5 +66,25 @@ describe('the methodology page', () => {
     expect(words).not.toContain('canada-only');
     expect(JSON.stringify(page)).not.toMatch(/\bAI\b/);
     expect(words).not.toContain('docs/');
+  });
+});
+
+describe('paragraph', () => {
+  it('makes a paragraph block from words and links', () => {
+    const link = { label: 'the link', href: '/x/' };
+    expect(paragraph('a ', link, ' b')).toEqual({
+      kind: 'paragraph',
+      content: ['a ', link, ' b'],
+    });
+  });
+});
+
+describe('the copy of every listed page', () => {
+  it.each(copyRules)('holds no %s', (_name, pattern) => {
+    for (const page of contentPages) {
+      for (const words of everyString(page)) {
+        expect(words, `${page.slug}: ${words}`).not.toMatch(pattern);
+      }
+    }
   });
 });

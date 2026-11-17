@@ -200,15 +200,6 @@ describe('natural-search wording of the page text', () => {
   );
 
   it.each(['Ontario', 'Alberta'])(
-    'words the popular-salaries link as "<salary> after tax in %s"',
-    (place) => {
-      expect(strings.salaryIndex.link('$75,000', place)).toBe(
-        `$75,000 after tax in ${place}`,
-      );
-    },
-  );
-
-  it.each(['Ontario', 'Alberta'])(
     'gives the assembled title, heading and description for a 75,000 page in %s',
     (place) => {
       const text = salaryPageText(syntheticResponse(75000), place, 2026);
