@@ -33,3 +33,10 @@ export function longestSentence(text: string): number {
       .map((sentence) => sentence.split(/\s+/).filter(Boolean).length),
   );
 }
+
+/** Every `{name}` a piece of text uses. */
+export function placeholdersIn(...texts: string[]): string[] {
+  return texts.flatMap((text) =>
+    [...text.matchAll(/\{([a-z][a-zA-Z0-9]*)\}/g)].map((m) => m[1] ?? ''),
+  );
+}
