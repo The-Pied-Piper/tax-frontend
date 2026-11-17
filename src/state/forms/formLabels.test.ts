@@ -7,6 +7,36 @@ function paragraphOf(pageId: string, sectionId: string): string {
   return shownText(section, section.paragraph);
 }
 
+/** Every `{name}` a piece of text uses. */
+function placeholdersIn(...texts: string[]): string[] {
+  return texts.flatMap((text) =>
+    [...text.matchAll(/\{([a-z][a-zA-Z0-9]*)\}/g)].map((m) => m[1] ?? ''),
+  );
+}
+
+const ab428Wording = {
+  income: {
+    paragraph:
+      'Taxable income is the part of your income that tax is charged on. This form does not work it out. It copies the number from the federal part of your return. Some things are taken off first, like part of your pension plan payments.',
+    example:
+      '{taken}, the extra part of your pension plan payments, is taken off first. That leaves a taxable income of {income}.',
+  },
+  brackets: {
+    paragraph:
+      "Alberta does not tax all of your income at one rate. It cuts your income into slices, called brackets, and each slice has its own rate. The form finds the top slice your income reaches. It adds up the tax on all the slices below that one, then charges the top slice's rate on the rest of your income.",
+    example:
+      'Your income reaches the slice that starts at {start}. That slice is taxed at {rate}. The tax on the slices below it comes to {below}. The {above} of your income above {start} adds {added}. Alberta tax before credits: {tax}.',
+  },
+  credits: {
+    paragraph:
+      'A credit lowers your tax bill. The form starts with a list of amounts: the basic personal amount that everyone gets ({basic} in 2025), the main part of your pension plan payments, and your EI payments. It adds them up, then takes {rate} of the total. That is your discount.',
+  },
+  supplement: {
+    paragraph:
+      'If your credits are large, you can get an extra credit. A short worksheet works it out. It starts with the amounts added up earlier on the form and takes off any unused tuition amount. It then works out the credit on what is left, the same way the form did before. Credits for gifts to charity are not counted. The worksheet takes away a set amount ({set}). If your credit is less than that, you get nothing extra. If it is more, the extra credit is {rate} of the difference. We do not use tuition, so we skip that step.',
+  },
+};
+
 describe('form page labels and copy', () => {
   it('ab428 names its supplement section "Alberta supplemental tax credit"', () => {
     const section = sectionOf('ab428', 'supplement');
@@ -76,71 +106,27 @@ describe('form page labels and copy', () => {
   });
 });
 
-/** Every `{name}` a piece of text uses. */
-function placeholdersIn(...texts: string[]): string[] {
-  return texts.flatMap((text) =>
-    [...text.matchAll(/\{([a-z][a-zA-Z0-9]*)\}/g)].map((m) => m[1] ?? ''),
-  );
-}
-
-const ab428Wording = {
-  income: {
-    paragraph:
-      'Taxable income is the part of your income that tax is charged on. This form does not work it out. It copies the number from the federal part of your return. Some things are taken off first, like part of your pension plan payments.',
-    example:
-      '{taken}, the extra part of your pension plan payments, is taken off first. That leaves a taxable income of {income}.',
-  },
-  brackets: {
-    paragraph:
-      "Alberta does not tax all of your income at one rate. It cuts your income into slices, called brackets, and each slice has its own rate. The form finds the top slice your income reaches. It adds up the tax on all the slices below that one, then charges the top slice's rate on the rest of your income.",
-    example:
-      'Your income reaches the slice that starts at {start}. That slice is taxed at {rate}. The tax on the slices below it comes to {below}. The {above} of your income above {start} adds {added}. Alberta tax before credits: {tax}.',
-  },
-  credits: {
-    paragraph:
-      'A credit lowers your tax bill. The form starts with a list of amounts: the basic personal amount that everyone gets ({basic} in 2025), the main part of your pension plan payments, and your EI payments. It adds them up, then takes {rate} of the total. That is your discount.',
-  },
-  supplement: {
-    paragraph:
-      'If your credits are large, you can get an extra credit. A short worksheet works it out. It starts with the amounts added up earlier on the form and takes off any unused tuition amount. It then works out the credit on what is left, the same way the form did before. Credits for gifts to charity are not counted. The worksheet takes away a set amount ({set}). If your credit is less than that, you get nothing extra. If it is more, the extra credit is {rate} of the difference. We do not use tuition, so we skip that step.',
-  },
-};
-
-describe('ab428 plain-English wording (#188)', () => {
+describe('ab428 copy', () => {
   it('income paragraph and example use the proposed wording', () => {
     const section = sectionOf('ab428', 'income');
-    expect(shownText(section, section.paragraph)).toBe(
-      shownText(section, ab428Wording.income.paragraph),
-    );
+    expect(section.paragraph).toBe(ab428Wording.income.paragraph);
     expect(section.example).toBe(ab428Wording.income.example);
   });
 
   it('brackets paragraph and example use the proposed wording', () => {
     const section = sectionOf('ab428', 'brackets');
-    expect(shownText(section, section.paragraph)).toBe(
-      shownText(section, ab428Wording.brackets.paragraph),
-    );
+    expect(section.paragraph).toBe(ab428Wording.brackets.paragraph);
     expect(section.example).toBe(ab428Wording.brackets.example);
   });
 
   it('credits paragraph uses the proposed wording', () => {
     const section = sectionOf('ab428', 'credits');
-    expect(shownText(section, section.paragraph)).toBe(
-      shownText(section, ab428Wording.credits.paragraph),
-    );
+    expect(section.paragraph).toBe(ab428Wording.credits.paragraph);
   });
 
   it('supplement paragraph uses the proposed wording', () => {
     const section = sectionOf('ab428', 'supplement');
-    expect(shownText(section, section.paragraph)).toBe(
-      shownText(section, ab428Wording.supplement.paragraph),
-    );
-  });
-
-  it('supplement raw paragraph is exactly the proposed text', () => {
-    expect(sectionOf('ab428', 'supplement').paragraph).toBe(
-      ab428Wording.supplement.paragraph,
-    );
+    expect(section.paragraph).toBe(ab428Wording.supplement.paragraph);
   });
 
   it('every placeholder in the proposed wording has a figure, and every figure is used', () => {
