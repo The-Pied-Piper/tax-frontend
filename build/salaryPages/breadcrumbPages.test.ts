@@ -8,6 +8,7 @@ import { publishedSlugs } from '../../src/test/pageLinks';
 import {
   apiBaseUrl,
   fakeFetch,
+  listedIn,
   siteUrl as site,
   contentTemplate,
   template,
@@ -56,7 +57,7 @@ async function build(siteUrl: string | null): Promise<string> {
     published: publishedSlugs,
     fetch: fakeFetch(),
     baseUrl: apiBaseUrl,
-    provinces,
+    provinces: listedIn(provinces),
     outDir: dir,
     template,
     render: renderSalaryApp,
