@@ -1,0 +1,30 @@
+import { strings } from './strings';
+
+describe('the shared site copy', () => {
+  it('words the form page notice in plain English, keeping year and salary', () => {
+    expect(strings.formPage.notice(2025, '$70,000')).toBe(
+      'Our calculator follows the published form. It is made for a single person whose only income is a salary. This page covers only the lines it uses, with figures from the 2025 form. Examples use a $70,000 salary. This is an estimate, not tax advice.',
+    );
+    expect(strings.formPage.notice(2026, '$55,000')).toContain(
+      'figures from the 2026 form. Examples use a $55,000 salary.',
+    );
+  });
+
+  it('spells out Employment Insurance in the intro', () => {
+    expect(strings.intro).toBe(
+      'Estimate your yearly take-home from a salary before tax. We work out the pension, Employment Insurance (EI) and income tax for a single person and show every step.',
+    );
+  });
+
+  it('keeps every sentence of the notice and intro to 40 words or fewer', () => {
+    for (const text of [
+      strings.formPage.notice(2025, '$70,000'),
+      strings.intro,
+    ]) {
+      for (const sentence of text.split(/(?<=[.!?])\s+/)) {
+        const count = sentence.split(/\s+/).filter(Boolean).length;
+        expect(count, sentence).toBeLessThanOrEqual(40);
+      }
+    }
+  });
+});
