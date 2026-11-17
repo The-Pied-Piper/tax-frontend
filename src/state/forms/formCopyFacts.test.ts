@@ -65,13 +65,69 @@ describe('on428 total section copy', () => {
     expect(paragraph).not.toMatch(/a set amount, not/i);
   });
 
-  it('says the premium steps up with income and phases in', () => {
-    expect(paragraph).toMatch(/steps? up/i);
-    expect(paragraph).toMatch(/phase/i);
+  it('says the premium goes up in steps as income rises', () => {
+    expect(paragraph).toMatch(/goes up in steps as income rises/i);
+    expect(paragraph).toMatch(/little or nothing/i);
+  });
+
+  it('adds the premium to the tax after all the earlier steps, not "after credits"', () => {
+    expect(paragraph).toMatch(
+      /adds it to your tax after all the earlier steps/,
+    );
+    expect(paragraph).not.toMatch(/after credits/);
   });
 
   it('keeps sentences short', () => {
     expect(longestSentence(paragraph)).toBeLessThanOrEqual(40);
+  });
+});
+
+describe('on428 plain-English copy', () => {
+  it('income says income, not pay, and puts the cause before the result', () => {
+    const { paragraph, example } = section('on428', 'income');
+    expect(paragraph).toMatch(/part of your income that tax is charged on/);
+    expect(example).toMatch(
+      /^\{taken\}.*That leaves a taxable income of \{income\}\.$/,
+    );
+  });
+
+  it('brackets calls the result the Ontario tax before credits', () => {
+    const { paragraph, example } = section('on428', 'brackets');
+    expect(paragraph).toMatch(/finds the top slice your income reaches/);
+    expect(example).toMatch(/Ontario tax before credits: \{tax\}\.$/);
+  });
+
+  it('credits starts from a list of amounts', () => {
+    expect(section('on428', 'credits').paragraph).toMatch(
+      /^A credit lowers your tax bill\. The form starts with a list of amounts/,
+    );
+  });
+
+  it('keeps every changed section short in sentences', () => {
+    for (const id of ['income', 'brackets', 'credits', 'surtax', 'reduction']) {
+      const { paragraph, example } = section('on428', id);
+      expect(longestSentence(`${paragraph} ${example}`)).toBeLessThanOrEqual(
+        40,
+      );
+    }
+  });
+});
+
+describe('on428 corrections', () => {
+  it('surtax says the form tests Ontario tax after credits, before the health premium', () => {
+    const { paragraph, example } = section('on428', 'surtax');
+    expect(paragraph).toMatch(
+      /tests your Ontario tax after credits, before the health premium/,
+    );
+    expect(example).toMatch(/^Your Ontario tax after credits is \{tax\}\./);
+  });
+
+  it('reduction says it takes away Ontario tax after credits and surtax', () => {
+    const { paragraph, example } = section('on428', 'reduction');
+    expect(paragraph).toMatch(
+      /takes away your Ontario tax after credits and surtax/,
+    );
+    expect(example).toMatch(/less your tax of \{tax\}/);
   });
 });
 

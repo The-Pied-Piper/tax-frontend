@@ -53,6 +53,13 @@ describe('form page labels and copy', () => {
     expect(text).not.toMatch(/the pension plan and EI payments/i);
   });
 
+  it('on428 credits lists the amounts the form starts with', () => {
+    const text = paragraphOf('on428', 'credits');
+    expect(text).toMatch(/^A credit lowers your tax bill\./);
+    expect(text).toMatch(/and your EI payments\./);
+    expect(text).not.toMatch(/discount on your tax bill/i);
+  });
+
   it('t1-income deductions names line 22215 and says 23300 is the total', () => {
     const text = paragraphOf('t1-income', 'deductions');
     expect(text).toMatch(/22215/);
