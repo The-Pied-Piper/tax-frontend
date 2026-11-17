@@ -4,7 +4,7 @@ export const languageCode = 'en';
 export const strings = {
   title: 'What will I take home?',
   intro:
-    'Estimate your yearly take-home from a salary before tax. We work out the pension, EI and income tax for a single person and show every step.',
+    'Estimate your yearly take-home from a salary before tax. We work out the pension, Employment Insurance (EI) and income tax for a single person and show every step.',
   footer:
     'This is an estimate, not tax advice. Your actual take-home depends on your own situation and what your employer withholds. Nothing you enter is saved.',
   siteNav: {
@@ -24,7 +24,7 @@ export const strings = {
     contents: 'On this page',
     permalink: (heading: string) => `Link to ${heading}`,
     notice: (year: number, salary: string) =>
-      `Our calculator follows the published form for a single person with a salary and no other income. This page covers the parts it uses, with figures from the ${year.toString()} form. Examples use a ${salary} salary. It is an estimate, not tax advice.`,
+      `Our calculator follows the published form. It is made for a single person whose only income is a salary. This page covers only the lines it uses, with figures from the ${year.toString()} form. Examples use a ${salary} salary. This is an estimate, not tax advice.`,
     example: (salary: string) => `At ${salary}`,
     related: 'Related',
     hub: (place: string) => `${place} forms and salary pages`,
