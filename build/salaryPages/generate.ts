@@ -6,11 +6,14 @@ import {
   type ComputeTakeHomeCalculationResponse,
   type ListJurisdictionsResponse,
 } from '../../src/api';
-import { dollarSign } from '../../src/adapters/fallback';
+import { dollarSign, responseUnit } from '../../src/adapters/fallback';
+import { displayWholeMoney } from '../../src/money/format';
+import { salaryBreadcrumb } from '../../src/state/breadcrumbs';
+import { breadcrumbJsonLd } from '../breadcrumbJsonLd';
 import { languageCode, strings } from '../../src/strings';
 import type { Unit } from '../../src/adapters';
 import type { SalaryPageData } from '../../src/state/useTakeHome';
-import { pageUrl } from './address';
+import { pagePath, pageUrl } from './address';
 import { buildPageHtml } from './pageHtml';
 import { pageMeta } from './pageMeta';
 import { DESCRIPTION_LIMIT, TITLE_LIMIT } from './limits';
@@ -130,16 +133,17 @@ export async function generateSalaryPages(
       const response = responses[at];
       if (!response) throw new Error(`Salary pages: no answer for ${salary}`);
       const page = `${province.slug}/${salary}`;
+      const links = {
+        ...salaryLinks(province.slug, steps, salary),
+        ...provinceLinks(province.slug, placeName, options.published),
+      };
       const data: SalaryPageData = {
         jurisdictions: list.jurisdictions,
         response,
         jurisdictionCode: province.code,
         year: province.year,
         salary,
-        links: {
-          ...salaryLinks(province.slug, steps, salary),
-          ...provinceLinks(province.slug, placeName, options.published),
-        },
+        links,
       };
       const meta = pageMeta(data);
       if (meta.title.length >= TITLE_LIMIT) {
@@ -160,6 +164,20 @@ export async function generateSalaryPages(
           data,
           options.siteUrl
             ? pageUrl(options.siteUrl, province.slug, salary)
+            : null,
+          options.siteUrl
+            ? breadcrumbJsonLd(
+                salaryBreadcrumb(
+                  links.hub,
+                  displayWholeMoney(
+                    response.salary,
+                    'annually',
+                    responseUnit(response),
+                  ),
+                ),
+                options.siteUrl,
+                pagePath(province.slug, salary),
+              )
             : null,
         ),
       });

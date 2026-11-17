@@ -10,6 +10,8 @@ import {
   isContentSlug,
 } from '../../src/state/siteLinks';
 import { isSitePath } from '../../src/state/salaryPageData';
+import { contentBreadcrumb } from '../../src/state/breadcrumbs';
+import { breadcrumbJsonLd } from '../breadcrumbJsonLd';
 import { isSalaryPageSlug } from '../salaryPages/address';
 import { DESCRIPTION_LIMIT, TITLE_LIMIT } from '../salaryPages/limits';
 import { buildContentPageHtml } from './html';
@@ -112,6 +114,13 @@ export async function generateContentPages(
       render(spec),
       spec,
       siteUrl === null ? null : `${siteUrl}${contentPath(spec.slug)}`,
+      siteUrl === null
+        ? null
+        : breadcrumbJsonLd(
+            contentBreadcrumb(spec),
+            siteUrl,
+            contentPath(spec.slug),
+          ),
     ),
   }));
   for (const { path, html } of built) {
