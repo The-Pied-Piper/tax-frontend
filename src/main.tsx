@@ -1,6 +1,7 @@
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import { App } from './App';
+import { ThemeToggle } from './components/ThemeToggle';
 import { sendVisitBeacon } from './beacon/visitBeacon';
 import {
   parseSalaryPageData,
@@ -40,4 +41,15 @@ async function start(root: HTMLElement) {
   sendVisitBeacon(initial ? 'salary' : 'home');
 }
 
-void start(root);
+// A pre-built content page has a slot for the Light/Dark switch and nothing
+// else to run: mount the switch there, with no calculator and no beacon.
+const toggleSlot = document.getElementById('content-theme-toggle');
+if (toggleSlot) {
+  createRoot(toggleSlot).render(
+    <StrictMode>
+      <ThemeToggle />
+    </StrictMode>,
+  );
+} else {
+  void start(root);
+}

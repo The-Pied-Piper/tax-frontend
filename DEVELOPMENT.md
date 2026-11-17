@@ -67,3 +67,17 @@ A deploy build can write one finished page per province and salary step (for Ont
 3. Run `npm run check`, then a build with `VITE_API_BASE_URL` set, and open `dist/ca-ab/<salary>/index.html`.
 
 Nothing else changes: the pages, their canonical addresses, the sitemap, the links between pages, and the home page group all come from that one list. A test adds a made-up province to the list to show this (`build/salaryPages/crawl.test.ts`), and `build/salaryPages/pageFigures.test.ts` checks that each page carries the figures the API gave for its own salary. A deploy build calls the API, so the API must be up when the site is built.
+
+## Content pages
+
+Reading pages (hubs, form pages, the methodology page) share one shell: `src/components/ContentPage.tsx` renders the heading, the Light/Dark switch, a breadcrumb row, the sections and the site footer. The footer (`src/components/SiteFooter.tsx`) is on every page, the calculator and the salary pages included: links to "How we calculate" and the provinces above the unchanged disclaimer, with the words in `src/strings.ts`.
+
+**Adding a page** is one entry in the list in `src/state/contentPages.ts`: `slug` (for example `ca-on` or `forms/bc428`), `title` (under 60 characters), `description` (under 160), `heading`, an optional `lede`, a `trail` (the listed pages between Home and this one, each given as a label and a slug) and the `sections` (a heading and paragraphs each). The build refuses an invalid or repeated slug, a title or description over the limit, and a trail step that is not itself a listed page, and then writes nothing. Run `npm run check`, then a deploy-style build, and open `dist/<slug>/index.html`.
+
+**Where a page lives** is said in one place only, `src/state/siteLinks.ts` (the address, the file path below `dist/`, the slug rules, and the footer's links). Nothing else builds a content page address. Each page gets its own title, description, canonical link and `og:url`, an entry in `dist/sitemap.xml` and a `lastmod` by the same rule as the salary pages (`build/contentPages/`).
+
+**Theme:** the page loads `/theme-init.js` in the head, like the calculator, so a stored Light or Dark choice shows before first paint. The page bundle finds the `#content-theme-toggle` slot in the pre-built page and mounts only the switch there (no calculator, no visit beacon).
+
+**When pages are written:** only in deploy builds, with `VITE_API_BASE_URL` set, together with the salary pages; local builds and CI write none.
+
+**CDN:** the pages are folders (`/ca-on/`, `/forms/bc428/`, `/methodology/`), so the CDN must serve those extension-less paths, with and without the trailing slash, as the pre-built `<path>/index.html`. This may need a change in the infrastructure repository (tax-infra). Until then the footer links to pages that later tickets add are links to paths the CDN does not yet serve.
