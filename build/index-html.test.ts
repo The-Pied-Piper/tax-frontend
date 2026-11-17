@@ -45,7 +45,9 @@ describe('index.html (what a crawler sees without JavaScript)', () => {
     ];
     for (const text of texts) {
       expect(text.length).toBeGreaterThan(0);
-      expect(text).not.toMatch(/ontario|alberta|british columbia/i);
+      for (const name of Object.values(strings.siteNav.provinceNames)) {
+        expect(text.toLowerCase()).not.toContain(name.toLowerCase());
+      }
     }
   });
 
