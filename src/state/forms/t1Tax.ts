@@ -80,12 +80,12 @@ export const t1Tax: FormPageSpec = {
     },
     {
       id: 'balance',
-      heading: 'Your total tax',
+      heading: 'Total payable and refund or balance owing',
       lines: 'Lines 43500, 48200 and 167',
       paragraph:
-        'The form adds your federal tax and your Ontario tax. That is your total tax. Line 167 then takes off credits that are paid out even if you owe no tax. This page does not look at tax already taken off your pay during the year.',
+        'Line 43500 mainly adds your federal tax and your Ontario tax. That gives your total payable. Line 167 is the total payable minus your total credits on line 48200. This page stops short of line 167. It ignores the tax already taken off your pay during the year (line 43700), which is part of the total credits on the real form. It counts only the other credits.',
       example:
-        '{federal} plus {ontario} is {total}. Those paid-out credits are {refundable} here, so the amount on line 167 is {total}.',
+        '{federal} plus {ontario} is a total payable of {total}. The other credits are {refundable}. Without the tax taken off your pay, the balance owing would be {total}.',
       figures: {
         federal: result('$7,585.64', 'federal_tax_after_credits'),
         ontario: result('$3,911.45', 'provincial_tax_line_42800'),
