@@ -57,7 +57,7 @@ describe('salaryPageText: the text of a page from its own answer', () => {
     expect(description).not.toContain('After Tax in');
     expect(description).not.toContain('Take-Home Pay');
     expect(description).toContain(
-      'income tax, pension plan and Employment Insurance',
+      'income tax, pension and Employment Insurance',
     );
   });
 
@@ -205,7 +205,7 @@ describe('natural-search wording of the page text', () => {
         '$58,786',
       );
       expect(description).toBe(
-        `On a $75,000 salary in ${place} in 2026, you take home an estimated $58,786 a year after income tax, pension plan and Employment Insurance.`,
+        `On a $75,000 salary in ${place} in 2026, you take home an estimated $58,786 a year after income tax, pension and Employment Insurance.`,
       );
       expect(description).toContain('an estimated $58,786');
     },
