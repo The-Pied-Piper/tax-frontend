@@ -54,11 +54,12 @@ describe('form page labels and copy', () => {
     expect(text).not.toMatch(/is your federal tax\.?\s*$/i);
   });
 
-  it('bc428 reduction says the reduction is zero once the charge passes the starting amount', () => {
+  it('bc428 reduction says the reduction is zero once nothing is left', () => {
     const text = paragraphOf('bc428', 'reduction');
     expect(text).toMatch(/net income/i);
-    expect(text).toMatch(/bigger than the starting amount/i);
-    expect(text).not.toMatch(/your income/i);
+    expect(text).toMatch(/If nothing is left, the reduction is zero/i);
+    expect(text).toMatch(/the higher your income, the smaller the reduction/i);
+    expect(text).not.toMatch(/bigger than the starting amount/i);
   });
 
   describe.each([
