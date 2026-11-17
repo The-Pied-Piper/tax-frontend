@@ -1,3 +1,8 @@
+import {
+  albertaTargets,
+  ontarioTargets,
+  publishedSlugs,
+} from '../../src/test/pageLinks';
 import { dollarSign } from '../../src/adapters/fallback';
 import { mkdtempSync, readFileSync, readdirSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
@@ -118,6 +123,7 @@ describe('generateSalaryPages for Ontario', () => {
     const api = fakeApi(seventyThousand);
     const dir = outDir();
     const result = await generateSalaryPages({
+      published: publishedSlugs,
       fetch: api.fetch,
       baseUrl,
       provinces: ontarioOnly,
@@ -140,6 +146,7 @@ describe('generateSalaryPages for Ontario', () => {
   it('asks the API once for the places and once per page, never twice', async () => {
     const api = fakeApi(seventyThousand);
     await generateSalaryPages({
+      published: publishedSlugs,
       fetch: api.fetch,
       baseUrl,
       provinces: ontarioOnly,
@@ -154,6 +161,7 @@ describe('generateSalaryPages for Ontario', () => {
   it('asks for the same thing the live page asks for', async () => {
     const api = fakeApi(seventyThousand);
     await generateSalaryPages({
+      published: publishedSlugs,
       fetch: api.fetch,
       baseUrl,
       provinces: ontarioOnly,
@@ -185,6 +193,7 @@ describe('generateSalaryPages for Ontario', () => {
     );
     const dir = outDir();
     await generateSalaryPages({
+      published: publishedSlugs,
       fetch: api.fetch,
       baseUrl,
       provinces: ontarioOnly,
@@ -203,6 +212,7 @@ describe('generateSalaryPages for Ontario', () => {
     const api = fakeApi(seventyThousand);
     const dir = outDir();
     await generateSalaryPages({
+      published: publishedSlugs,
       fetch: api.fetch,
       baseUrl,
       provinces: ontarioOnly,
@@ -227,17 +237,21 @@ describe('generateSalaryPages for Ontario', () => {
       jurisdictionCode: 'CA-ON',
       year: 2026,
       salary: '70000',
-      links: salaryLinks(
-        'ca-on',
-        Array.from({ length: 25 }, (_, i) => String(30000 + i * 5000)),
-        '70000',
-      ),
+      links: {
+        ...salaryLinks(
+          'ca-on',
+          Array.from({ length: 25 }, (_, i) => String(30000 + i * 5000)),
+          '70000',
+        ),
+        ...ontarioTargets,
+      },
     });
   });
 
   it('uses the year of the list entry for every page', async () => {
     const api = fakeApi(seventyThousand);
     await generateSalaryPages({
+      published: publishedSlugs,
       fetch: api.fetch,
       baseUrl,
       provinces: provinces.map((p) => ({ ...p, year: 2025 })),
@@ -260,6 +274,7 @@ describe('generateSalaryPages for Alberta', () => {
     const api = fakeApi(alberta, () => Response.json(withAlberta));
     const dir = outDir();
     const result = await generateSalaryPages({
+      published: publishedSlugs,
       fetch: api.fetch,
       baseUrl,
       provinces: albertaOnly,
@@ -277,6 +292,7 @@ describe('generateSalaryPages for Alberta', () => {
   it('asks the API for Alberta in the tax year of its entry, as the live page does', async () => {
     const api = fakeApi(alberta, () => Response.json(withAlberta));
     await generateSalaryPages({
+      published: publishedSlugs,
       fetch: api.fetch,
       baseUrl,
       provinces: albertaOnly,
@@ -299,6 +315,7 @@ describe('generateSalaryPages for Alberta', () => {
     const api = fakeApi(alberta, () => Response.json(withAlberta));
     const dir = outDir();
     await generateSalaryPages({
+      published: publishedSlugs,
       fetch: api.fetch,
       baseUrl,
       provinces: albertaOnly,
@@ -323,7 +340,10 @@ describe('generateSalaryPages for Alberta', () => {
       jurisdictionCode: 'CA-AB',
       year: 2026,
       salary: '70000',
-      links: salaryLinks('ca-ab', steps, '70000'),
+      links: {
+        ...salaryLinks('ca-ab', steps, '70000'),
+        ...albertaTargets,
+      },
     });
   });
 
@@ -339,6 +359,7 @@ describe('generateSalaryPages for Alberta', () => {
     );
     const dir = outDir();
     await generateSalaryPages({
+      published: publishedSlugs,
       fetch: api.fetch,
       baseUrl,
       provinces: albertaOnly,
@@ -359,6 +380,7 @@ describe('adding a province is one list entry', () => {
     const api = fakeApi(seventyThousand, () => Response.json(withXland));
     const dir = outDir();
     const result = await generateSalaryPages({
+      published: publishedSlugs,
       fetch: api.fetch,
       baseUrl,
       provinces: [...provinces, xland],
@@ -382,6 +404,7 @@ describe('a listed province the API does not return', () => {
     const api = fakeApi(seventyThousand);
     const dir = outDir();
     const result = await generateSalaryPages({
+      published: publishedSlugs,
       fetch: api.fetch,
       baseUrl,
       provinces: [
@@ -414,6 +437,7 @@ describe('the build fails clearly', () => {
     );
     await expect(
       generateSalaryPages({
+        published: publishedSlugs,
         fetch: api.fetch,
         baseUrl,
         provinces,
@@ -435,6 +459,7 @@ describe('the build fails clearly', () => {
     const dir = outDir();
     await expect(
       generateSalaryPages({
+        published: publishedSlugs,
         fetch: api.fetch,
         baseUrl,
         provinces,
@@ -455,6 +480,7 @@ describe('the build fails clearly', () => {
         : Promise.reject(new TypeError('connection refused'));
     await expect(
       generateSalaryPages({
+        published: publishedSlugs,
         fetch: down,
         baseUrl,
         provinces,
@@ -472,6 +498,7 @@ describe('the build fails clearly', () => {
     );
     await expect(
       generateSalaryPages({
+        published: publishedSlugs,
         fetch: api.fetch,
         baseUrl,
         provinces,
@@ -497,6 +524,7 @@ describe('a page whose text is too long fails the build', () => {
   async function build(name: string, dir: string) {
     const api = fakeApi(seventyThousand, namedAs(name));
     return generateSalaryPages({
+      published: publishedSlugs,
       fetch: api.fetch,
       baseUrl,
       provinces,
@@ -529,6 +557,7 @@ describe('generateSalaryPages is deterministic', () => {
     const dir = outDir();
     const api = fakeApi(seventyThousand);
     const result = await generateSalaryPages({
+      published: publishedSlugs,
       fetch: api.fetch,
       baseUrl,
       provinces: ontarioOnly,

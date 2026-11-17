@@ -1,3 +1,4 @@
+import { publishedSlugs } from '../../src/test/pageLinks';
 import { mkdtempSync, readFileSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
@@ -44,6 +45,7 @@ const pages = new Map<number, Document>();
 
 beforeAll(async () => {
   await generateSalaryPages({
+    published: publishedSlugs,
     fetch: fakeFetch,
     baseUrl,
     provinces,
