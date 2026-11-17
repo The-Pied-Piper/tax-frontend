@@ -20,7 +20,7 @@ export const t2204: FormPageSpec = {
       heading: 'Pay that EI counts',
       lines: 'Lines 1–3',
       paragraph:
-        'EI is only charged on pay up to a yearly limit. The form takes your pay and cuts it off at that limit, which is {max} in 2025. The form also treats pay below {exempt} as if it were not insured pay at all. That is why someone who earns less than {exempt} gets all of their EI payments back. At very low pay, this can leave take-home pay higher than the salary.',
+        'EI is only charged on pay up to a yearly limit. The form takes your pay and cuts it off at that limit, which is {max} in 2025. The form also takes {exempt} off your insured pay. If your insured pay for the year is under {exempt}, the form counts none of it, so all of your EI payments come back to you.',
       example:
         'Your pay is more than the limit, so EI counts only {counted} of it.',
       figures: {

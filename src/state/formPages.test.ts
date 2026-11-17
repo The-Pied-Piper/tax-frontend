@@ -4,6 +4,8 @@ import { contentPages } from './contentPages';
 import { displayWholeMoney, type MoneyUnit } from '../money/format';
 import { strings } from '../strings';
 import { formSlug, isContentSlug } from './siteLinks';
+import { DESCRIPTION_LIMIT, TITLE_LIMIT } from '../../build/salaryPages/limits';
+import { copyRules, everyString } from '../test/copyRules';
 
 type Line = {
   label: string;
@@ -143,5 +145,55 @@ describe('splitFigures', () => {
     expect(splitFigures('No figures.')).toEqual([
       { kind: 'text', value: 'No figures.' },
     ]);
+  });
+});
+
+describe.each(formPages)('the words of the $name page', (form) => {
+  const copy = {
+    title: form.title,
+    description: form.description,
+    intro: form.intro,
+    sections: form.sections.map((section) => ({
+      heading: section.heading,
+      paragraph: section.paragraph,
+      example: section.example,
+    })),
+  };
+
+  it('has a title and description within the limits', () => {
+    expect(form.title.length).toBeLessThan(TITLE_LIMIT);
+    expect(form.description.length).toBeLessThan(DESCRIPTION_LIMIT);
+  });
+
+  it.each(copyRules)('holds no %s', (_name, pattern) => {
+    for (const words of everyString(copy)) {
+      expect(words, words).not.toMatch(pattern);
+    }
+  });
+});
+
+describe('the one fact each credit and refund page states plainly', () => {
+  const bodyOf = (id: string) => {
+    const form = formPages.find((page) => page.id === id);
+    if (!form) throw new Error(`no form page "${id}" in formPages`);
+    return form.sections
+      .flatMap((section) =>
+        [section.paragraph, section.example].map((text) =>
+          text.replace(
+            /\{([a-z][a-zA-Z0-9]*)\}/g,
+            (whole, name: string) => section.figures[name]?.shown ?? whole,
+          ),
+        ),
+      )
+      .join(' ');
+  };
+
+  it.each([
+    ['t2204', /\$2,000/],
+    ['bc479', /refundable|paid to you/i],
+    ['schedule-6', /Canada Workers Benefit/],
+    ['on428-a', /LIFT/],
+  ] as const)('%s says %s', (id, fact) => {
+    expect(bodyOf(id)).toMatch(fact);
   });
 });
