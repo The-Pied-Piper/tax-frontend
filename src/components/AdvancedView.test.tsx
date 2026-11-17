@@ -4,11 +4,14 @@ import type { AdvancedGroup } from '../adapters';
 import { AdvancedView } from './AdvancedView';
 import { strings } from '../strings';
 import { cad, months } from '../test/units';
+import { caOnAdapter } from '../adapters/ca-on';
+import { compute70000 } from '../test/syntheticPages';
 
 const groups: AdvancedGroup[] = [
   {
     form: 'ca/schedule_8',
     name: 'ca/schedule_8',
+    page: 'schedule-8',
     lines: [
       {
         label: 'cpp basic exemption',
@@ -31,6 +34,7 @@ const groups: AdvancedGroup[] = [
   {
     form: 'ca-on/return',
     name: 'ca-on/return',
+    page: null,
     lines: [
       {
         label: 'take home',
@@ -45,6 +49,7 @@ const groups: AdvancedGroup[] = [
   {
     form: 'ca/t2204',
     name: 'ca/t2204',
+    page: 't2204',
     lines: [
       {
         label: 'note only',
@@ -159,6 +164,7 @@ describe('AdvancedView', () => {
           {
             form: 'ex/form',
             name: 'ex/form',
+            page: null,
             lines: [
               {
                 label: 'same',
@@ -194,7 +200,7 @@ describe('AdvancedView', () => {
               },
             ],
           },
-          { form: 'ex/empty', name: 'ex/empty', lines: [] },
+          { form: 'ex/empty', name: 'ex/empty', page: null, lines: [] },
         ]}
       />,
     );
@@ -215,6 +221,7 @@ describe('AdvancedView', () => {
           {
             form: 'ex/form',
             name: 'Example form',
+            page: null,
             lines: [
               {
                 label: 'Printed figure',
@@ -259,6 +266,7 @@ describe('AdvancedView', () => {
           {
             form: 'ex/form',
             name: 'Example form',
+            page: null,
             lines: [
               {
                 label: 'Line 2',
@@ -311,6 +319,7 @@ describe('AdvancedView', () => {
           {
             form: 'ex/form',
             name: 'Example form',
+            page: null,
             lines: [
               {
                 label: 'Printed',
@@ -345,6 +354,7 @@ describe('AdvancedView', () => {
       {
         form: 'ex/form',
         name: 'Example form',
+        page: null,
         lines: [
           {
             label: 'EI premiums',
@@ -444,5 +454,93 @@ describe('AdvancedView', () => {
       await userEvent.click(summary());
       expect(section()).toHaveAttribute('open');
     });
+  });
+});
+
+describe('AdvancedView form link', () => {
+  const real = caOnAdapter.adapt(compute70000).advanced;
+  const on428 = real.find((g) => g.form === 'ca-on/on428');
+  const unmapped = real.find((g) => g.form === 'ca-on/return');
+  const t2204 = real.find((g) => g.form === 'ca/t2204');
+
+  function linkOf(name: string) {
+    return within(form(name)).queryByRole('link', {
+      name: /What is this form\?/,
+    });
+  }
+
+  function pick(group: AdvancedGroup | undefined): AdvancedGroup {
+    if (!group) throw new Error('missing fixture group');
+    return group;
+  }
+
+  it('links a group with a published page to that page', () => {
+    const group = pick(on428);
+    render(<AdvancedView groups={[group]} />);
+    const link = linkOf(group.name);
+    expect(link).toHaveAttribute('href', '/forms/on428/');
+    expect(link).toHaveTextContent('What is this form?');
+  });
+
+  it('follows the group page, never the engine form key', () => {
+    const group = pick(on428);
+    const { unmount } = render(
+      <AdvancedView groups={[{ ...group, form: 'ex/form', page: 'on428' }]} />,
+    );
+    expect(linkOf(group.name)).toHaveAttribute('href', '/forms/on428/');
+    unmount();
+    render(<AdvancedView groups={[{ ...group, page: null }]} />);
+    expect(screen.queryByRole('link')).not.toBeInTheDocument();
+  });
+
+  it('has no link for a group with no page', () => {
+    const group = pick(unmapped);
+    render(<AdvancedView groups={[group]} />);
+    expect(screen.queryByRole('link')).not.toBeInTheDocument();
+  });
+
+  it('has no link for a group whose page is not published', () => {
+    const group = { ...pick(t2204), page: 'no-such-page' };
+    render(<AdvancedView groups={[group]} />);
+    expect(screen.queryByRole('link')).not.toBeInTheDocument();
+  });
+
+  it('is a plain link in the heading, outside the line list, named for the form', () => {
+    const group = pick(on428);
+    render(<AdvancedView groups={[group]} />);
+    const link = linkOf(group.name);
+    expect(link?.tagName).toBe('A');
+    expect(link?.closest('button')).toBeNull();
+    expect(link?.closest('summary')).not.toBeNull();
+    expect(link?.closest('dl')).toBeNull();
+    expect(link).toHaveAccessibleName(new RegExp(group.name));
+  });
+
+  it('does not open or close the form when clicked', async () => {
+    const group = pick(on428);
+    render(<AdvancedView groups={[group]} />);
+    await open();
+    const details = form(group.name);
+    const link = linkOf(group.name);
+    if (!link) throw new Error('no link');
+    // The click is not prevented: it must leave the form's lines as they were.
+    // jsdom cannot navigate and reports that to the console, so mute it here.
+    const error = vi.spyOn(console, 'error').mockImplementation(() => {});
+    try {
+      await userEvent.click(link);
+    } finally {
+      error.mockRestore();
+    }
+    expect(details).not.toHaveAttribute('open');
+  });
+
+  it('can be reached with the keyboard', async () => {
+    const group = pick(on428);
+    render(<AdvancedView groups={[group]} />);
+    await open();
+    const link = linkOf(group.name);
+    await userEvent.tab();
+    await userEvent.tab();
+    expect(link).toHaveFocus();
   });
 });

@@ -117,12 +117,16 @@ describe('crawl of the full build for the salary page links (#150)', () => {
         expect(targets).toContain('ca-ab/index.html');
         expect(targets).toContain(contentFile(METHODOLOGY_SLUG));
         const forms = targets.filter((t) => t.startsWith('forms/'));
-        // Alberta's main form is linked exactly when its page is built.
-        expect(forms).toEqual(
-          published.has(formSlug('ab428'))
-            ? [contentFile(formSlug('ab428'))]
-            : [],
+        // Alberta's main form is linked exactly when its page is built; the
+        // advanced view adds a link per form, each to a page that is built.
+        expect(forms.includes(contentFile(formSlug('ab428')))).toBe(
+          published.has(formSlug('ab428')),
         );
+        for (const form of forms) {
+          expect(published, form).toContain(
+            form.slice(0, -'/index.html'.length),
+          );
+        }
       }
     },
     SLOW_TEST_MS,

@@ -52,4 +52,14 @@ describe('the dollar sign', () => {
       lines.some((l) => /\$\d/.test(l.detail) && !l.detail.includes('CA')),
     ).toBe(true);
   });
+
+  it('advancedGroups carries the page id of each form, or null', () => {
+    const page = Object.fromEntries(
+      advancedGroups(compute70000).map((g) => [g.form, g.page]),
+    );
+    expect(page['ca-on/on428']).toBe('on428');
+    expect(page['ca/t2204']).toBe('t2204');
+    expect(page['ca/schedule_8']).toBe('schedule-8');
+    expect(page['ca-on/return']).toBeNull();
+  });
 });
