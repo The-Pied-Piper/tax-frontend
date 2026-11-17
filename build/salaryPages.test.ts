@@ -112,12 +112,15 @@ describe('salaryPages closeBundle', () => {
       '/ca-on/30000/',
       '/ca-on/35000/',
       '/forms/on428/',
+      '/forms/schedule-8/',
+      '/forms/t1-income/',
+      '/forms/t1-tax/',
       '/methodology/',
     ]);
 
     const sitemap = await readFile(join(root, 'dist', 'sitemap.xml'), 'utf8');
     const urls = sitemap.match(/<url>[\s\S]*?<\/url>/g) ?? [];
-    expect(urls).toHaveLength(8);
+    expect(urls).toHaveLength(11);
     for (const url of urls) {
       expect(url).toMatch(/<lastmod>\d{4}-\d{2}-\d{2}<\/lastmod>/);
     }
