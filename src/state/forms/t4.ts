@@ -33,7 +33,7 @@ export const t4: FormPageSpec = {
       heading: 'Pension plan payments',
       lines: 'Boxes 16, 16A and 26',
       paragraph:
-        'Box 16 shows what was taken off your pay for the Canada Pension Plan. It adds two parts together: a main part and an extra part. Box 16A shows the second, smaller pension plan payment, charged only on pay above the main limit; for most people it is blank. Box 26 shows the pay that pension plan payments are charged on. If box 26 is blank, use box 14. Two rates apply to the same pay: {rate} for the main part and {extraRate} for the extra part.',
+        'Box 16 shows what was taken off your pay for the Canada Pension Plan. It has two parts added together: a main part and an extra part. Box 16A shows a second, smaller payment. It only applies to pay above the main limit, so for most people it is blank. Box 26 shows the pay that pension plan payments are charged on. If box 26 is blank, use box 14. Two rates apply to the same pay: {rate} for the main part and {extraRate} for the extra part.',
       example:
         'Your pay is {earnings}. The first {exempt} of it is not charged, so {charged} is. {rate} of that is {main}, and {extraRate} of that is {extra}.',
       figures: {
@@ -69,7 +69,7 @@ export const t4: FormPageSpec = {
       heading: 'Income tax already taken off',
       lines: 'Line 43700',
       paragraph:
-        'Your employer takes some income tax off each paycheque and sends it to the government. The slip shows the total in the box called Income tax deducted. You copy it to line 43700 of your return. It counts as tax you already paid. Our calculator does not use it. Our number is the tax you owe for the whole year, not what your employer already took off. That is federal plus provincial tax, and it depends on the province you live in.',
+        'Your employer takes some income tax off each paycheque and sends it to the government. The slip shows the yearly total in the box called Income tax deducted. You copy it to line 43700 of your return, where it counts as tax you have already paid. Our calculator does not use it. Our number is the tax you owe for the whole year, not what your employer already took off. That is federal tax plus provincial tax, so it depends on which province you lived in on December 31.',
       example:
         'Take Ontario as the example. At this pay, the federal tax plus Ontario tax you owe for the year is {owed}.',
       figures: {

@@ -31,7 +31,9 @@ describe('t1-tax balance section copy', () => {
   });
 
   it('says tax already taken off pay is left out', () => {
-    expect(balance().paragraph).toMatch(/already taken off|already deducted/i);
+    expect(balance().paragraph).toMatch(
+      /already took off|already taken off|already deducted/i,
+    );
   });
 
   it('keeps sentences short', () => {
