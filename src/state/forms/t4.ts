@@ -30,9 +30,9 @@ export const t4: FormPageSpec = {
     {
       id: 'pension',
       heading: 'Pension plan payments',
-      lines: 'Boxes 16 and 26',
+      lines: 'Boxes 16, 16A and 26',
       paragraph:
-        'Box 16 shows what was taken off your pay for the Canada Pension Plan. It adds two parts together: a main part and an extra part. Box 26 shows the pay that pension plan payments are charged on. If box 26 is blank, use box 14. Two rates apply to the same pay: {rate} for the main part and {extraRate} for the extra part.',
+        'Box 16 shows what was taken off your pay for the Canada Pension Plan. It adds two parts together: a main part and an extra part. Box 16A shows the second, smaller pension plan payment, charged only on pay above the main limit; for most people it is blank. Box 26 shows the pay that pension plan payments are charged on. If box 26 is blank, use box 14. Two rates apply to the same pay: {rate} for the main part and {extraRate} for the extra part.',
       example:
         'Your pay is {earnings}. The first {exempt} of it is not charged, so {charged} is. {rate} of that is {main}, and {extraRate} of that is {extra}.',
       figures: {
