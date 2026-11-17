@@ -85,3 +85,156 @@ describe('on428 total section copy', () => {
     expect(longestSentence(paragraph)).toBeLessThanOrEqual(40);
   });
 });
+
+function words(pageId: string, sectionId: string): string {
+  const { paragraph, example } = section(pageId, sectionId);
+  return `${paragraph} ${example}`;
+}
+
+function body(pageId: string): string {
+  return page(pageId)
+    .sections.map((s) => `${s.paragraph} ${s.example}`)
+    .join(' ');
+}
+
+describe('bc479 copy', () => {
+  it('says it counts only the sales tax credit', () => {
+    expect(body('bc479')).toMatch(
+      /(count|use|include|add)\w*[^.]*\b(only|just)\b[^.]*sales tax credit|\b(only|just) the sales tax credit/i,
+    );
+  });
+
+  it.each([
+    ["renter's", /renter/i],
+    ['home renovation', /home renovation/i],
+    ['venture capital', /venture capital/i],
+    ['mining exploration', /mining exploration/i],
+    ['clean buildings', /clean buildings/i],
+    ['training', /\btraining\b/i],
+  ])('names the %s credit as left out', (_name, pattern) => {
+    expect(body('bc479')).toMatch(pattern);
+  });
+
+  it('no longer calls the sales tax credit the main one', () => {
+    expect(page('bc479').intro).not.toMatch(/main one/i);
+    expect(body('bc479')).not.toMatch(/the main one/i);
+  });
+
+  it('says the total goes to line 47900', () => {
+    expect(words('bc479', 'total')).toMatch(/47900/);
+  });
+});
+
+describe('t2204 copy', () => {
+  it('says in the intro that a refund needs more than $1', () => {
+    expect(page('t2204').intro).toMatch(/more than \$1\b/);
+  });
+
+  it('says in the refund section that a refund needs more than $1', () => {
+    expect(words('t2204', 'refund')).toMatch(/more than \$1\b/);
+  });
+
+  it('does not say the form takes $2,000 off', () => {
+    expect(body('t2204')).not.toMatch(/takes? \$2,000 off/i);
+  });
+
+  it('says pay under the exempt amount is entered as zero', () => {
+    expect(words('t2204', 'earnings')).toMatch(
+      /under[^.]*(zero|\$0)|(zero|\$0)[^.]*under/i,
+    );
+  });
+
+  it('limits the zero rule to employer pay, not self-employment', () => {
+    expect(words('t2204', 'earnings')).toMatch(
+      /under[^.]*(self-employ|only (work|earn)|employer)[^.]*\.|(self-employ|only (work|earn)|employer)[^.]*under/i,
+    );
+  });
+
+  it('never lets pay less the exempt amount go below zero', () => {
+    expect(words('t2204', 'earnings')).toMatch(/never below zero/i);
+  });
+
+  it('uses the amount for the refund and the EI credit', () => {
+    const text = words('t2204', 'earnings');
+    expect(text).toMatch(/refund/i);
+    expect(text).toMatch(/credit/i);
+  });
+
+  it('sends line 16 to the EI credit lines and the provincial form', () => {
+    const text = body('t2204');
+    expect(text).toMatch(/line 16/i);
+    expect(text).toMatch(/31200/);
+    expect(text).toMatch(/58300/);
+    expect(text).toMatch(/provincial/i);
+  });
+});
+
+describe('schedule-6 copy', () => {
+  const text = () => body('schedule-6');
+
+  it('says the amounts are for a single person', () => {
+    expect(text()).toMatch(/single person/i);
+  });
+
+  it('says a spouse gives other amounts', () => {
+    expect(text()).toMatch(/spouse/i);
+  });
+
+  it('says full-time students cannot claim, after 13 weeks', () => {
+    expect(text()).toMatch(/full-time student/i);
+    expect(text()).toMatch(/13 weeks/i);
+  });
+
+  it('says prisoners of 90 days or more cannot claim', () => {
+    expect(text()).toMatch(/prison/i);
+    expect(text()).toMatch(/90 days/i);
+  });
+
+  it('says diplomats cannot claim', () => {
+    expect(text()).toMatch(/diplomat/i);
+  });
+
+  it('names the eligible dependant and December 31', () => {
+    expect(text()).toMatch(/eligible dependant/i);
+    expect(text()).toMatch(/under 19/i);
+    expect(text()).toMatch(/December 31/);
+  });
+
+  it('says the dependant was not eligible for the benefit themselves', () => {
+    expect(text()).toMatch(
+      /(not eligible|isn't eligible|was not|were not)[^.]*(benefit|CWB)|(benefit|CWB)[^.]*(not eligible|isn't eligible|was not|were not)/i,
+    );
+  });
+
+  it('says the dependant is a child of yours or your spouse', () => {
+    expect(text()).toMatch(/your (spouse|partner)/i);
+  });
+
+  it('names an eligible spouse', () => {
+    expect(text()).toMatch(/eligible spouse/i);
+  });
+
+  it('sends the benefit to line 45300, even with no tax owed', () => {
+    expect(text()).toMatch(/45300/);
+    expect(text()).toMatch(/even if you owe no (income )?tax/i);
+  });
+});
+
+describe('on428-a copy', () => {
+  it('says the amounts are for a single person', () => {
+    expect(body('on428-a')).toMatch(/single person/i);
+  });
+
+  it('says a spouse gives other amounts', () => {
+    expect(body('on428-a')).toMatch(/spouse/i);
+  });
+
+  it('sends the result to line 85 of the ON428', () => {
+    expect(body('on428-a')).toMatch(/ON428/);
+    expect(body('on428-a')).toMatch(/line 85/i);
+  });
+
+  it('does not mention children', () => {
+    expect(body('on428-a')).not.toMatch(/child/i);
+  });
+});
