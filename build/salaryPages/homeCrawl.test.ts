@@ -7,6 +7,7 @@ import {
   template,
   tmpDirs,
   withAlberta,
+  withAlbertaAndBc,
 } from '../../src/test/generatedSite';
 import {
   fileFor,
@@ -40,7 +41,10 @@ const SLOW_TEST_MS = 20_000;
 const outDir = tmpDirs('salary-home-crawl');
 
 async function build(
-  options: { list?: 'alberta' | 'none'; withHubs?: boolean } = {},
+  options: {
+    list?: 'alberta' | 'alberta-bc' | 'none';
+    withHubs?: boolean;
+  } = {},
 ) {
   const dir = outDir();
   writeFileSync(join(dir, 'index.html'), template);
@@ -48,9 +52,11 @@ async function build(
     fetch: fakeFetch(
       options.list === 'alberta'
         ? withAlberta
-        : options.list === 'none'
-          ? { jurisdictions: [] }
-          : undefined,
+        : options.list === 'alberta-bc'
+          ? withAlbertaAndBc
+          : options.list === 'none'
+            ? { jurisdictions: [] }
+            : undefined,
     ),
     baseUrl: apiBaseUrl,
     provinces,
@@ -194,7 +200,7 @@ describe('crawl from the built home page', () => {
   it(
     'has no broken link on any written page, the home page and the footers included',
     async () => {
-      const { dir, written } = await build({ list: 'alberta' });
+      const { dir, written } = await build({ list: 'alberta-bc' });
       const links = internalLinks(dir, ['index.html', ...written]);
       expect(links.filter((l) => l.file === 'index.html')).toHaveLength(4);
       for (const { file, target } of links) {
