@@ -108,7 +108,7 @@ export const strings = {
       year: number,
       takeHome: string,
     ) =>
-      `On a ${salary} salary in ${place} in ${String(year)}, you take home about ${takeHome} a year after income tax, pension plan and Employment Insurance.`,
+      `On a ${salary} salary in ${place} in ${String(year)}, you take home an estimated ${takeHome} a year after income tax, pension plan and Employment Insurance.`,
     heading: (salary: string, place: string, year: number) =>
       `${salary} After Tax in ${place} (${String(year)} Take-Home Pay)`,
     paragraph: (
