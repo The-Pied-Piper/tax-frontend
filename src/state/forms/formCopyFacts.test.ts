@@ -186,9 +186,12 @@ describe('t2204 copy', () => {
     expect(paragraph).not.toMatch(/set most/i);
   });
 
-  it('says there is no refund when nothing was overpaid', () => {
+  it('says there may still be a refund when nothing was overpaid, pointing to the first section', () => {
     const { paragraph } = section('t2204', 'refund');
-    expect(paragraph).toMatch(/there is no refund/i);
+    expect(paragraph).toMatch(
+      /there may still be a refund, as the first section explains/i,
+    );
+    expect(paragraph).not.toMatch(/there is no refund/i);
   });
 
   it('says line 16 is a different amount, the EI credit figure', () => {

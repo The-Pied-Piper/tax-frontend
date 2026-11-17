@@ -49,7 +49,7 @@ export const t2204: FormPageSpec = {
       heading: 'Your EI refund',
       lines: 'Lines 13–16',
       paragraph:
-        'If your employer took off more than the most you owe, the extra is an overpayment, and it comes back to you as a refund. If not, there is no refund. A refund is only paid if the overpayment is more than $1. Line 16 is a different amount. It is the EI credit figure, the smallest of three amounts on the form, and it goes onto line 31200 of your return and line 58300 of your provincial form.',
+        'If your employer took off more than the most you owe, the extra is an overpayment, and it comes back to you as a refund. If not, there may still be a refund, as the first section explains. A refund is only paid if the overpayment is more than $1. Line 16 is a different amount. It is the EI credit figure, the smallest of three amounts on the form, and it goes onto line 31200 of your return and line 58300 of your provincial form.',
       example:
         'Your employer took off {taken}. The most you owe is {most}. The difference, your overpayment, is {extra}.',
       figures: {
