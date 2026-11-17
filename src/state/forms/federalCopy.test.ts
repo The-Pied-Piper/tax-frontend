@@ -135,7 +135,7 @@ describe('t1-income taxable-income copy', () => {
   const { paragraph } = section('t1-income', 'taxable-income');
 
   it('says your federal tax and your provincial tax', () => {
-    expect(paragraph).toContain('your federal tax and your provincial tax');
+    expect(paragraph).toContain('Your federal tax and your provincial tax');
   });
 
   it('does not say Ontario tax', () => {
@@ -160,5 +160,67 @@ describe('t4 tax-deducted copy', () => {
     expect(example).toContain(
       'federal tax plus Ontario tax you owe for the year is {owed}',
     );
+  });
+});
+
+describe('ticket 191 federal form wording', () => {
+  it('t4 pension paragraph', () => {
+    expect(section('t4', 'pension').paragraph).toBe(
+      'Box 16 shows what was taken off your pay for the Canada Pension Plan. It has two parts added together: a main part and an extra part. Box 16A shows a second, smaller payment. It only applies to pay above the main limit, so for most people it is blank. Box 26 shows the pay that pension plan payments are charged on. If box 26 is blank, use box 14. Two rates apply to the same pay: {rate} for the main part and {extraRate} for the extra part.',
+    );
+  });
+
+  it('t4 tax-deducted paragraph', () => {
+    expect(section('t4', 'tax-deducted').paragraph).toBe(
+      'Your employer takes some income tax off each paycheque and sends it to the government. The slip shows the yearly total in the box called Income tax deducted. You copy it to line 43700 of your return, where it counts as tax you have already paid. Our calculator does not use it. Our number is the tax you owe for the whole year, not what your employer already took off. That is federal tax plus provincial tax, so it depends on which province you lived in on December 31.',
+    );
+  });
+
+  it('t1-income total-income paragraph and example', () => {
+    const { paragraph, example } = section('t1-income', 'total-income');
+    expect(paragraph).toBe(
+      'Total income is all the income you report for the year. For someone with only a salary, that is your pay. Your pay from your job goes on one line. Other work income goes on another. The form adds them together.',
+    );
+    expect(example).toBe(
+      'Your pay plus other work income is {total}. Of that, {other} is other work income. Total income: {total}.',
+    );
+  });
+
+  it('t1-income taxable-income paragraph', () => {
+    expect(section('t1-income', 'taxable-income').paragraph).toBe(
+      'Some people take off a few more amounts at this step. What is left is your taxable income, and it cannot be below zero. Your federal tax and your provincial tax are both worked out from it.',
+    );
+  });
+
+  it('t1-tax federal-tax paragraph', () => {
+    expect(section('t1-tax', 'federal-tax').paragraph).toBe(
+      "Federal tax is charged in slices of income, called brackets, each with its own rate. The form finds the top slice your income reaches. It adds up the tax on all the slices below that one, then charges the top slice's rate on the rest of your income.",
+    );
+  });
+
+  it('t1-tax credits paragraph', () => {
+    expect(section('t1-tax', 'credits').paragraph).toBe(
+      'A credit lowers your tax bill. The form starts with a list of amounts: the basic personal amount that everyone gets (it shrinks at high incomes), the base part of your pension plan payments, your Employment Insurance (EI) payments, and the Canada employment amount. That last one is a set amount, or your job income if that is less. The form adds them up and takes {rate} of the total. That is your discount.',
+    );
+  });
+
+  it('t1-tax balance paragraph', () => {
+    expect(section('t1-tax', 'balance').paragraph).toBe(
+      'Line 43500 mainly adds your federal tax and your provincial tax. That gives your total payable. The last step, line 167, takes away your total credits (line 48200) to show whether you owe money or get a refund. This page stops before that step. One of those credits is the tax your employer already took off your pay during the year (line 43700). We leave it out and count only the other credits.',
+    );
+  });
+
+  it('schedule-8 second-contribution paragraph and higher figure', () => {
+    const { paragraph, figures } = section('schedule-8', 'second-contribution');
+    expect(paragraph).toBe(
+      'Pay above the first limit of {limit}, up to the higher limit of {higher}, is charged a second payment at {rate}. Pay above the higher limit is not charged. If your pay is under the first limit, there is nothing to pay here.',
+    );
+    expect(figures.higher).toEqual({
+      shown: '$81,200',
+      trace: {
+        form: 'ca/schedule_8',
+        label: 'cpp_additional_maximum_pensionable_earnings',
+      },
+    });
   });
 });
