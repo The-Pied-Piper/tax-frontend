@@ -11,9 +11,12 @@ import {
   type ComputeTakeHomeCalculationResponse,
   type ListJurisdictionsResponse,
 } from '../api';
+import { displayWholeMoney } from '../money/format';
 import type { PayPeriod } from '../money/payPeriod';
 import { languageCode } from '../strings';
+import { salaryBreadcrumb, type BreadcrumbTrail } from './breadcrumbs';
 import { pickDefaultYear } from './defaultYear';
+import { salaryPageText } from './salaryPageText';
 import { describeFailure } from './failure';
 import { placeOptions, type PlaceOption } from './places';
 import { checkSalary, type SalaryCheck } from './salary';
@@ -96,10 +99,18 @@ export type SalaryPageData = {
   links?: SalaryPageLinks;
 };
 
+/** What a pre-built page was built with: its heading and trail, kept through every calculation so they match its address. */
+export type BuiltWith = {
+  heading: string;
+  /** Null when the page came without the links that make a trail. */
+  crumb: BreadcrumbTrail | null;
+};
+
 type Seed = {
   jurisdictionsState: JurisdictionsState;
   values: FormValues;
   request: RequestState;
+  built: BuiltWith;
 };
 
 /** The state a pre-built page starts in, or null if its answer cannot be read. */
@@ -137,6 +148,20 @@ function seedFrom(
         response: data.response,
         adapted,
         links: data.links,
+      },
+      built: {
+        heading: salaryPageText(
+          data.response,
+          data.jurisdictions.find((j) => j.code === data.jurisdictionCode)
+            ?.name ?? data.jurisdictionCode,
+          data.year,
+        ).heading,
+        crumb: data.links
+          ? salaryBreadcrumb(
+              data.links.hub,
+              displayWholeMoney(data.response.salary, 'annually', adapted.unit),
+            )
+          : null,
       },
     };
   } catch {
@@ -285,6 +310,7 @@ export function useTakeHome(
     values,
     salaryCheck,
     request,
+    built: seed?.built ?? null,
     payPeriod,
     setPayPeriod,
     setJurisdictionCode,

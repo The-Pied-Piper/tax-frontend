@@ -65,7 +65,7 @@ describe('App links on a pre-built salary page', () => {
       expect(nearby()).not.toBeInTheDocument();
       expect(document.querySelector('.page-summary')).toBeInTheDocument();
       expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent(
-        /After Tax in Ontario/,
+        /^\$70,000 After Tax in Ontario/,
       );
     },
   );

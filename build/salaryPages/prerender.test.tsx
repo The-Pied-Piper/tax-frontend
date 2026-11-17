@@ -159,7 +159,7 @@ describe('the h1 and paragraph of a salary page', () => {
     expect(screen.getAllByRole('heading', { level: 1 })).toHaveLength(1);
   });
 
-  it('follows the answer when the salary is changed in place', async () => {
+  it('writes the paragraph again, and keeps the heading, when the salary is changed in place', async () => {
     const before = pageMeta(dataFor(compute70000, '70000'));
     const client = createApiClient({
       baseUrl: 'https://api.test',
@@ -186,14 +186,15 @@ describe('the h1 and paragraph of a salary page', () => {
       screen.getByRole('button', { name: strings.form.calculate }),
     );
     await waitFor(() => {
-      expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent(
-        /^\$30,000 After Tax in Ontario/,
+      expect(document.querySelector('.page-summary')).toHaveTextContent(
+        /^On a salary of \$30,000 in Ontario/,
       );
     });
-    expect(screen.getAllByRole('heading', { level: 1 })).toHaveLength(1);
     expect(screen.queryByText(before.paragraph)).not.toBeInTheDocument();
-    expect(document.querySelector('.page-summary')).toHaveTextContent(
-      /^On a salary of \$30,000 in Ontario/,
+    // The heading stays the one the page was built with, like its address.
+    expect(screen.getAllByRole('heading', { level: 1 })).toHaveLength(1);
+    expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent(
+      before.heading,
     );
   });
 });
@@ -318,9 +319,9 @@ describe('salary links in the static page and the mounted page (#81)', () => {
       screen.getByRole('button', { name: strings.form.calculate }),
     );
     await waitFor(() => {
-      expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent(
-        /^\$30,000 After Tax in Ontario/,
-      );
+      expect(
+        screen.queryByRole('navigation', { name: strings.salaryLinks.label }),
+      ).not.toBeInTheDocument();
     });
     expect(
       screen.queryByRole('navigation', { name: strings.salaryLinks.label }),
@@ -491,7 +492,7 @@ describe('breadcrumb and learn-more links in the static page (#150)', () => {
     expect(learnMore().outerHTML).toBe(staticMore);
   });
 
-  it('shows the breadcrumb and Learn more nav only while the answer is the one the page was built with', async () => {
+  it('keeps the breadcrumb and drops the Learn more nav once another salary is calculated', async () => {
     const client = createApiClient({
       baseUrl: 'https://api.test',
       fetch: (input) => {
@@ -523,11 +524,14 @@ describe('breadcrumb and learn-more links in the static page (#150)', () => {
     );
     await waitFor(() => {
       expect(
-        screen.queryByRole('navigation', { name: strings.siteNav.breadcrumb }),
+        screen.queryByRole('navigation', { name: /learn more/i }),
       ).not.toBeInTheDocument();
     });
-    expect(
-      screen.queryByRole('navigation', { name: /learn more/i }),
-    ).not.toBeInTheDocument();
+    // The breadcrumb stays the one the page was built with, like its address.
+    expect(crumbs()).toBeInTheDocument();
+    expect(within(crumbs()).getByText('$70,000')).toHaveAttribute(
+      'aria-current',
+      'page',
+    );
   });
 });
