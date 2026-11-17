@@ -119,6 +119,7 @@ export function salaryPages(
           baseUrl,
           provinces,
           outDir,
+          published: new Set(contentPages.map((p) => p.slug)),
           template,
           render: renderSalaryApp,
           siteUrl,

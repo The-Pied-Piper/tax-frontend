@@ -1,3 +1,4 @@
+import { Breadcrumb } from './Breadcrumb';
 import styles from './ContentPage.module.css';
 import { FormSections } from './FormSections';
 import { SiteFooter } from './SiteFooter';
@@ -103,19 +104,16 @@ export function ContentPage({
             <ThemeToggle />
           </div>
         </header>
-        <nav aria-label={strings.siteNav.breadcrumb} className={styles.crumbs}>
-          <ol className={styles.crumbList}>
-            <li>
-              <a href={HOME_PATH}>{strings.siteNav.home}</a>
-            </li>
-            {trail.map((step) => (
-              <li key={step.slug}>
-                <a href={contentPath(step.slug)}>{step.label}</a>
-              </li>
-            ))}
-            <li aria-current="page">{heading}</li>
-          </ol>
-        </nav>
+        <Breadcrumb
+          steps={[
+            { label: strings.siteNav.home, href: HOME_PATH },
+            ...trail.map((step) => ({
+              label: step.label,
+              href: contentPath(step.slug),
+            })),
+          ]}
+          current={heading}
+        />
         {form && <FormSections {...form} />}
         {sections.map((section, at) => (
           <section key={at} className={styles.section}>

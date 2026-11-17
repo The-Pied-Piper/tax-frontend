@@ -53,6 +53,12 @@ function isLink(value: unknown): boolean {
   );
 }
 
+function isPageLink(value: unknown): boolean {
+  return (
+    isRecord(value) && typeof value.label === 'string' && isSitePath(value.href)
+  );
+}
+
 function isLinks(value: unknown): boolean {
   return (
     isRecord(value) &&
@@ -60,7 +66,10 @@ function isLinks(value: unknown): boolean {
     (value.previous === null || isLink(value.previous)) &&
     (value.next === null || isLink(value.next)) &&
     Array.isArray(value.others) &&
-    value.others.every(isLink)
+    value.others.every(isLink) &&
+    isPageLink(value.hub) &&
+    Array.isArray(value.learnMore) &&
+    value.learnMore.every(isPageLink)
   );
 }
 

@@ -1,3 +1,4 @@
+import { publishedSlugs } from '../../src/test/pageLinks';
 import { existsSync } from 'node:fs';
 import { join } from 'node:path';
 import compute70000 from '../../src/api/fixtures/compute-on-2026-70000.json';
@@ -21,6 +22,7 @@ const outDir = tmpDirs('salary-built');
 
 function run(dir: string, options: { all?: boolean; list?: unknown } = {}) {
   return generateSalaryPages({
+    published: publishedSlugs,
     fetch: fakeFetch(options.list ?? (options.all ? withXland : undefined)),
     baseUrl: apiBaseUrl,
     provinces: options.all ? [...provinces, xland] : provinces,
@@ -68,6 +70,7 @@ describe('generateSalaryPages: built', () => {
 
   it('has no entry for a listed province the API does not return', async () => {
     const result = await generateSalaryPages({
+      published: publishedSlugs,
       fetch: fakeFetch(),
       baseUrl: apiBaseUrl,
       provinces: [...provinces.filter((p) => p.code === 'CA-ON'), xland],
@@ -82,6 +85,7 @@ describe('generateSalaryPages: built', () => {
 
   it('has no entries when no listed province is returned', async () => {
     const result = await generateSalaryPages({
+      published: publishedSlugs,
       fetch: fakeFetch({ jurisdictions: [] }),
       baseUrl: apiBaseUrl,
       provinces,

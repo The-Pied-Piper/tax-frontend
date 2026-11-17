@@ -57,12 +57,19 @@ export type FormValues = {
 /** One link to another pre-built page: the yearly salary it is for and its address. */
 export type SalaryPageLink = { salary: string; href: string };
 
+/** A link to a page of this site, with the words it is shown as. */
+export type PageLink = { label: string; href: string };
+
 /** The links of a pre-built page: its neighbours, the calculator and other pages. */
 export type SalaryPageLinks = {
   calculator: string;
   previous: SalaryPageLink | null;
   next: SalaryPageLink | null;
   others: SalaryPageLink[];
+  /** The province's hub page: the middle step of the breadcrumb. */
+  hub: PageLink;
+  /** The "Learn more" links: the hub, the methodology page and the main form page, when they exist. */
+  learnMore: PageLink[];
 };
 
 /** What a pre-built salary page carries so React can start where it left off. */

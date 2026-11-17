@@ -15,6 +15,7 @@ import fixture30000 from '../../src/api/fixtures/compute-on-2026-30000.json';
 import fixture70000 from '../../src/api/fixtures/compute-on-2026-70000.json';
 import fixture150000 from '../../src/api/fixtures/compute-on-2026-150000.json';
 import jurisdictions from '../../src/api/fixtures/jurisdictions.json';
+import { bareLinks, ontarioTargets } from '../../src/test/pageLinks';
 import { strings } from '../../src/strings';
 import type { SalaryPageData } from '../../src/state/useTakeHome';
 
@@ -33,7 +34,7 @@ function dataFor(
     year: 2026,
     salary,
     // Only a pre-built page, which carries its links, shows the summary.
-    links: { calculator: '/', previous: null, next: null, others: [] },
+    links: bareLinks,
   };
 }
 
@@ -201,7 +202,10 @@ describe('salary links in the static page and the mounted page (#81)', () => {
     links: undefined,
   };
   const links = salaryLinks('ca-on', ['65000', '70000', '75000'], '70000');
-  const withLinks: SalaryPageData = { ...base, links };
+  const withLinks: SalaryPageData = {
+    ...base,
+    links: { ...links, ...ontarioTargets },
+  };
 
   it('puts the nav with its links in the static HTML', () => {
     show(withLinks);
@@ -299,5 +303,136 @@ describe('renderContentPage', () => {
     expect(page.querySelector('#content-theme-toggle')).not.toBeNull();
     expect(page.querySelector('footer a[href="/methodology/"]')).not.toBeNull();
     expect(page.querySelector('footer')?.textContent).toContain(strings.footer);
+  });
+});
+
+describe('breadcrumb and learn-more links in the static page (#150)', () => {
+  const links = {
+    ...salaryLinks('ca-on', ['65000', '70000', '75000'], '70000'),
+    ...ontarioTargets,
+  };
+  const withLinks: SalaryPageData = {
+    ...dataFor(compute70000, '70000'),
+    links,
+  };
+  const crumbs = () =>
+    screen.getByRole('navigation', { name: strings.siteNav.breadcrumb });
+  const learnMore = () =>
+    screen.getByRole('navigation', { name: /learn more about this estimate/i });
+
+  it('has the breadcrumb Calculator / Ontario / $70,000 in the HTML, with no script run', () => {
+    show(withLinks);
+    const nav = crumbs();
+    expect(within(nav).getByRole('list').tagName).toBe('OL');
+    expect(
+      within(nav)
+        .getAllByRole('link')
+        .map((a) => [a.textContent, a.getAttribute('href')]),
+    ).toEqual([
+      ['Calculator', '/'],
+      ['Ontario', '/ca-on/'],
+    ]);
+    const current = within(nav).getByText('$70,000');
+    expect(current).toHaveAttribute('aria-current', 'page');
+    expect(current.closest('a')).toBeNull();
+  });
+
+  it('puts the breadcrumb above the h1', () => {
+    show(withLinks);
+    const h1 = screen.getByRole('heading', { level: 1 });
+    expect(
+      crumbs().compareDocumentPosition(h1) & Node.DOCUMENT_POSITION_FOLLOWING,
+    ).toBeTruthy();
+  });
+
+  it('has a Learn more nav with the hub, methodology and form links in the HTML', () => {
+    show(withLinks);
+    const nav = learnMore();
+    expect(nav).toHaveTextContent(/learn more about this estimate/i);
+    expect(
+      within(nav)
+        .getAllByRole('link')
+        .map((a) => [a.textContent, a.getAttribute('href')]),
+    ).toEqual(ontarioTargets.learnMore.map((l) => [l.label, l.href]));
+  });
+
+  it('puts the Learn more nav after the neighbour links', () => {
+    show(withLinks);
+    const neighbours = screen.getByRole('navigation', {
+      name: strings.salaryLinks.label,
+    });
+    expect(
+      neighbours.compareDocumentPosition(learnMore()) &
+        Node.DOCUMENT_POSITION_FOLLOWING,
+    ).toBeTruthy();
+  });
+
+  it('leaves the form link out when the data has none', () => {
+    show({
+      ...withLinks,
+      links: { ...links, learnMore: ontarioTargets.learnMore.slice(0, 2) },
+    });
+    expect(within(learnMore()).getAllByRole('link')).toHaveLength(2);
+    expect(document.body.innerHTML).not.toContain('/forms/');
+  });
+
+  it('has no breadcrumb and no Learn more nav on the calculator home (no links)', () => {
+    show({ ...withLinks, links: undefined });
+    expect(
+      screen.queryByRole('navigation', { name: strings.siteNav.breadcrumb }),
+    ).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole('navigation', { name: /learn more/i }),
+    ).not.toBeInTheDocument();
+  });
+
+  it('renders the same breadcrumb and Learn more nav when mounted from the same data', () => {
+    show(withLinks);
+    const staticCrumbs = crumbs().outerHTML;
+    const staticMore = learnMore().outerHTML;
+    document.body.innerHTML = '';
+    render(<App initial={withLinks} />);
+    expect(crumbs().outerHTML).toBe(staticCrumbs);
+    expect(learnMore().outerHTML).toBe(staticMore);
+  });
+
+  it('shows the breadcrumb and Learn more nav only while the answer is the one the page was built with', async () => {
+    const client = createApiClient({
+      baseUrl: 'https://api.test',
+      fetch: (input) => {
+        const url =
+          typeof input === 'string'
+            ? input
+            : input instanceof URL
+              ? input.href
+              : input.url;
+        return Promise.resolve(
+          url.endsWith('/jurisdictions')
+            ? Response.json(jurisdictions)
+            : Response.json(compute30000),
+        );
+      },
+    });
+    const user = userEvent.setup();
+    render(<App client={client} initial={withLinks} />);
+    expect(crumbs()).toBeInTheDocument();
+    await user.clear(
+      screen.getByRole('textbox', { name: strings.form.salary }),
+    );
+    await user.type(
+      screen.getByRole('textbox', { name: strings.form.salary }),
+      '30000',
+    );
+    await user.click(
+      screen.getByRole('button', { name: strings.form.calculate }),
+    );
+    await waitFor(() => {
+      expect(
+        screen.queryByRole('navigation', { name: strings.siteNav.breadcrumb }),
+      ).not.toBeInTheDocument();
+    });
+    expect(
+      screen.queryByRole('navigation', { name: /learn more/i }),
+    ).not.toBeInTheDocument();
   });
 });

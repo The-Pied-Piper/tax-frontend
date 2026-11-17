@@ -4,6 +4,7 @@ import { displayWholeMoney } from '../money/format';
 import { strings } from '../strings';
 import { compute70000 } from '../test/syntheticPages';
 import type { SalaryPageLinks } from '../state/useTakeHome';
+import { bareLinks, ontarioTargets } from '../test/pageLinks';
 import { SalaryLinks } from './SalaryLinks';
 
 const unit = readUnit(compute70000.unit) ?? strings.fallbackUnit;
@@ -19,6 +20,7 @@ const links: SalaryPageLinks = {
     { salary: '60000', href: '/ca-on/60000/' },
     { salary: '80000', href: '/ca-on/80000/' },
   ],
+  ...ontarioTargets,
 };
 
 function show(value: SalaryPageLinks) {
@@ -114,7 +116,7 @@ describe('SalaryLinks', () => {
   });
 
   it('omits the list when there are no other pages', () => {
-    show({ calculator: '/', previous: null, next: null, others: [] });
+    show(bareLinks);
     expect(screen.queryByRole('list')).not.toBeInTheDocument();
     expect(
       screen.getByRole('link', { name: strings.salaryLinks.calculator }),

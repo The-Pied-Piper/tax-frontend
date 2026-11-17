@@ -10,6 +10,7 @@ export const strings = {
   siteNav: {
     label: 'Site',
     breadcrumb: 'Breadcrumb',
+    calculator: 'Calculator',
     home: 'Home',
     methodology: 'How we calculate',
     provinces: 'Provinces:',
@@ -125,6 +126,10 @@ export const strings = {
     next: (amount: string) => `Next: ${amount}`,
     calculator: 'Back to the calculator',
     others: 'Other salaries',
+  },
+  learnMore: {
+    label: 'Learn more about this estimate',
+    form: (name: string) => `What is ${name}?`,
   },
   notices: {
     provisionalTitle: (year: number) =>

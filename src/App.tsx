@@ -2,16 +2,20 @@ import type { AdapterRegistry } from './adapters';
 import type { ApiClient } from './api';
 import { AdvancedView } from './components/AdvancedView';
 import { AnswerCard } from './components/AnswerCard';
+import { Breadcrumb } from './components/Breadcrumb';
 import { Breakdown } from './components/Breakdown';
 import { ErrorNotice } from './components/ErrorNotice';
+import { LearnMore } from './components/LearnMore';
 import { ProvisionalNotice } from './components/ProvisionalNotice';
 import { SalaryForm } from './components/SalaryForm';
 import { SalaryLinks } from './components/SalaryLinks';
 import { SiteFooter } from './components/SiteFooter';
 import { StarLink } from './components/StarLink';
 import { ThemeToggle } from './components/ThemeToggle';
+import { displayWholeMoney } from './money/format';
 import { salaryPageText } from './state/salaryPageText';
 import { useTakeHome, type SalaryPageData } from './state/useTakeHome';
+import { HOME_PATH } from './state/siteLinks';
 import { strings } from './strings';
 
 type Props = {
@@ -37,6 +41,19 @@ export function App({ client, registry, initial, clock }: Props) {
   return (
     <>
       <main>
+        {request.status === 'success' && request.links && (
+          <Breadcrumb
+            steps={[
+              { label: strings.siteNav.calculator, href: HOME_PATH },
+              request.links.hub,
+            ]}
+            current={displayWholeMoney(
+              request.response.salary,
+              'annually',
+              request.adapted.unit,
+            )}
+          />
+        )}
         <header className="page-header">
           <div className="page-header-text">
             <h1>{text ? text.heading : strings.title}</h1>
@@ -97,6 +114,9 @@ export function App({ client, registry, initial, clock }: Props) {
                 links={page.request.links}
                 unit={page.request.adapted.unit}
               />
+            )}
+            {page.request.links && (
+              <LearnMore links={page.request.links.learnMore} />
             )}
           </>
         )}

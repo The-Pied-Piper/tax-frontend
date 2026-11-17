@@ -1,3 +1,4 @@
+import { publishedSlugs } from '../../src/test/pageLinks';
 import { dollarSign } from '../../src/adapters/fallback';
 import { mkdtempSync, readFileSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
@@ -85,6 +86,7 @@ const answerBySalary: typeof fetch = (input, init) => {
 const outDir = mkdtempSync(join(tmpdir(), 'salary-figures-'));
 beforeAll(async () => {
   await generateSalaryPages({
+    published: publishedSlugs,
     fetch: answerBySalary,
     baseUrl,
     provinces: entries,
