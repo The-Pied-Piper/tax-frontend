@@ -86,10 +86,10 @@ export const ab428: FormPageSpec = {
     },
     {
       id: 'supplement',
-      heading: 'Extra credit for lower pay',
+      heading: 'Extra credit for large credits',
       lines: 'Line 74',
       paragraph:
-        'People on lower pay can get an extra credit. A short worksheet works it out. It takes your credit and takes away a set amount ({set}). If your credit is smaller than that, you get nothing extra. If it is bigger, you get {rate} of the difference.',
+        'If you claim a lot of credits, you can get an extra credit. A short worksheet works it out. It takes your credit and takes away a set amount ({set}). If your credit is smaller than that, you get nothing extra. If it is bigger, you get {rate} of the difference.',
       example:
         'Your credit is {credit}. That is less than {set}, so the difference is {difference} and the extra credit is {extra}.',
       figures: {
@@ -103,7 +103,7 @@ export const ab428: FormPageSpec = {
     {
       id: 'total',
       heading: 'Your Alberta tax',
-      lines: 'Line 75',
+      lines: 'Lines 73–75',
       paragraph:
         'The last line is your Alberta tax. It is your tax after credits, less the extra credit. It then goes onto your return.',
       example: '{after} less an extra credit of {extra} gives {total}.',
