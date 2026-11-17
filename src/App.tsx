@@ -53,8 +53,8 @@ export function App({ client, registry, initial, clock }: Props) {
   // under it and the form below. The calculator page has no answer yet, so its
   // form and note keep their old places. The order is fixed for the life of the
   // page, so the layout does not flip after Calculate. The heading and
-  // breadcrumb stay as the page was built (`page.built`); only the paragraph
-  // follows the new answer, and the links go.
+  // breadcrumb and links stay as the page was built (`page.built`); only the
+  // paragraph follows the new answer.
   const notice = shown?.response.provisional ? (
     <ProvisionalNotice year={shown.asked.year} />
   ) : null;
@@ -127,10 +127,10 @@ export function App({ client, registry, initial, clock }: Props) {
           answer
         )}
         {answerFirst && controls}
-        {shown?.links && (
+        {page.built?.links && (
           <>
-            <SalaryLinks links={shown.links} unit={shown.adapted.unit} />
-            <LearnMore links={shown.links.learnMore} />
+            <SalaryLinks links={page.built.links} unit={page.built.unit} />
+            <LearnMore links={page.built.links.learnMore} />
           </>
         )}
         <StarLink />

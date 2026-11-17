@@ -3,6 +3,7 @@ import {
   adapters,
   COMING_SOON,
   type AdaptedResult,
+  type Unit,
   type AdapterRegistry,
 } from '../adapters';
 import {
@@ -56,8 +57,6 @@ export type SuccessState = {
   };
   response: ComputeTakeHomeCalculationResponse;
   adapted: AdaptedResult;
-  /** Links of a pre-built page; set only by the seed, so a new calculation has none. */
-  links?: SalaryPageLinks;
 };
 
 export type FormValues = {
@@ -99,11 +98,15 @@ export type SalaryPageData = {
   links?: SalaryPageLinks;
 };
 
-/** What a pre-built page was built with: its heading and trail, kept through every calculation so they match its address. */
+/** What a pre-built page was built with: its heading, trail and links, kept through every calculation so they match its address. */
 export type BuiltWith = {
   heading: string;
   /** Null when the page came without the links that make a trail. */
   crumb: BreadcrumbTrail | null;
+  /** The page's links to other pages, or null when it came without. */
+  links: SalaryPageLinks | null;
+  /** The unit of the page's own answer, for the amounts in those links. */
+  unit: Unit;
 };
 
 type Seed = {
@@ -147,7 +150,6 @@ function seedFrom(
         },
         response: data.response,
         adapted,
-        links: data.links,
       },
       built: {
         heading: salaryPageText(
@@ -162,6 +164,8 @@ function seedFrom(
               displayWholeMoney(data.response.salary, 'annually', adapted.unit),
             )
           : null,
+        links: data.links ?? null,
+        unit: adapted.unit,
       },
     };
   } catch {

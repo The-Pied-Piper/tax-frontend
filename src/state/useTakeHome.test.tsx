@@ -88,47 +88,6 @@ describe('useTakeHome with an initial state (a pre-built salary page)', () => {
   });
 });
 
-// The seeded success state carries the page's links, and a new calculation drops them.
-describe('useTakeHome links of a pre-built page', () => {
-  const links = {
-    calculator: '/',
-    previous: { salary: '65000', href: '/ca-on/65000/', takeHome: '49976.45' },
-    next: { salary: '75000', href: '/ca-on/75000/', takeHome: '57611.80' },
-    others: [{ salary: '60000', href: '/ca-on/60000/', takeHome: '46000.10' }],
-    ...ontarioTargets,
-  };
-  const withLinks: SalaryPageData = { ...initial, links };
-
-  function linksOf(request: object): unknown {
-    return 'links' in request ? request.links : undefined;
-  }
-
-  it('carries the links of the data in the seeded success state', () => {
-    const { client } = fakeClient();
-    const { result } = renderHook(() =>
-      useTakeHome(client, undefined, withLinks),
-    );
-    expect(result.current.request.status).toBe('success');
-    expect(linksOf(result.current.request)).toEqual(links);
-  });
-
-  it('has no links in the success state after a new calculation', async () => {
-    const { client } = fakeClient();
-    const { result } = renderHook(() =>
-      useTakeHome(client, undefined, withLinks),
-    );
-    act(() => {
-      result.current.setSalary('80000');
-    });
-    await act(async () => {
-      result.current.submit();
-      await Promise.resolve();
-    });
-    expect(result.current.request.status).toBe('success');
-    expect(linksOf(result.current.request)).toBeUndefined();
-  });
-});
-
 // What the page was built with is kept for the life of the page.
 describe('useTakeHome built-with heading and breadcrumb', () => {
   const links = {
@@ -151,6 +110,19 @@ describe('useTakeHome built-with heading and breadcrumb', () => {
     expect(result.current.built?.crumb?.steps.at(-1)).toEqual(links.hub);
   });
 
+  it('has the links and the unit of the pre-built page', () => {
+    const { client } = fakeClient();
+    const { result } = renderHook(() =>
+      useTakeHome(client, undefined, { ...initial, links }),
+    );
+    expect(result.current.built?.links).toEqual(links);
+    expect(result.current.built?.unit).toEqual(
+      result.current.request.status === 'success'
+        ? result.current.request.adapted.unit
+        : undefined,
+    );
+  });
+
   it('has a heading but no trail when the page came without links', () => {
     const { client } = fakeClient();
     const { result } = renderHook(() =>
@@ -158,6 +130,7 @@ describe('useTakeHome built-with heading and breadcrumb', () => {
     );
     expect(result.current.built?.heading).toMatch(/^\$70,000 After Tax/);
     expect(result.current.built?.crumb).toBeNull();
+    expect(result.current.built?.links).toBeNull();
   });
 
   it('is unchanged by a new calculation', async () => {
