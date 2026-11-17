@@ -86,91 +86,116 @@ describe('on428 total section copy', () => {
   });
 });
 
-function words(pageId: string, sectionId: string): string {
-  const { paragraph, example } = section(pageId, sectionId);
-  return `${paragraph} ${example}`;
-}
-
-function body(pageId: string): string {
-  return page(pageId)
-    .sections.map((s) => `${s.paragraph} ${s.example}`)
-    .join(' ');
-}
-
 describe('bc479 copy', () => {
+  const text = () =>
+    page('bc479')
+      .sections.map((s) => `${s.paragraph} ${s.example}`)
+      .join(' ');
+
   it('says it counts only the sales tax credit', () => {
-    expect(body('bc479')).toMatch(
+    expect(text()).toMatch(
       /(count|use|include|add)\w*[^.]*\b(only|just)\b[^.]*sales tax credit|\b(only|just) the sales tax credit/i,
     );
   });
 
-  it.each([
-    ["renter's", /renter/i],
-    ['home renovation', /home renovation/i],
-    ['venture capital', /venture capital/i],
-    ['mining exploration', /mining exploration/i],
-    ['clean buildings', /clean buildings/i],
-    ['training', /\btraining\b/i],
-  ])('names the %s credit as left out', (_name, pattern) => {
-    expect(body('bc479')).toMatch(pattern);
+  it("names the renter's credit as left out", () => {
+    expect(text()).toMatch(/renter/i);
+  });
+
+  it('names the home renovation credit as left out', () => {
+    expect(text()).toMatch(/home renovation/i);
+  });
+
+  it('names the venture capital credit as left out', () => {
+    expect(text()).toMatch(/venture capital/i);
+  });
+
+  it('names the mining exploration credit as left out', () => {
+    expect(text()).toMatch(/mining exploration/i);
+  });
+
+  it('names the clean buildings credit as left out', () => {
+    expect(text()).toMatch(/clean buildings/i);
+  });
+
+  it('names the training credit as left out', () => {
+    expect(text()).toMatch(/\btraining\b/i);
   });
 
   it('no longer calls the sales tax credit the main one', () => {
     expect(page('bc479').intro).not.toMatch(/main one/i);
-    expect(body('bc479')).not.toMatch(/the main one/i);
+    expect(text()).not.toMatch(/the main one/i);
   });
 
   it('says the total goes to line 47900', () => {
-    expect(words('bc479', 'total')).toMatch(/47900/);
+    const { paragraph, example } = section('bc479', 'total');
+    expect(`${paragraph} ${example}`).toMatch(/47900/);
+  });
+
+  it('keeps sentences short', () => {
+    expect(longestSentence(text())).toBeLessThanOrEqual(40);
   });
 });
 
 describe('t2204 copy', () => {
+  const text = () =>
+    page('t2204')
+      .sections.map((s) => `${s.paragraph} ${s.example}`)
+      .join(' ');
+  const earnings = () => {
+    const { paragraph, example } = section('t2204', 'earnings');
+    return `${paragraph} ${example}`;
+  };
+
   it('says in the intro that a refund needs more than $1', () => {
     expect(page('t2204').intro).toMatch(/more than \$1\b/);
   });
 
   it('says in the refund section that a refund needs more than $1', () => {
-    expect(words('t2204', 'refund')).toMatch(/more than \$1\b/);
+    const { paragraph, example } = section('t2204', 'refund');
+    expect(`${paragraph} ${example}`).toMatch(/more than \$1\b/);
   });
 
   it('does not say the form takes $2,000 off', () => {
-    expect(body('t2204')).not.toMatch(/takes? \$2,000 off/i);
+    expect(text()).not.toMatch(/takes? \$2,000 off/i);
   });
 
   it('says pay under the exempt amount is entered as zero', () => {
-    expect(words('t2204', 'earnings')).toMatch(
-      /under[^.]*(zero|\$0)|(zero|\$0)[^.]*under/i,
-    );
+    expect(earnings()).toMatch(/under[^.]*(zero|\$0)|(zero|\$0)[^.]*under/i);
   });
 
   it('limits the zero rule to employer pay, not self-employment', () => {
-    expect(words('t2204', 'earnings')).toMatch(
+    expect(earnings()).toMatch(
       /under[^.]*(self-employ|only (work|earn)|employer)[^.]*\.|(self-employ|only (work|earn)|employer)[^.]*under/i,
     );
   });
 
   it('never lets pay less the exempt amount go below zero', () => {
-    expect(words('t2204', 'earnings')).toMatch(/never below zero/i);
+    expect(earnings()).toMatch(/never below zero/i);
   });
 
   it('uses the amount for the refund and the EI credit', () => {
-    const text = words('t2204', 'earnings');
-    expect(text).toMatch(/refund/i);
-    expect(text).toMatch(/credit/i);
+    expect(earnings()).toMatch(/refund/i);
+    expect(earnings()).toMatch(/credit/i);
   });
 
   it('sends line 16 to the EI credit lines and the provincial form', () => {
-    const text = body('t2204');
-    expect(text).toMatch(/line 16/i);
-    expect(text).toMatch(/31200/);
-    expect(text).toMatch(/58300/);
-    expect(text).toMatch(/provincial/i);
+    expect(text()).toMatch(/line 16/i);
+    expect(text()).toMatch(/31200/);
+    expect(text()).toMatch(/58300/);
+    expect(text()).toMatch(/provincial/i);
+  });
+
+  it('keeps sentences short', () => {
+    expect(longestSentence(text())).toBeLessThanOrEqual(40);
   });
 });
 
 describe('schedule-6 copy', () => {
-  const text = () => body('schedule-6');
+  const text = () =>
+    page('schedule-6')
+      .sections.map((s) => `${s.paragraph} ${s.example}`)
+      .join(' ');
 
   it('says the amounts are for a single person', () => {
     expect(text()).toMatch(/single person/i);
@@ -218,23 +243,36 @@ describe('schedule-6 copy', () => {
     expect(text()).toMatch(/45300/);
     expect(text()).toMatch(/even if you owe no (income )?tax/i);
   });
+
+  it('keeps sentences short', () => {
+    expect(longestSentence(text())).toBeLessThanOrEqual(40);
+  });
 });
 
 describe('on428-a copy', () => {
+  const text = () =>
+    page('on428-a')
+      .sections.map((s) => `${s.paragraph} ${s.example}`)
+      .join(' ');
+
   it('says the amounts are for a single person', () => {
-    expect(body('on428-a')).toMatch(/single person/i);
+    expect(text()).toMatch(/single person/i);
   });
 
   it('says a spouse gives other amounts', () => {
-    expect(body('on428-a')).toMatch(/spouse/i);
+    expect(text()).toMatch(/spouse/i);
   });
 
   it('sends the result to line 85 of the ON428', () => {
-    expect(body('on428-a')).toMatch(/ON428/);
-    expect(body('on428-a')).toMatch(/line 85/i);
+    expect(text()).toMatch(/ON428/);
+    expect(text()).toMatch(/line 85/i);
   });
 
   it('does not mention children', () => {
-    expect(body('on428-a')).not.toMatch(/child/i);
+    expect(text()).not.toMatch(/child/i);
+  });
+
+  it('keeps sentences short', () => {
+    expect(longestSentence(text())).toBeLessThanOrEqual(40);
   });
 });
