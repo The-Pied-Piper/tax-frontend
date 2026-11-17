@@ -1,4 +1,4 @@
-import { render, screen, waitFor } from '@testing-library/react';
+import { render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { App } from './App';
 import type { ApiClient } from './api';
@@ -12,9 +12,9 @@ import jurisdictions from './api/fixtures/jurisdictions.json';
 // `initial.response`.
 const links = {
   calculator: '/',
-  previous: { salary: '65000', href: '/ca-on/65000/' },
-  next: { salary: '75000', href: '/ca-on/75000/' },
-  others: [],
+  previous: { salary: '65000', href: '/ca-on/65000/', takeHome: '49976.45' },
+  next: { salary: '75000', href: '/ca-on/75000/', takeHome: '57611.80' },
+  others: [{ salary: '80000', href: '/ca-on/80000/', takeHome: '61430.05' }],
   ...ontarioTargets,
 };
 const seeded = { ...pageData(compute70000, '70000'), links };
@@ -69,6 +69,26 @@ describe('App links on a pre-built salary page', () => {
       );
     },
   );
+});
+
+describe('App take-home figures on the links of a pre-built salary page', () => {
+  it('shows each linked page its own take-home, as the data block carries it', () => {
+    render(<App client={sameObjectClient()} initial={seeded} />);
+    const nav = pageLinks() as HTMLElement;
+    const text = nav.textContent;
+    expect(text).toContain('$49,976.45');
+    expect(text).toContain('$57,611.80');
+    expect(text).toContain('$61,430.05');
+    expect(
+      within(nav).getByRole('link', { name: /^Previous: \$65,000/ }),
+    ).toHaveAttribute('href', '/ca-on/65000/');
+    expect(
+      within(nav).getByRole('link', { name: /^Next: \$75,000/ }),
+    ).toHaveAttribute('href', '/ca-on/75000/');
+    expect(
+      within(nav).getByRole('link', { name: /^\$80,000/ }),
+    ).toHaveAttribute('href', '/ca-on/80000/');
+  });
 });
 
 describe('App summary on a pre-built salary page', () => {

@@ -125,8 +125,12 @@ export const strings = {
   // Navigation between the pre-built salary pages; amounts come from displayMoney.
   salaryLinks: {
     label: 'More salaries',
-    previous: (amount: string) => `Previous: ${amount}`,
-    next: (amount: string) => `Next: ${amount}`,
+    previous: (salary: string, takeHome: string) =>
+      `Previous: ${salary}, you keep ${takeHome}`,
+    next: (salary: string, takeHome: string) =>
+      `Next: ${salary}, you keep ${takeHome}`,
+    other: (salary: string, takeHome: string) =>
+      `${salary}, you keep ${takeHome}`,
     calculator: 'Back to the calculator',
     others: 'Other salaries',
   },
