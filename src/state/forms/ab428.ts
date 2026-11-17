@@ -22,9 +22,9 @@ export const ab428: FormPageSpec = {
       heading: 'Your taxable income',
       lines: 'Line 1',
       paragraph:
-        'Taxable income is the part of your pay that tax is charged on. This form does not work it out. It copies the number from the federal part of your return. Some things are taken off first, like part of your pension plan payments.',
+        'Taxable income is the part of your income that tax is charged on. This form does not work it out. It copies the number from the federal part of your return. Some things are taken off first, like part of your pension plan payments.',
       example:
-        'Taxable income is {income}, because {taken}, the extra part of your pension plan payments, is taken off first.',
+        '{taken}, the extra part of your pension plan payments, is taken off first. That leaves a taxable income of {income}.',
       figures: {
         income: result('$69,335', 'ab428_taxable_income_line_1'),
         taken: result(
@@ -39,9 +39,9 @@ export const ab428: FormPageSpec = {
       heading: 'Tax on your income, slice by slice',
       lines: 'Lines 3–8',
       paragraph:
-        'Alberta does not tax all of your income at one rate. It cuts your income into slices, called brackets, and each slice has its own rate. The form finds the highest slice your income reaches, adds the tax on all the slices below it, then charges that slice’s rate on the rest.',
+        "Alberta does not tax all of your income at one rate. It cuts your income into slices, called brackets, and each slice has its own rate. The form finds the top slice your income reaches. It adds up the tax on all the slices below that one, then charges the top slice's rate on the rest of your income.",
       example:
-        'Your income reaches the slice that starts at {start}, taxed at {rate}. The slices below it come to {below}. The {above} above {start} adds {added}. Alberta tax on your income: {tax}.',
+        'Your income reaches the slice that starts at {start}. That slice is taxed at {rate}. The tax on the slices below it comes to {below}. The {above} of your income above {start} adds {added}. Alberta tax before credits: {tax}.',
       figures: {
         start: result('$60,000', 'ab428_bracket_lower_bound_line_3'),
         rate: result('10%', 'ab428_bracket_rate_line_5'),
@@ -56,7 +56,7 @@ export const ab428: FormPageSpec = {
       heading: 'Credits that lower your tax',
       lines: 'Lines 16–58',
       paragraph:
-        'A credit is a discount on your tax bill. Everyone gets a basic personal amount ({basic} in 2025). You also get credit for the main part of your pension plan payments and for your EI payments. The form adds these amounts up, then takes {rate} of the total. That is your discount.',
+        'A credit lowers your tax bill. The form starts with a list of amounts: the basic personal amount that everyone gets ({basic} in 2025), the main part of your pension plan payments, and your EI payments. It adds them up, then takes {rate} of the total. That is your discount.',
       example:
         'The basic amount, {cpp} for the main part of your pension plan payments and {ei} of EI payments add up to {total}. {rate} of that is {discount}.',
       figures: {
@@ -89,7 +89,7 @@ export const ab428: FormPageSpec = {
       heading: 'Alberta supplemental tax credit',
       lines: 'Line 74',
       paragraph:
-        'If you claim a lot of credits, you can get an extra credit. A short worksheet works it out. It takes your credit and takes away a set amount ({set}). If your credit is smaller than that, you get nothing extra. If it is bigger, you get {rate} of the difference. The credit total this worksheet uses leaves out your tuition amount. Line 2 of the printed worksheet takes the unused tuition amount off first.',
+        'If your credits are large, you can get an extra credit. A short worksheet works it out. It starts with the amounts added up earlier on the form and takes off any unused tuition amount. It then works out the credit on what is left, the same way the form did before. Credits for gifts to charity are not counted. The worksheet takes away a set amount ({set}). If your credit is less than that, you get nothing extra. If it is more, the extra credit is {rate} of the difference. We do not use tuition, so we skip that step.',
       example:
         'Your credit is {credit}. That is less than {set}, so the difference is {difference} and the extra credit is {extra}.',
       figures: {
