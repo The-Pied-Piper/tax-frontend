@@ -54,8 +54,9 @@ export function App({ client, registry, initial, clock }: Props) {
   // screen and in the source, is the figure; the provisional note sits just
   // under it and the form below. The calculator page has no answer yet, so its
   // form and note keep their old places. The order is fixed for the life of the
-  // page: after Calculate the answer is a fresh one with no summary or links,
-  // but the form stays below it, so the layout does not flip.
+  // page: after Calculate the answer is a fresh one with no links (the heading
+  // and paragraph are written again), and the form stays below it, so the
+  // layout does not flip.
   const notice = shown?.response.provisional ? (
     <ProvisionalNotice year={shown.asked.year} />
   ) : null;

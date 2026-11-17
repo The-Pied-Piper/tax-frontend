@@ -229,17 +229,23 @@ describe('recalculating on a mounted salary page', () => {
 });
 
 describe('while a mounted salary page recalculates', () => {
-  async function holdRequest() {
+  // The first `answered` calculations come back at once; the next one is held
+  // until `release` is called.
+  async function holdRequest(answered = 0) {
     const base = fixtureClient(undefined, compute30000);
     let release: () => void = () => {};
+    let calls = 0;
     const client: ApiClient = {
       listJurisdictions: (query) => base.listJurisdictions(query),
-      computeTakeHomeCalculation: (body) =>
-        new Promise((resolve) => {
+      computeTakeHomeCalculation: (body) => {
+        calls += 1;
+        if (calls <= answered) return base.computeTakeHomeCalculation(body);
+        return new Promise((resolve) => {
           release = () => {
             resolve(base.computeTakeHomeCalculation(body));
           };
-        }),
+        });
+      },
     };
     const user = userEvent.setup();
     const { container } = render(
@@ -248,10 +254,16 @@ describe('while a mounted salary page recalculates', () => {
         initial={withLinks(pageData(compute70000, '70000'))}
       />,
     );
-    await user.click(
-      screen.getByRole('button', { name: strings.form.calculate }),
-    );
-    return { container, release };
+    const calculate = () =>
+      user.click(screen.getByRole('button', { name: strings.form.calculate }));
+    await calculate();
+    return {
+      container,
+      release: () => {
+        release();
+      },
+      calculate,
+    };
   }
 
   it('keeps the old answer in place, with the form still below it', async () => {
@@ -290,31 +302,7 @@ describe('while a mounted salary page recalculates', () => {
   });
 
   it('keeps the paragraph of a freshly calculated answer, faded, on the next Calculate', async () => {
-    const base = fixtureClient(undefined, compute30000);
-    let calls = 0;
-    let release: () => void = () => {};
-    const client: ApiClient = {
-      listJurisdictions: (query) => base.listJurisdictions(query),
-      computeTakeHomeCalculation: (body) => {
-        calls += 1;
-        if (calls === 1) return base.computeTakeHomeCalculation(body);
-        return new Promise((resolve) => {
-          release = () => {
-            resolve(base.computeTakeHomeCalculation(body));
-          };
-        });
-      },
-    };
-    const user = userEvent.setup();
-    const { container } = render(
-      <App
-        client={client}
-        initial={withLinks(pageData(compute70000, '70000'))}
-      />,
-    );
-    const calculate = () =>
-      user.click(screen.getByRole('button', { name: strings.form.calculate }));
-    await calculate();
+    const { container, calculate } = await holdRequest(1);
     await waitFor(() => {
       expect(container.querySelector('.page-summary')).toHaveTextContent(
         /\$30,000/,
@@ -326,6 +314,5 @@ describe('while a mounted salary page recalculates', () => {
     expect(container.querySelector('[inert]')).toContainElement(
       paragraph as HTMLElement,
     );
-    release();
   });
 });
