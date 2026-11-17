@@ -10,7 +10,12 @@ import {
   withXland,
   xland,
 } from '../../src/test/generatedSite';
-import { fileFor, internalLinks, parse } from '../../src/test/crawlSite';
+import {
+  fileFor,
+  internalLinks,
+  linksToWrittenFiles,
+  parse,
+} from '../../src/test/crawlSite';
 import { generateSalaryPages } from './generate';
 import { rewriteHome } from './home';
 import { renderSalaryApp, renderSalaryIndexNav } from './prerender';
@@ -163,7 +168,7 @@ describe('crawl from the built home page', () => {
     'has no broken link anywhere, the home page included',
     async () => {
       const { dir, written } = await build();
-      const links = internalLinks(dir, ['index.html', ...written]);
+      const links = linksToWrittenFiles(dir, ['index.html', ...written]);
       expect(
         links.filter((l) => l.file === 'index.html').length,
       ).toBeGreaterThanOrEqual(25);

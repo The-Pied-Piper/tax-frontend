@@ -7,6 +7,18 @@ export const strings = {
     'Estimate your yearly take-home from a salary before tax. We work out the pension, EI and income tax for a single person and show every step.',
   footer:
     'This is an estimate, not tax advice. Your actual take-home depends on your own situation and what your employer withholds. Nothing you enter is saved.',
+  siteNav: {
+    label: 'Site',
+    breadcrumb: 'Breadcrumb',
+    home: 'Home',
+    methodology: 'How we calculate',
+    provinces: 'Provinces:',
+    provinceNames: {
+      'ca-on': 'Ontario',
+      'ca-ab': 'Alberta',
+      'ca-bc': 'British Columbia',
+    },
+  },
   summaryHeading: 'About this estimate',
   themeLabel: 'Theme',
   themeLight: 'Light',

@@ -64,22 +64,20 @@ function withAddress(html: string, address: string): string {
     );
 }
 
-/** The template with `#root` holding the rendered page, plus the data blocks for React (the page's, and the link index when given). */
-export function buildPageHtml(
+/**
+ * The template with `#root` holding the rendered page, the page's own title
+ * and description in every tag that carries them, and, when given, its own
+ * canonical link and og:url. Shared by salary pages and content pages.
+ */
+export function pageShell(
   template: string,
   appHtml: string,
-  data: SalaryPageData,
-  canonicalUrl: string | null = null,
-  index: SalaryIndex | null = null,
+  meta: { title: string; description: string },
+  canonicalUrl: string | null,
 ): string {
-  const blocks = [
-    dataBlock(SALARY_PAGE_DATA_ID, data),
-    ...(index === null ? [] : [dataBlock(SALARY_INDEX_ID, index)]),
-  ].join('\n    ');
   // #root ends at the </div> that is followed by a script or the end of the body.
   const root = /(<div id="root">)[\s\S]*?(?=<\/div>\s*(?:<script|<\/body>))/;
   if (!root.test(template)) throw new Error('index.html has no #root element');
-  const meta = pageMeta(data);
   const withRoot = template.replace(root, (_m, open: string) => open + appHtml);
   if (!/<title>[\s\S]*?<\/title>/.test(withRoot)) {
     throw new Error('index.html has no title element');
@@ -99,7 +97,23 @@ export function buildPageHtml(
     (html, [key, text]) => withContent(html, key, text),
     head,
   );
-  const addressed =
-    canonicalUrl === null ? described : withAddress(described, canonicalUrl);
+  return canonicalUrl === null
+    ? described
+    : withAddress(described, canonicalUrl);
+}
+
+/** The template with `#root` holding the rendered page, plus the data blocks for React (the page's, and the link index when given). */
+export function buildPageHtml(
+  template: string,
+  appHtml: string,
+  data: SalaryPageData,
+  canonicalUrl: string | null = null,
+  index: SalaryIndex | null = null,
+): string {
+  const blocks = [
+    dataBlock(SALARY_PAGE_DATA_ID, data),
+    ...(index === null ? [] : [dataBlock(SALARY_INDEX_ID, index)]),
+  ].join('\n    ');
+  const addressed = pageShell(template, appHtml, pageMeta(data), canonicalUrl);
   return addressed.replace('</body>', () => `${blocks}\n  </body>`);
 }

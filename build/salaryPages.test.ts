@@ -24,7 +24,7 @@ vi.mock('vite', () => ({
   build: vi.fn(async (config: { build: { outDir: string } }): Promise<void> => {
     await writeFile(
       join(config.build.outDir, 'prerender.mjs'),
-      'export const renderSalaryApp = () => "";\nexport const renderSalaryIndexNav = () => "";\n',
+      'export const renderSalaryApp = () => "";\nexport const renderSalaryIndexNav = () => "";\nexport const renderContentPage = () => "";\n',
     );
   }),
 }));

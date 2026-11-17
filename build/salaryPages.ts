@@ -6,16 +6,19 @@ import { build, type Plugin } from 'vite';
 import react from '@vitejs/plugin-react';
 import { normalizeSiteUrl } from './seo';
 import { generateSalaryPages } from './salaryPages/generate';
+import { generateContentPages } from './contentPages/generate';
 import { provinces } from './salaryPages/provinces';
 import { rewriteHome } from './salaryPages/home';
 import { pageDates } from './salaryPages/lastmod';
 import { rewriteSitemap } from './salaryPages/sitemap';
+import { contentPages, type ContentPageSpec } from '../src/state/contentPages';
 import type { SalaryIndex } from '../src/state/salaryIndex';
 import type { SalaryPageData } from '../src/state/useTakeHome';
 
 type Prerender = {
   renderSalaryApp: (data: SalaryPageData) => string;
   renderSalaryIndexNav: (index: SalaryIndex) => string;
+  renderContentPage: (spec: ContentPageSpec) => string;
 };
 
 function isAppRenderer(value: unknown): value is Prerender['renderSalaryApp'] {
@@ -25,6 +28,12 @@ function isAppRenderer(value: unknown): value is Prerender['renderSalaryApp'] {
 function isNavRenderer(
   value: unknown,
 ): value is Prerender['renderSalaryIndexNav'] {
+  return typeof value === 'function';
+}
+
+function isContentRenderer(
+  value: unknown,
+): value is Prerender['renderContentPage'] {
   return typeof value === 'function';
 }
 
@@ -52,15 +61,18 @@ async function loadRenderer(tempDir: string): Promise<Prerender> {
     'renderSalaryApp' in loaded &&
     isAppRenderer(loaded.renderSalaryApp) &&
     'renderSalaryIndexNav' in loaded &&
-    isNavRenderer(loaded.renderSalaryIndexNav)
+    isNavRenderer(loaded.renderSalaryIndexNav) &&
+    'renderContentPage' in loaded &&
+    isContentRenderer(loaded.renderContentPage)
   ) {
     return {
       renderSalaryApp: loaded.renderSalaryApp,
       renderSalaryIndexNav: loaded.renderSalaryIndexNav,
+      renderContentPage: loaded.renderContentPage,
     };
   }
   throw new Error(
-    'The prerender build did not export renderSalaryApp and renderSalaryIndexNav',
+    'The prerender build did not export renderSalaryApp, renderSalaryIndexNav and renderContentPage',
   );
 }
 
@@ -68,7 +80,8 @@ async function loadRenderer(tempDir: string): Promise<Prerender> {
  * Writes dist/<slug>/<salary>/index.html for every listed province and step.
  * With the site address set it also lists them in dist/sitemap.xml, each with a
  * last-modified date kept in dist/page-hashes.json, and gives each its own
- * canonical address. Only when the API address is set (deploy builds); local
+ * canonical address. The content pages in src/state/contentPages.ts are
+ * written the same way, after them. Only when the API address is set (deploy builds); local
  * builds and CI write no salary pages.
  */
 export function salaryPages(
@@ -87,7 +100,7 @@ export function salaryPages(
       const outDir = resolve('dist');
       const tempDir = await mkdtemp(join(tmpdir(), 'salary-pages-ssr-'));
       try {
-        const { renderSalaryApp, renderSalaryIndexNav } =
+        const { renderSalaryApp, renderSalaryIndexNav, renderContentPage } =
           await loadRenderer(tempDir);
         const template = await readFile(join(outDir, 'index.html'), 'utf8');
         const { written, skipped, index } = await generateSalaryPages({
@@ -100,14 +113,25 @@ export function salaryPages(
           siteUrl,
         });
         await rewriteHome(outDir, index, renderSalaryIndexNav);
+        const content = await generateContentPages({
+          outDir,
+          template,
+          pages: contentPages,
+          render: renderContentPage,
+          siteUrl,
+        });
+        const everyPage = [...written, ...content.written];
         const lastmods = await pageDates(
           outDir,
           siteUrl,
-          ['index.html', ...written],
+          ['index.html', ...everyPage],
           { fetch, now: () => new Date(), warn: console.warn },
         );
-        await rewriteSitemap(outDir, siteUrl, written, lastmods);
+        await rewriteSitemap(outDir, siteUrl, everyPage, lastmods);
         console.log(`Salary pages: wrote ${written.length.toString()}`);
+        console.log(
+          `Content pages: wrote ${content.written.length.toString()}`,
+        );
         for (const code of skipped) {
           console.log(`Salary pages: ${code} not returned by the API, skipped`);
         }

@@ -95,4 +95,37 @@ describe('rewriteSitemap(outDir, siteUrl, written)', () => {
       expect(existsSync(join(dir, 'sitemap.xml'))).toBe(false);
     });
   });
+
+  describe('with content pages', () => {
+    const mixed = [
+      ...written,
+      'sample-page/index.html',
+      'forms/bc428/index.html',
+    ];
+
+    it('lists a content page at its address, after the salary pages in the order written', async () => {
+      const dir = outDir();
+      await rewriteSitemap(dir, site, mixed);
+      expect(locs(readFileSync(join(dir, 'sitemap.xml'), 'utf8'))).toEqual([
+        `${site}/`,
+        `${site}/ca-on/30000/`,
+        `${site}/ca-on/70000/`,
+        `${site}/ca-on/150000/`,
+        `${site}/sample-page/`,
+        `${site}/forms/bc428/`,
+      ]);
+    });
+
+    it('gives a content page its lastmod', async () => {
+      const dir = outDir();
+      await rewriteSitemap(dir, site, ['sample-page/index.html'], {
+        '/': '2026-01-02',
+        '/sample-page/': '2026-05-06',
+      });
+      const xml = readFileSync(join(dir, 'sitemap.xml'), 'utf8');
+      expect(xml).toContain(
+        `<loc>${site}/sample-page/</loc><lastmod>2026-05-06</lastmod>`,
+      );
+    });
+  });
 });
