@@ -56,15 +56,21 @@ describe('a form page', () => {
     const first = container.querySelector('#first');
     expect(first).not.toBeNull();
     const part = within(first as HTMLElement);
-    expect(
-      part.getByRole('heading', { level: 2, name: /First part/ }),
-    ).toBeInTheDocument();
-    expect(
-      part.getByRole('link', {
-        name: strings.formPage.permalink('First part'),
-      }),
-    ).toHaveAttribute('href', '#first');
-    expect(part.getByText('Line 1')).toBeInTheDocument();
+    const heading = part.getByRole('heading', { level: 2 });
+    expect(heading.textContent).toBe('First part');
+    const permalink = part.getByRole('link', {
+      name: strings.formPage.permalink('First part'),
+    });
+    expect(permalink).toHaveAttribute('href', '#first');
+    expect(heading).not.toContainElement(permalink);
+    const pill = part.getByText('Line 1');
+    expect(heading).not.toContainElement(pill);
+    expect(first).toContainElement(permalink);
+    expect(first).toContainElement(pill);
+    expect(first?.getAttribute('aria-labelledby')).toBe('first-heading');
+    expect(container.querySelector('#first-heading')?.textContent).toBe(
+      'First part',
+    );
     expect(part.getByText('At $70,000')).toBeInTheDocument();
     const figures = part.getAllByText('$100');
     expect(figures).toHaveLength(2);
@@ -187,6 +193,42 @@ describe.each([sampleFormSpec, ...formPages])(
     });
   },
 );
+
+// The h2 is what screen readers and search read, so it holds only the words.
+describe.each(formPages)('the headings on the $name page', (spec) => {
+  const built = formContentPage(spec);
+
+  it('read exactly as the section heading, with the permalink and tag outside', () => {
+    const { container } = render(<ContentPage {...built} />);
+    const sections = [...container.querySelectorAll('section[id]')];
+    expect(sections.length).toBe(spec.sections.length);
+    spec.sections.forEach((section, at) => {
+      const el = sections[at];
+      if (el === undefined) throw new Error(`no section at ${at.toString()}`);
+      expect(el.id).toBe(section.id);
+      const h2 = el.querySelector('h2');
+      expect(h2?.textContent).toBe(section.heading);
+      const permalink = el.querySelector(`a[href="#${section.id}"]`);
+      expect(permalink).not.toBeNull();
+      expect(h2).not.toContainElement(permalink as HTMLElement);
+    });
+  });
+
+  it('keep every contents link pointing at an existing section', () => {
+    const { container } = render(<ContentPage {...built} />);
+    const contents = screen.getByRole('navigation', {
+      name: strings.formPage.contents,
+    });
+    const links = within(contents).getAllByRole('link');
+    expect(links.map((a) => a.getAttribute('href'))).toEqual(
+      spec.sections.map((section) => `#${section.id}`),
+    );
+    for (const a of links) {
+      const target = (a.getAttribute('href') ?? '').slice(1);
+      expect(container.querySelector(`section[id="${target}"]`)).not.toBeNull();
+    }
+  });
+});
 
 /** A made-up form whose first part has links and whose second part has none. */
 const linkedSpec: FormPageSpec = {

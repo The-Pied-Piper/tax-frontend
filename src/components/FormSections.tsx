@@ -75,8 +75,8 @@ export function FormSections({
           aria-labelledby={`${section.id}-heading`}
           className={styles.section}
         >
-          <h2>
-            <span id={`${section.id}-heading`}>{section.heading}</span>{' '}
+          <div className={styles.heading}>
+            <h2 id={`${section.id}-heading`}>{section.heading}</h2>
             <a
               className={styles.permalink}
               href={`#${section.id}`}
@@ -85,7 +85,7 @@ export function FormSections({
               #
             </a>
             <span className={styles.pill}>{section.lines}</span>
-          </h2>
+          </div>
           <p>
             <Words text={section.paragraph} figures={section.figures} />
           </p>
