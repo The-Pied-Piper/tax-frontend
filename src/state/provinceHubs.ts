@@ -25,12 +25,12 @@ export const federalForms: HubForm[] = [
   },
   {
     name: 'T1 return, steps 2 to 4',
-    line: 'Adds up your income and finds the part of it that tax is charged on.',
+    line: 'Your yearly tax return. These steps add up your income and find the part of it that tax is charged on.',
     slug: 'forms/t1-steps-2-4',
   },
   {
     name: 'T1 return, steps 5 and 6',
-    line: 'Works out your federal tax and what you end up owing or getting back.',
+    line: 'More of your yearly tax return. These steps work out your federal tax and what you end up owing or getting back.',
     slug: 'forms/t1-steps-5-6',
   },
   {
@@ -62,7 +62,7 @@ export const provinceHubs: ProvinceHub[] = [
       },
       {
         name: 'Schedule ON428-A: LIFT credit',
-        line: 'Gives some tax relief to people on lower pay.',
+        line: "Ontario's tax relief for people on lower pay.",
         slug: 'forms/on428-a',
       },
     ],

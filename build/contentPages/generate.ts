@@ -9,6 +9,7 @@ import {
   contentPath,
   isContentSlug,
 } from '../../src/state/siteLinks';
+import { isSalaryAddress } from '../salaryPages/address';
 import { DESCRIPTION_LIMIT, TITLE_LIMIT } from '../salaryPages/limits';
 import { buildContentPageHtml } from './html';
 
@@ -61,7 +62,7 @@ function check(pages: ContentPageSpec[]): void {
     if (!isContentSlug(slug)) {
       throw new Error(`Content pages: "${slug}" is not a valid slug`);
     }
-    if (/^[a-z0-9-]+\/\d+$/.test(slug)) {
+    if (isSalaryAddress(slug)) {
       throw new Error(
         `Content pages: "${slug}" is the address of a salary page`,
       );

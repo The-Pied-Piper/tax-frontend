@@ -46,7 +46,7 @@ function formList(forms: HubForm[], published: string[]): ContentBlock {
 }
 
 /**
- * One page for each province that has hub text: how take-home is worked out,
+ * One page for each province (it is an error for one to have no hub text): how take-home is worked out,
  * the forms followed, a link to every salary page that was written, and the
  * methodology page and the other provinces. Links go only to pages that exist.
  */
@@ -55,9 +55,15 @@ export function hubPages(options: HubOptions): ContentPageSpec[] {
   const names: Record<string, string> = options.names ?? {
     ...strings.siteNav.provinceNames,
   };
-  const listed = provinces.flatMap((province) => {
+  const listed = provinces.map((province) => {
     const hub = hubs.find((h) => h.slug === province.slug);
-    return hub ? [{ province, hub }] : [];
+    if (!hub) {
+      // Without its page, a province's salary pages would have no link to them.
+      throw new Error(
+        `Hub pages: ${province.slug} has no entry in provinceHubs`,
+      );
+    }
+    return { province, hub };
   });
   const placeOf = (slug: string): string => {
     const name = names[slug];

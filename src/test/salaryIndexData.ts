@@ -1,11 +1,10 @@
-// Test data only: nothing in the build imports this file. A small salary index
-// for the component and App tests (the built one is covered by the build tests).
+// Test data only: nothing in the build imports this file. A small salary
+// group for the tests of the hub pages.
 import { readUnit } from '../adapters/fallback';
 import { strings } from '../strings';
 import { compute70000 } from './syntheticPages';
-import type { SalaryIndex } from '../../build/salaryPages/salaryIndex';
 
-export const indexUnit = readUnit(compute70000.unit) ?? strings.fallbackUnit;
+const indexUnit = readUnit(compute70000.unit) ?? strings.fallbackUnit;
 
 function group(code: string, name: string, slug: string, salaries: number[]) {
   return {
@@ -23,16 +22,3 @@ const steps = Array.from({ length: 25 }, (_, i) => 30000 + i * 5000);
 
 /** Ontario's 25 steps, as the build writes them. */
 export const ontarioGroup = group('CA-ON', 'Ontario', 'ca-on', steps);
-export const xlandGroup = group(
-  'CA-XX',
-  'Xland',
-  'ca-xx',
-  [10000, 15000, 20000],
-);
-
-export const ontarioIndex: SalaryIndex = { groups: [ontarioGroup] };
-export const twoProvinceIndex: SalaryIndex = {
-  groups: [ontarioGroup, xlandGroup],
-};
-/** An index with no group for Ontario. */
-export const xlandOnlyIndex: SalaryIndex = { groups: [xlandGroup] };

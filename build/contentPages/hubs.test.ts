@@ -8,7 +8,7 @@ import { isContentSlug } from '../../src/state/siteLinks';
 import { DESCRIPTION_LIMIT, TITLE_LIMIT } from '../salaryPages/limits';
 import { provinces } from '../salaryPages/provinces';
 import type { SalaryIndex } from '../salaryPages/salaryIndex';
-import { indexUnit, ontarioGroup } from '../../src/test/salaryIndexData';
+import { ontarioGroup } from '../../src/test/salaryIndexData';
 import { hubPages } from './hubs';
 
 const index: SalaryIndex = {
@@ -59,10 +59,13 @@ describe('hubPages', () => {
     for (const hub of build()) expect(hub.trail).toEqual([]);
   });
 
-  it('skips a province with no hub text and a hub text with no province', () => {
-    expect(
-      build({ hubs: [provinceHubs[0] as ProvinceHub] }).map((p) => p.slug),
-    ).toEqual(['ca-on']);
+  it('refuses a province with no hub text, so its salary pages are never left unlinked', () => {
+    expect(() => build({ hubs: [provinceHubs[0] as ProvinceHub] })).toThrow(
+      'ca-ab has no entry in provinceHubs',
+    );
+  });
+
+  it('writes no page for a hub text with no province', () => {
     expect(build({ provinces: [] })).toEqual([]);
   });
 
@@ -145,7 +148,6 @@ describe('hubPages', () => {
       href: '/ca-on/150000/',
     });
     expect(grid.links.every((l) => l.href.startsWith('/ca-on/'))).toBe(true);
-    expect(indexUnit.name).not.toBe('CA$');
     const alberta = blocksOf('ca-ab', 'Take-home pay by salary')[0];
     expect(alberta?.kind === 'links' && alberta.links).toEqual([
       { label: '$30,000', href: '/ca-ab/30000/' },
@@ -228,7 +230,7 @@ describe('the hub text', () => {
     ]) {
       expect(form.name.length).toBeGreaterThan(0);
       expect(form.line.endsWith('.')).toBe(true);
-      expect(form.line.length, form.name).toBeLessThan(100);
+      expect(form.line.length, form.name).toBeLessThan(130);
     }
   });
 });

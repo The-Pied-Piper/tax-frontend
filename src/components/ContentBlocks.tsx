@@ -18,7 +18,7 @@ export function ContentBlocks({ blocks }: { blocks: ContentBlock[] }) {
               <ul key={at} className={styles.list}>
                 {block.items.map((item) => (
                   <li key={item.label}>
-                    {item.href ? (
+                    {item.href !== undefined ? (
                       <a href={item.href}>{item.label}</a>
                     ) : (
                       <span className={styles.name}>{item.label}</span>

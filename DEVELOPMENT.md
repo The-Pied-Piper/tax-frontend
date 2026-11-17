@@ -64,9 +64,10 @@ A deploy build can write one finished page per province and salary step (for Ont
 
 1. Make sure `GET /v1/jurisdictions` returns the province code (a listed province the API does not return gets no pages) and that the year you list is one the API can compute, otherwise the build fails naming the page. Put its adapter and wording in `src/adapters/` and register the adapter in `src/adapters/index.ts`; without one, the page uses the fallback adapter (no simple breakdown, every trace line in the advanced view).
 2. Add one entry to the list in `build/salaryPages/provinces.ts`: `code` (for example `CA-AB`), `slug` (for example `ca-ab`), `year`, `from`, `to` and `step`.
-3. Run `npm run check`, then a build with `VITE_API_BASE_URL` set, and open `dist/ca-ab/<salary>/index.html`.
+3. Add its province page text in `src/state/provinceHubs.ts` and its name in `strings.siteNav.provinceNames`, and its slug in `FOOTER_PROVINCE_SLUGS`. The build fails for a province with no province page text, because its salary pages would otherwise have no link to them.
+4. Run `npm run check`, then a build with `VITE_API_BASE_URL` set, and open `dist/ca-ab/<salary>/index.html`.
 
-Nothing else changes: the pages, their canonical addresses, the sitemap, the links between pages, and the province page's salary links all come from that one list. A test adds a made-up province to the list to show this (`build/salaryPages/crawl.test.ts`), and `build/salaryPages/pageFigures.test.ts` checks that each page carries the figures the API gave for its own salary. A deploy build calls the API, so the API must be up when the site is built.
+Nothing else changes after that: the pages, their canonical addresses, the sitemap, the links between pages, and the province page's salary links all come from that one list. A test adds a made-up province to the list to show this (`build/salaryPages/crawl.test.ts`), and `build/salaryPages/pageFigures.test.ts` checks that each page carries the figures the API gave for its own salary. A deploy build calls the API, so the API must be up when the site is built.
 
 ## Content pages
 
