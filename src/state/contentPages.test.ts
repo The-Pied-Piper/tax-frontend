@@ -2,7 +2,7 @@ import { DESCRIPTION_LIMIT, TITLE_LIMIT } from '../../build/salaryPages/limits';
 import { copyRules, everyString } from '../test/copyRules';
 import { longestSentence } from '../test/formText';
 import { contentPages, paragraph } from './contentPages';
-import { isContentSlug, METHODOLOGY_SLUG } from './siteLinks';
+import { ENGINE_REPO_URL, isContentSlug, METHODOLOGY_SLUG } from './siteLinks';
 
 // Adding a page is one entry in the list; these checks keep every entry sound.
 describe('contentPages', () => {
@@ -98,10 +98,28 @@ describe('the methodology page', () => {
       [
         'Look for yourself',
         [
-          'Because the engine is open source, anyone can read how each line is worked out and run it themselves. Nothing you enter on this site is saved.',
+          `Because the engine is open source, anyone can read how each line is worked out and run it themselves. Nothing you enter on this site is saved. Read the engine's code on GitHub${ENGINE_REPO_URL}.`,
         ],
       ],
     ]);
+  });
+
+  it('links the engine repository, and only that repository, from "Look for yourself"', () => {
+    const section = page?.sections.find(
+      (entry) => entry.heading === 'Look for yourself',
+    );
+    const links = section?.blocks.flatMap((block) =>
+      block.kind === 'paragraph'
+        ? block.content.filter((part) => typeof part !== 'string')
+        : [],
+    );
+    expect(ENGINE_REPO_URL).toBe(
+      'https://github.com/The-Pied-Piper/tax-engine',
+    );
+    expect(links).toEqual([
+      { label: "Read the engine's code on GitHub", href: ENGINE_REPO_URL },
+    ]);
+    expect(words).not.toContain('tax-service');
   });
 
   it('keeps every sentence to 40 words or fewer', () => {

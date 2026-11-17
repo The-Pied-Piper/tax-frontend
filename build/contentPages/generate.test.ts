@@ -1,3 +1,4 @@
+import { ENGINE_REPO_URL } from '../../src/state/siteLinks';
 import { existsSync, readFileSync, readdirSync } from 'node:fs';
 import { join } from 'node:path';
 import {
@@ -251,6 +252,17 @@ describe('generateContentPages validation', () => {
       const dir = outDir();
       await expect(run(dir, [withBlocks(block)])).rejects.toThrow(/plain-page/);
       expect(files(dir)).toEqual([]);
+    });
+
+    it('accepts a link to the engine repository, the one address off the site', async () => {
+      const dir = outDir();
+      await run(dir, [
+        withBlocks({
+          kind: 'paragraph',
+          content: ['See ', { label: 'x', href: ENGINE_REPO_URL }],
+        }),
+      ]);
+      expect(files(dir).length).toBeGreaterThan(0);
     });
 
     it.each([
