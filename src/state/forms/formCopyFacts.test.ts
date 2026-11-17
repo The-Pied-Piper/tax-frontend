@@ -98,6 +98,17 @@ describe('bc479 copy', () => {
     );
   });
 
+  it('says in the intro that it counts only the sales tax credit', () => {
+    expect(page('bc479').intro).toMatch(/only the sales tax credit/i);
+  });
+
+  it("says the renter's credit can still pay at higher incomes, if you paid rent", () => {
+    const { paragraph, example } = section('bc479', 'total');
+    const total = `${paragraph} ${example}`;
+    expect(total).toMatch(/higher incomes/i);
+    expect(total).toMatch(/paid rent/i);
+  });
+
   it("names the renter's credit as left out", () => {
     expect(text()).toMatch(/renter/i);
   });
@@ -148,16 +159,20 @@ describe('t2204 copy', () => {
   };
 
   it('says in the intro that a refund needs more than $1', () => {
-    expect(page('t2204').intro).toMatch(/more than \$1\b/);
+    expect(page('t2204').intro).toMatch(/more than \$1(?![\d,])/);
+  });
+
+  it('labels the refund section Lines 13–16', () => {
+    expect(section('t2204', 'refund').lines).toBe('Lines 13–16');
   });
 
   it('says in the refund section that a refund needs more than $1', () => {
     const { paragraph, example } = section('t2204', 'refund');
-    expect(`${paragraph} ${example}`).toMatch(/more than \$1\b/);
+    expect(`${paragraph} ${example}`).toMatch(/more than \$1(?![\d,])/);
   });
 
   it('does not say the form takes $2,000 off', () => {
-    expect(text()).not.toMatch(/takes? \$2,000 off/i);
+    expect(text()).not.toMatch(/takes? (\{exempt\}|\$2,000) off/i);
   });
 
   it('says pay under the exempt amount is entered as zero', () => {
