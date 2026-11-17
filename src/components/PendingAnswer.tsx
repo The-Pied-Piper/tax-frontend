@@ -9,21 +9,22 @@ type Props = {
 };
 
 // Keeps the answer where it is while the next one loads. The faded copy cannot
-// be used (inert), and a moving bar plus a spoken note say that work is going on.
+// be used (inert). The moving bar and the spoken note sit outside the inert
+// part, so a screen reader still hears that work is going on; the note's live
+// region is always on the page so its change is announced.
 export function PendingAnswer({ pending, children }: Props) {
   return (
     <div
       className={pending ? styles.pending : styles.answer}
       aria-busy={pending}
-      inert={pending}
     >
       {pending && <div className={styles.bar} aria-hidden="true" />}
-      {pending && (
-        <p role="status" className={styles.visuallyHidden}>
-          {strings.form.calculating}
-        </p>
-      )}
-      {children}
+      <p role="status" className={styles.visuallyHidden}>
+        {pending ? strings.form.calculating : ''}
+      </p>
+      <div className={styles.content} inert={pending}>
+        {children}
+      </div>
     </div>
   );
 }

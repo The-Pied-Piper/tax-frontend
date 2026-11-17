@@ -267,11 +267,15 @@ describe('while a mounted salary page recalculates', () => {
 
   it('marks the old answer busy and unusable, and says it is calculating', async () => {
     const { container } = await holdRequest();
-    const busy = container.querySelector('[aria-busy="true"]');
-    expect(busy).toHaveAttribute('inert');
-    expect(screen.getByRole('status')).toHaveTextContent(
-      strings.form.calculating,
+    expect(container.querySelector('[aria-busy="true"]')).not.toBeNull();
+    const old = container.querySelector('[inert]');
+    expect(old).not.toBeNull();
+    expect(old).toContainElement(
+      screen.getByRole('heading', { name: strings.answer.heading }),
     );
+    const status = screen.getByRole('status');
+    expect(status).toHaveTextContent(strings.form.calculating);
+    expect(old).not.toContainElement(status);
   });
 
   it('shows the new figures and drops the busy mark when the answer arrives', async () => {
@@ -281,6 +285,7 @@ describe('while a mounted salary page recalculates', () => {
       expect(screen.getAllByText('$27,550.43').length).toBeGreaterThan(0);
     });
     expect(container.querySelector('[aria-busy="true"]')).toBeNull();
-    expect(screen.queryByRole('status')).not.toBeInTheDocument();
+    expect(container.querySelector('[inert]')).toBeNull();
+    expect(screen.getByRole('status')).toBeEmptyDOMElement();
   });
 });

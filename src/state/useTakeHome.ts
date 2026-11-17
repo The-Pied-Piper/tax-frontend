@@ -29,7 +29,10 @@ export type JurisdictionsState =
     }
   | { status: 'failed' };
 
-/** One request at a time; a new request clears the previous answer. */
+/**
+ * One request at a time; a new request clears the previous answer, though
+ * `loading` still carries it for a page that keeps showing it.
+ */
 export type RequestState =
   | { status: 'idle' }
   | {
