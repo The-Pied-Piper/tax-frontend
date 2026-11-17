@@ -85,4 +85,6 @@ Reading pages (hubs, form pages, the methodology page) share one shell: `src/com
 
 **When pages are written:** only in deploy builds, with `VITE_API_BASE_URL` set, together with the salary pages; local builds and CI write none.
 
+**Not-found page:** a deploy build also writes `dist/404.html` (`build/contentPages/notFound.ts`, text in `src/state/notFoundPage.ts`), a text-only page that links home, the province hubs and the methodology page. It has no canonical or `og:url`, carries `<meta name="robots" content="noindex">`, and is never in the sitemap; it is not one of the listed content pages.
+
 **CDN:** the pages are folders (`/ca-on/`, `/forms/bc428/`, `/methodology/`), so the CDN must serve those extension-less paths, with and without the trailing slash, as the pre-built `<path>/index.html`. This may need a change in the infrastructure repository (tax-infra). Until then the footer links to pages that later tickets add are links to paths the CDN does not yet serve.

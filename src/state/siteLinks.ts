@@ -13,6 +13,9 @@ export const FORMS_SEGMENT = 'forms';
 /** The address of the calculator. */
 export const HOME_PATH = '/';
 
+/** The file, at the top of the output, that the host serves for an address with no page; not a slug or a page address. */
+export const NOT_FOUND_FILE = '404.html';
+
 /** The province pages the footer links to, in the order shown. Their names are in `strings.siteNav.provinceNames`. */
 export const FOOTER_PROVINCE_SLUGS = ['ca-on', 'ca-ab', 'ca-bc'] as const;
 
