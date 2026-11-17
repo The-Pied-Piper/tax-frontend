@@ -13,7 +13,7 @@ export const bc479: FormPageSpec = {
   description:
     'What Form BC479 is for and what each part asks, in plain words, with a worked example for a $70,000 salary.',
   intro:
-    'This form adds up the credits you can get from British Columbia. The main one is the sales tax credit, which helps people on lower pay.',
+    'This form adds up the credits you can get from British Columbia. We count only the sales tax credit, which helps people on lower pay.',
   sections: [
     {
       id: 'income',
@@ -49,7 +49,7 @@ export const bc479: FormPageSpec = {
       heading: 'Your BC credits',
       lines: 'Lines 15, 35 and 45',
       paragraph:
-        'The form adds the credits together. The total is the amount that goes onto your return.',
+        "The form adds the credits together. We count only the sales tax credit. The form also has a renter's tax credit and credits for home renovation, venture capital, mining exploration, clean buildings and training. We do not use them. The renter's credit can still pay something on income well above where the sales tax credit stops. The total goes onto line 47900 of your return.",
       example: 'Your BC credits come to {total}.',
       figures: {
         total: result('$0', 'bc479_british_columbia_credits_line_45'),
