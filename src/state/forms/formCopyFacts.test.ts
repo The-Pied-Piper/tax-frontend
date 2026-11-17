@@ -65,13 +65,69 @@ describe('on428 total section copy', () => {
     expect(paragraph).not.toMatch(/a set amount, not/i);
   });
 
-  it('says the premium steps up with income and phases in', () => {
-    expect(paragraph).toMatch(/steps? up/i);
-    expect(paragraph).toMatch(/phase/i);
+  it('says the premium goes up in steps as income rises', () => {
+    expect(paragraph).toMatch(/goes up in steps as income rises/i);
+    expect(paragraph).toMatch(/little or nothing/i);
+  });
+
+  it('adds the premium to the tax after all the earlier steps, not "after credits"', () => {
+    expect(paragraph).toMatch(
+      /adds it to your tax after all the earlier steps/,
+    );
+    expect(paragraph).not.toMatch(/after credits/);
   });
 
   it('keeps sentences short', () => {
     expect(longestSentence(paragraph)).toBeLessThanOrEqual(40);
+  });
+});
+
+describe('on428 plain-English copy', () => {
+  it('income says income, not pay, and puts the cause before the result', () => {
+    const { paragraph, example } = section('on428', 'income');
+    expect(paragraph).toMatch(/part of your income that tax is charged on/);
+    expect(example).toMatch(
+      /^\{taken\}.*That leaves a taxable income of \{income\}\.$/,
+    );
+  });
+
+  it('brackets calls the result the Ontario tax before credits', () => {
+    const { paragraph, example } = section('on428', 'brackets');
+    expect(paragraph).toMatch(/finds the top slice your income reaches/);
+    expect(example).toMatch(/Ontario tax before credits: \{tax\}\.$/);
+  });
+
+  it('credits starts from a list of amounts', () => {
+    expect(section('on428', 'credits').paragraph).toMatch(
+      /^A credit lowers your tax bill\. The form starts with a list of amounts/,
+    );
+  });
+
+  it('keeps every changed section short in sentences', () => {
+    for (const id of ['income', 'brackets', 'credits', 'surtax', 'reduction']) {
+      const { paragraph, example } = section('on428', id);
+      expect(longestSentence(`${paragraph} ${example}`)).toBeLessThanOrEqual(
+        40,
+      );
+    }
+  });
+});
+
+describe('on428 corrections', () => {
+  it('surtax says the form tests Ontario tax after credits, before the health premium', () => {
+    const { paragraph, example } = section('on428', 'surtax');
+    expect(paragraph).toMatch(
+      /tests your Ontario tax after credits, before the health premium/,
+    );
+    expect(example).toMatch(/^Your Ontario tax after credits is \{tax\}\./);
+  });
+
+  it('reduction says it takes away Ontario tax after credits and surtax', () => {
+    const { paragraph, example } = section('on428', 'reduction');
+    expect(paragraph).toMatch(
+      /takes away your Ontario tax after credits and surtax/,
+    );
+    expect(example).toMatch(/less your tax of \{tax\}/);
   });
 });
 
@@ -387,9 +443,44 @@ describe('t2204 copy', () => {
     expect(earnings()).toMatch(/under[^.]*(zero|\$0)|(zero|\$0)[^.]*under/i);
   });
 
-  it('limits the zero rule to employer pay, not self-employment', () => {
+  it('limits the zero rule to people with no self-employment income', () => {
+    expect(earnings()).toMatch(/no self-employment income/i);
+    expect(earnings()).not.toMatch(/only work for an employer/i);
+  });
+
+  it('says insured pay is added up from all T4 slips', () => {
     expect(earnings()).toMatch(
-      /under[^.]*(self-employ|only (work|earn)|employer)[^.]*\.|(self-employ|only (work|earn)|employer)[^.]*under/i,
+      /insured pay[^.]*added up from all your T4 slips/i,
+    );
+  });
+
+  it('says the premiums are capped at a top amount, then compared', () => {
+    const { paragraph } = section('t2204', 'premiums');
+    expect(paragraph).toMatch(/top amount for the year/i);
+    expect(paragraph).toMatch(/Then it compares/);
+    expect(paragraph).not.toMatch(/set most/i);
+  });
+
+  it('says there may still be a refund when nothing was overpaid, pointing to the first section', () => {
+    const { paragraph } = section('t2204', 'refund');
+    expect(paragraph).toMatch(
+      /there may still be a refund, as the first section explains/i,
+    );
+    expect(paragraph).not.toMatch(/there is no refund/i);
+  });
+
+  it('says line 16 is a different amount, the EI credit figure', () => {
+    const { paragraph } = section('t2204', 'refund');
+    expect(paragraph).toMatch(/line 16 is a different amount/i);
+    expect(paragraph).toMatch(/EI credit figure/i);
+    expect(paragraph).toMatch(/smallest of three amounts/i);
+    expect(paragraph).toMatch(/line 31200 of your return/i);
+    expect(paragraph).toMatch(/line 58300 of your provincial form/i);
+  });
+
+  it('words the refund example as three plain sentences', () => {
+    expect(section('t2204', 'refund').example).toBe(
+      'Your employer took off {taken}. The most you owe is {most}. The difference, your overpayment, is {extra}.',
     );
   });
 
@@ -426,6 +517,51 @@ describe('schedule-6 copy', () => {
 
   it('says a spouse gives other amounts', () => {
     expect(text()).toMatch(/spouse/i);
+  });
+
+  const earnings = () => {
+    const { paragraph, example } = section('schedule-6', 'earnings');
+    return `${paragraph} ${example}`;
+  };
+  const benefit = () => {
+    const { paragraph, example } = section('schedule-6', 'benefit');
+    return `${paragraph} ${example}`;
+  };
+
+  it('says who the benefit is for: a full year in Canada, 19 or older', () => {
+    expect(earnings()).toMatch(/lived in Canada all year/i);
+    expect(earnings()).toMatch(
+      /19 or older[^.]*lived with a spouse, partner or child/i,
+    );
+  });
+
+  it('names an approved school or college and more than 13 weeks', () => {
+    expect(earnings()).toMatch(
+      /full-time student at a school or college the government has approved/i,
+    );
+    expect(earnings()).toMatch(/studied for more than 13 weeks/i);
+  });
+
+  it('extends the diplomat rule to family members and employees', () => {
+    expect(earnings()).toMatch(
+      /diplomats, the family members who lived with them, and their employees/i,
+    );
+  });
+
+  it('keeps the 90 day prison rule in the earnings section', () => {
+    expect(earnings()).toMatch(/prison for 90 days or more/i);
+  });
+
+  it('says the first amount does not count, up to a top amount', () => {
+    expect(benefit()).toMatch(/does not count/i);
+    expect(benefit()).toMatch(/top amount of \{max\}/);
+    expect(benefit()).not.toMatch(/nothing on the first/i);
+  });
+
+  it('words the benefit example against the top amount', () => {
+    const { example } = section('schedule-6', 'benefit');
+    expect(example).toMatch(/which is more than \{max\}/);
+    expect(example).toMatch(/before your income is taken into account/i);
   });
 
   it('says full-time students cannot claim, after 13 weeks', () => {
