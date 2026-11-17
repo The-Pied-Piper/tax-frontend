@@ -47,10 +47,23 @@ describe('salaryPageText: the text of a page from its own answer', () => {
     expect(salaryPageText(compute70000, '  Ontario ', 2026)).toEqual(clean);
   });
 
+  it('gives a description that says more than the title, not a repeat of it', () => {
+    const { title, description } = salaryPageText(
+      compute70000,
+      'Ontario',
+      2026,
+    );
+    expect(description).not.toContain(title);
+    expect(description).not.toContain('After Tax in');
+    expect(description).not.toContain('Take-Home Pay');
+    expect(description).toContain(
+      'income tax, pension and Employment Insurance',
+    );
+  });
+
   it('puts the take-home in the description, as an estimate', () => {
     const { description } = salaryPageText(compute70000, 'Ontario', 2026);
-    expect(description).toContain('53,786.25');
-    expect(description.toLowerCase()).toContain('estimate');
+    expect(description).toContain('an estimated $53,786.25');
   });
 
   it("states the page's own figures in the paragraph, as the API printed them", () => {
@@ -183,7 +196,7 @@ describe('natural-search wording of the page text', () => {
   );
 
   it.each(['Ontario', 'Alberta'])(
-    'opens the description with the same phrase, then the take-home (%s)',
+    'words the description as salary, place, year, take-home and what is taken off (%s)',
     (place) => {
       const description = strings.pageText.description(
         '$75,000',
@@ -191,11 +204,10 @@ describe('natural-search wording of the page text', () => {
         2026,
         '$58,786',
       );
-      expect(description.startsWith(phrase(place, 2026))).toBe(true);
-      expect(description.slice(phrase(place, 2026).length)).toContain(
-        '$58,786',
+      expect(description).toBe(
+        `On a $75,000 salary in ${place} in 2026, you take home an estimated $58,786 a year after income tax, pension and Employment Insurance.`,
       );
-      expect(description.toLowerCase()).toContain('estimate');
+      expect(description).toContain('an estimated $58,786');
     },
   );
 
@@ -207,7 +219,7 @@ describe('natural-search wording of the page text', () => {
       expect(text.title).toMatch(/^\D*75,000(\.00)?/);
       expect(text.title.endsWith(tail)).toBe(true);
       expect(text.heading).toBe(text.title);
-      expect(text.description.startsWith(text.title)).toBe(true);
+      expect(text.description).not.toContain(text.title);
       expect(text.description).toContain('58,786.25');
     },
   );
@@ -216,10 +228,13 @@ describe('natural-search wording of the page text', () => {
     const response = syntheticResponse(75000);
     const y2026 = salaryPageText(response, 'Ontario', 2026);
     const y2027 = salaryPageText(response, 'Ontario', 2027);
-    for (const field of ['title', 'heading', 'description'] as const) {
+    for (const field of ['title', 'heading'] as const) {
       expect(y2026[field]).toContain('(2026 Take-Home Pay)');
       expect(y2027[field]).toContain('(2027 Take-Home Pay)');
       expect(y2027[field]).not.toContain('2026');
     }
+    expect(y2026.description).toContain(' in 2026, ');
+    expect(y2027.description).toContain(' in 2027, ');
+    expect(y2027.description).not.toContain('2026');
   });
 });
