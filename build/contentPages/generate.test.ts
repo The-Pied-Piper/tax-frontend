@@ -1,4 +1,3 @@
-import { ENGINE_REPO_URL } from '../../src/state/siteLinks';
 import { existsSync, readFileSync, readdirSync } from 'node:fs';
 import { join } from 'node:path';
 import {
@@ -6,6 +5,7 @@ import {
   contentTemplate as template,
   tmpDirs,
 } from '../../src/test/generatedSite';
+import { ENGINE_REPO_URL } from '../../src/state/siteLinks';
 import {
   blocksSpec,
   parentSpec,
@@ -270,6 +270,9 @@ describe('generateContentPages validation', () => {
       ['//example.com/x/'],
       ['x/relative/'],
       ['/has space/'],
+      ['https://github.com/The-Pied-Piper/tax-service'],
+      [`${ENGINE_REPO_URL}-evil`],
+      [`${ENGINE_REPO_URL}/`],
     ])('rejects a link to %s, which is not a site path', async (href) => {
       const dir = outDir();
       const links: ContentBlock[] = [

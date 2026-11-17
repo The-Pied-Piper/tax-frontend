@@ -119,7 +119,6 @@ describe('the methodology page', () => {
     expect(links).toEqual([
       { label: "Read the engine's code on GitHub", href: ENGINE_REPO_URL },
     ]);
-    expect(words).not.toContain('tax-service');
   });
 
   it('keeps every sentence to 40 words or fewer', () => {
@@ -134,6 +133,7 @@ describe('the methodology page', () => {
     expect(words).not.toContain('canada-only');
     expect(JSON.stringify(page)).not.toMatch(/\bAI\b/);
     expect(words).not.toContain('docs/');
+    expect(words).not.toContain('tax-service');
   });
 });
 
