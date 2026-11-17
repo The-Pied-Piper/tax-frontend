@@ -2,6 +2,7 @@ import { mkdir, mkdtemp, readFile, rm, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import type { Plugin } from 'vite';
+import { template } from '../src/test/generatedSite';
 import { salaryPages } from './salaryPages';
 
 // Vitest can only import a module built at run time from inside the project,
@@ -84,7 +85,7 @@ describe('salaryPages closeBundle', () => {
   beforeEach(async () => {
     root = await mkdtemp(join(tmpdir(), 'salary-pages-test-'));
     await mkdir(join(root, 'dist'));
-    await writeFile(join(root, 'dist', 'index.html'), '<html>home</html>');
+    await writeFile(join(root, 'dist', 'index.html'), template);
     vi.spyOn(process, 'cwd').mockReturnValue(root);
     vi.spyOn(console, 'log').mockImplementation(() => undefined);
     vi.spyOn(console, 'warn').mockImplementation(() => undefined);
@@ -112,11 +113,12 @@ describe('salaryPages closeBundle', () => {
       '/',
       '/ca-on/30000/',
       '/ca-on/35000/',
+      '/methodology/',
     ]);
 
     const sitemap = await readFile(join(root, 'dist', 'sitemap.xml'), 'utf8');
     const urls = sitemap.match(/<url>[\s\S]*?<\/url>/g) ?? [];
-    expect(urls).toHaveLength(3);
+    expect(urls).toHaveLength(4);
     for (const url of urls) {
       expect(url).toMatch(/<lastmod>\d{4}-\d{2}-\d{2}<\/lastmod>/);
     }
