@@ -131,6 +131,34 @@
   cursor: not-allowed;
 }
 
+/* A light band sweeping across the button while an answer loads. */
+.working {
+  composes: primary;
+  background-image: linear-gradient(
+    90deg,
+    transparent 0%,
+    color-mix(in srgb, var(--btn-fg) 30%, transparent) 50%,
+    transparent 100%
+  );
+  background-size: 200% 100%;
+  animation: working 1.2s linear infinite;
+}
+
+@keyframes working {
+  from {
+    background-position: 200% 0;
+  }
+  to {
+    background-position: -100% 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .working {
+    animation: none;
+  }
+}
+
 @media (max-width: 479.98px) {
   .form {
     grid-template-columns: 1fr;

@@ -24,6 +24,8 @@ type Props = {
   /** A problem the service reported about the salary. */
   salaryProblem: string | null;
   loading: boolean;
+  /** Sweep a light band across the button while loading (the pre-built salary pages). */
+  showProgress?: boolean;
   canSubmit: boolean;
   onJurisdictionChange: (code: string) => void;
   onYearChange: (year: number) => void;
@@ -43,6 +45,7 @@ export function SalaryForm({
   salaryCheck,
   salaryProblem,
   loading,
+  showProgress = false,
   canSubmit,
   onJurisdictionChange,
   onYearChange,
@@ -206,7 +209,7 @@ export function SalaryForm({
       </div>
       <button
         type="submit"
-        className={styles.primary}
+        className={loading && showProgress ? styles.working : styles.primary}
         disabled={placesLoading || loading || !canSubmit}
       >
         {loading ? strings.form.calculating : strings.form.calculate}
