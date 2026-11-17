@@ -1,5 +1,9 @@
 import { formPages } from '../formPages';
-import { pageOf as page, sectionOf as section } from '../../test/formText';
+import {
+  longestSentence,
+  pageOf as page,
+  sectionOf as section,
+} from '../../test/formText';
 
 const FEDERAL_IDS = [
   't4',
@@ -10,19 +14,8 @@ const FEDERAL_IDS = [
   'schedule-6',
 ];
 
-// Read the flag without naming it on the type, so the file compiles before the
-// field exists on FormPageSpec.
-const isFederal = (spec: object): boolean =>
-  (spec as { federal?: unknown }).federal === true;
-
-function longestSentence(text: string): number {
-  return Math.max(
-    0,
-    ...text
-      .split(/(?<=[.!?])\s+/)
-      .map((sentence) => sentence.split(/\s+/).filter(Boolean).length),
-  );
-}
+const isFederal = (spec: ReturnType<typeof page>): boolean =>
+  spec.federal === true;
 
 /** Every field a visitor reads on a page: the description, intro, paragraphs and examples. */
 function wordsOf(spec: ReturnType<typeof page>): string[] {

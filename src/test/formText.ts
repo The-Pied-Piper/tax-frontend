@@ -23,3 +23,13 @@ export function shownText(section: Section, text: string): string {
     (whole, name: string) => section.figures[name]?.shown ?? whole,
   );
 }
+
+/** The word count of the longest sentence in a piece of text. */
+export function longestSentence(text: string): number {
+  return Math.max(
+    0,
+    ...text
+      .split(/(?<=[.!?])\s+/)
+      .map((sentence) => sentence.split(/\s+/).filter(Boolean).length),
+  );
+}

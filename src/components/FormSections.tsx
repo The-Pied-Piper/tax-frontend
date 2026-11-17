@@ -99,33 +99,23 @@ export function FormSections({
       ))}
       <nav aria-label={strings.formPage.related} className={styles.related}>
         {federal === true ? (
-          <>
-            {FOOTER_PROVINCE_SLUGS.map((slug) => (
-              <a key={slug} href={contentPath(slug)}>
-                {strings.formPage.hub(strings.siteNav.provinceNames[slug])}
-              </a>
-            ))}
-            <a href={contentPath(METHODOLOGY_SLUG)}>
-              {strings.siteNav.methodology}
+          FOOTER_PROVINCE_SLUGS.map((slug) => (
+            <a key={slug} href={contentPath(slug)}>
+              {strings.formPage.hub(strings.siteNav.provinceNames[slug])}
             </a>
-            {salaryPageWritten === true && (
-              <a href={salaryPagePath(province, exampleSalary)}>
-                {strings.formPage.federalSalaryExample(salary)}
-              </a>
-            )}
-          </>
+          ))
         ) : (
-          <>
-            <a href={contentPath(province)}>{strings.formPage.hub(place)}</a>
-            <a href={contentPath(METHODOLOGY_SLUG)}>
-              {strings.siteNav.methodology}
-            </a>
-            {salaryPageWritten === true && (
-              <a href={salaryPagePath(province, exampleSalary)}>
-                {strings.formPage.salaryExample(salary)}
-              </a>
-            )}
-          </>
+          <a href={contentPath(province)}>{strings.formPage.hub(place)}</a>
+        )}
+        <a href={contentPath(METHODOLOGY_SLUG)}>
+          {strings.siteNav.methodology}
+        </a>
+        {salaryPageWritten === true && (
+          <a href={salaryPagePath(province, exampleSalary)}>
+            {federal === true
+              ? strings.formPage.federalSalaryExample(salary)
+              : strings.formPage.salaryExample(salary)}
+          </a>
         )}
       </nav>
     </>
