@@ -20,7 +20,7 @@ export const schedule6: FormPageSpec = {
       heading: 'What you earned from work',
       lines: 'Lines 1–6',
       paragraph:
-        'The Canada Workers Benefit starts with what you earned from working. The form uses this to work out how much benefit you could get. Someone who was a full-time student for more than 13 weeks in the year cannot claim, unless they had an eligible dependant. That is a child under 19 who lived with them on December 31. Someone who was in prison for 90 days or more cannot claim. A diplomat or their family cannot claim either.',
+        "The Canada Workers Benefit starts with what you earned from working. The form uses this to work out how much benefit you could get. Someone who was a full-time student for more than 13 weeks in the year cannot claim, unless they had an eligible dependant. An eligible dependant is a child of yours or your spouse's who was under 19, lived with you on December 31, and was not eligible for the benefit themselves. Someone who was in prison for 90 days or more cannot claim. A diplomat or their family cannot claim either.",
       example: 'Your pay from work is {pay}.',
       figures: {
         pay: result('$70,000', 'cwb_family_working_income'),
@@ -48,7 +48,7 @@ export const schedule6: FormPageSpec = {
       heading: 'Less benefit as income rises',
       lines: 'Lines 7–15 and 24–28',
       paragraph:
-        'The benefit shrinks as your income goes up. Once your income is over {threshold}, the form takes away {rate} of the part above it. If that takes away all of the benefit, you get nothing. These are the amounts for a single person. With a spouse, partner or child, the printed form uses other amounts. The benefit goes onto line 45300 of your return, and it is paid to you even if you owe no tax.',
+        'The benefit shrinks as your income goes up. Once your income is over {threshold}, the form takes away {rate} of the part above it. If that takes away all of the benefit, you get nothing. These are the amounts for a single person. With an eligible spouse or an eligible dependant, the printed form uses other amounts. The benefit goes onto line 45300 of your return, and it is paid to you even if you owe no tax.',
       example:
         'Your income is {income}, which is {over} over {threshold}. {rate} of that is {cut}. {basic} less {cut} is below zero, so the benefit is {benefit}.',
       figures: {
