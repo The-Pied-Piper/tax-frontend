@@ -15,7 +15,11 @@ const ready: JurisdictionsState = {
   places: placeOptions(jurisdictions, COMING_SOON),
 };
 
-function setup(jurisdictionsState: JurisdictionsState, loading = false) {
+function setup(
+  jurisdictionsState: JurisdictionsState,
+  loading = false,
+  showProgress = false,
+) {
   return render(
     <SalaryForm
       jurisdictionsState={jurisdictionsState}
@@ -23,6 +27,7 @@ function setup(jurisdictionsState: JurisdictionsState, loading = false) {
       salaryCheck="ok"
       salaryProblem={null}
       loading={loading}
+      showProgress={showProgress}
       canSubmit
       onJurisdictionChange={() => undefined}
       onYearChange={() => undefined}
@@ -118,5 +123,27 @@ describe('SalaryForm when the places failed', () => {
     );
     expect(container.querySelector('form')).toBeNull();
     expect(screen.queryByRole('status')).not.toBeInTheDocument();
+  });
+});
+
+describe('SalaryForm button while an answer loads', () => {
+  it('has the sweeping band only when progress is asked for', () => {
+    const plain = setup(ready, true);
+    const plainButton = within(plain.container).getByRole('button');
+    plain.unmount();
+    const withBand = setup(ready, true, true);
+    const bandButton = within(withBand.container).getByRole('button');
+    expect(bandButton.className).not.toBe(plainButton.className);
+    expect(bandButton).toHaveTextContent(strings.form.calculating);
+  });
+
+  it('has no band when not loading, even if progress is asked for', () => {
+    const idle = setup(ready, false, true);
+    const idleButton = within(idle.container).getByRole('button');
+    idle.unmount();
+    const plain = setup(ready, false, false);
+    expect(within(plain.container).getByRole('button').className).toBe(
+      idleButton.className,
+    );
   });
 });
