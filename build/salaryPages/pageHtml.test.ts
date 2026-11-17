@@ -3,7 +3,7 @@ import type { ComputeTakeHomeCalculationResponse } from '../../src/api';
 import computeFixture from '../../src/api/fixtures/compute-on-2026-70000.json';
 import jurisdictions from '../../src/api/fixtures/jurisdictions.json';
 import type { SalaryPageData } from '../../src/state/useTakeHome';
-import { buildPageHtml, dataBlock } from './pageHtml';
+import { buildPageHtml, dataBlock, withoutAddress } from './pageHtml';
 import { pageMeta } from './pageMeta';
 import { pageUrl } from './address';
 
@@ -241,5 +241,17 @@ describe('buildPageHtml: the data block', () => {
     expect(
       page.querySelectorAll('script[type="application/json"]'),
     ).toHaveLength(1);
+  });
+});
+
+describe('withoutAddress', () => {
+  const html =
+    '<head><link rel="canonical" href="https://x.test/" /><meta property="og:url" content="https://x.test/" /><link rel="icon" href="/favicon.ico" /><meta property="og:type" content="website" /></head>';
+
+  it('removes the canonical link and og:url and nothing else', () => {
+    const out = withoutAddress(html);
+    expect(out).not.toMatch(/canonical|og:url/);
+    expect(out).toContain('rel="icon"');
+    expect(out).toContain('og:type');
   });
 });

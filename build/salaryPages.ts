@@ -8,11 +8,13 @@ import { normalizeSiteUrl } from './seo';
 import { formPageIdDefine } from './formPageIds';
 import { generateSalaryPages } from './salaryPages/generate';
 import { generateContentPages } from './contentPages/generate';
+import { generateNotFoundPage } from './contentPages/notFound';
 import { provinces } from './salaryPages/provinces';
 import { rewriteHome } from './salaryPages/home';
 import { pageDates } from './salaryPages/lastmod';
 import { rewriteSitemap } from './salaryPages/sitemap';
 import { contentPages, type ContentPageSpec } from '../src/state/contentPages';
+import { notFoundPage } from '../src/state/notFoundPage';
 import { hubPages } from './contentPages/hubs';
 import { withSalaryLinks } from './contentPages/forms';
 import type { SalaryPageData } from '../src/state/useTakeHome';
@@ -137,6 +139,12 @@ export function salaryPages(
           render: renderContentPage,
           siteUrl,
         });
+        const notFound = await generateNotFoundPage({
+          outDir,
+          template: await readFile(contentFile, 'utf8'),
+          render: renderContentPage,
+          spec: notFoundPage,
+        });
         const everyPage = [...written, ...content.written];
         const lastmods = await pageDates(
           outDir,
@@ -149,6 +157,7 @@ export function salaryPages(
         console.log(
           `Content pages: wrote ${content.written.length.toString()}`,
         );
+        console.log(`Not-found page: wrote ${notFound}`);
         for (const code of skipped) {
           console.log(`Salary pages: ${code} not returned by the API, skipped`);
         }

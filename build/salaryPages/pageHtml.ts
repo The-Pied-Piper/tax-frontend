@@ -42,6 +42,17 @@ function attributeWords(tag: string, name: string): string[] {
   return value.toLowerCase().split(/\s+/);
 }
 
+/** The page with every canonical link and og:url tag removed. */
+export function withoutAddress(html: string): string {
+  return html
+    .replace(LINK_TAG, (tag) =>
+      attributeWords(tag, 'rel').includes('canonical') ? '' : tag,
+    )
+    .replace(META_TAG, (tag) =>
+      attributeWords(tag, 'property').includes('og:url') ? '' : tag,
+    );
+}
+
 /**
  * Gives the page its own canonical link and og:url: every canonical link and
  * og:url tag the template has (the calculator's, from the site build) is
