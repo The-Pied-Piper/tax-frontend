@@ -11,6 +11,7 @@ const groups: AdvancedGroup[] = [
   {
     form: 'ca/schedule_8',
     name: 'ca/schedule_8',
+    page: 'schedule-8',
     lines: [
       {
         label: 'cpp basic exemption',
@@ -33,6 +34,7 @@ const groups: AdvancedGroup[] = [
   {
     form: 'ca-on/return',
     name: 'ca-on/return',
+    page: null,
     lines: [
       {
         label: 'take home',
@@ -47,6 +49,7 @@ const groups: AdvancedGroup[] = [
   {
     form: 'ca/t2204',
     name: 'ca/t2204',
+    page: 't2204',
     lines: [
       {
         label: 'note only',
@@ -161,6 +164,7 @@ describe('AdvancedView', () => {
           {
             form: 'ex/form',
             name: 'ex/form',
+            page: null,
             lines: [
               {
                 label: 'same',
@@ -196,7 +200,7 @@ describe('AdvancedView', () => {
               },
             ],
           },
-          { form: 'ex/empty', name: 'ex/empty', lines: [] },
+          { form: 'ex/empty', name: 'ex/empty', page: null, lines: [] },
         ]}
       />,
     );
@@ -217,6 +221,7 @@ describe('AdvancedView', () => {
           {
             form: 'ex/form',
             name: 'Example form',
+            page: null,
             lines: [
               {
                 label: 'Printed figure',
@@ -261,6 +266,7 @@ describe('AdvancedView', () => {
           {
             form: 'ex/form',
             name: 'Example form',
+            page: null,
             lines: [
               {
                 label: 'Line 2',
@@ -313,6 +319,7 @@ describe('AdvancedView', () => {
           {
             form: 'ex/form',
             name: 'Example form',
+            page: null,
             lines: [
               {
                 label: 'Printed',
@@ -347,6 +354,7 @@ describe('AdvancedView', () => {
       {
         form: 'ex/form',
         name: 'Example form',
+        page: null,
         lines: [
           {
             label: 'EI premiums',
@@ -466,7 +474,7 @@ describe('AdvancedView form link', () => {
     return group;
   }
 
-  it('links a mapped, published form to its page', () => {
+  it('links a group with a published page to that page', () => {
     const group = pick(on428);
     render(<AdvancedView groups={[group]} />);
     const link = linkOf(group.name);
@@ -474,13 +482,24 @@ describe('AdvancedView form link', () => {
     expect(link).toHaveTextContent('What is this form?');
   });
 
-  it('has no link for a form with no map entry', () => {
+  it('follows the group page, never the engine form key', () => {
+    const group = pick(on428);
+    const { unmount } = render(
+      <AdvancedView groups={[{ ...group, form: 'ex/form', page: 'on428' }]} />,
+    );
+    expect(linkOf(group.name)).toHaveAttribute('href', '/forms/on428/');
+    unmount();
+    render(<AdvancedView groups={[{ ...group, page: null }]} />);
+    expect(screen.queryByRole('link')).not.toBeInTheDocument();
+  });
+
+  it('has no link for a group with no page', () => {
     const group = pick(unmapped);
     render(<AdvancedView groups={[group]} />);
     expect(screen.queryByRole('link')).not.toBeInTheDocument();
   });
 
-  it('has no link for a mapped form whose page is not published', () => {
+  it('has no link for a group whose page is not published', () => {
     const group = pick(t2204);
     render(<AdvancedView groups={[group]} />);
     expect(screen.queryByRole('link')).not.toBeInTheDocument();
@@ -504,10 +523,14 @@ describe('AdvancedView form link', () => {
     const details = form(group.name);
     const link = linkOf(group.name);
     if (!link) throw new Error('no link');
-    link.addEventListener('click', (event) => {
-      event.preventDefault();
-    });
-    await userEvent.click(link);
+    // The click is not prevented: it must leave the form's lines as they were.
+    // jsdom cannot navigate and reports that to the console, so mute it here.
+    const error = vi.spyOn(console, 'error').mockImplementation(() => {});
+    try {
+      await userEvent.click(link);
+    } finally {
+      error.mockRestore();
+    }
     expect(details).not.toHaveAttribute('open');
   });
 
