@@ -7,7 +7,7 @@ import {
   type ListJurisdictionsResponse,
 } from '../../src/api';
 import { dollarSign } from '../../src/adapters/fallback';
-import { languageCode } from '../../src/strings';
+import { languageCode, strings } from '../../src/strings';
 import type { Unit } from '../../src/adapters';
 import type { SalaryPageData } from '../../src/state/useTakeHome';
 import { pageUrl } from './address';
@@ -15,6 +15,7 @@ import { buildPageHtml } from './pageHtml';
 import { pageMeta } from './pageMeta';
 import { DESCRIPTION_LIMIT, TITLE_LIMIT } from './limits';
 import { salaryLinks } from './links';
+import { provinceLinks } from '../../src/state/salaryPageLinks';
 import { salaries, type Province } from './provinces';
 
 /** What was built for one province: its salary steps, lowest first, and the unit of its answers. */
@@ -29,6 +30,8 @@ export type GenerateOptions = {
   baseUrl: string;
   provinces: Province[];
   outDir: string;
+  /** The slugs of the content pages in the build, such as `methodology` and `forms/on428`. */
+  published: ReadonlySet<string>;
   /** The built index.html. */
   template: string;
   /** The real App as a string for one page's data. */
@@ -115,6 +118,13 @@ export async function generateSalaryPages(
   );
   const pages: { path: string; html: string }[] = [];
   for (const { province, steps, responses } of fetched) {
+    // The name the hubs use, so the breadcrumb and the hub's own title agree.
+    const placeName =
+      (strings.siteNav.provinceNames as Record<string, string | undefined>)[
+        province.slug
+      ] ??
+      list.jurisdictions.find((j) => j.code === province.code)?.name ??
+      province.code;
     // Links go only to the pages of this province that are about to be written.
     steps.forEach((salary, at) => {
       const response = responses[at];
@@ -126,7 +136,10 @@ export async function generateSalaryPages(
         jurisdictionCode: province.code,
         year: province.year,
         salary,
-        links: salaryLinks(province.slug, steps, salary),
+        links: {
+          ...salaryLinks(province.slug, steps, salary),
+          ...provinceLinks(province.slug, placeName, options.published),
+        },
       };
       const meta = pageMeta(data);
       if (meta.title.length >= TITLE_LIMIT) {

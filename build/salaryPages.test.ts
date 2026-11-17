@@ -3,6 +3,7 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import type { Plugin } from 'vite';
 import { contentTemplate, template } from '../src/test/generatedSite';
+import { contentPages } from '../src/state/contentPages';
 import { salaryPages } from './salaryPages';
 
 // Vitest can only import a module built at run time from inside the project,
@@ -30,19 +31,26 @@ vi.mock('vite', () => ({
   }),
 }));
 
+const generateCalls = vi.hoisted(() => ({
+  published: [] as unknown[],
+}));
+
 vi.mock('./salaryPages/generate', async () => {
   const { mkdir: makeDir, writeFile: write } = await import('node:fs/promises');
   const { join: joinPath } = await import('node:path');
   return {
     generateSalaryPages: async ({
       outDir,
+      published,
     }: {
       outDir: string;
+      published: unknown;
     }): Promise<{
       written: string[];
       skipped: string[];
       built: never[];
     }> => {
+      generateCalls.published.push(published);
       const written = ['ca-on/30000/index.html', 'ca-on/35000/index.html'];
       for (const file of written) {
         await makeDir(joinPath(outDir, file, '..'), { recursive: true });
@@ -94,6 +102,17 @@ describe('salaryPages closeBundle', () => {
     vi.restoreAllMocks();
     vi.unstubAllGlobals();
     await rm(root, { recursive: true, force: true });
+  });
+
+  it('hands the generator the slugs of every content page, so salary pages link only to pages that exist (#150)', async () => {
+    generateCalls.published.length = 0;
+    await runCloseBundle(
+      salaryPages('https://api.example.com/api/v1', 'https://example.com'),
+    );
+    const [published] = generateCalls.published;
+    expect(published).toEqual(new Set(contentPages.map((page) => page.slug)));
+    expect((published as Set<string>).has('methodology')).toBe(true);
+    expect((published as Set<string>).has('forms/on428')).toBe(true);
   });
 
   it('dates every page in the sitemap and keeps the dates in page-hashes.json', async () => {

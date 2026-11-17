@@ -1,3 +1,8 @@
+import {
+  albertaTargets,
+  ontarioTargets,
+  publishedSlugs,
+} from '../../src/test/pageLinks';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { parseSalaryPageData } from '../../src/state/salaryPageData';
@@ -8,6 +13,7 @@ import {
   siteUrl,
   template,
   tmpDirs,
+  withAlberta,
   xland,
 } from '../../src/test/generatedSite';
 import { generateSalaryPages } from './generate';
@@ -18,9 +24,18 @@ import { provinces } from './provinces';
 const outDir = tmpDirs('salary-links');
 const render = (data: SalaryPageData) => `<main>${data.salary}</main>`;
 
-function run(dir: string, options: { all?: boolean; siteUrl?: string } = {}) {
+function run(
+  dir: string,
+  options: {
+    all?: boolean;
+    siteUrl?: string;
+    published?: ReadonlySet<string>;
+    list?: unknown;
+  } = {},
+) {
   return generateSalaryPages({
-    fetch: fakeFetch(),
+    published: options.published ?? publishedSlugs,
+    fetch: fakeFetch(options.list),
     baseUrl: apiBaseUrl,
     provinces: options.all ? [...provinces, xland] : provinces,
     outDir: dir,
@@ -57,6 +72,7 @@ describe('generateSalaryPages links', () => {
         salary: n.toString(),
         href: `/ca-on/${n.toString()}/`,
       })),
+      ...ontarioTargets,
     });
   });
 
@@ -64,6 +80,7 @@ describe('generateSalaryPages links', () => {
     const dir = outDir();
     const seen: SalaryPageData[] = [];
     await generateSalaryPages({
+      published: publishedSlugs,
       fetch: fakeFetch(),
       baseUrl: apiBaseUrl,
       provinces,
@@ -105,6 +122,87 @@ describe('generateSalaryPages links', () => {
     for (const file of written) {
       expect(readFileSync(join(dir, file), 'utf8')).not.toContain('ca-xx');
     }
+  });
+});
+
+describe('generateSalaryPages hub and learn-more links (#150)', () => {
+  const methodologyOnly = new Set(['methodology']);
+
+  it('puts the Ontario hub, labelled Ontario, and a learnMore list in every page data block', async () => {
+    const dir = outDir();
+    const { written } = await run(dir);
+    expect(written).toHaveLength(25);
+    for (const file of written) {
+      const { links } = dataOf(dir, file);
+      expect(links?.hub, file).toEqual({ label: 'Ontario', href: '/ca-on/' });
+      expect(links?.learnMore, file).toEqual(ontarioTargets.learnMore);
+    }
+  });
+
+  it('lists the hub, the methodology page and the form page, in that order, with absolute hrefs', async () => {
+    const dir = outDir();
+    await run(dir);
+    const links = dataOf(dir, 'ca-on/70000/index.html').links;
+    expect(links?.learnMore.map((l) => l.href)).toEqual([
+      '/ca-on/',
+      '/methodology/',
+      '/forms/on428/',
+    ]);
+  });
+
+  it('has no form link while forms/on428 is not published', async () => {
+    const dir = outDir();
+    const { written } = await run(dir, { published: methodologyOnly });
+    for (const file of written) {
+      const learnMore = dataOf(dir, file).links?.learnMore ?? [];
+      expect(
+        learnMore.map((l) => l.href),
+        file,
+      ).toEqual(['/ca-on/', '/methodology/']);
+    }
+  });
+
+  it('keeps the hub and methodology links even when no content page is published', async () => {
+    const dir = outDir();
+    await run(dir, { published: new Set() });
+    const links = dataOf(dir, 'ca-on/70000/index.html').links;
+    expect(links?.hub.href).toBe('/ca-on/');
+    expect(links?.learnMore.map((l) => l.href)).toEqual([
+      '/ca-on/',
+      '/methodology/',
+    ]);
+  });
+
+  it('gives a province with no published forms only the hub and methodology', async () => {
+    const dir = outDir();
+    const { written } = await run(dir, { list: withAlberta });
+    const alberta = written.filter((f) => f.startsWith('ca-ab/'));
+    expect(alberta).toHaveLength(25);
+    for (const file of alberta) {
+      const { links } = dataOf(dir, file);
+      expect(links?.hub, file).toEqual(albertaTargets.hub);
+      expect(links?.learnMore, file).toEqual(albertaTargets.learnMore);
+    }
+  });
+
+  it('hands the render function the same hub and learnMore as the block', async () => {
+    const dir = outDir();
+    const seen: SalaryPageData[] = [];
+    await generateSalaryPages({
+      published: publishedSlugs,
+      fetch: fakeFetch(),
+      baseUrl: apiBaseUrl,
+      provinces,
+      outDir: dir,
+      template,
+      render: (data) => {
+        seen.push(data);
+        return '<main></main>';
+      },
+    });
+    const rendered = seen.find((d) => d.salary === '70000');
+    expect(rendered?.links?.hub).toEqual({ label: 'Ontario', href: '/ca-on/' });
+    expect(rendered?.links?.learnMore).toEqual(ontarioTargets.learnMore);
   });
 });
 
