@@ -1,6 +1,7 @@
 import { useId } from 'react';
 import type { AdvancedGroup, AdvancedLine, Unit } from '../adapters';
 import { groupThousands, withUnit } from '../money/format';
+import { formPageLink } from '../state/formLinks';
 import { strings } from '../strings';
 import { HelpTerm } from './HelpTerm';
 import styles from './AdvancedView.module.css';
@@ -31,6 +32,7 @@ export function AdvancedView({ groups }: Props) {
 
 function FormGroup({ group }: { group: AdvancedGroup }) {
   const nameId = useId();
+  const pageHref = formPageLink(group.form);
   return (
     <details className={styles.form} aria-labelledby={nameId}>
       <summary className={styles.formSummary}>
@@ -38,6 +40,12 @@ function FormGroup({ group }: { group: AdvancedGroup }) {
           <span id={nameId} className={styles.formName}>
             {group.name}
           </span>
+          {pageHref === null ? null : (
+            <a className={styles.formLink} href={pageHref}>
+              {strings.advanced.formLink}
+              <span className={styles.hidden}>{` (${group.name})`}</span>
+            </a>
+          )}
           <span className={styles.count}>
             {strings.advanced.lineCount(group.lines.length)}
           </span>

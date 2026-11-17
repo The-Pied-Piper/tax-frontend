@@ -4,6 +4,7 @@ import react from '@vitejs/plugin-react';
 import { salaryPages } from './build/salaryPages.ts';
 import { keepCssModules } from './build/keepCssModules.ts';
 import { seo } from './build/seo.ts';
+import { formPageIdDefine } from './build/formPageIds.ts';
 
 // Local development: the dev server forwards /api to a tax-service started
 // with ./dev.sh (http://localhost:8000). Override with DEV_API_TARGET.
@@ -18,6 +19,7 @@ export default defineConfig(({ mode }) => {
       seo(env.VITE_SITE_URL),
       salaryPages(env.VITE_API_BASE_URL, env.VITE_SITE_URL),
     ],
+    define: formPageIdDefine(),
     // Two pages: the calculator (index.html) and the template of the pre-built
     // content pages (content.html), which loads only the Light/Dark switch.
     build: {

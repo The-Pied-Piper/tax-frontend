@@ -141,6 +141,7 @@ export const strings = {
     note: 'Advanced view shows yearly amounts, as printed on the forms.',
     lineCount: (count: number) =>
       count === 1 ? '1 line' : `${String(count)} lines`,
+    formLink: 'What is this form?',
     reference: 'Form reference',
     noDetail: 'The service gave no further detail for this line.',
     lineNumber: (reference: string) => `Line ${reference}`,
