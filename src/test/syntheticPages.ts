@@ -50,6 +50,16 @@ export function syntheticOntarioPages(): SalaryPageData[] {
   );
 }
 
+/** take_home of every Ontario step, keyed by salary, as `salaryLinks` takes it (synthetic, see above). */
+export function syntheticTakeHomes(): Record<string, string> {
+  return Object.fromEntries(
+    Array.from({ length: 25 }, (_, i) => 30000 + i * 5000).map((n) => [
+      n.toString(),
+      syntheticResponse(n).take_home,
+    ]),
+  );
+}
+
 /** The values that appear more than once, so a duplicate can be named. */
 export function duplicates(values: string[]): string[] {
   return values.filter((v, i) => values.indexOf(v) !== i);

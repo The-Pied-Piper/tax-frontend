@@ -148,13 +148,20 @@ export async function generateSalaryPages(
       placeNames[province.slug] ??
       list.jurisdictions.find((j) => j.code === province.code)?.name ??
       province.code;
+    // Each link shows the take_home of the page it points to: this province's own responses.
+    const takeHomes: Record<string, string> = {};
+    steps.forEach((step, at) => {
+      const answer = responses[at];
+      if (!answer) throw new Error(`Salary pages: no answer for ${step}`);
+      takeHomes[step] = answer.take_home;
+    });
     // Links go only to the pages of this province that are about to be written.
     steps.forEach((salary, at) => {
       const response = responses[at];
       if (!response) throw new Error(`Salary pages: no answer for ${salary}`);
       const page = `${province.slug}/${salary}`;
       const links = {
-        ...salaryLinks(province.slug, steps, salary),
+        ...salaryLinks(province.slug, steps, salary, takeHomes),
         ...provinceLinks(province.slug, placeName, options.published),
       };
       const data: SalaryPageData = {
