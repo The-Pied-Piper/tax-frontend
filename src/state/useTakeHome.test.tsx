@@ -129,6 +129,60 @@ describe('useTakeHome links of a pre-built page', () => {
   });
 });
 
+// What the page was built with is kept for the life of the page.
+describe('useTakeHome built-with heading and breadcrumb', () => {
+  const links = {
+    calculator: '/',
+    previous: { salary: '65000', href: '/ca-on/65000/', takeHome: '49976.45' },
+    next: { salary: '75000', href: '/ca-on/75000/', takeHome: '57611.80' },
+    others: [{ salary: '60000', href: '/ca-on/60000/', takeHome: '46000.10' }],
+    ...ontarioTargets,
+  };
+
+  it('has the heading and the trail of the pre-built page', () => {
+    const { client } = fakeClient();
+    const { result } = renderHook(() =>
+      useTakeHome(client, undefined, { ...initial, links }),
+    );
+    expect(result.current.built?.heading).toBe(
+      '$70,000 After Tax in Ontario (2026 Take-Home Pay)',
+    );
+    expect(result.current.built?.crumb?.current).toBe('$70,000');
+    expect(result.current.built?.crumb?.steps.at(-1)).toEqual(links.hub);
+  });
+
+  it('has a heading but no trail when the page came without links', () => {
+    const { client } = fakeClient();
+    const { result } = renderHook(() =>
+      useTakeHome(client, undefined, initial),
+    );
+    expect(result.current.built?.heading).toMatch(/^\$70,000 After Tax/);
+    expect(result.current.built?.crumb).toBeNull();
+  });
+
+  it('is unchanged by a new calculation', async () => {
+    const { client } = fakeClient();
+    const { result } = renderHook(() =>
+      useTakeHome(client, undefined, { ...initial, links }),
+    );
+    const before = result.current.built;
+    act(() => {
+      result.current.setSalary('80000');
+    });
+    await act(async () => {
+      result.current.submit();
+      await Promise.resolve();
+    });
+    expect(result.current.built).toBe(before);
+  });
+
+  it('is null on the calculator page', () => {
+    const { client } = fakeClient();
+    const { result } = renderHook(() => useTakeHome(client));
+    expect(result.current.built).toBeNull();
+  });
+});
+
 describe('useTakeHome default year (the first load and a change of place)', () => {
   const place = (code: string, ...years: number[]) => ({
     code,

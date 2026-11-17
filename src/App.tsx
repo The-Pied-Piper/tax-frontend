@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import type { AdapterRegistry } from './adapters';
 import type { ApiClient } from './api';
 import { AdvancedView } from './components/AdvancedView';
@@ -14,8 +13,6 @@ import { SalaryLinks } from './components/SalaryLinks';
 import { SiteFooter } from './components/SiteFooter';
 import { StarLink } from './components/StarLink';
 import { ThemeToggle } from './components/ThemeToggle';
-import { displayWholeMoney } from './money/format';
-import { salaryBreadcrumb } from './state/breadcrumbs';
 import { salaryPageText } from './state/salaryPageText';
 import { useTakeHome, type SalaryPageData } from './state/useTakeHome';
 import { strings } from './strings';
@@ -41,20 +38,6 @@ export function App({ client, registry, initial, clock }: Props) {
       : answerFirst && request.status === 'loading'
         ? request.previous
         : undefined;
-  // The breadcrumb is the one the page was built with and stays through every
-  // Calculate, so it keeps matching the page's address.
-  const [crumb] = useState(() =>
-    shown?.links
-      ? salaryBreadcrumb(
-          shown.links.hub,
-          displayWholeMoney(
-            shown.response.salary,
-            'annually',
-            shown.adapted.unit,
-          ),
-        )
-      : null,
-  );
   // A salary page writes its paragraph from whatever answer is on screen,
   // pre-built or freshly calculated; the calculator page has none.
   const text =
@@ -69,11 +52,9 @@ export function App({ client, registry, initial, clock }: Props) {
   // screen and in the source, is the figure; the provisional note sits just
   // under it and the form below. The calculator page has no answer yet, so its
   // form and note keep their old places. The order is fixed for the life of the
-  // page: after Calculate the answer is a fresh one with no links (the paragraph is
-  // written again), and the form stays below it, so the
-  // layout does not flip.
-  // The heading, like the breadcrumb, stays the one the page was built with.
-  const [heading] = useState(() => (text ? text.heading : strings.title));
+  // page, so the layout does not flip after Calculate. The heading and
+  // breadcrumb stay as the page was built (`page.built`); only the paragraph
+  // follows the new answer, and the links go.
   const notice = shown?.response.provisional ? (
     <ProvisionalNotice year={shown.asked.year} />
   ) : null;
@@ -127,10 +108,10 @@ export function App({ client, registry, initial, clock }: Props) {
   return (
     <>
       <main>
-        {crumb && <Breadcrumb {...crumb} />}
+        {page.built?.crumb && <Breadcrumb {...page.built.crumb} />}
         <header className="page-header">
           <div className="page-header-text">
-            <h1>{heading}</h1>
+            <h1>{page.built ? page.built.heading : strings.title}</h1>
             <p className="lede">{strings.intro}</p>
           </div>
           <ThemeToggle />
