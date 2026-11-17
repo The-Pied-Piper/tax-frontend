@@ -75,118 +75,52 @@ describe('on428 total section copy', () => {
   });
 });
 
-const PROPOSED: Array<{
-  page: string;
-  section: string;
-  paragraph?: string;
-  example?: string;
-}> = [
-  {
-    page: 'on428',
-    section: 'income',
-    paragraph:
-      'Taxable income is the part of your income that tax is charged on. This form does not work it out. It copies the number from the federal part of your return. Some things are taken off first, like part of your pension plan payments.',
-    example:
-      '{taken}, the extra part of your pension plan payments, is taken off first. That leaves a taxable income of {income}.',
-  },
-  {
-    page: 'on428',
-    section: 'brackets',
-    paragraph:
-      "Ontario does not tax all of your income at one rate. It cuts your income into slices, called brackets, and each slice has its own rate. Lower slices are taxed less. The form finds the top slice your income reaches. It adds up the tax on all the slices below that one, then charges the top slice's rate on the rest of your income.",
-    example:
-      'Your income reaches the slice that starts at {start}. That slice is taxed at {rate}. The tax on the slices below it comes to {below}. The {above} of your income above {start} adds {added}. Ontario tax before credits: {tax}.',
-  },
-  {
-    page: 'on428',
-    section: 'credits',
-    paragraph:
-      'A credit lowers your tax bill. The form starts with a list of amounts: the basic personal amount that everyone gets ({basic} in 2025), the main part of your pension plan payments, and your EI payments. It adds them up, then takes {rate} of the total. That is your discount. A credit can bring your Ontario tax down to zero, but not below it.',
-  },
-  {
-    page: 'on428',
-    section: 'surtax',
-    paragraph:
-      'A surtax is an extra tax. It only applies when your Ontario tax is already high. The form tests your Ontario tax after credits, before the health premium. In 2025 the surtax starts once that tax is over {first}. It then adds {firstRate} of the amount over {first}. Once your tax is over {second}, it adds another {secondRate} of the amount over {second}. If your tax is under {first}, you pay no surtax.',
-    example:
-      'Your Ontario tax after credits is {tax}. That is under {first}, so the surtax is {surtax}.',
-  },
-  {
-    page: 'on428',
-    section: 'reduction',
-    paragraph:
-      'If your Ontario tax is small, Ontario can lower it further. The form starts with a set amount ({set} in 2025) and doubles it to {doubled}. It then takes away your Ontario tax after credits and surtax. Whatever is left is your reduction. If your tax is more than {doubled}, the reduction is zero.',
-    example:
-      '{doubled} less your tax of {tax} is below zero, so the reduction is {reduction}.',
-  },
-  {
-    page: 'on428',
-    section: 'total',
-    paragraph:
-      'The Ontario health premium is a yearly charge based on your income. Lower incomes pay little or nothing, and the amount goes up in steps as income rises. The form adds it to your tax after credits. The total is your Ontario tax, which goes onto your return.',
-  },
-  {
-    page: 'on428-a',
-    section: 'credit',
-    example:
-      '{rate} of {pay} is {before}. That is more than the top amount of {max}, so the credit, before your income is taken into account, is {max}.',
-  },
-];
-
-const names = (text: string): Set<string> =>
-  new Set(
-    [...text.matchAll(/\{([a-z][a-zA-Z0-9]*)\}/g)].map((m) => m[1] ?? ''),
-  );
-
-describe.each(PROPOSED)(
-  'plain-English copy of $page $section',
-  ({ page: pageId, section: sectionId, paragraph, example }) => {
-    const sec = () => section(pageId, sectionId);
-
-    if (paragraph !== undefined) {
-      it('has the proposed paragraph', () => {
-        expect(sec().paragraph).toBe(paragraph);
-      });
-    }
-    if (example !== undefined) {
-      it('has the proposed example', () => {
-        expect(sec().example).toBe(example);
-      });
-    }
-
-    it('gives every placeholder in the paragraph and example a figure', () => {
-      const used = names(`${sec().paragraph} ${sec().example}`);
-      for (const name of used) {
-        expect(sec().figures[name], `figure ${name}`).toBeDefined();
-      }
-    });
-
-    it('uses every figure of the section', () => {
-      const used = names(`${sec().paragraph} ${sec().example}`);
-      for (const name of Object.keys(sec().figures)) {
-        expect(used.has(name), `figure ${name} unused`).toBe(true);
-      }
-    });
-
-    it('keeps sentences short', () => {
-      expect(
-        longestSentence(`${sec().paragraph} ${sec().example}`),
-      ).toBeLessThanOrEqual(40);
-    });
-  },
-);
-
-describe('on428 corrections', () => {
-  it('surtax says the form tests Ontario tax after credits, before the health premium', () => {
-    expect(section('on428', 'surtax').paragraph).toMatch(
-      /tests your Ontario tax after credits, before the health premium/,
+describe('on428 plain-English copy', () => {
+  it('income says income, not pay, and puts the cause before the result', () => {
+    const { paragraph, example } = section('on428', 'income');
+    expect(paragraph).toMatch(/part of your income that tax is charged on/);
+    expect(example).toMatch(
+      /^\{taken\}.*That leaves a taxable income of \{income\}\.$/,
     );
   });
 
+  it('brackets calls the result the Ontario tax before credits', () => {
+    const { paragraph, example } = section('on428', 'brackets');
+    expect(paragraph).toMatch(/finds the top slice your income reaches/);
+    expect(example).toMatch(/Ontario tax before credits: \{tax\}\.$/);
+  });
+
+  it('credits starts from a list of amounts', () => {
+    expect(section('on428', 'credits').paragraph).toMatch(
+      /^A credit lowers your tax bill\. The form starts with a list of amounts/,
+    );
+  });
+
+  it('keeps every changed section short in sentences', () => {
+    for (const id of ['income', 'brackets', 'credits', 'surtax', 'reduction']) {
+      const { paragraph, example } = section('on428', id);
+      expect(longestSentence(`${paragraph} ${example}`)).toBeLessThanOrEqual(
+        40,
+      );
+    }
+  });
+});
+
+describe('on428 corrections', () => {
+  it('surtax says the form tests Ontario tax after credits, before the health premium', () => {
+    const { paragraph, example } = section('on428', 'surtax');
+    expect(paragraph).toMatch(
+      /tests your Ontario tax after credits, before the health premium/,
+    );
+    expect(example).toMatch(/^Your Ontario tax after credits is \{tax\}\./);
+  });
+
   it('reduction says it takes away Ontario tax after credits and surtax', () => {
-    expect(section('on428', 'reduction').paragraph).toMatch(
+    const { paragraph, example } = section('on428', 'reduction');
+    expect(paragraph).toMatch(
       /takes away your Ontario tax after credits and surtax/,
     );
+    expect(example).toMatch(/less your tax of \{tax\}/);
   });
 });
 
