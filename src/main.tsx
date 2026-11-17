@@ -12,6 +12,7 @@ import { parseSalaryIndex, SALARY_INDEX_ID } from './state/salaryIndex';
 import './styles/fonts.css';
 import './styles/tokens.css';
 import './styles/global.css';
+import { contentPageStyles } from './components/contentPageStyles';
 
 const root = document.getElementById('root');
 if (!root) {
@@ -46,6 +47,9 @@ async function start(root: HTMLElement) {
 // else to run: mount the switch there, with no calculator and no beacon.
 const toggleSlot = document.getElementById(THEME_TOGGLE_SLOT_ID);
 if (toggleSlot) {
+  if (contentPageStyles.length === 0) {
+    throw new Error('Missing content page styles');
+  }
   createRoot(toggleSlot).render(
     <StrictMode>
       <ThemeToggle />

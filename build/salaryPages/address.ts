@@ -1,8 +1,12 @@
-import { contentPath, contentSlugOfFile } from '../../src/state/siteLinks';
+import {
+  contentPath,
+  contentSlugOfFile,
+  salaryPagePath,
+} from '../../src/state/siteLinks';
 
 /** The address of a salary page on the site: the one place that says where a page lives. */
 export function pagePath(slug: string, salary: string | number): string {
-  return `/${slug}/${salary.toString()}/`;
+  return salaryPagePath(slug, salary);
 }
 
 /** The full address of a salary page under the site origin. */

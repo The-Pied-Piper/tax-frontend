@@ -19,6 +19,16 @@ export const strings = {
       'ca-bc': 'British Columbia',
     },
   },
+  formPage: {
+    contents: 'On this page',
+    permalink: 'Link to this section',
+    notice: (year: number, salary: string) =>
+      `Our calculator follows the published form for a single person with a salary and no other income. This page covers the parts it uses, with figures from the ${year.toString()} form. Examples use a ${salary} salary. It is an estimate, not tax advice.`,
+    example: (salary: string) => `At ${salary}`,
+    related: 'Related',
+    hub: (place: string) => `${place} forms and salary pages`,
+    salaryExample: (salary: string) => `See a ${salary} example`,
+  },
   summaryHeading: 'About this estimate',
   themeLabel: 'Theme',
   themeLight: 'Light',

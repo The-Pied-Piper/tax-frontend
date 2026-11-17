@@ -1,3 +1,5 @@
+import { formContentPage, type FormBody } from './formPage';
+import { formPages } from './formPages';
 import { METHODOLOGY_SLUG } from './siteLinks';
 
 /** One reading page of the site. Adding a page is one entry in `contentPages`. */
@@ -15,6 +17,8 @@ export type ContentPageSpec = {
   /** The pages between Home and this one, nearest to Home first. Each is itself a listed page. */
   trail: { label: string; slug: string }[];
   sections: { heading: string; paragraphs: string[] }[];
+  /** Set on a form's page: its parts, drawn after the lede in place of `sections`. */
+  form?: FormBody;
 };
 
 /** The id of the slot in a pre-built content page where the Light/Dark switch is mounted. */
@@ -65,4 +69,5 @@ export const contentPages: ContentPageSpec[] = [
       },
     ],
   },
+  ...formPages.map(formContentPage),
 ];
