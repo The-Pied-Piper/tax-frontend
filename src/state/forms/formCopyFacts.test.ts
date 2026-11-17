@@ -1,4 +1,4 @@
-import { formPages } from '../formPages';
+import { pageOf as page, sectionOf as section } from '../../test/formText';
 
 function longestSentence(text: string): number {
   return Math.max(
@@ -7,18 +7,6 @@ function longestSentence(text: string): number {
       .split(/(?<=[.!?])\s+/)
       .map((sentence) => sentence.split(/\s+/).filter(Boolean).length),
   );
-}
-
-function page(id: string) {
-  const form = formPages.find((entry) => entry.id === id);
-  if (!form) throw new Error(`No form page with id ${id}`);
-  return form;
-}
-
-function section(pageId: string, sectionId: string) {
-  const found = page(pageId).sections.find((s) => s.id === sectionId);
-  if (!found) throw new Error(`No section ${sectionId} on ${pageId}`);
-  return found;
 }
 
 describe('t1-tax balance section copy', () => {
