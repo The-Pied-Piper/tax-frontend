@@ -6,6 +6,7 @@ import { siteUrl as site } from './generatedSite';
 import {
   contentFile,
   FOOTER_PROVINCE_SLUGS,
+  FORMS_SEGMENT,
   METHODOLOGY_SLUG,
 } from '../state/siteLinks';
 
@@ -60,12 +61,14 @@ export function internalLinks(dir: string, written: string[]) {
 
 /**
  * The internal links that must resolve to a written file when only salary
- * pages were built: every link except the footer's, whose pages are written by
- * other steps. A full build (salary pages, content pages and hubs) checks
+ * pages were built: every link except the footer's and the advanced view's
+ * form-page links, whose pages are written by other steps. A full build (salary pages, content pages and hubs) checks
  * every link with `internalLinks` instead.
  */
 export function linksToWrittenFiles(dir: string, written: string[]) {
   return internalLinks(dir, written).filter(
-    ({ target }) => !FOOTER_TARGETS.includes(target),
+    ({ target }) =>
+      !FOOTER_TARGETS.includes(target) &&
+      !target.startsWith(`${FORMS_SEGMENT}/`),
   );
 }
