@@ -1,6 +1,6 @@
 import { readFileSync } from 'node:fs';
 import { renderContentPage } from '../salaryPages/prerender';
-import { template } from '../../src/test/generatedSite';
+import { contentTemplate as template } from '../../src/test/generatedSite';
 import { plainSpec } from '../../src/test/contentPageData';
 import { buildContentPageHtml } from './html';
 
