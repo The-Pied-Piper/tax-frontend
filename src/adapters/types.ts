@@ -40,6 +40,8 @@ export interface AdvancedGroup {
   form: string;
   /** The API's display name of the form. */
   name: string;
+  /** The id of the form's page, or null for a form with no page. */
+  page: string | null;
   lines: AdvancedLine[];
 }
 

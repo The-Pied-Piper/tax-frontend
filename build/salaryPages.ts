@@ -5,6 +5,7 @@ import { pathToFileURL } from 'node:url';
 import { build, type Plugin } from 'vite';
 import react from '@vitejs/plugin-react';
 import { normalizeSiteUrl } from './seo';
+import { formPageIdDefine } from './formPageIds';
 import { generateSalaryPages } from './salaryPages/generate';
 import { generateContentPages } from './contentPages/generate';
 import { provinces } from './salaryPages/provinces';
@@ -47,6 +48,7 @@ async function loadRenderer(tempDir: string): Promise<Prerender> {
     configFile: false,
     logLevel: 'warn',
     plugins: [react()],
+    define: formPageIdDefine(),
     // Same CSS-module naming as the client build, so class names match.
     build: {
       ssr: resolve('build/salaryPages/prerender.tsx'),
