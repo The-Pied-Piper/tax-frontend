@@ -59,8 +59,8 @@ export const t1Tax: FormPageSpec = {
       heading: 'Federal tax after credits',
       lines: 'Lines 40400, 125 and 42900',
       paragraph:
-        'The form takes your credit discount away from your federal tax. The answer cannot go below zero. What is left is your federal tax.',
-      example: '{tax} less {discount} leaves a federal tax of {after}.',
+        'The form takes your credit discount away from your federal tax. The answer cannot go below zero. What is left is your basic federal tax.',
+      example: '{tax} less {discount} leaves a basic federal tax of {after}.',
       figures: {
         tax: result('$10,771.18', 'federal_tax_with_split_income'),
         discount: result('$3,185.54', 'credits_against_basic_federal_tax'),

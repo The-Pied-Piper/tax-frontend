@@ -85,7 +85,7 @@ export const schedule8: FormPageSpec = {
       heading: 'Where the payments go on your return',
       lines: 'Lines 25 and 28',
       paragraph:
-        'The base payment becomes a credit, which is a discount on your tax. The extra part, plus any second payment, is taken off your income before tax is worked out.',
+        'The base payment goes on line 30800 and becomes a credit, which is a discount on your tax. The extra part, plus any second payment, goes on line 22215 and is taken off your income before tax is worked out.',
       example:
         'The base payment of {base} goes to a credit. The extra part of {extra}, plus the second payment of {second}, comes off your income.',
       figures: {

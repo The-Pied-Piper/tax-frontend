@@ -57,7 +57,7 @@ export const on428: FormPageSpec = {
       heading: 'Credits that lower your tax',
       lines: 'Lines 9–50',
       paragraph:
-        'A credit is a discount on your tax bill. Everyone gets a basic personal amount ({basic} in 2025). You also get credit for the pension plan and EI payments you made. The form adds these amounts up, then takes {rate} of the total. That is your discount. A credit can bring your Ontario tax down to zero, but not below it.',
+        'A credit is a discount on your tax bill. Everyone gets a basic personal amount ({basic} in 2025). You also get credit for the main part of your pension plan payments and for your EI payments. The form adds these amounts up, then takes {rate} of the total. That is your discount. A credit can bring your Ontario tax down to zero, but not below it.',
       example:
         'The amounts add up to {total}. {rate} of that is {discount}. Your tax drops from {before} to {after}.',
       figures: {

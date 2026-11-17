@@ -86,10 +86,10 @@ export const ab428: FormPageSpec = {
     },
     {
       id: 'supplement',
-      heading: 'Extra credit for large credits',
+      heading: 'Alberta supplemental tax credit',
       lines: 'Line 74',
       paragraph:
-        'If you claim a lot of credits, you can get an extra credit. A short worksheet works it out. It takes your credit and takes away a set amount ({set}). If your credit is smaller than that, you get nothing extra. If it is bigger, you get {rate} of the difference.',
+        'If you claim a lot of credits, you can get an extra credit. A short worksheet works it out. It takes your credit and takes away a set amount ({set}). If your credit is smaller than that, you get nothing extra. If it is bigger, you get {rate} of the difference. The credit total this worksheet uses leaves out your tuition amount. Line 2 of the printed worksheet takes the unused tuition amount off first.',
       example:
         'Your credit is {credit}. That is less than {set}, so the difference is {difference} and the extra credit is {extra}.',
       figures: {
