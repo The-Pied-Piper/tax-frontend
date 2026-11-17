@@ -2,7 +2,7 @@ import { existsSync, readFileSync, readdirSync } from 'node:fs';
 import { join } from 'node:path';
 import {
   siteUrl as site,
-  template,
+  contentTemplate as template,
   tmpDirs,
 } from '../../src/test/generatedSite';
 import {

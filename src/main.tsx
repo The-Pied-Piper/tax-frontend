@@ -1,9 +1,7 @@
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import { App } from './App';
-import { ThemeToggle } from './components/ThemeToggle';
-import { THEME_TOGGLE_SLOT_ID } from './state/contentPages';
-import { sendVisitBeacon } from './beacon/visitBeacon';
+import { sendVisitBeacon, type VisitKind } from './beacon/visitBeacon';
 import {
   parseSalaryPageData,
   SALARY_PAGE_DATA_ID,
@@ -18,7 +16,7 @@ if (!root) {
   throw new Error('Missing #root element');
 }
 
-async function start(root: HTMLElement) {
+async function start(root: HTMLElement): Promise<VisitKind> {
   // `npm run dev:mock` serves the saved responses in src/api/fixtures instead
   // of calling a real tax-service. The dynamic import keeps it out of builds.
   if (import.meta.env.MODE === 'mock') {
@@ -39,18 +37,10 @@ async function start(root: HTMLElement) {
       />
     </StrictMode>,
   );
-  sendVisitBeacon(initial ? 'salary' : 'home');
+  return initial ? 'salary' : 'home';
 }
 
-// A pre-built content page has a slot for the Light/Dark switch and nothing
-// else to run: mount the switch there, with no calculator and no beacon.
-const toggleSlot = document.getElementById(THEME_TOGGLE_SLOT_ID);
-if (toggleSlot) {
-  createRoot(toggleSlot).render(
-    <StrictMode>
-      <ThemeToggle />
-    </StrictMode>,
-  );
-} else {
-  void start(root);
-}
+// The calculator and the pre-built salary pages. The visit beacon is its own
+// module, sent once the page is up; content pages (src/contentMain.tsx) load
+// neither the calculator nor the beacon.
+void start(root).then(sendVisitBeacon);

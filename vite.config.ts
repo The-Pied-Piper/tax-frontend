@@ -16,6 +16,13 @@ export default defineConfig(({ mode }) => {
       seo(env.VITE_SITE_URL),
       salaryPages(env.VITE_API_BASE_URL, env.VITE_SITE_URL),
     ],
+    // Two pages: the calculator (index.html) and the template of the pre-built
+    // content pages (content.html), which loads only the Light/Dark switch.
+    build: {
+      rollupOptions: {
+        input: { main: 'index.html', content: 'content.html' },
+      },
+    },
     server: {
       proxy: { '/api': { target: apiTarget, changeOrigin: true } },
     },

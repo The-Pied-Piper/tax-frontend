@@ -3,6 +3,7 @@ import { join } from 'node:path';
 import { renderContentPage } from '../salaryPages/prerender';
 import {
   siteUrl as site,
+  contentTemplate,
   template,
   tmpDirs,
 } from '../../src/test/generatedSite';
@@ -25,7 +26,7 @@ async function build() {
   writeFileSync(join(dir, 'index.html'), template);
   const { written } = await generateContentPages({
     outDir: dir,
-    template,
+    template: contentTemplate,
     pages: [plainSpec],
     render: renderContentPage,
     siteUrl: site,
