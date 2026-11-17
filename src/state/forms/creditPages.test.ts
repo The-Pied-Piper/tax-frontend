@@ -41,6 +41,27 @@ function bodyOf(id: string): string {
     .join(' ');
 }
 
+/** One section's paragraph and example, each `{name}` shown as its figure. */
+function sectionOf(id: string, sectionId: string): string {
+  const form = formPages.find((entry) => entry.id === id);
+  const section = form?.sections.find((entry) => entry.id === sectionId);
+  if (!section) throw new Error(`No section ${sectionId} on ${id}`);
+  return [section.paragraph, section.example]
+    .map((text) =>
+      text.replace(
+        /\{([a-z][a-zA-Z0-9]*)\}/g,
+        (whole, name: string) => section.figures[name]?.shown ?? whole,
+      ),
+    )
+    .join(' ');
+}
+
+function introOf(id: string): string {
+  const form = formPages.find((entry) => entry.id === id);
+  if (!form) throw new Error(`No form page with id ${id}`);
+  return form.intro;
+}
+
 function longestSentence(text: string): number {
   return Math.max(
     0,
@@ -115,5 +136,86 @@ describe.each(Object.keys(EXPECTED))('the %s page', (id) => {
     expect(page.title.length).toBeLessThan(TITLE_LIMIT);
     expect(page.description.length).toBeGreaterThan(0);
     expect(page.description.length).toBeLessThan(DESCRIPTION_LIMIT);
+  });
+});
+
+describe('the credit page copy fixes', () => {
+  it('bc479 says it counts only the sales tax credit', () => {
+    expect(bodyOf('bc479')).toMatch(
+      /(count|use|include|add)\w*[^.]*\b(only|just)\b[^.]*sales tax credit|\b(only|just) the sales tax credit/i,
+    );
+  });
+
+  it.each([
+    ["renter's", /renter/i],
+    ['home renovation', /home renovation/i],
+    ['venture capital', /venture capital/i],
+  ])('bc479 names the %s credit as left out', (_name, pattern) => {
+    expect(bodyOf('bc479')).toMatch(pattern);
+  });
+
+  it('bc479 no longer calls the sales tax credit the main one', () => {
+    expect(introOf('bc479')).not.toMatch(/main one/i);
+    expect(bodyOf('bc479')).not.toMatch(/the main one/i);
+  });
+
+  it('bc479 says the total goes to line 47900', () => {
+    expect(bodyOf('bc479')).toMatch(/47900/);
+  });
+
+  it('t2204 intro says a refund needs an overpayment of more than $1', () => {
+    expect(introOf('t2204')).toMatch(/more than \$1\b/);
+  });
+
+  it("t2204's refund section says a refund needs more than $1", () => {
+    expect(sectionOf('t2204', 'refund')).toMatch(/more than \$1\b/);
+  });
+
+  it("t2204's earnings section does not say $2,000 is taken off", () => {
+    expect(sectionOf('t2204', 'earnings')).not.toMatch(/takes? \$2,000 off/i);
+  });
+
+  it('t2204 says pay under $2,000 is counted as zero', () => {
+    expect(sectionOf('t2204', 'earnings')).toMatch(
+      /under[^.]*(zero|\$0)|(zero|\$0)[^.]*under/i,
+    );
+  });
+
+  it('t2204 says the $2,000 is used for the refund and the EI credit', () => {
+    const text = sectionOf('t2204', 'earnings');
+    expect(text).toMatch(/\$2,000/);
+    expect(text).toMatch(/refund/i);
+    expect(text).toMatch(/credit/i);
+  });
+
+  it('t2204 points from line 16 to the EI credit on the return and provincial form', () => {
+    const text = bodyOf('t2204');
+    expect(text).toMatch(/line 16/i);
+    expect(text).toMatch(/31200/);
+    expect(text).toMatch(/provincial/i);
+  });
+
+  it('schedule-6 says the amounts are for a single person', () => {
+    expect(bodyOf('schedule-6')).toMatch(/single person/i);
+  });
+
+  it('schedule-6 says full-time students cannot claim', () => {
+    expect(bodyOf('schedule-6')).toMatch(/full-time student/i);
+  });
+
+  it('schedule-6 says the benefit goes to line 45300, even with no tax owed', () => {
+    const text = bodyOf('schedule-6');
+    expect(text).toMatch(/45300/);
+    expect(text).toMatch(/even if you owe no (income )?tax/i);
+  });
+
+  it('on428-a says the amounts are for a single person', () => {
+    expect(bodyOf('on428-a')).toMatch(/single person/i);
+  });
+
+  it('on428-a says the result goes to line 85 of the ON428', () => {
+    const text = bodyOf('on428-a');
+    expect(text).toMatch(/ON428/);
+    expect(text).toMatch(/line 85/i);
   });
 });
