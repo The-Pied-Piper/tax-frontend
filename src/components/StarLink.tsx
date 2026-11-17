@@ -1,14 +1,13 @@
 import styles from './StarLink.module.css';
 import { strings } from '../strings';
-
-const ENGINE_URL = 'https://github.com/The-Pied-Piper/tax-engine';
+import { ENGINE_REPO_URL } from '../state/siteLinks';
 
 export function StarLink() {
   return (
     <div className={styles.row}>
       <a
         className={styles.button}
-        href={ENGINE_URL}
+        href={ENGINE_REPO_URL}
         target="_blank"
         rel="noopener noreferrer"
       >

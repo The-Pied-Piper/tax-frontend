@@ -10,6 +10,9 @@ export const METHODOLOGY_SLUG = 'methodology';
 /** The folder, below the site root, that every form page lives in. */
 export const FORMS_SEGMENT = 'forms';
 
+/** The address of the open-source engine's code, which the methodology page and the star button link to. */
+export const ENGINE_REPO_URL = 'https://github.com/The-Pied-Piper/tax-engine';
+
 /** The address of the calculator. */
 export const HOME_PATH = '/';
 

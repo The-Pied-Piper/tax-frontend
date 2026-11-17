@@ -1,6 +1,6 @@
 import { formContentPage, type FormBody } from './formPage';
 import { formPages } from './formPages';
-import { METHODOLOGY_SLUG } from './siteLinks';
+import { ENGINE_REPO_URL, METHODOLOGY_SLUG } from './siteLinks';
 
 /** A link in a page: its words and where it goes. */
 export type ContentLink = { label: string; href: string };
@@ -108,7 +108,12 @@ export const contentPages: ContentPageSpec[] = [
         heading: 'Look for yourself',
         blocks: [
           paragraph(
-            'Because the engine is open source, anyone can read how each line is worked out and run it themselves. Nothing you enter on this site is saved.',
+            'Because the engine is open source, anyone can read how each line is worked out and run it themselves. Nothing you enter on this site is saved. ',
+            {
+              label: "Read the engine's code on GitHub",
+              href: ENGINE_REPO_URL,
+            },
+            '.',
           ),
         ],
       },

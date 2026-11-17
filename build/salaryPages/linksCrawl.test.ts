@@ -3,6 +3,7 @@ import { join } from 'node:path';
 import {
   apiBaseUrl,
   fakeFetch,
+  listedIn,
   siteUrl as site,
   template,
   tmpDirs,
@@ -36,7 +37,8 @@ async function build() {
     published,
     fetch: fakeFetch(withAlberta),
     baseUrl: apiBaseUrl,
-    provinces,
+    // Only the provinces the fake API lists: a site-URL build fails on any other.
+    provinces: listedIn(provinces, withAlberta),
     outDir: dir,
     template,
     render: renderSalaryApp,

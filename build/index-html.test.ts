@@ -34,6 +34,23 @@ describe('index.html (what a crawler sees without JavaScript)', () => {
     expect(html.toLowerCase()).not.toContain('checked against cra');
   });
 
+  it('names no single province in the title or any description text', () => {
+    const texts = [
+      page.title,
+      meta('meta[name="description"]'),
+      meta('meta[property="og:title"]'),
+      meta('meta[property="og:description"]'),
+      meta('meta[name="twitter:title"]'),
+      meta('meta[name="twitter:description"]'),
+    ];
+    for (const text of texts) {
+      expect(text.length).toBeGreaterThan(0);
+      for (const name of Object.values(strings.siteNav.provinceNames)) {
+        expect(text.toLowerCase()).not.toContain(name.toLowerCase());
+      }
+    }
+  });
+
   it('is English and has theme colours for both themes', () => {
     expect(page.documentElement.lang).toBe('en');
     expect(page.querySelectorAll('meta[name="theme-color"]')).toHaveLength(2);
