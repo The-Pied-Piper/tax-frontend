@@ -41,13 +41,15 @@ export type FormPageSpec = {
   description: string;
   /** What the form is for, in plain words. */
   intro: string;
+  /** Set on the pages shared by every province: their related links name each province's forms and salary pages. */
+  federal?: true;
   sections: FormSection[];
 };
 
 /** The data a form page's body is drawn from; the shell's `ContentPageSpec` carries it. */
 export type FormBody = Pick<
   FormPageSpec,
-  'province' | 'year' | 'exampleSalary' | 'sections'
+  'province' | 'year' | 'exampleSalary' | 'sections' | 'federal'
 > & {
   /** Set by the build: true when the example salary page was written. Unset or false means no salary link. */
   salaryPageWritten?: boolean;
@@ -67,6 +69,7 @@ export function formContentPage(form: FormPageSpec): ContentPageSpec {
       province: form.province,
       year: form.year,
       exampleSalary: form.exampleSalary,
+      federal: form.federal,
       sections: form.sections,
     },
   };
