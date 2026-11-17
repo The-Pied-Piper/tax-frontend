@@ -29,6 +29,9 @@ export const strings = {
     related: 'Related',
     hub: (place: string) => `${place} forms and salary pages`,
     salaryExample: (salary: string) => `See a ${salary} example`,
+    // Federal pages show the Ontario example; Ontario is the province the figures use.
+    federalSalaryExample: (salary: string) =>
+      `See an Ontario ${salary} example`,
   },
   summaryHeading: 'About this estimate',
   themeLabel: 'Theme',

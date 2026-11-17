@@ -9,11 +9,12 @@ export const t1Tax: FormPageSpec = {
   province: 'ca-on',
   year: 2025,
   exampleSalary: '70000',
+  federal: true,
   title: 'T1 return, steps 5 and 6, in plain words',
   description:
-    'How the T1 tax return works out federal tax, credits and total tax, step by step in plain words, with a $70,000 salary example.',
+    'How the T1 tax return works out federal tax, credits and total payable, step by step in plain words, with a $70,000 salary example.',
   intro:
-    'These steps of the federal tax return work out the tax on your taxable income, take off your credits, and add the Ontario tax to give the total tax.',
+    'These steps of the federal tax return work out the tax on your taxable income, take off your credits, and add your provincial tax to give your total payable.',
   sections: [
     {
       id: 'federal-tax',
@@ -69,11 +70,11 @@ export const t1Tax: FormPageSpec = {
     },
     {
       id: 'provincial',
-      heading: 'Your Ontario tax',
+      heading: 'Your provincial tax',
       lines: 'Line 42800',
       paragraph:
-        'Ontario charges its own tax, which is worked out on a separate Ontario form. This line copies the answer from that form onto your return.',
-      example: 'The Ontario tax is {ontario}.',
+        "Each province charges its own tax on its own form. Ontario's is Form ON428, and line 42800 copies the answer from that form onto your return.",
+      example: 'In Ontario the provincial tax is {ontario}.',
       figures: {
         ontario: result('$3,911.45', 'provincial_tax_line_42800'),
       },
@@ -83,9 +84,9 @@ export const t1Tax: FormPageSpec = {
       heading: 'Total payable and refund or balance owing',
       lines: 'Lines 43500, 48200 and 167',
       paragraph:
-        'Line 43500 mainly adds your federal tax and your Ontario tax. That gives your total payable. Line 167 is the total payable minus your total credits on line 48200. This page stops short of line 167. It ignores the tax already taken off your pay during the year (line 43700), which is part of the total credits on the real form. It counts only the other credits.',
+        'Line 43500 mainly adds your federal tax and your provincial tax. That gives your total payable. Line 167 is the total payable minus your total credits on line 48200. This page stops short of line 167. It ignores the tax already taken off your pay during the year (line 43700), which is part of the total credits on the real form. It counts only the other credits.',
       example:
-        '{federal} plus {ontario} is a total payable of {total}. The other credits are {refundable}. Without the tax taken off your pay, the balance owing would be {total}.',
+        "{federal} plus Ontario's {ontario} is a total payable of {total}. The other credits are {refundable}. Without the tax taken off your pay, the balance owing would be {total}.",
       figures: {
         federal: result('$7,585.64', 'federal_tax_after_credits'),
         ontario: result('$3,911.45', 'provincial_tax_line_42800'),
