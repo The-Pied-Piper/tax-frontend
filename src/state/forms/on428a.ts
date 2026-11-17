@@ -5,11 +5,11 @@ const { result, printed } = figuresOf('ca-on/on428_a');
 /** Schedule ON428-A in plain words. The figures are the 2025 form's, at a $70,000 salary. */
 export const on428a: FormPageSpec = {
   id: 'on428-a',
-  name: 'Schedule ON428-A: LIFT Credit',
+  name: 'Schedule ON428-A: LIFT credit',
   province: 'ca-on',
   year: 2025,
   exampleSalary: '70000',
-  title: 'Schedule ON428-A: LIFT Credit, in plain words',
+  title: 'Schedule ON428-A: LIFT credit, in plain words',
   description:
     'What Schedule ON428-A is for and what each part asks, in plain words, with a worked example for a $70,000 salary.',
   intro:
@@ -20,7 +20,7 @@ export const on428a: FormPageSpec = {
       heading: 'The most you could get',
       lines: 'Lines 3–5',
       paragraph:
-        'The form takes {rate} of what you earned from work. The credit can never be more than {max}.',
+        'The LIFT credit starts at {rate} of what you earned from work. It can never be more than {max}.',
       example:
         '{rate} of {pay} is {before}. That is more than the most, so the credit before income is checked is {max}.',
       figures: {

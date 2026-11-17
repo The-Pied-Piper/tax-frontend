@@ -5,11 +5,11 @@ const { result } = figuresOf('ca-bc/bc479');
 /** Form BC479 in plain words. The figures are the 2025 form's, at a $70,000 salary. */
 export const bc479: FormPageSpec = {
   id: 'bc479',
-  name: 'Form BC479: BC Credits',
+  name: 'Form BC479: British Columbia credits',
   province: 'ca-bc',
   year: 2025,
   exampleSalary: '70000',
-  title: 'Form BC479: BC Credits, in plain words',
+  title: 'Form BC479: British Columbia credits, in plain words',
   description:
     'What Form BC479 is for and what each part asks, in plain words, with a worked example for a $70,000 salary.',
   intro:

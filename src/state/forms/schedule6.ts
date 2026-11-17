@@ -20,7 +20,7 @@ export const schedule6: FormPageSpec = {
       heading: 'What you earned from work',
       lines: 'Lines 1–6',
       paragraph:
-        'The form starts with what you earned from working. It uses this to work out how much benefit you could get.',
+        'The Canada Workers Benefit starts with what you earned from working. The form uses this to work out how much benefit you could get.',
       example: 'Your pay from work is {pay}.',
       figures: {
         pay: result('$70,000', 'cwb_family_working_income'),

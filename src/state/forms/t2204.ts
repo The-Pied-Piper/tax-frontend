@@ -5,11 +5,11 @@ const { result } = figuresOf('ca/t2204');
 /** Form T2204 in plain words. The figures are the 2025 form's, at a $70,000 salary. */
 export const t2204: FormPageSpec = {
   id: 't2204',
-  name: 'Form T2204: EI Overpayment',
+  name: 'Form T2204: EI overpayment',
   province: 'ca-on',
   year: 2025,
   exampleSalary: '70000',
-  title: 'Form T2204: EI Overpayment, in plain words',
+  title: 'Form T2204: EI overpayment, in plain words',
   description:
     'What Form T2204 is for and what each part asks, in plain words, with a worked example for a $70,000 salary.',
   intro:
