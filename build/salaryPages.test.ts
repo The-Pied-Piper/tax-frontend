@@ -25,7 +25,7 @@ vi.mock('vite', () => ({
   build: vi.fn(async (config: { build: { outDir: string } }): Promise<void> => {
     await writeFile(
       join(config.build.outDir, 'prerender.mjs'),
-      'export const renderSalaryApp = () => "";\nexport const renderSalaryIndexNav = () => "";\nexport const renderContentPage = () => "";\n',
+      'export const renderSalaryApp = () => "";\nexport const renderSiteFooter = () => "";\nexport const renderContentPage = () => "";\n',
     );
   }),
 }));
@@ -41,14 +41,14 @@ vi.mock('./salaryPages/generate', async () => {
     }): Promise<{
       written: string[];
       skipped: string[];
-      index: { groups: never[] };
+      built: never[];
     }> => {
       const written = ['ca-on/30000/index.html', 'ca-on/35000/index.html'];
       for (const file of written) {
         await makeDir(joinPath(outDir, file, '..'), { recursive: true });
         await write(joinPath(outDir, file), `<html>${file}</html>`);
       }
-      return { written, skipped: [], index: { groups: [] } };
+      return { written, skipped: [], built: [] };
     },
   };
 });
@@ -111,6 +111,9 @@ describe('salaryPages closeBundle', () => {
     ) as Record<string, unknown>;
     expect(Object.keys(hashes)).toEqual([
       '/',
+      '/ca-ab/',
+      '/ca-bc/',
+      '/ca-on/',
       '/ca-on/30000/',
       '/ca-on/35000/',
       '/methodology/',
@@ -118,7 +121,7 @@ describe('salaryPages closeBundle', () => {
 
     const sitemap = await readFile(join(root, 'dist', 'sitemap.xml'), 'utf8');
     const urls = sitemap.match(/<url>[\s\S]*?<\/url>/g) ?? [];
-    expect(urls).toHaveLength(4);
+    expect(urls).toHaveLength(7);
     for (const url of urls) {
       expect(url).toMatch(/<lastmod>\d{4}-\d{2}-\d{2}<\/lastmod>/);
     }

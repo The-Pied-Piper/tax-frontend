@@ -1,4 +1,4 @@
-import { addressOf, pagePath, pageUrl } from './address';
+import { addressOf, isSalaryPageSlug, pagePath, pageUrl } from './address';
 
 // The one function that says where a salary page lives. The sitemap, the
 // canonical link, og:url and the page links all take their address from it.
@@ -43,5 +43,34 @@ describe('addressOf', () => {
     ]) {
       expect(() => addressOf(file), file).toThrow();
     }
+  });
+});
+
+describe('isSalaryPageSlug', () => {
+  it('is true for a province folder and a whole salary', () => {
+    for (const slug of ['ca-on/70000', 'ca-xx/15000', 'a1/0']) {
+      expect(isSalaryPageSlug(slug), slug).toBe(true);
+    }
+  });
+
+  it('is false for every other kind of slug', () => {
+    for (const slug of [
+      'ca-on',
+      'methodology',
+      'forms/bc428',
+      'forms/t1-income',
+      'ca-on/70000/extra',
+      'ca-on/70k',
+      'Ca-On/70000',
+      '/ca-on/70000',
+      'ca-on/70000/',
+      '',
+    ]) {
+      expect(isSalaryPageSlug(slug), slug).toBe(false);
+    }
+  });
+
+  it('agrees with pagePath: the address of a salary page, without its slashes', () => {
+    expect(isSalaryPageSlug(pagePath('ca-on', 70000).slice(1, -1))).toBe(true);
   });
 });

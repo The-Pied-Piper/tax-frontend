@@ -1,6 +1,7 @@
 import { DESCRIPTION_LIMIT, TITLE_LIMIT } from '../../build/salaryPages/limits';
-import { contentPages } from './contentPages';
+import { contentPages, paragraph } from './contentPages';
 import { isContentSlug, METHODOLOGY_SLUG } from './siteLinks';
+import { THEME_TOGGLE_SLOT_ID } from './themeSlot';
 
 // Adding a page is one entry in the list; these checks keep every entry sound.
 describe('contentPages', () => {
@@ -35,7 +36,7 @@ describe('contentPages', () => {
       }
       for (const section of page.sections) {
         expect(section.heading.length).toBeGreaterThan(0);
-        expect(section.paragraphs.length).toBeGreaterThan(0);
+        expect(section.blocks.length).toBeGreaterThan(0);
       }
     }
   });
@@ -65,5 +66,21 @@ describe('the methodology page', () => {
     expect(words).not.toContain('canada-only');
     expect(JSON.stringify(page)).not.toMatch(/\bAI\b/);
     expect(words).not.toContain('docs/');
+  });
+});
+
+describe('the theme switch slot', () => {
+  it('has its own module, so the calculator never imports page copy', () => {
+    expect(THEME_TOGGLE_SLOT_ID).toBe('content-theme-toggle');
+  });
+});
+
+describe('paragraph', () => {
+  it('makes a paragraph block from words and links', () => {
+    const link = { label: 'the link', href: '/x/' };
+    expect(paragraph('a ', link, ' b')).toEqual({
+      kind: 'paragraph',
+      content: ['a ', link, ' b'],
+    });
   });
 });

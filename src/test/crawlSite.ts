@@ -39,8 +39,9 @@ export function navHrefs(dir: string, file: string): (string | null)[] {
 }
 
 /**
- * The pages the footer links to. The hubs and the methodology page come from
- * later tickets, so a built folder without them is allowed to lack these files.
+ * The pages the footer links to. A full build writes every one of them (the
+ * methodology page and the three hubs); a folder built from fewer pieces may
+ * lack some, and the tests of those skip these files.
  */
 export const FOOTER_TARGETS: string[] = [
   contentFile(METHODOLOGY_SLUG),
@@ -57,7 +58,12 @@ export function internalLinks(dir: string, written: string[]) {
   );
 }
 
-/** The internal links that must resolve to a written file: every link except the footer's. */
+/**
+ * The internal links that must resolve to a written file when only salary
+ * pages were built: every link except the footer's, whose pages are written by
+ * other steps. A full build (salary pages, content pages and hubs) checks
+ * every link with `internalLinks` instead.
+ */
 export function linksToWrittenFiles(dir: string, written: string[]) {
   return internalLinks(dir, written).filter(
     ({ target }) => !FOOTER_TARGETS.includes(target),

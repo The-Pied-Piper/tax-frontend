@@ -7,15 +7,26 @@ const INDEX = '/index.html';
 /** The page the footer's "How we calculate" link goes to. */
 export const METHODOLOGY_SLUG = 'methodology';
 
+/** The folder, below the site root, that every form page lives in. */
+export const FORMS_SEGMENT = 'forms';
+
 /** The address of the calculator. */
 export const HOME_PATH = '/';
 
 /** The province pages the footer links to, in the order shown. Their names are in `strings.siteNav.provinceNames`. */
 export const FOOTER_PROVINCE_SLUGS = ['ca-on', 'ca-ab', 'ca-bc'] as const;
 
+/** The province pages the footer links to, by slug. */
+export type FooterProvinceSlug = (typeof FOOTER_PROVINCE_SLUGS)[number];
+
 /** Whether this is a slug: lower-case letters, digits and hyphens, in segments separated by "/". */
 export function isContentSlug(slug: string): boolean {
   return SLUG.test(slug);
+}
+
+/** The slug of a form page, such as `forms/on428`. */
+export function formSlug(id: string): string {
+  return `${FORMS_SEGMENT}/${id}`;
 }
 
 /** The address of a content page, such as `/ca-on/`. */

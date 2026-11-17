@@ -6,12 +6,10 @@ import { Breakdown } from './components/Breakdown';
 import { ErrorNotice } from './components/ErrorNotice';
 import { ProvisionalNotice } from './components/ProvisionalNotice';
 import { SalaryForm } from './components/SalaryForm';
-import { SalaryIndexNav } from './components/SalaryIndexNav';
 import { SalaryLinks } from './components/SalaryLinks';
 import { SiteFooter } from './components/SiteFooter';
 import { StarLink } from './components/StarLink';
 import { ThemeToggle } from './components/ThemeToggle';
-import type { SalaryIndex } from './state/salaryIndex';
 import { salaryPageText } from './state/salaryPageText';
 import { useTakeHome, type SalaryPageData } from './state/useTakeHome';
 import { strings } from './strings';
@@ -21,12 +19,11 @@ type Props = {
   registry?: AdapterRegistry;
   initial?: SalaryPageData;
   /** Every pre-built salary page; none in a plain build. */
-  salaryIndex?: SalaryIndex;
   /** The date the default year is taken from; tests pin it. */
   clock?: () => Date;
 };
 
-export function App({ client, registry, initial, salaryIndex, clock }: Props) {
+export function App({ client, registry, initial, clock }: Props) {
   const page = useTakeHome(client, registry, initial, clock);
   const { request } = page;
   // Only a pre-built page carries a summary; a fresh calculation does not.
@@ -105,7 +102,6 @@ export function App({ client, registry, initial, salaryIndex, clock }: Props) {
           </>
         )}
         <StarLink />
-        {salaryIndex && !initial && <SalaryIndexNav index={salaryIndex} />}
       </main>
       <SiteFooter />
     </>

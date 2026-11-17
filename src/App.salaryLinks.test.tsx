@@ -3,7 +3,6 @@ import userEvent from '@testing-library/user-event';
 import { App } from './App';
 import type { ApiClient } from './api';
 import { strings } from './strings';
-import { ontarioIndex } from './test/salaryIndexData';
 import { compute70000, pageData } from './test/syntheticPages';
 import jurisdictions from './api/fixtures/jurisdictions.json';
 
@@ -44,13 +43,7 @@ async function calculate(salary: string) {
 
 describe('App links on a pre-built salary page', () => {
   it('shows the links of the page and no nearby list when seeded', () => {
-    render(
-      <App
-        client={sameObjectClient()}
-        initial={seeded}
-        salaryIndex={ontarioIndex}
-      />,
-    );
+    render(<App client={sameObjectClient()} initial={seeded} />);
     expect(pageLinks()).toBeInTheDocument();
     expect(nearby()).not.toBeInTheDocument();
   });
@@ -61,13 +54,7 @@ describe('App links on a pre-built salary page', () => {
   ])(
     'turns into the plain calculator after %s is calculated',
     async (_name, salary, makeClient) => {
-      render(
-        <App
-          client={makeClient()}
-          initial={seeded}
-          salaryIndex={ontarioIndex}
-        />,
-      );
+      render(<App client={makeClient()} initial={seeded} />);
       await calculate(salary);
       await screen.findByRole('heading', { name: strings.answer.heading });
       await waitFor(() => {
@@ -84,13 +71,7 @@ describe('App links on a pre-built salary page', () => {
 
 describe('App summary on a pre-built salary page', () => {
   it('shows the Take-home heading, About this estimate and the paragraph when seeded', () => {
-    render(
-      <App
-        client={sameObjectClient()}
-        initial={seeded}
-        salaryIndex={ontarioIndex}
-      />,
-    );
+    render(<App client={sameObjectClient()} initial={seeded} />);
     expect(screen.getByRole('heading', { level: 1 }).textContent).toMatch(
       / After Tax in Ontario \(2026 Take-Home Pay\)$/,
     );

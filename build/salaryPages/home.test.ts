@@ -1,28 +1,23 @@
 import { readFileSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
-import { render, screen } from '@testing-library/react';
+import { render } from '@testing-library/react';
 import { createElement } from 'react';
-import { SalaryIndexNav } from '../../src/components/SalaryIndexNav';
-import { displayWholeMoney } from '../../src/money/format';
-import { parseSalaryIndex, SALARY_INDEX_ID } from '../../src/state/salaryIndex';
+import { SiteFooter } from '../../src/components/SiteFooter';
+import { FOOTER_PROVINCE_SLUGS } from '../../src/state/siteLinks';
 import { strings } from '../../src/strings';
 import { tmpDirs, template } from '../../src/test/generatedSite';
-import {
-  indexUnit,
-  ontarioIndex,
-  twoProvinceIndex,
-} from '../../src/test/salaryIndexData';
 import { rewriteHome } from './home';
-import { renderSalaryIndexNav } from './prerender';
+import { renderSiteFooter } from './prerender';
 
-// What the build writes into dist/index.html: the data block for React and the
-// same nav as static HTML, so the home page links to every page without scripts.
+// What the build writes into dist/index.html: the real footer as static HTML,
+// so the home page links to the methodology page and the province pages
+// without scripts.
 const outDir = tmpDirs('salary-home');
 
-async function home(index = ontarioIndex) {
+async function home() {
   const dir = outDir();
   writeFileSync(join(dir, 'index.html'), template);
-  await rewriteHome(dir, index, renderSalaryIndexNav);
+  await rewriteHome(dir, renderSiteFooter);
   const html = readFileSync(join(dir, 'index.html'), 'utf8');
   return {
     dir,
@@ -31,61 +26,57 @@ async function home(index = ontarioIndex) {
   };
 }
 
-const popular = (page: Document) =>
-  [...page.querySelectorAll('nav')].filter(
-    (n) => n.getAttribute('aria-label') === 'Popular salaries',
-  );
-
-/** What a reader sees of a nav: its name, its headings, and each link's text and address. */
-function shape(nav: Element) {
-  return {
-    label: nav.getAttribute('aria-label'),
-    headings: [...nav.querySelectorAll('h2, h3')].map((h) => h.textContent),
-    links: [...nav.querySelectorAll('a')].map((a) => [
-      a.textContent,
-      a.getAttribute('href'),
-    ]),
-  };
-}
+const hrefs = (root: ParentNode) =>
+  [...root.querySelectorAll('nav a')].map((a) => a.getAttribute('href'));
 
 describe('rewriteHome (dist/index.html)', () => {
-  it('names the data block the page reads', () => {
-    expect(SALARY_INDEX_ID).toBe('salary-pages-index');
+  it('links the methodology page and the three hubs in the static html', async () => {
+    const { page } = await home();
+    expect(page.querySelector('nav a[href="/methodology/"]')).not.toBeNull();
+    for (const slug of FOOTER_PROVINCE_SLUGS) {
+      expect(
+        page.querySelector(`nav a[href="/${slug}/"]`),
+        slug,
+      ).not.toBeNull();
+    }
+    expect(hrefs(page)).toEqual([
+      '/methodology/',
+      '/ca-on/',
+      '/ca-ab/',
+      '/ca-bc/',
+    ]);
   });
 
-  it('puts the index in a JSON data block that the guard accepts', async () => {
+  it('has the footer inside #root after the main, with the disclaimer', async () => {
     const { page } = await home();
-    const blocks = page.querySelectorAll('script#salary-pages-index');
-    expect(blocks).toHaveLength(1);
-    expect(blocks[0]?.getAttribute('type')).toBe('application/json');
-    expect(parseSalaryIndex(blocks[0]?.textContent ?? null)).toEqual(
-      ontarioIndex,
+    const footer = page.querySelector('#root > footer');
+    expect(footer).not.toBeNull();
+    expect(footer?.previousElementSibling?.tagName).toBe('MAIN');
+    expect(footer?.textContent).toContain(strings.footer);
+    expect(page.querySelectorAll('footer')).toHaveLength(1);
+  });
+
+  it('has no Popular salaries list and no salary links or data block', async () => {
+    const { html, page } = await home();
+    expect(html).not.toContain('Popular salaries');
+    expect(page.querySelector('details')).toBeNull();
+    expect(page.querySelector('script[type="application/json"]')).toBeNull();
+    expect(page.querySelectorAll('a[href^="/ca-on/"]')).toHaveLength(1);
+  });
+
+  it('is the same footer that React draws', async () => {
+    const { page } = await home();
+    const { container } = render(createElement(SiteFooter));
+    const pairs = (root: ParentNode) =>
+      [...root.querySelectorAll('a')].map((a) => [
+        a.textContent,
+        a.getAttribute('href'),
+      ]);
+    expect(pairs(page.querySelector('#root > footer') as Element)).toEqual(
+      pairs(container),
     );
-  });
-
-  it('has a static Popular salaries nav at the end of #root main, with a link to every page', async () => {
-    const { page } = await home();
-    const navs = popular(page);
-    expect(navs).toHaveLength(1);
-    const nav = navs[0] as Element;
-    expect(nav.closest('#root > main')).not.toBeNull();
-    expect(nav.parentElement?.lastElementChild).toBe(nav);
-    expect(
-      [...nav.querySelectorAll('a')].map((a) => a.getAttribute('href')),
-    ).toEqual(ontarioIndex.groups[0]?.pages.map((p) => p.href));
-    expect(nav.querySelectorAll('a')).toHaveLength(25);
-  });
-
-  it('words each link as the salary in the province, and groups under the province name', async () => {
-    const { page } = await home();
-    const nav = popular(page)[0] as Element;
-    expect(nav.textContent).toContain('Ontario');
-    const first = nav.querySelector('a[href="/ca-on/75000/"]');
-    expect(first?.textContent).toBe(
-      strings.salaryIndex.link(
-        displayWholeMoney('75000', 'annually', indexUnit),
-        'Ontario',
-      ),
+    expect(page.querySelector('#root > footer')?.outerHTML).toBe(
+      container.querySelector('footer')?.outerHTML,
     );
   });
 
@@ -97,99 +88,38 @@ describe('rewriteHome (dist/index.html)', () => {
     expect(after.querySelector('h1')?.textContent).toBe(
       before.querySelector('h1')?.textContent,
     );
+    expect(after.querySelector('main')?.outerHTML).toBe(
+      before.querySelector('main')?.outerHTML,
+    );
     expect(after.querySelector('script[src="/src/main.tsx"]')).not.toBeNull();
     expect(after.querySelectorAll('main')).toHaveLength(1);
   });
 
-  it('gives a second province its own group with no other change', async () => {
-    const { page } = await home(twoProvinceIndex);
-    const nav = popular(page)[0] as Element;
-    expect(nav.querySelectorAll('a')).toHaveLength(28);
-    expect(nav.querySelector('a[href="/ca-xx/15000/"]')).not.toBeNull();
-    expect(nav.textContent).toContain('Xland');
-  });
-
-  it('writes nothing for an index with no groups', async () => {
-    const dir = outDir();
-    writeFileSync(join(dir, 'index.html'), template);
-    await rewriteHome(dir, { groups: [] }, renderSalaryIndexNav);
-    expect(readFileSync(join(dir, 'index.html'), 'utf8')).toBe(template);
-  });
-
-  it('is idempotent: a second call changes nothing', async () => {
-    const { dir, html } = await home(twoProvinceIndex);
-    await rewriteHome(dir, twoProvinceIndex, renderSalaryIndexNav);
+  it('is idempotent: a second call leaves exactly one footer and the same bytes', async () => {
+    const { dir, html } = await home();
+    await rewriteHome(dir, renderSiteFooter);
     const again = readFileSync(join(dir, 'index.html'), 'utf8');
     expect(again).toBe(html);
     const page = new DOMParser().parseFromString(again, 'text/html');
-    expect(page.querySelectorAll('script#salary-pages-index')).toHaveLength(1);
-    expect(popular(page)).toHaveLength(1);
-  });
-
-  it('is the same nav that React mounts from the data block', async () => {
-    const { page } = await home(twoProvinceIndex);
-    const parsed = parseSalaryIndex(
-      page.getElementById(SALARY_INDEX_ID)?.textContent ?? null,
+    expect(page.querySelectorAll('footer')).toHaveLength(1);
+    expect(page.querySelectorAll('nav a[href="/methodology/"]')).toHaveLength(
+      1,
     );
-    expect(parsed).toEqual(twoProvinceIndex);
-    render(createElement(SalaryIndexNav, { index: parsed ?? { groups: [] } }));
-    const mounted = screen.getByRole('navigation', {
-      name: 'Popular salaries',
-    });
-    expect(shape(popular(page)[0] as Element)).toEqual(shape(mounted));
   });
 
-  describe('disclosure in the built home page', () => {
-    it('puts one closed details with a summary around the 25 anchors', async () => {
-      const { page } = await home();
-      const all = page.querySelectorAll('details');
-      expect(all).toHaveLength(1);
-      const details = all[0] as HTMLDetailsElement;
-      expect(details.hasAttribute('open')).toBe(false);
-      expect(details.querySelector('summary')).not.toBeNull();
-      expect(details.querySelectorAll('a')).toHaveLength(25);
-      expect(page.querySelectorAll('a[href^="/ca-on/"]')).toHaveLength(25);
-      expect(details.closest('#root > main')).not.toBeNull();
-    });
+  it('writes whatever footer it is given, once, even on a repeat call', async () => {
+    const dir = outDir();
+    writeFileSync(join(dir, 'index.html'), template);
+    const footer = () => '<footer class="page-footer">stand-in</footer>';
+    await rewriteHome(dir, footer);
+    await rewriteHome(dir, footer);
+    const html = readFileSync(join(dir, 'index.html'), 'utf8');
+    expect(html.match(/stand-in/g)).toHaveLength(1);
+  });
 
-    it('writes the anchors as static markup, in the same order, with no hiding', async () => {
-      const { html, page } = await home();
-      expect(
-        [
-          ...(page.querySelector('details') as Element).querySelectorAll('a'),
-        ].map((a) => a.getAttribute('href')),
-      ).toEqual(ontarioIndex.groups[0]?.pages.map((p) => p.href));
-      for (const h of ontarioIndex.groups[0]?.pages.map((p) => p.href) ?? [])
-        expect(html).toContain(`href="${h}"`);
-      expect(page.querySelector('[hidden], [aria-hidden="true"]')).toBeNull();
-      expect(page.querySelector('details [style*="display"]')).toBeNull();
-    });
-
-    it('shows crawlers the same links as visitors: the static anchors equal what React mounts', async () => {
-      const { page } = await home(twoProvinceIndex);
-      const details = page.querySelector('details') as Element;
-      render(createElement(SalaryIndexNav, { index: twoProvinceIndex }));
-      const mounted = screen.getByRole('navigation', {
-        name: 'Popular salaries',
-      });
-      const pairs = (root: Element) =>
-        [...root.querySelectorAll('a')].map((a) => [
-          a.textContent,
-          a.getAttribute('href'),
-        ]);
-      expect(pairs(details)).toEqual(pairs(mounted));
-    });
-
-    it('is idempotent for the disclosure: still one details, one nav, same bytes', async () => {
-      const { dir, html } = await home();
-      await rewriteHome(dir, ontarioIndex, renderSalaryIndexNav);
-      await rewriteHome(dir, ontarioIndex, renderSalaryIndexNav);
-      const again = readFileSync(join(dir, 'index.html'), 'utf8');
-      expect(again).toBe(html);
-      const page = new DOMParser().parseFromString(again, 'text/html');
-      expect(page.querySelectorAll('details')).toHaveLength(1);
-      expect(popular(page)).toHaveLength(1);
-      expect(page.querySelectorAll('a[href^="/ca-on/"]')).toHaveLength(25);
-    });
+  it('throws when index.html has no main in #root', async () => {
+    const dir = outDir();
+    writeFileSync(join(dir, 'index.html'), '<html><body></body></html>');
+    await expect(rewriteHome(dir, renderSiteFooter)).rejects.toThrow(/main/);
   });
 });

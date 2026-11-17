@@ -1,9 +1,7 @@
-import { existsSync, readFileSync } from 'node:fs';
+import { existsSync } from 'node:fs';
 import { join } from 'node:path';
-import jurisdictions from '../../src/api/fixtures/jurisdictions.json';
 import compute70000 from '../../src/api/fixtures/compute-on-2026-70000.json';
 import { readUnit } from '../../src/adapters/fallback';
-import { parseSalaryIndex } from '../../src/state/salaryIndex';
 import {
   apiBaseUrl,
   fakeFetch,
@@ -17,13 +15,9 @@ import { generateSalaryPages } from './generate';
 import { provinces } from './provinces';
 import { renderSalaryApp } from './prerender';
 
-// Each page carries the advanced lines, so building and parsing many pages
-// outlasts the 5 s default when the whole suite runs in parallel.
-const SLOW_TEST_MS = 20_000;
-
-// What the generator adds for the link index: the result's `index`, and the
-// same data block in every page it writes.
-const outDir = tmpDirs('salary-index');
+// What the generator reports for the hub pages: the result's `built`, one
+// entry per province that was written, and no list data inside the pages.
+const outDir = tmpDirs('salary-built');
 
 function run(dir: string, options: { all?: boolean; list?: unknown } = {}) {
   return generateSalaryPages({
@@ -37,153 +31,65 @@ function run(dir: string, options: { all?: boolean; list?: unknown } = {}) {
   });
 }
 
-function blocks(dir: string, file: string): Element[] {
-  return [
-    ...new DOMParser()
-      .parseFromString(readFileSync(join(dir, file), 'utf8'), 'text/html')
-      .querySelectorAll('script#salary-pages-index'),
-  ];
-}
-
-describe('generateSalaryPages: the salary-pages-index', () => {
-  it('has one group for Ontario: code, name, unit and 25 pages, lowest first', async () => {
-    const { index } = await run(outDir());
-    expect(index.groups).toHaveLength(1);
-    const [group] = index.groups;
-    expect(group?.code).toBe('CA-ON');
-    expect(group?.name).toBe('Ontario');
-    expect(group?.unit).toEqual(readUnit(compute70000.unit));
-    expect(group?.pages).toHaveLength(25);
-    expect(group?.pages[0]).toEqual({ salary: '30000', href: '/ca-on/30000/' });
-    expect(group?.pages[24]).toEqual({
-      salary: '150000',
-      href: '/ca-on/150000/',
-    });
-    expect(group?.pages.map((p) => p.href)).toEqual(
-      Array.from(
-        { length: 25 },
-        (_, i) => `/ca-on/${(30000 + i * 5000).toString()}/`,
-      ),
+describe('generateSalaryPages: built', () => {
+  it('has one entry for Ontario: its province, unit and 25 salaries, lowest first', async () => {
+    const { built } = await run(outDir());
+    expect(built).toHaveLength(1);
+    const [ontario] = built;
+    expect(ontario?.province.code).toBe('CA-ON');
+    expect(ontario?.unit).toEqual(readUnit(compute70000.unit));
+    expect(ontario?.salaries).toEqual(
+      Array.from({ length: 25 }, (_, i) => (30000 + i * 5000).toString()),
     );
   });
 
   it('lists exactly the pages it wrote, never one it did not', async () => {
     const dir = outDir();
-    const { index, written } = await run(dir, { all: true });
-    const hrefs = index.groups.flatMap((g) => g.pages.map((p) => p.href));
-    expect(hrefs.sort()).toEqual(
-      written.map((f) => `/${f.replace('index.html', '')}`).sort(),
+    const { built, written } = await run(dir, { all: true });
+    const files = built.flatMap(({ province, salaries }) =>
+      salaries.map((salary) => `${province.slug}/${salary}/index.html`),
     );
-    for (const href of hrefs) {
-      expect(existsSync(join(dir, href.slice(1), 'index.html'))).toBe(true);
-    }
+    expect(files.sort()).toEqual([...written].sort());
+    for (const file of files) expect(existsSync(join(dir, file))).toBe(true);
   });
 
-  it('adds a group for a made-up second province, in the province-list order', async () => {
-    const { index } = await run(outDir(), { all: true });
-    expect(index.groups.map((g) => [g.code, g.name])).toEqual([
-      ['CA-ON', 'Ontario'],
-      ['CA-XX', 'Xland'],
-    ]);
-    expect(index.groups[1]?.pages).toEqual([
-      { salary: '10000', href: '/ca-xx/10000/' },
-      { salary: '15000', href: '/ca-xx/15000/' },
-      { salary: '20000', href: '/ca-xx/20000/' },
-    ]);
+  it('adds an entry for a made-up second province, in the province-list order', async () => {
+    const { built } = await run(outDir(), { all: true });
+    expect(built.map((b) => b.province.code)).toEqual(['CA-ON', 'CA-XX']);
+    expect(built[1]?.salaries).toEqual(['10000', '15000', '20000']);
   });
 
-  it('has an Ontario group then an Alberta group, 25 pages each, when the API lists Alberta', async () => {
-    const { index, written } = await run(outDir(), { list: withAlberta });
-    expect(index.groups.map((g) => [g.code, g.name])).toEqual([
-      ['CA-ON', 'Ontario'],
-      ['CA-AB', 'Alberta'],
-    ]);
-    expect(index.groups.map((g) => g.pages.length)).toEqual([25, 25]);
-    expect(index.groups[1]?.pages[0]).toEqual({
-      salary: '30000',
-      href: '/ca-ab/30000/',
-    });
-    expect(index.groups[1]?.pages[24]).toEqual({
-      salary: '150000',
-      href: '/ca-ab/150000/',
-    });
+  it('has an Ontario entry then an Alberta entry, 25 salaries each, when the API lists Alberta', async () => {
+    const { built, written } = await run(outDir(), { list: withAlberta });
+    expect(built.map((b) => b.province.code)).toEqual(['CA-ON', 'CA-AB']);
+    expect(built.map((b) => b.salaries.length)).toEqual([25, 25]);
     expect(written).toHaveLength(50);
   });
 
-  it('has no group for a listed province the API does not return', async () => {
-    const dir = outDir();
+  it('has no entry for a listed province the API does not return', async () => {
     const result = await generateSalaryPages({
       fetch: fakeFetch(),
       baseUrl: apiBaseUrl,
       provinces: [...provinces.filter((p) => p.code === 'CA-ON'), xland],
-      outDir: dir,
+      outDir: outDir(),
       template,
       render: renderSalaryApp,
       siteUrl: null,
     });
     expect(result.skipped).toEqual(['CA-XX']);
-    expect(result.index.groups.map((g) => g.code)).toEqual(['CA-ON']);
+    expect(result.built.map((b) => b.province.code)).toEqual(['CA-ON']);
   });
 
-  it('has no groups when no listed province is returned', async () => {
-    const dir = outDir();
+  it('has no entries when no listed province is returned', async () => {
     const result = await generateSalaryPages({
       fetch: fakeFetch({ jurisdictions: [] }),
       baseUrl: apiBaseUrl,
       provinces,
-      outDir: dir,
+      outDir: outDir(),
       template,
       render: renderSalaryApp,
       siteUrl: null,
     });
-    expect(result.index).toEqual({ groups: [] });
-  });
-
-  it(
-    'writes the same block, once, into every page',
-    async () => {
-      const dir = outDir();
-      const { index, written } = await run(dir, { all: true });
-      expect(written).toHaveLength(28);
-      for (const file of written) {
-        const found = blocks(dir, file);
-        expect(found, file).toHaveLength(1);
-        expect(found[0]?.getAttribute('type')).toBe('application/json');
-        // The block carries the API's unit; reading it shows the plain $.
-        expect(parseSalaryIndex(found[0]?.textContent ?? null), file).toEqual(
-          parseSalaryIndex(JSON.stringify(index)),
-        );
-      }
-    },
-    SLOW_TEST_MS,
-  );
-
-  it('cannot be ended early by a province name that is markup', async () => {
-    const dir = outDir();
-    const hostile = '</script><b>';
-    const list = {
-      jurisdictions: jurisdictions.jurisdictions.map((j) =>
-        j.code === 'CA-ON' ? { ...j, name: hostile } : j,
-      ),
-    };
-    const { written } = await run(dir, { list });
-    const file = written[0] ?? 'missing';
-    const html = readFileSync(join(dir, file), 'utf8');
-    const start = html.indexOf('id="salary-pages-index"');
-    const block = html.slice(start, html.indexOf('</script>', start));
-    expect(block).not.toContain('<');
-    expect(blocks(dir, file)).toHaveLength(1);
-    expect(
-      parseSalaryIndex(blocks(dir, file)[0]?.textContent ?? null)?.groups[0]
-        ?.name,
-    ).toBe(hostile);
-  });
-
-  it('leaves the existing data block and its links as they were', async () => {
-    const dir = outDir();
-    const { written } = await run(dir);
-    const html = readFileSync(join(dir, 'ca-on/70000/index.html'), 'utf8');
-    expect(html.match(/id="salary-page-data"/g)).toHaveLength(1);
-    expect(written).toHaveLength(25);
+    expect(result.built).toEqual([]);
   });
 });
