@@ -12,7 +12,7 @@ export type Province = {
   step: number;
 };
 
-/** One entry per province. A province the API does not return yet gets no pages. */
+/** One entry per province. A province the API does not return fails a build with a site URL and is skipped without one. */
 export const provinces: Province[] = [
   {
     code: 'CA-ON',

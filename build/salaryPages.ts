@@ -159,7 +159,9 @@ export function salaryPages(
         );
         console.log(`Not-found page: wrote ${notFound}`);
         for (const code of skipped) {
-          console.log(`Salary pages: ${code} not returned by the API, skipped`);
+          console.warn(
+            `Salary pages: ${code} not returned by the API, skipped`,
+          );
         }
       } finally {
         await rm(tempDir, { recursive: true, force: true });
