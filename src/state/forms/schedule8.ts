@@ -20,7 +20,7 @@ export const schedule8: FormPageSpec = {
       heading: 'Months you paid in',
       lines: 'Lines A, B, D and E',
       paragraph:
-        'The form starts with how many months you paid into the pension plan. For a full year that is {months}. The number of months sets three limits. One is the most pay the plan counts. The next is a higher limit for extra payments. The last is a first slice of pay that is not counted.',
+        'The form starts with how many months you paid into the pension plan. For a full year that is {months}. The number of months sets three limits. One is the limit for the main payment. The next is a higher limit, the most pay the plan counts at all. The last is a first slice of pay that is not counted.',
       example:
         'For {months} months the limits are {first}, {second} and {exemption}.',
       figures: {
@@ -67,9 +67,9 @@ export const schedule8: FormPageSpec = {
       heading: 'Your main payment',
       lines: 'Lines 5–12',
       paragraph:
-        'The first {exemption} of your pay is not counted. The rest, up to {first}, is charged at {baseRate}. That is your base payment. A further {extraRate} of the same amount is the extra part, which is treated differently on your return.',
+        'The first {exemption} of your pay is not counted. The rest of your pay, up to {first} in total, is charged at {baseRate}. That is your base payment. A further {extraRate} of the same amount is the extra part, which is treated differently on your return.',
       example:
-        'Your pay less {exemption} is {rest}, which is under {first}. {baseRate} of that is {base}. {extraRate} of it is {extra}.',
+        'Your pay is under {first}, so all of it is charged. Your pay less {exemption} is {rest}. {baseRate} of that is {base}. {extraRate} of it is {extra}.',
       figures: {
         exemption: result('$3,500', 'cpp_basic_exemption'),
         first: result('$71,300', 'cpp_maximum_pensionable_earnings'),
