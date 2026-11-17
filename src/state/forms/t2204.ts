@@ -9,6 +9,7 @@ export const t2204: FormPageSpec = {
   province: 'ca-on',
   year: 2025,
   exampleSalary: '70000',
+  federal: true,
   title: 'Form T2204: EI overpayment, in plain words',
   description:
     'What Form T2204 is for and what each part asks, in plain words, with a worked example for a $70,000 salary.',

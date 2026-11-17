@@ -4,6 +4,7 @@ import { displayWholeMoney } from '../money/format';
 import { splitFigures, type FormBody } from '../state/formPage';
 import {
   contentPath,
+  FOOTER_PROVINCE_SLUGS,
   METHODOLOGY_SLUG,
   salaryPagePath,
 } from '../state/siteLinks';
@@ -43,6 +44,7 @@ export function FormSections({
   exampleSalary,
   sections,
   salaryPageWritten,
+  federal,
 }: FormBody) {
   const salary = displayWholeMoney(
     exampleSalary,
@@ -105,13 +107,23 @@ export function FormSections({
         </section>
       ))}
       <nav aria-label={strings.formPage.related} className={styles.related}>
-        <a href={contentPath(province)}>{strings.formPage.hub(place)}</a>
+        {federal === true ? (
+          FOOTER_PROVINCE_SLUGS.map((slug) => (
+            <a key={slug} href={contentPath(slug)}>
+              {strings.formPage.hub(strings.siteNav.provinceNames[slug])}
+            </a>
+          ))
+        ) : (
+          <a href={contentPath(province)}>{strings.formPage.hub(place)}</a>
+        )}
         <a href={contentPath(METHODOLOGY_SLUG)}>
           {strings.siteNav.methodology}
         </a>
         {salaryPageWritten === true && (
           <a href={salaryPagePath(province, exampleSalary)}>
-            {strings.formPage.salaryExample(salary)}
+            {federal === true
+              ? strings.formPage.federalSalaryExample(salary)
+              : strings.formPage.salaryExample(salary)}
           </a>
         )}
       </nav>
