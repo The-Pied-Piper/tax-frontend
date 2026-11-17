@@ -161,6 +161,17 @@ describe('the breadcrumb and Learn more links before the bundle loads match thos
     ).toBeTruthy();
   });
 
+  it.each(each)('has the answer before the form for $%s', (_salary, data) => {
+    const { container } = render(<App initial={data} />);
+    const answer = container.querySelector('.page-summary');
+    const form = screen.getByLabelText(strings.form.place);
+    expect(answer).not.toBeNull();
+    expect(
+      (answer as Node).compareDocumentPosition(form) &
+        Node.DOCUMENT_POSITION_FOLLOWING,
+    ).toBeTruthy();
+  });
+
   it('shows no breadcrumb on the home calculator', () => {
     const { container } = render(<App />);
     expect(

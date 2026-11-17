@@ -388,6 +388,35 @@ describe('breadcrumb and learn-more links in the static page (#150)', () => {
     expect(current.closest('a')).toBeNull();
   });
 
+  it('puts the answer and the page paragraph before the form in the HTML', () => {
+    const html = renderSalaryApp(dataFor(compute70000, '70000'));
+    const form = html.indexOf(strings.form.place);
+    expect(form).toBeGreaterThan(-1);
+    expect(html.indexOf('$53,786.25')).toBeLessThan(form);
+    expect(html.indexOf('class="page-summary"')).toBeGreaterThan(-1);
+    expect(html.indexOf('class="page-summary"')).toBeLessThan(form);
+  });
+
+  it('puts the provisional note after the answer and before the form', () => {
+    const html = renderSalaryApp(dataFor(compute70000, '70000'));
+    const note = html.indexOf('figures are provisional');
+    expect(note).toBeGreaterThan(-1);
+    expect(html.indexOf('$53,786.25')).toBeLessThan(note);
+    expect(note).toBeLessThan(html.indexOf(strings.form.place));
+  });
+
+  it('puts the form before the neighbour links, so the keyboard reaches it in screen order', () => {
+    show(dataFor(compute70000, '70000'));
+    const form = screen.getByLabelText(strings.form.place);
+    const neighbours = screen.getByRole('navigation', {
+      name: strings.salaryLinks.label,
+    });
+    expect(
+      form.compareDocumentPosition(neighbours) &
+        Node.DOCUMENT_POSITION_FOLLOWING,
+    ).toBeTruthy();
+  });
+
   it('puts the breadcrumb above the h1', () => {
     show(withLinks);
     const h1 = screen.getByRole('heading', { level: 1 });
