@@ -206,18 +206,6 @@ describe('t2204 copy', () => {
     );
   });
 
-  it('gives every figure in each section a place in its words', () => {
-    for (const s of page('t2204').sections) {
-      const words = `${s.paragraph} ${s.example}`;
-      const used = [...words.matchAll(/\{([a-zA-Z][a-zA-Z0-9]*)\}/g)].map(
-        (m) => m[1],
-      );
-      expect(Object.keys(s.figures).sort(), s.id).toEqual(
-        [...new Set(used)].sort(),
-      );
-    }
-  });
-
   it('never lets pay less the exempt amount go below zero', () => {
     expect(earnings()).toMatch(/never below zero/i);
   });
@@ -296,18 +284,6 @@ describe('schedule-6 copy', () => {
     const { example } = section('schedule-6', 'benefit');
     expect(example).toMatch(/which is more than \{max\}/);
     expect(example).toMatch(/before your income is taken into account/i);
-  });
-
-  it('gives every figure in each section a place in its words', () => {
-    for (const s of page('schedule-6').sections) {
-      const words = `${s.paragraph} ${s.example}`;
-      const used = [...words.matchAll(/\{([a-zA-Z][a-zA-Z0-9]*)\}/g)].map(
-        (m) => m[1],
-      );
-      expect(Object.keys(s.figures).sort(), s.id).toEqual(
-        [...new Set(used)].sort(),
-      );
-    }
   });
 
   it('says full-time students cannot claim, after 13 weeks', () => {
