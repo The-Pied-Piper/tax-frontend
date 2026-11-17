@@ -70,6 +70,13 @@ describe('on428 total section copy', () => {
     expect(paragraph).toMatch(/little or nothing/i);
   });
 
+  it('adds the premium to the tax after all the earlier steps, not "after credits"', () => {
+    expect(paragraph).toMatch(
+      /adds it to your tax after all the earlier steps/,
+    );
+    expect(paragraph).not.toMatch(/after credits/);
+  });
+
   it('keeps sentences short', () => {
     expect(longestSentence(paragraph)).toBeLessThanOrEqual(40);
   });
