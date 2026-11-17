@@ -57,8 +57,6 @@ export type SuccessState = {
   };
   response: ComputeTakeHomeCalculationResponse;
   adapted: AdaptedResult;
-  /** Links of a pre-built page; set only by the seed, so a new calculation has none. */
-  links?: SalaryPageLinks;
 };
 
 export type FormValues = {
@@ -152,7 +150,6 @@ function seedFrom(
         },
         response: data.response,
         adapted,
-        links: data.links,
       },
       built: {
         heading: salaryPageText(
