@@ -8,6 +8,7 @@ import { ProvisionalNotice } from './components/ProvisionalNotice';
 import { SalaryForm } from './components/SalaryForm';
 import { SalaryIndexNav } from './components/SalaryIndexNav';
 import { SalaryLinks } from './components/SalaryLinks';
+import { SiteFooter } from './components/SiteFooter';
 import { StarLink } from './components/StarLink';
 import { ThemeToggle } from './components/ThemeToggle';
 import type { SalaryIndex } from './state/salaryIndex';
@@ -106,7 +107,7 @@ export function App({ client, registry, initial, salaryIndex, clock }: Props) {
         <StarLink />
         {salaryIndex && !initial && <SalaryIndexNav index={salaryIndex} />}
       </main>
-      <footer className="page-footer">{strings.footer}</footer>
+      <SiteFooter />
     </>
   );
 }

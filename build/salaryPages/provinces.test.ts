@@ -1,6 +1,12 @@
+import { FOOTER_PROVINCE_SLUGS } from '../../src/state/siteLinks';
 import { provinces, salaries, TAX_YEAR } from './provinces';
 
 describe('the province list', () => {
+  it('has a page list entry for every province the footer links to', () => {
+    const slugs = provinces.map((p) => p.slug);
+    for (const slug of FOOTER_PROVINCE_SLUGS) expect(slugs).toContain(slug);
+  });
+
   it('has Ontario, Alberta then British Columbia, each from $30,000 to $150,000 in $5,000 steps', () => {
     expect(provinces).toEqual([
       {

@@ -1,6 +1,11 @@
 import { render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { renderSalaryApp, renderSalaryIndexNav } from './prerender';
+import {
+  renderContentPage,
+  renderSalaryApp,
+  renderSalaryIndexNav,
+} from './prerender';
+import { sampleSpec } from '../../src/test/contentPageData';
 import { ontarioIndex } from '../../src/test/salaryIndexData';
 import { pageMeta } from './pageMeta';
 import { salaryLinks } from './links';
@@ -214,15 +219,22 @@ describe('salary links in the static page and the mounted page (#81)', () => {
 
   it('has no nav in the static HTML for data without links', () => {
     show(base);
-    expect(screen.queryByRole('navigation')).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole('navigation', { name: strings.salaryLinks.label }),
+    ).not.toBeInTheDocument();
   });
 
   it('renders the same nav when mounted from the same data (the pre-hydration rule)', () => {
     show(withLinks);
-    const staticNav = screen.getByRole('navigation').outerHTML;
+    const staticNav = screen.getByRole('navigation', {
+      name: strings.salaryLinks.label,
+    }).outerHTML;
     document.body.innerHTML = '';
     render(<App initial={withLinks} />);
-    expect(screen.getByRole('navigation').outerHTML).toBe(staticNav);
+    expect(
+      screen.getByRole('navigation', { name: strings.salaryLinks.label })
+        .outerHTML,
+    ).toBe(staticNav);
   });
 
   it('shows the nav only while the answer is the one the page was built with', async () => {
@@ -258,7 +270,9 @@ describe('salary links in the static page and the mounted page (#81)', () => {
         screen.getByRole('heading', { name: strings.title, level: 1 }),
       ).toBeInTheDocument();
     });
-    expect(screen.queryByRole('navigation')).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole('navigation', { name: strings.salaryLinks.label }),
+    ).not.toBeInTheDocument();
     expect(
       screen.queryByRole('link', { name: strings.salaryLinks.calculator }),
     ).not.toBeInTheDocument();
@@ -270,5 +284,16 @@ describe('renderSalaryIndexNav (the static nav of the home page)', () => {
     document.body.innerHTML = renderSalaryIndexNav(ontarioIndex);
     const nav = screen.getByRole('navigation', { name: 'Popular salaries' });
     expect(within(nav).getAllByRole('link')).toHaveLength(25);
+  });
+});
+
+describe('renderContentPage', () => {
+  it('is the real content page as a string, footer and theme slot included', () => {
+    const html = renderContentPage(sampleSpec);
+    const page = new DOMParser().parseFromString(html, 'text/html');
+    expect(page.querySelector('h1')?.textContent).toBe(sampleSpec.heading);
+    expect(page.querySelector('#content-theme-toggle')).not.toBeNull();
+    expect(page.querySelector('footer a[href="/methodology/"]')).not.toBeNull();
+    expect(page.querySelector('footer')?.textContent).toContain(strings.footer);
   });
 });
