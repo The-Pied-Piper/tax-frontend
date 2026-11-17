@@ -120,7 +120,7 @@ export const on428: FormPageSpec = {
       heading: 'Health premium and your Ontario tax',
       lines: 'Lines 89–90',
       paragraph:
-        'The Ontario health premium is a yearly charge that depends on your income. It is mostly a set amount that steps up with income, with short phase-in bands where it rises gradually. The form adds it to your tax after credits. The total is your Ontario tax, which then goes onto your return.',
+        'The Ontario health premium is a yearly charge that depends on your income. It is mostly a set amount that steps up with income, with bands where it phases in and rises gradually. The form adds it to your tax after credits. The total is your Ontario tax, which then goes onto your return.',
       example:
         '{tax} plus a health premium of {premium} gives an Ontario tax of {total}.',
       figures: {
