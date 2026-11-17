@@ -20,8 +20,9 @@ export const bc479: FormPageSpec = {
       heading: 'Your income',
       lines: 'Lines 1–8',
       paragraph:
-        'The form starts with your income. It takes off {threshold}, because the sales tax credit only shrinks on income above that.',
-      example: 'Your income is {income}. Less {threshold}, that leaves {over}.',
+        'The form starts with your income. It takes off {threshold}, because the sales tax credit only starts to shrink once your income is over that amount.',
+      example:
+        'Your income is {income}. Take off {threshold} and {over} is left.',
       figures: {
         income: result('$69,335', 'bc479_adjusted_family_net_income_line_6'),
         threshold: result('$15,000', 'bc479_threshold_line_7'),
@@ -33,7 +34,7 @@ export const bc479: FormPageSpec = {
       heading: 'The sales tax credit',
       lines: 'Lines 9–13',
       paragraph:
-        'The sales tax credit starts at {credit}. It shrinks by {rate} of your income over {threshold}. This credit is refundable. That means it can be paid to you even if you owe no BC tax. At very low incomes, this can make take-home pay higher than the salary.',
+        'The sales tax credit starts at {credit}. It shrinks by {rate} of your income over {threshold}. It can be paid to you even if you owe no BC tax. At very low incomes, that can make your take-home pay higher than your salary.',
       example:
         '{credit} less {cut} is below zero, so the sales tax credit is {paid}.',
       figures: {
@@ -49,7 +50,7 @@ export const bc479: FormPageSpec = {
       heading: 'Your BC credits',
       lines: 'Lines 15, 35 and 45',
       paragraph:
-        "The form adds the credits together. We count only the sales tax credit. The form also has a renter's tax credit and credits for home renovation, venture capital, mining exploration, clean buildings and training. We do not use them. The renter's credit can still pay something at higher incomes, but only if you paid rent. The total goes onto line 47900 of your return.",
+        "The form adds up your credits. We count only the sales tax credit. The form has other credits too: for renters, home renovation, venture capital, mining exploration, clean buildings and training. We do not use those. The renter's credit is for people who paid rent. It gets smaller as income rises and stops at a set income. The total goes onto line 47900 of your return.",
       example: 'Your BC credits come to {total}.',
       figures: {
         total: result('$0', 'bc479_british_columbia_credits_line_45'),
