@@ -87,7 +87,7 @@ export const bc428: FormPageSpec = {
       heading: 'Reduction for lower income',
       lines: 'Lines 73–80',
       paragraph:
-        'British Columbia can reduce the tax of people on lower income. The reduction starts at {set}. The form then takes your net income above {base} and charges {rate} on it. It takes that away from the reduction. If the answer is below zero, the reduction is zero. It is also zero when your net income is $40,807 or more.',
+        'British Columbia can reduce the tax of people on lower income. The reduction starts at {set}. The form then takes your net income above {base} and charges {rate} on it. It takes that away from the reduction. If the answer is below zero, the reduction is zero. It is also zero once your net income is high enough that this charge is bigger than the starting amount.',
       example:
         'Your net income is {over} above {base}. {rate} of that is {clawback}, which is more than {set}. The reduction is {reduction}.',
       figures: {
