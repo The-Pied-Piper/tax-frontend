@@ -5,6 +5,7 @@ import type {
   ContentLink,
   ContentPageSpec,
 } from './contentPages';
+import { copyRules, everyString } from '../test/copyRules';
 import { hubPage, provinceHubs } from './provinceHubs';
 import {
   contentPath,
@@ -71,15 +72,6 @@ function section(page: ContentPageSpec, heading: string) {
 function lists(page: ContentPageSpec): ListBlock[] {
   const blocks = section(page, 'The forms we follow')?.blocks ?? [];
   return blocks.filter((b): b is ListBlock => b.kind === 'list');
-}
-
-function everyString(value: unknown): string[] {
-  if (typeof value === 'string') return [value];
-  if (Array.isArray(value)) return value.flatMap(everyString);
-  if (typeof value === 'object' && value !== null) {
-    return Object.values(value).flatMap(everyString);
-  }
-  return [];
 }
 
 describe('provinceHubs', () => {
@@ -248,5 +240,42 @@ describe('province names', () => {
     const words = everyString(shared).join(' ');
     expect(words).toContain('Zedland');
     expect(words).not.toContain('Ontario');
+  });
+});
+
+describe.each(FOOTER_PROVINCE_SLUGS)('the copy of the hub for %s', (slug) => {
+  const text = provinceHubs.find((hub) => hub.slug === slug);
+  const page = text
+    ? hubPage(
+        text,
+        strings.siteNav.provinceNames[slug],
+        [{ label: '$30,000', href: `/${slug}/30000/` }],
+        new Set(),
+        [],
+      )
+    : null;
+
+  it.each(copyRules)('holds no %s', (_name, pattern) => {
+    expect(page).not.toBeNull();
+    for (const words of everyString(page)) {
+      expect(words, words).not.toMatch(pattern);
+    }
+  });
+});
+
+describe('the copy rules', () => {
+  it('catch what they are for', () => {
+    const samples = [
+      'It was checked against the agency',
+      'Only in Canada',
+      'a Canada-only site',
+      'Written by an AI',
+      `the ${['CRA', 'calculator'].join(' ')}`,
+      `see ${['Tax', 'Tips'].join('')}`,
+      'see docs/readme',
+    ];
+    samples.forEach((text, at) => {
+      expect(text).toMatch(copyRules[at]?.[1] ?? /^$/);
+    });
   });
 });

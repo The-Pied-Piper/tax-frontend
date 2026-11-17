@@ -1,7 +1,7 @@
 import { DESCRIPTION_LIMIT, TITLE_LIMIT } from '../../build/salaryPages/limits';
+import { copyRules, everyString } from '../test/copyRules';
 import { contentPages, paragraph } from './contentPages';
 import { isContentSlug, METHODOLOGY_SLUG } from './siteLinks';
-import { THEME_TOGGLE_SLOT_ID } from './themeSlot';
 
 // Adding a page is one entry in the list; these checks keep every entry sound.
 describe('contentPages', () => {
@@ -69,12 +69,6 @@ describe('the methodology page', () => {
   });
 });
 
-describe('the theme switch slot', () => {
-  it('has its own module, so the calculator never imports page copy', () => {
-    expect(THEME_TOGGLE_SLOT_ID).toBe('content-theme-toggle');
-  });
-});
-
 describe('paragraph', () => {
   it('makes a paragraph block from words and links', () => {
     const link = { label: 'the link', href: '/x/' };
@@ -82,5 +76,15 @@ describe('paragraph', () => {
       kind: 'paragraph',
       content: ['a ', link, ' b'],
     });
+  });
+});
+
+describe('the copy of every listed page', () => {
+  it.each(copyRules)('holds no %s', (_name, pattern) => {
+    for (const page of contentPages) {
+      for (const words of everyString(page)) {
+        expect(words, `${page.slug}: ${words}`).not.toMatch(pattern);
+      }
+    }
   });
 });
