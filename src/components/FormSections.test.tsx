@@ -2,7 +2,7 @@ import { render, screen, within } from '@testing-library/react';
 import { renderToString } from 'react-dom/server';
 import { ContentPage } from './ContentPage';
 import type { ContentPageSpec } from '../state/contentPages';
-import { formContentPage } from '../state/formPage';
+import { formContentPage, type FormPageSpec } from '../state/formPage';
 import { formPages } from '../state/formPages';
 import { isSitePath } from '../state/salaryPageData';
 import { sampleFormSpec } from '../test/contentPageData';
@@ -136,3 +136,96 @@ describe.each([sampleFormSpec, ...formPages])(
     });
   },
 );
+
+/** A made-up form whose first part has links and whose second part has none. */
+const linkedSpec: FormPageSpec = {
+  id: 'linked-form',
+  name: 'Form LINKED: A made-up form',
+  province: 'ca-on',
+  year: 2025,
+  exampleSalary: '70000',
+  title: 'Form LINKED in plain words',
+  description: 'A made-up form page with links in one part.',
+  intro: 'What the made-up form is for.',
+  sections: [
+    {
+      id: 'first',
+      heading: 'First part',
+      lines: 'Line 1',
+      paragraph: 'Only words here.',
+      example: 'No figure.',
+      figures: {},
+      links: [
+        { label: 'Sample schedule', href: '/forms/sample-schedule/' },
+        { label: 'Same page part', href: '#second' },
+      ],
+    },
+    {
+      id: 'second',
+      heading: 'Second part',
+      lines: 'Lines 2–4',
+      paragraph: 'Only words here.',
+      example: 'No figure.',
+      figures: {},
+    },
+  ],
+};
+
+describe('the links of a form part', () => {
+  it('draws each link as an anchor inside its own part', () => {
+    const { container } = render(
+      <ContentPage {...formContentPage(linkedSpec)} />,
+    );
+    const first = container.querySelector('#first');
+    expect(first).not.toBeNull();
+    expect(
+      within(first as HTMLElement)
+        .getAllByRole('link')
+        .map((a) => [a.textContent, a.getAttribute('href')]),
+    ).toEqual([
+      ['#', '#first'],
+      ['Sample schedule', '/forms/sample-schedule/'],
+      ['Same page part', '#second'],
+    ]);
+  });
+
+  it('shows the links after the worked example, not inside it', () => {
+    const { container } = render(
+      <ContentPage {...formContentPage(linkedSpec)} />,
+    );
+    const first = container.querySelector('#first') as HTMLElement;
+    const exampleBox = within(first).getByText('At $70,000')
+      .parentElement as HTMLElement;
+    const link = within(first).getByRole('link', { name: 'Sample schedule' });
+    expect(exampleBox).not.toContainElement(link);
+    expect(
+      exampleBox.compareDocumentPosition(link) &
+        Node.DOCUMENT_POSITION_FOLLOWING,
+    ).toBeTruthy();
+  });
+
+  it('draws the links as one short row', () => {
+    const { container } = render(
+      <ContentPage {...formContentPage(linkedSpec)} />,
+    );
+    const first = container.querySelector('#first') as HTMLElement;
+    const rowLinks = within(first)
+      .getAllByRole('link')
+      .filter((a) => a.getAttribute('href') !== '#first');
+    expect(rowLinks).toHaveLength(2);
+    const rows = new Set(rowLinks.map((a) => a.parentElement));
+    expect(rows.size).toBe(1);
+  });
+
+  it('adds no link row to a part without links', () => {
+    const { container } = render(
+      <ContentPage {...formContentPage(linkedSpec)} />,
+    );
+    const second = container.querySelector('#second') as HTMLElement;
+    expect(
+      within(second)
+        .getAllByRole('link')
+        .map((a) => a.getAttribute('href')),
+    ).toEqual(['#second']);
+  });
+});

@@ -1,4 +1,5 @@
 import { figuresOf, type FormPageSpec } from '../formPage';
+import { contentPath, formSlug } from '../siteLinks';
 
 const { result, printed } = figuresOf('ca-on/on428');
 
@@ -114,6 +115,12 @@ export const on428: FormPageSpec = {
       figures: {
         credit: result('$0', 'on428_lift_credit_line_85'),
       },
+      links: [
+        {
+          label: 'See how the LIFT credit is worked out on its own schedule',
+          href: contentPath(formSlug('on428-a')),
+        },
+      ],
     },
     {
       id: 'total',

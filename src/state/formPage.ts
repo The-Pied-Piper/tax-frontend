@@ -1,4 +1,4 @@
-import type { ContentPageSpec } from './contentPages';
+import type { ContentLink, ContentPageSpec } from './contentPages';
 import { formSlug, type FooterProvinceSlug } from './siteLinks';
 
 /**
@@ -23,6 +23,8 @@ export type FormSection = {
   example: string;
   /** Every figure the paragraph and the example use. */
   figures: Record<string, FormFigure>;
+  /** Links shown in a row after the worked example, such as to a schedule this part copies from. */
+  links?: ContentLink[];
 };
 
 /** One form's page. Adding a form is one entry in `formPages`. */

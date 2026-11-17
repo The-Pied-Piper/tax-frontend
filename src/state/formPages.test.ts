@@ -1,9 +1,10 @@
 import { formPages } from './formPages';
 import { formContentPage, splitFigures } from './formPage';
 import { contentPages } from './contentPages';
+import { on428 } from './forms/on428';
 import { displayWholeMoney, type MoneyUnit } from '../money/format';
 import { strings } from '../strings';
-import { formSlug, isContentSlug } from './siteLinks';
+import { contentPath, formSlug, isContentSlug } from './siteLinks';
 
 type Line = {
   label: string;
@@ -53,6 +54,27 @@ describe.each(formPages)('the $name page', (form) => {
     const ids = form.sections.map((section) => section.id);
     expect(ids).not.toContain('form-contents');
     for (const id of ids) expect(ids).not.toContain(`${id}-heading`);
+  });
+
+  it('has section links that are absolute paths or fragments only', () => {
+    for (const section of form.sections) {
+      for (const link of section.links ?? []) {
+        expect(
+          link.href.startsWith('/') || link.href.startsWith('#'),
+          `${section.id}: ${link.href}`,
+        ).toBe(true);
+      }
+    }
+  });
+
+  it('links to a form page only where that page exists in formPages', () => {
+    const formPaths = formPages.map((page) => contentPath(formSlug(page.id)));
+    for (const section of form.sections) {
+      for (const link of section.links ?? []) {
+        if (!link.href.startsWith('/forms/')) continue;
+        expect(formPaths, `${section.id}: ${link.href}`).toContain(link.href);
+      }
+    }
   });
 
   it('names no year in its words but the one it quotes', () => {
@@ -143,5 +165,28 @@ describe('splitFigures', () => {
     expect(splitFigures('No figures.')).toEqual([
       { kind: 'text', value: 'No figures.' },
     ]);
+  });
+});
+
+describe('the ON428 links', () => {
+  const lift = on428.sections.find((section) => section.id === 'lift');
+
+  it('give the lift section exactly one link, to the ON428-A page', () => {
+    expect(lift?.links).toHaveLength(1);
+    expect(lift?.links?.[0]?.href).toBe('/forms/on428-a/');
+    expect(lift?.links?.[0]?.href).toBe(contentPath(formSlug('on428-a')));
+  });
+
+  it('give that link a label of words with no digits', () => {
+    const label = lift?.links?.[0]?.label ?? '';
+    expect(label.trim()).not.toBe('');
+    expect(label).not.toMatch(/\d/);
+  });
+
+  it('give no link to any other section', () => {
+    for (const section of on428.sections) {
+      if (section.id === 'lift') continue;
+      expect(section.links ?? [], section.id).toHaveLength(0);
+    }
   });
 });
