@@ -21,7 +21,7 @@ export const t1Tax: FormPageSpec = {
       heading: 'Federal tax on your income',
       lines: 'Lines 70–76',
       paragraph:
-        'Federal tax is charged in slices of income, called brackets, each with its own rate. The form finds the slice your income reaches. It adds the tax on the slices below, then charges that slice’s rate on the rest.',
+        "Federal tax is charged in slices of income, called brackets, each with its own rate. The form finds the top slice your income reaches. It adds up the tax on all the slices below that one, then charges the top slice's rate on the rest of your income.",
       example:
         'Taxable income is {income}. Your slice starts at {start} and is taxed at {rate}. The tax below it is {below}. The {over} above the start adds {added}. Federal tax: {tax}.',
       figures: {
@@ -42,7 +42,7 @@ export const t1Tax: FormPageSpec = {
       heading: 'Credits that lower your tax',
       lines: 'Lines 30000–35000',
       paragraph:
-        'A credit is a discount on your tax bill. You get one for a basic personal amount, for the base part of your pension plan payments, for your Employment Insurance (EI) payments, and for the Canada employment amount, a set amount for people with job income. The basic personal amount is one everyone gets, and it shrinks at high incomes. The form adds the amounts up and takes {rate} of the total.',
+        'A credit lowers your tax bill. The form starts with a list of amounts: the basic personal amount that everyone gets (it shrinks at high incomes), the base part of your pension plan payments, your Employment Insurance (EI) payments, and the Canada employment amount. That last one is a set amount, or your job income if that is less. The form adds them up and takes {rate} of the total. That is your discount.',
       example:
         'The amounts are {basic}, {cpp}, {ei} and {job}. They add up to {total}. {rate} of that is {discount}.',
       figures: {
@@ -84,7 +84,7 @@ export const t1Tax: FormPageSpec = {
       heading: 'Total payable and refund or balance owing',
       lines: 'Lines 43500, 48200 and 167',
       paragraph:
-        'Line 43500 mainly adds your federal tax and your provincial tax. That gives your total payable. Line 167 is the total payable minus your total credits on line 48200. This page stops short of line 167. It ignores the tax already taken off your pay during the year (line 43700), which is part of the total credits on the real form. It counts only the other credits.',
+        'Line 43500 mainly adds your federal tax and your provincial tax. That gives your total payable. The last step, line 167, takes away your total credits (line 48200) to show whether you owe money or get a refund. This page stops before that step. One of those credits is the tax your employer already took off your pay during the year (line 43700). We leave it out and count only the other credits.',
       example:
         "{federal} plus Ontario's {ontario} is a total payable of {total}. The other credits are {refundable}. Without the tax taken off your pay, the balance owing would be {total}.",
       figures: {
