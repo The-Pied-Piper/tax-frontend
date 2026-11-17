@@ -1,4 +1,4 @@
-import { render, screen, waitFor, within } from '@testing-library/react';
+import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { App } from './App';
 import type { ApiClient } from './api';
@@ -54,14 +54,12 @@ describe('App links on a pre-built salary page', () => {
     ['another salary', '80000', () => clientAnswering({ ...compute70000 })],
     ['the same salary', '70000', sameObjectClient],
   ])(
-    'drops the links and keeps the answer text after %s is calculated',
+    'keeps the links as built, and the answer text, after %s is calculated',
     async (_name, salary, makeClient) => {
       render(<App client={makeClient()} initial={seeded} />);
       await calculate(salary);
       await screen.findByRole('heading', { name: strings.answer.heading });
-      await waitFor(() => {
-        expect(pageLinks()).not.toBeInTheDocument();
-      });
+      expect(pageLinks()).toBeInTheDocument();
       expect(nearby()).not.toBeInTheDocument();
       expect(document.querySelector('.page-summary')).toBeInTheDocument();
       expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent(

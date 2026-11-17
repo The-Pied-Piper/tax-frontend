@@ -290,7 +290,7 @@ describe('salary links in the static page and the mounted page (#81)', () => {
     ).toBe(staticNav);
   });
 
-  it('shows the nav only while the answer is the one the page was built with', async () => {
+  it('keeps the nav as the page was built once another salary is calculated', async () => {
     const client = createApiClient({
       baseUrl: 'https://api.test',
       fetch: (input) => {
@@ -319,16 +319,17 @@ describe('salary links in the static page and the mounted page (#81)', () => {
       screen.getByRole('button', { name: strings.form.calculate }),
     );
     await waitFor(() => {
-      expect(
-        screen.queryByRole('navigation', { name: strings.salaryLinks.label }),
-      ).not.toBeInTheDocument();
+      expect(document.querySelector('.page-summary')).toHaveTextContent(
+        /\$30,000/,
+      );
     });
+    // The links stay the ones the page was built with, like its address.
     expect(
-      screen.queryByRole('navigation', { name: strings.salaryLinks.label }),
-    ).not.toBeInTheDocument();
+      screen.getByRole('navigation', { name: strings.salaryLinks.label }),
+    ).toBeInTheDocument();
     expect(
-      screen.queryByRole('link', { name: strings.salaryLinks.calculator }),
-    ).not.toBeInTheDocument();
+      screen.getByRole('link', { name: strings.salaryLinks.calculator }),
+    ).toBeInTheDocument();
   });
 });
 
@@ -492,7 +493,7 @@ describe('breadcrumb and learn-more links in the static page (#150)', () => {
     expect(learnMore().outerHTML).toBe(staticMore);
   });
 
-  it('keeps the breadcrumb and drops the Learn more nav once another salary is calculated', async () => {
+  it('keeps the breadcrumb and the Learn more nav once another salary is calculated', async () => {
     const client = createApiClient({
       baseUrl: 'https://api.test',
       fetch: (input) => {
@@ -523,10 +524,13 @@ describe('breadcrumb and learn-more links in the static page (#150)', () => {
       screen.getByRole('button', { name: strings.form.calculate }),
     );
     await waitFor(() => {
-      expect(
-        screen.queryByRole('navigation', { name: /learn more/i }),
-      ).not.toBeInTheDocument();
+      expect(document.querySelector('.page-summary')).toHaveTextContent(
+        /\$30,000/,
+      );
     });
+    expect(
+      screen.getByRole('navigation', { name: /learn more/i }),
+    ).toBeInTheDocument();
     // The breadcrumb stays the one the page was built with, like its address.
     expect(crumbs()).toBeInTheDocument();
     expect(within(crumbs()).getByText('$70,000')).toHaveAttribute(
