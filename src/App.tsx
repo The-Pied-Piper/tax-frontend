@@ -38,6 +38,33 @@ export function App({ client, registry, initial, clock }: Props) {
           request.asked.year,
         )
       : null;
+  // A pre-built salary page leads with its answer, so the first thing read, on
+  // screen and in the source, is the figure; the provisional note sits just
+  // under it and the form below. The calculator page has no answer yet, so its
+  // form and note keep their old places. The order is fixed for the life of the
+  // page: after Calculate the answer is a fresh one with no summary or links,
+  // but the form stays below it, so the layout does not flip.
+  const answerFirst = initial !== undefined;
+  const notice =
+    page.request.status === 'success' && page.request.response.provisional ? (
+      <ProvisionalNotice year={page.request.asked.year} />
+    ) : null;
+  const controls = (
+    <SalaryForm
+      jurisdictionsState={page.jurisdictionsState}
+      values={page.values}
+      salaryCheck={page.salaryCheck}
+      salaryProblem={
+        page.failure?.kind === 'salary' ? page.failure.message : null
+      }
+      canSubmit={page.canSubmit}
+      loading={page.request.status === 'loading'}
+      onJurisdictionChange={page.setJurisdictionCode}
+      onYearChange={page.setYear}
+      onSalaryChange={page.setSalary}
+      onSubmit={page.submit}
+    />
+  );
   return (
     <>
       <main>
@@ -60,27 +87,11 @@ export function App({ client, registry, initial, clock }: Props) {
           </div>
           <ThemeToggle />
         </header>
-        <SalaryForm
-          jurisdictionsState={page.jurisdictionsState}
-          values={page.values}
-          salaryCheck={page.salaryCheck}
-          salaryProblem={
-            page.failure?.kind === 'salary' ? page.failure.message : null
-          }
-          canSubmit={page.canSubmit}
-          loading={page.request.status === 'loading'}
-          onJurisdictionChange={page.setJurisdictionCode}
-          onYearChange={page.setYear}
-          onSalaryChange={page.setSalary}
-          onSubmit={page.submit}
-        />
+        {!answerFirst && controls}
         {page.failure?.kind === 'notice' && (
           <ErrorNotice message={page.failure.message} />
         )}
-        {page.request.status === 'success' &&
-          page.request.response.provisional && (
-            <ProvisionalNotice year={page.request.asked.year} />
-          )}
+        {!answerFirst && notice}
         {page.request.status === 'success' && (
           <>
             <AnswerCard
@@ -102,12 +113,18 @@ export function App({ client, registry, initial, clock }: Props) {
               />
               <AdvancedView groups={page.request.adapted.advanced} />
             </AnswerCard>
+            {answerFirst && notice}
             {text && (
               <section className="page-summary-section">
                 <h2>{strings.summaryHeading}</h2>
                 <p className="page-summary">{text.paragraph}</p>
               </section>
             )}
+          </>
+        )}
+        {answerFirst && controls}
+        {page.request.status === 'success' && (
+          <>
             {page.request.links && (
               <SalaryLinks
                 links={page.request.links}

@@ -40,6 +40,23 @@ describe('App form', () => {
     ).toBeInTheDocument();
   });
 
+  it('keeps the form above the answer on the calculator page', async () => {
+    const user = userEvent.setup();
+    render(<App client={fixtureClient()} />);
+    const form = await screen.findByLabelText(strings.form.place);
+    await waitFor(() => expect(form).toBeEnabled());
+    await user.type(screen.getByLabelText(strings.form.salary), '70000');
+    await user.click(
+      screen.getByRole('button', { name: strings.form.calculate }),
+    );
+    const answer = await screen.findByRole('heading', {
+      name: strings.answer.heading,
+    });
+    expect(
+      form.compareDocumentPosition(answer) & Node.DOCUMENT_POSITION_FOLLOWING,
+    ).toBeTruthy();
+  });
+
   it('shows the intro and the estimate footer', () => {
     render(<App client={fixtureClient()} />);
     expect(screen.getByText(strings.intro)).toBeInTheDocument();

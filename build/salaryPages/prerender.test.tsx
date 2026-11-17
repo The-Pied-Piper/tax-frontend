@@ -388,6 +388,48 @@ describe('breadcrumb and learn-more links in the static page (#150)', () => {
     expect(current.closest('a')).toBeNull();
   });
 
+  it('puts the answer and the page paragraph before the form', () => {
+    show(dataFor(compute70000, '70000'));
+    const form = screen.getByLabelText(strings.form.place);
+    const answer = screen.getByRole('heading', {
+      name: strings.answer.heading,
+    });
+    const paragraph = document.querySelector('.page-summary') as Node;
+    for (const earlier of [answer, paragraph]) {
+      expect(
+        earlier.compareDocumentPosition(form) &
+          Node.DOCUMENT_POSITION_FOLLOWING,
+      ).toBeTruthy();
+    }
+  });
+
+  it('puts the provisional note after the answer and before the form', () => {
+    show(dataFor(compute70000, '70000'));
+    const note = screen.getByText(strings.notices.provisionalTitle(2026));
+    const answer = screen.getByRole('heading', {
+      name: strings.answer.heading,
+    });
+    const form = screen.getByLabelText(strings.form.place);
+    expect(
+      answer.compareDocumentPosition(note) & Node.DOCUMENT_POSITION_FOLLOWING,
+    ).toBeTruthy();
+    expect(
+      note.compareDocumentPosition(form) & Node.DOCUMENT_POSITION_FOLLOWING,
+    ).toBeTruthy();
+  });
+
+  it('puts the form before the neighbour links, so the keyboard reaches it in screen order', () => {
+    show(dataFor(compute70000, '70000'));
+    const form = screen.getByLabelText(strings.form.place);
+    const neighbours = screen.getByRole('navigation', {
+      name: strings.salaryLinks.label,
+    });
+    expect(
+      form.compareDocumentPosition(neighbours) &
+        Node.DOCUMENT_POSITION_FOLLOWING,
+    ).toBeTruthy();
+  });
+
   it('puts the breadcrumb above the h1', () => {
     show(withLinks);
     const h1 = screen.getByRole('heading', { level: 1 });
