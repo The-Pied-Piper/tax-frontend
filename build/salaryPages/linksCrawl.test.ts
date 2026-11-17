@@ -107,16 +107,22 @@ describe('crawl of the full build for the salary page links (#150)', () => {
   );
 
   it(
-    'links Alberta pages to the Alberta hub and methodology, and to no form page that is not built',
+    'links Alberta pages to the Alberta hub and methodology, and to a form page only when it is built',
     async () => {
-      const { dir, salaryFiles } = await build();
+      const { dir, salaryFiles, published } = await build();
       const alberta = salaryFiles.filter((f) => f.startsWith('ca-ab/'));
       expect(alberta).toHaveLength(25);
       for (const file of alberta) {
         const targets = bodyTargets(dir, file);
         expect(targets).toContain('ca-ab/index.html');
         expect(targets).toContain(contentFile(METHODOLOGY_SLUG));
-        expect(targets.filter((t) => t.startsWith('forms/'))).toEqual([]);
+        const forms = targets.filter((t) => t.startsWith('forms/'));
+        // Alberta's main form is linked exactly when its page is built.
+        expect(forms).toEqual(
+          published.has(formSlug('ab428'))
+            ? [contentFile(formSlug('ab428'))]
+            : [],
+        );
       }
     },
     SLOW_TEST_MS,
