@@ -117,6 +117,23 @@ describe.each(FOOTER_PROVINCE_SLUGS)('the hub page for %s', (slug) => {
     expect(words).toContain('EI');
   });
 
+  it('says EI can pay you if you lose your job, not that it does', () => {
+    const how = section(page, `How your ${name} take-home is worked out`);
+    const words = everyString(how?.blocks).join(' ');
+    expect(words).toContain('which can pay you if you lose your job');
+    expect(words).not.toContain('which pays you');
+  });
+
+  it('opens the forms section with the plain-English paragraph', () => {
+    const [first] = section(page, 'The forms we follow')?.blocks ?? [];
+    expect(first).toEqual({
+      kind: 'paragraph',
+      content: [
+        'Our calculator follows the published forms, line by line. Pick a form to see what it is for and how each part works.',
+      ],
+    });
+  });
+
   it('lists the province forms first, titled with its name', () => {
     const [own] = lists(page);
     expect(own?.title).toBe(name);

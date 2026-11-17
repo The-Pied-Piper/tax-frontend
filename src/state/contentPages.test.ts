@@ -1,5 +1,6 @@
 import { DESCRIPTION_LIMIT, TITLE_LIMIT } from '../../build/salaryPages/limits';
 import { copyRules, everyString } from '../test/copyRules';
+import { longestSentence } from '../test/formText';
 import { contentPages, paragraph } from './contentPages';
 import { isContentSlug, METHODOLOGY_SLUG } from './siteLinks';
 
@@ -51,13 +52,62 @@ describe('the methodology page', () => {
     expect(page?.trail).toEqual([]);
   });
 
-  it('states the method plainly', () => {
-    expect(words).toContain('follows the published forms');
-    expect(words).toContain('line by line');
-    expect(words).toContain('exact decimals');
-    expect(words).toContain('more than a hundred salaries');
-    expect(words).toContain('provisional');
-    expect(words).toContain('not tax advice');
+  it('has the plain-English description', () => {
+    expect(page?.description).toBe(
+      'How we work out your take-home pay: we follow the published forms line by line, use exact math, and check the results.',
+    );
+  });
+
+  it('has every section, in order, with its paragraphs word for word', () => {
+    const sections = (page?.sections ?? []).map((section) => [
+      section.heading,
+      section.blocks.map((block) =>
+        block.kind === 'paragraph'
+          ? everyString(block.content).join('')
+          : block.kind,
+      ),
+    ]);
+    expect(sections).toEqual([
+      [
+        'It follows the published forms',
+        [
+          'A program that anyone can read, called an open-source engine, does the math. It follows the published federal and provincial tax forms line by line. Each line on a form is one step in the engine, in the same order. That covers everything from your pension and EI amounts to your credits and the tax on each slice of income. Under your answer, the advanced view lists every step and the form line it comes from, so you can follow along on paper.',
+          'Every rate, limit and top amount comes from the published forms and tables for that province and year.',
+        ],
+      ],
+      [
+        'Exact arithmetic',
+        [
+          'Computers often store money in a way that can be off by a tiny fraction of a cent. Our engine does not. It does its math with exact numbers. It rounds only where a form says to round, and it rounds the way the form says. It never rounds early to make things easier, so the cents you see are the cents the forms give.',
+        ],
+      ],
+      [
+        'How we check it',
+        [
+          'For each province and tax year, we run more than a hundred salaries through the engine and check the results. We pick salaries at the edge of every tax slice and at the yearly limits for the Canada Pension Plan and EI, because that is where mistakes hide.',
+        ],
+      ],
+      [
+        'What it does not do',
+        [
+          'It estimates take-home pay for a single person whose only income is a salary, in Ontario, Alberta and British Columbia. Other places show as coming soon.',
+          'The 2026 figures are provisional. That means they use the rates published so far, and we replace them when the final rates come out. The calculator tells you whenever you pick a provisional year.',
+          'It is an estimate, not tax advice. What you actually take home depends on your own situation and on how much tax your employer takes off each paycheque.',
+        ],
+      ],
+      [
+        'Look for yourself',
+        [
+          'Because the engine is open source, anyone can read how each line is worked out and run it themselves. Nothing you enter on this site is saved.',
+        ],
+      ],
+    ]);
+  });
+
+  it('keeps every sentence to 40 words or fewer', () => {
+    for (const text of everyString(page?.sections)) {
+      expect(longestSentence(text), text).toBeLessThanOrEqual(40);
+    }
   });
 
   it('keeps to the copy rules', () => {
