@@ -18,3 +18,10 @@ export function pageUrl(
 export function addressOf(file: string): string {
   return contentPath(contentSlugOfFile(file));
 }
+
+const SALARY_PAGE_SLUG = /^[a-z0-9-]+\/\d+$/;
+
+/** Whether a content slug has the shape of a salary page address, such as `ca-on/70000`. */
+export function isSalaryPageSlug(slug: string): boolean {
+  return SALARY_PAGE_SLUG.test(slug);
+}

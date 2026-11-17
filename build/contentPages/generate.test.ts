@@ -6,11 +6,15 @@ import {
   tmpDirs,
 } from '../../src/test/generatedSite';
 import {
+  blocksSpec,
   parentSpec,
   plainSpec,
   sampleSpec,
 } from '../../src/test/contentPageData';
-import type { ContentPageSpec } from '../../src/state/contentPages';
+import type {
+  ContentBlock,
+  ContentPageSpec,
+} from '../../src/state/contentPages';
 import { DESCRIPTION_LIMIT, TITLE_LIMIT } from '../salaryPages/limits';
 import { generateContentPages } from './generate';
 
@@ -198,5 +202,80 @@ describe('generateContentPages validation', () => {
       run(dir, [parentSpec, sampleSpec], { render: failing }),
     ).rejects.toThrow(/render broke/);
     expect(files(dir)).toEqual([]);
+  });
+
+  describe('blocks', () => {
+    const withBlocks = (...blocks: ContentBlock[]): ContentPageSpec => ({
+      ...plainSpec,
+      sections: [{ heading: 'Part', blocks }],
+    });
+
+    it('accepts a page with one block of every kind', async () => {
+      const { written } = await run(outDir(), [blocksSpec]);
+      expect(written).toEqual(['blocks-page/index.html']);
+    });
+
+    it('rejects a table row longer than the head and names the page', async () => {
+      const dir = outDir();
+      const ragged = withBlocks({
+        kind: 'table',
+        caption: 'Rates',
+        head: ['Band', 'Rate'],
+        rows: [['First', '5%', 'extra']],
+      });
+      await expect(run(dir, [ragged])).rejects.toThrow(/plain-page/);
+      expect(files(dir)).toEqual([]);
+    });
+
+    it('rejects a table row shorter than the head', async () => {
+      const ragged = withBlocks({
+        kind: 'table',
+        caption: 'Rates',
+        head: ['Band', 'Rate'],
+        rows: [['First', '5%'], ['Second']],
+      });
+      await expect(run(outDir(), [ragged])).rejects.toThrow(/plain-page/);
+    });
+
+    it.each([
+      ['a list with no items', { kind: 'list', items: [] }],
+      [
+        'a links block with no links',
+        { kind: 'links', label: 'More', layout: 'row', links: [] },
+      ],
+      [
+        'a table with no rows',
+        { kind: 'table', caption: 'Rates', head: ['Band'], rows: [] },
+      ],
+    ] as [string, ContentBlock][])('rejects %s', async (_name, block) => {
+      const dir = outDir();
+      await expect(run(dir, [withBlocks(block)])).rejects.toThrow(/plain-page/);
+      expect(files(dir)).toEqual([]);
+    });
+
+    it.each([
+      ['https://example.com/x/'],
+      ['//example.com/x/'],
+      ['x/relative/'],
+      ['/has space/'],
+    ])('rejects a link to %s, which is not a site path', async (href) => {
+      const dir = outDir();
+      const links: ContentBlock[] = [
+        {
+          kind: 'links',
+          label: 'More',
+          layout: 'row',
+          links: [{ label: 'x', href }],
+        },
+        { kind: 'list', items: [{ label: 'x', href, description: 'y' }] },
+        { kind: 'paragraph', content: ['See ', { label: 'x', href }] },
+      ];
+      for (const block of links) {
+        await expect(run(dir, [withBlocks(block)])).rejects.toThrow(
+          /plain-page.*not a site path/,
+        );
+      }
+      expect(files(dir)).toEqual([]);
+    });
   });
 });

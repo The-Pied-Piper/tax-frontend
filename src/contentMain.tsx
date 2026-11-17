@@ -1,7 +1,7 @@
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import { ThemeToggle } from './components/ThemeToggle';
-import { THEME_TOGGLE_SLOT_ID } from './state/contentPages';
+import { THEME_TOGGLE_SLOT_ID } from './state/themeSlot';
 import './styles/fonts.css';
 import './styles/tokens.css';
 import './styles/global.css';

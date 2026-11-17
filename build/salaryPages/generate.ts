@@ -8,7 +8,7 @@ import {
 } from '../../src/api';
 import { dollarSign } from '../../src/adapters/fallback';
 import { languageCode } from '../../src/strings';
-import type { SalaryIndex } from '../../src/state/salaryIndex';
+import type { Unit } from '../../src/adapters';
 import type { SalaryPageData } from '../../src/state/useTakeHome';
 import { pageUrl } from './address';
 import { buildPageHtml } from './pageHtml';
@@ -16,7 +16,13 @@ import { pageMeta } from './pageMeta';
 import { DESCRIPTION_LIMIT, TITLE_LIMIT } from './limits';
 import { salaryLinks } from './links';
 import { salaries, type Province } from './provinces';
-import { salaryIndex, type BuiltProvince } from './salaryIndex';
+
+/** What was built for one province: its salary steps, lowest first, and the unit of its answers. */
+export type BuiltProvince = {
+  province: Province;
+  unit: Unit;
+  salaries: string[];
+};
 
 export type GenerateOptions = {
   fetch: typeof fetch;
@@ -36,8 +42,8 @@ export type GenerateResult = {
   written: string[];
   /** Listed provinces the API did not return, so got no pages. */
   skipped: string[];
-  /** The links to every page written, by province: the one list the site's links come from. */
-  index: SalaryIndex;
+  /** What was written, by province: the one list the hub pages' salary links come from. */
+  built: BuiltProvince[];
 };
 
 function reason(error: unknown): string {
@@ -85,7 +91,7 @@ export async function generateSalaryPages(
           language_code: languageCode,
           include_trace: true,
         });
-        // The page, its data block and the index carry "$", never the API's "CA$".
+        // The page and its data block carry "$", never the API's "CA$".
         responses.push(
           JSON.parse(
             dollarSign(JSON.stringify(answer)),
@@ -107,7 +113,6 @@ export async function generateSalaryPages(
       return { province, unit: first.unit, salaries: steps };
     },
   );
-  const index = salaryIndex(built, list.jurisdictions);
   const pages: { path: string; html: string }[] = [];
   for (const { province, steps, responses } of fetched) {
     // Links go only to the pages of this province that are about to be written.
@@ -143,7 +148,6 @@ export async function generateSalaryPages(
           options.siteUrl
             ? pageUrl(options.siteUrl, province.slug, salary)
             : null,
-          index,
         ),
       });
     });
@@ -154,5 +158,5 @@ export async function generateSalaryPages(
     await mkdir(dirname(file), { recursive: true });
     await writeFile(file, html);
   }
-  return { written: pages.map((p) => p.path), skipped, index };
+  return { written: pages.map((p) => p.path), skipped, built };
 }

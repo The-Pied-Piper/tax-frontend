@@ -3,8 +3,6 @@ import type { ComputeTakeHomeCalculationResponse } from '../../src/api';
 import computeFixture from '../../src/api/fixtures/compute-on-2026-70000.json';
 import jurisdictions from '../../src/api/fixtures/jurisdictions.json';
 import type { SalaryPageData } from '../../src/state/useTakeHome';
-import { parseSalaryIndex } from '../../src/state/salaryIndex';
-import { ontarioGroup, twoProvinceIndex } from '../../src/test/salaryIndexData';
 import { buildPageHtml, dataBlock } from './pageHtml';
 import { pageMeta } from './pageMeta';
 import { pageUrl } from './address';
@@ -236,36 +234,12 @@ describe('dataBlock', () => {
   });
 });
 
-describe('buildPageHtml: the salary-pages-index block', () => {
-  const body = '<main></main>';
-
-  it('writes the index once, next to the page data, and it parses back', () => {
-    const page = parse(
-      buildPageHtml(template, body, data, null, twoProvinceIndex),
-    );
-    expect(page.querySelectorAll('script#salary-pages-index')).toHaveLength(1);
+describe('buildPageHtml: the data block', () => {
+  it('writes the page data once and no other data block', () => {
+    const page = parse(buildPageHtml(template, '<main></main>', data));
     expect(page.querySelectorAll('script#salary-page-data')).toHaveLength(1);
     expect(
-      parseSalaryIndex(
-        page.getElementById('salary-pages-index')?.textContent ?? null,
-      ),
-    ).toEqual(twoProvinceIndex);
-  });
-
-  it('escapes it like the page data', () => {
-    const hostile = {
-      groups: [{ ...ontarioGroup, name: '</script><b id="x">' }],
-    };
-    const html = buildPageHtml(template, body, data, null, hostile);
-    expect(parse(html).getElementById('x')).toBeNull();
-  });
-
-  it('is absent when no index is given, as before', () => {
-    for (const html of [
-      buildPageHtml(template, body, data),
-      buildPageHtml(template, body, data, null, null),
-    ]) {
-      expect(html).not.toContain('salary-pages-index');
-    }
+      page.querySelectorAll('script[type="application/json"]'),
+    ).toHaveLength(1);
   });
 });
