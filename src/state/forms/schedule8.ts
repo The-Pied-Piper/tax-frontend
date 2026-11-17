@@ -13,7 +13,7 @@ export const schedule8: FormPageSpec = {
   description:
     'What Schedule 8 is for and what each part asks, in plain words, with a worked example for a $70,000 salary.',
   intro:
-    'This form works out how much you paid into the Canada Pension Plan, the pension plan that most people who work outside Quebec pay into. It also says where those payments go on your tax return.',
+    'This form works out the contributions you were required to pay into the Canada Pension Plan and whether you overpaid. The Canada Pension Plan is the pension plan that most people who work outside Quebec pay into. It also says where those payments go on your tax return.',
   sections: [
     {
       id: 'months',
