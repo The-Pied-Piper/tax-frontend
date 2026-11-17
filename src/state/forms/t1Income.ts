@@ -9,6 +9,7 @@ export const t1Income: FormPageSpec = {
   province: 'ca-on',
   year: 2025,
   exampleSalary: '70000',
+  federal: true,
   title: 'T1 return, steps 2 to 4, in plain words',
   description:
     'How the T1 tax return finds your taxable income, step by step in plain words, with a worked example for a $70,000 salary.',
@@ -58,7 +59,7 @@ export const t1Income: FormPageSpec = {
       heading: 'Your taxable income',
       lines: 'Lines 25700 and 26000',
       paragraph:
-        'Some people take off a few more amounts at this step. What is left is your taxable income, and it cannot be below zero. It is the amount your federal tax and your Ontario tax are worked out from.',
+        'Some people take off a few more amounts at this step. What is left is your taxable income, and it cannot be below zero. It is the amount your federal tax and your provincial tax are worked out from.',
       example:
         'The other amounts are {other}, so your taxable income is {taxable}.',
       figures: {

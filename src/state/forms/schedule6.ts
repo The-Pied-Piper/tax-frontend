@@ -9,6 +9,7 @@ export const schedule6: FormPageSpec = {
   province: 'ca-on',
   year: 2025,
   exampleSalary: '70000',
+  federal: true,
   title: 'Schedule 6: Canada Workers Benefit, in plain words',
   description:
     'What Schedule 6 is for and what each part asks, in plain words, with a worked example for a $70,000 salary.',
