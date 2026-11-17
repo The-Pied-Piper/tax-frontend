@@ -1,6 +1,6 @@
 import { DESCRIPTION_LIMIT, TITLE_LIMIT } from '../../build/salaryPages/limits';
 import { contentPages } from './contentPages';
-import { isContentSlug } from './siteLinks';
+import { isContentSlug, METHODOLOGY_SLUG } from './siteLinks';
 
 // Adding a page is one entry in the list; these checks keep every entry sound.
 describe('contentPages', () => {
@@ -38,5 +38,32 @@ describe('contentPages', () => {
         expect(section.paragraphs.length).toBeGreaterThan(0);
       }
     }
+  });
+});
+
+describe('the methodology page', () => {
+  const page = contentPages.find((entry) => entry.slug === METHODOLOGY_SLUG);
+  const words = JSON.stringify(page).replace(/\s+/g, ' ').toLowerCase();
+
+  it('is listed under the slug the footer links to', () => {
+    expect(page).toBeDefined();
+    expect(page?.trail).toEqual([]);
+  });
+
+  it('states the method plainly', () => {
+    expect(words).toContain('follows the published forms');
+    expect(words).toContain('line by line');
+    expect(words).toContain('exact decimals');
+    expect(words).toContain('more than a hundred salaries');
+    expect(words).toContain('provisional');
+    expect(words).toContain('not tax advice');
+  });
+
+  it('keeps to the copy rules', () => {
+    expect(words).not.toContain('checked against cra');
+    expect(words).not.toContain('canada only');
+    expect(words).not.toContain('canada-only');
+    expect(JSON.stringify(page)).not.toMatch(/\bAI\b/);
+    expect(words).not.toContain('docs/');
   });
 });
