@@ -36,14 +36,18 @@ export type GenerateOptions = {
   template: string;
   /** The real App as a string for one page's data. */
   render: (data: SalaryPageData) => string;
-  /** The normalized site origin; null leaves canonical and og:url as the template has them. */
+  /**
+   * The normalized site origin; null leaves canonical and og:url as the template has them.
+   * When set (a prod-shaped build), a listed province the API does not return fails the
+   * build before anything is fetched or written; without it such a province is skipped.
+   */
   siteUrl?: string | null;
 };
 
 export type GenerateResult = {
   /** Paths written, relative to outDir. */
   written: string[];
-  /** Listed provinces the API did not return, so got no pages. */
+  /** Listed provinces the API did not return, so got no pages (only without a site URL; with one, generating throws instead). */
   skipped: string[];
   /** What was written, by province: the one list the hub pages' salary links come from. */
   built: BuiltProvince[];
@@ -71,6 +75,24 @@ export async function generateSalaryPages(
     );
   }
 
+  const placeNames = strings.siteNav.provinceNames as Record<
+    string,
+    string | undefined
+  >;
+  const missing = provinces.filter(
+    (p) => !list.jurisdictions.some((j) => j.code === p.code),
+  );
+  if (options.siteUrl && missing.length > 0) {
+    throw new Error(
+      missing
+        .map(
+          (p) =>
+            `${placeNames[p.slug] ?? p.code} (${p.code}) is listed in build/salaryPages/provinces.ts but the API at ${baseUrl} does not return it. Release the service with it first, or take it out of the list.`,
+        )
+        .join('\n'),
+    );
+  }
+
   const fetched: {
     province: Province;
     steps: string[];
@@ -78,7 +100,7 @@ export async function generateSalaryPages(
   }[] = [];
   const skipped: string[] = [];
   for (const province of provinces) {
-    if (!list.jurisdictions.some((j) => j.code === province.code)) {
+    if (missing.includes(province)) {
       skipped.push(province.code);
       continue;
     }
@@ -120,9 +142,7 @@ export async function generateSalaryPages(
   for (const { province, steps, responses } of fetched) {
     // The name the hubs use, so the breadcrumb and the hub's own title agree.
     const placeName =
-      (strings.siteNav.provinceNames as Record<string, string | undefined>)[
-        province.slug
-      ] ??
+      placeNames[province.slug] ??
       list.jurisdictions.find((j) => j.code === province.code)?.name ??
       province.code;
     // Links go only to the pages of this province that are about to be written.
