@@ -1,6 +1,6 @@
 import { useId } from 'react';
 import type { Unit } from '../adapters';
-import { displayWholeMoney } from '../money/format';
+import { displayMoney, displayWholeMoney } from '../money/format';
 import type { SalaryPageLinks } from '../state/useTakeHome';
 import { strings } from '../strings';
 import styles from './SalaryLinks.module.css';
@@ -16,17 +16,24 @@ type Props = {
 export function SalaryLinks({ links, unit }: Props) {
   const headingId = useId();
   const money = (salary: string) => displayWholeMoney(salary, 'annually', unit);
+  const kept = (takeHome: string) => displayMoney(takeHome, 'annually', unit);
   return (
     <nav className={styles.nav} aria-label={strings.salaryLinks.label}>
       <div className={styles.row}>
         {links.previous && (
           <a className={styles.link} href={links.previous.href}>
-            {strings.salaryLinks.previous(money(links.previous.salary))}
+            {strings.salaryLinks.previous(
+              money(links.previous.salary),
+              kept(links.previous.takeHome),
+            )}
           </a>
         )}
         {links.next && (
           <a className={styles.link} href={links.next.href}>
-            {strings.salaryLinks.next(money(links.next.salary))}
+            {strings.salaryLinks.next(
+              money(links.next.salary),
+              kept(links.next.takeHome),
+            )}
           </a>
         )}
         <a className={styles.link} href={links.calculator}>
@@ -42,7 +49,10 @@ export function SalaryLinks({ links, unit }: Props) {
             {links.others.map((other) => (
               <li key={other.href}>
                 <a className={styles.link} href={other.href}>
-                  {money(other.salary)}
+                  {strings.salaryLinks.other(
+                    money(other.salary),
+                    kept(other.takeHome),
+                  )}
                 </a>
               </li>
             ))}

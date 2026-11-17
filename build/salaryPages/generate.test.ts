@@ -242,6 +242,13 @@ describe('generateSalaryPages for Ontario', () => {
           'ca-on',
           Array.from({ length: 25 }, (_, i) => String(30000 + i * 5000)),
           '70000',
+          // The fake API answers every request with the $70,000 response.
+          Object.fromEntries(
+            Array.from({ length: 25 }, (_, i) => [
+              String(30000 + i * 5000),
+              compute70000.take_home,
+            ]),
+          ),
         ),
         ...ontarioTargets,
       },
@@ -341,7 +348,12 @@ describe('generateSalaryPages for Alberta', () => {
       year: 2026,
       salary: '70000',
       links: {
-        ...salaryLinks('ca-ab', steps, '70000'),
+        ...salaryLinks(
+          'ca-ab',
+          steps,
+          '70000',
+          Object.fromEntries(steps.map((s) => [s, alberta70000.take_home])),
+        ),
         ...albertaTargets,
       },
     });

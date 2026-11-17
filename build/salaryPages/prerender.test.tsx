@@ -201,7 +201,11 @@ describe('salary links in the static page and the mounted page (#81)', () => {
     ...dataFor(compute70000, '70000'),
     links: undefined,
   };
-  const links = salaryLinks('ca-on', ['65000', '70000', '75000'], '70000');
+  const links = salaryLinks('ca-on', ['65000', '70000', '75000'], '70000', {
+    '65000': '49976.45',
+    '70000': '53786.25',
+    '75000': '57611.80',
+  });
   const withLinks: SalaryPageData = {
     ...base,
     links: { ...links, ...ontarioTargets },
@@ -218,6 +222,49 @@ describe('salary links in the static page and the mounted page (#81)', () => {
     expect(hrefs).toEqual(
       expect.arrayContaining(['/', '/ca-on/65000/', '/ca-on/75000/']),
     );
+  });
+
+  it('writes each neighbour with its take-home in the static HTML, and the mounted page agrees', () => {
+    show(withLinks);
+    const nav = screen.getByRole('navigation', {
+      name: strings.salaryLinks.label,
+    });
+    const previous = within(nav).getByRole('link', {
+      name: /^Previous: \$65,000/,
+    });
+    const next = within(nav).getByRole('link', { name: /^Next: \$75,000/ });
+    expect(previous.textContent).toContain('$49,976.45');
+    expect(next.textContent).toContain('$57,611.80');
+    expect(previous.textContent).not.toContain('$53,786.25');
+    const staticText = nav.textContent;
+    document.body.innerHTML = '';
+    render(<App initial={withLinks} />);
+    expect(
+      screen.getByRole('navigation', { name: strings.salaryLinks.label })
+        .textContent,
+    ).toBe(staticText);
+  });
+
+  it('renders the first and last page of a province with no previous or next and no crash', () => {
+    const first: SalaryPageData = {
+      ...base,
+      links: {
+        ...salaryLinks('ca-on', ['70000', '75000'], '70000', {
+          '70000': '53786.25',
+          '75000': '57611.80',
+        }),
+        ...ontarioTargets,
+      },
+    };
+    show(first);
+    const nav = screen.getByRole('navigation', {
+      name: strings.salaryLinks.label,
+    });
+    expect(within(nav).queryByRole('link', { name: /^Previous/ })).toBeNull();
+    expect(
+      within(nav).getByRole('link', { name: /^Next: \$75,000.*\$57,611\.80/ }),
+    ).toBeInTheDocument();
+    expect(nav.textContent).not.toMatch(/undefined|NaN|null/);
   });
 
   it('has no nav in the static HTML for data without links', () => {
@@ -308,7 +355,11 @@ describe('renderContentPage', () => {
 
 describe('breadcrumb and learn-more links in the static page (#150)', () => {
   const links = {
-    ...salaryLinks('ca-on', ['65000', '70000', '75000'], '70000'),
+    ...salaryLinks('ca-on', ['65000', '70000', '75000'], '70000', {
+      '65000': '49976.45',
+      '70000': '53786.25',
+      '75000': '57611.80',
+    }),
     ...ontarioTargets,
   };
   const withLinks: SalaryPageData = {

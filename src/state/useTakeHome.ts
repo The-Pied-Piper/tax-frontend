@@ -54,8 +54,13 @@ export type FormValues = {
   salary: string;
 };
 
-/** One link to another pre-built page: the yearly salary it is for and its address. */
-export type SalaryPageLink = { salary: string; href: string };
+/** One link to another pre-built page: the yearly salary it is for, its address and its take-home. */
+export type SalaryPageLink = {
+  salary: string;
+  href: string;
+  /** The linked page's own yearly take_home, as the API printed it. */
+  takeHome: string;
+};
 
 /** A link to a page of this site, with the words it is shown as. */
 export type PageLink = { label: string; href: string };
