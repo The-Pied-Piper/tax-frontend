@@ -103,7 +103,7 @@ function page(dir: string, file: string): Document {
 
 const blocks = (doc: Document) =>
   [...doc.querySelectorAll('script[type="application/ld+json"]')].map(
-    (s) => s.textContent ?? '',
+    (s) => s.textContent,
   );
 
 /** The one block of a page, parsed. */
@@ -121,7 +121,7 @@ function list(doc: Document) {
 function visible(doc: Document) {
   const current = doc.querySelector('nav ol li[aria-current="page"]');
   const ol = current?.parentElement;
-  if (!ol || !current) throw new Error('no visible breadcrumb');
+  if (!ol) throw new Error('no visible breadcrumb');
   const steps = [...ol.querySelectorAll('li a')].map((a) => ({
     name: a.textContent,
     item: new URL(a.getAttribute('href') ?? '', site).href,
