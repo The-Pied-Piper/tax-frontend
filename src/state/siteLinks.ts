@@ -34,6 +34,11 @@ export function contentPath(slug: string): string {
   return `/${slug}/`;
 }
 
+/** The address of a salary page, such as `/ca-on/70000/`. */
+export function salaryPagePath(slug: string, salary: string | number): string {
+  return `/${slug}/${salary.toString()}/`;
+}
+
 /** The file of a content page below the output folder, such as `ca-on/index.html`. */
 export function contentFile(slug: string): string {
   return `${slug}${INDEX}`;

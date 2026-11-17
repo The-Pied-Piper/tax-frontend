@@ -1,4 +1,5 @@
 import styles from './ContentPage.module.css';
+import { FormSections } from './FormSections';
 import { SiteFooter } from './SiteFooter';
 import { ThemeToggle } from './ThemeToggle';
 import type { ContentBlock, ContentPageSpec } from '../state/contentPages';
@@ -88,6 +89,7 @@ export function ContentPage({
   lede,
   trail,
   sections,
+  form,
 }: ContentPageSpec) {
   return (
     <>
@@ -114,6 +116,7 @@ export function ContentPage({
             <li aria-current="page">{heading}</li>
           </ol>
         </nav>
+        {form && <FormSections {...form} />}
         {sections.map((section, at) => (
           <section key={at} className={styles.section}>
             <h2>{section.heading}</h2>

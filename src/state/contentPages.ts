@@ -1,3 +1,5 @@
+import { formContentPage, type FormBody } from './formPage';
+import { formPages } from './formPages';
 import { METHODOLOGY_SLUG } from './siteLinks';
 
 /** A link in a page: its words and where it goes. */
@@ -47,6 +49,8 @@ export type ContentPageSpec = {
   /** The pages between Home and this one, nearest to Home first. Each is itself a listed page. */
   trail: { label: string; slug: string }[];
   sections: ContentSection[];
+  /** Set on a form's page: its parts, drawn after the lede in place of `sections`. */
+  form?: FormBody;
 };
 
 export const contentPages: ContentPageSpec[] = [
@@ -110,4 +114,5 @@ export const contentPages: ContentPageSpec[] = [
       },
     ],
   },
+  ...formPages.map(formContentPage),
 ];

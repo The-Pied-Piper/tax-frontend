@@ -8,6 +8,7 @@ import './styles/global.css';
 // The pre-built page uses these components' styles; the page itself is plain
 // HTML, so only their stylesheets are needed here.
 import './components/ContentPage.module.css';
+import './components/FormSections.module.css';
 import './components/SiteFooter.module.css';
 
 // A pre-built content page has a slot for the Light/Dark switch and nothing
