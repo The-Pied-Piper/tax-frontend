@@ -22,7 +22,7 @@
     }
   },
   "marginal_income_tax_rate": {
-    "amount": "0.2700",
+    "amount": "0.282",
     "unit": {
       "name": "core/percent",
       "placement": "after",
@@ -2411,6 +2411,21 @@
           "text": "Line 70 (CA$69335.00) falls in a bracket with CA$8319.38 of tax on the income below it."
         },
         {
+          "label": "provincial_credits_line_47900",
+          "name": "Provincial or territorial credits",
+          "reference": "47900",
+          "amount": "0.00",
+          "unit": {
+            "name": "ca/cad",
+            "placement": "before",
+            "singular": "CA$",
+            "plural": "CA$",
+            "spaced": false,
+            "as_percentage": false
+          },
+          "text": "Line 45 of BC479 (CA$0.00) gives CA$0.00."
+        },
+        {
           "label": "provincial_tax_line_42800",
           "name": "Provincial or territorial tax",
           "reference": "42800",
@@ -2783,7 +2798,7 @@
             "spaced": false,
             "as_percentage": false
           },
-          "text": "Line 45000 (CA$0.00) plus line 45300 (CA$0.00) gives CA$0.00 (rounded to the nearest cent)."
+          "text": "Line 45000 (CA$0.00) plus line 45300 (CA$0.00) plus line 47900 (CA$0.00) gives CA$0.00 (rounded to the nearest cent)."
         },
         {
           "label": "total_payable",
@@ -2822,6 +2837,209 @@
       "name": "Return summary",
       "lines": [
         {
+          "label": "bc428_bracket_rate_line_12",
+          "name": null,
+          "reference": null,
+          "amount": "0",
+          "unit": null,
+          "text": "Line 12 of BC428 (item 1 of bc428.bc428 bracket rate line 12): left blank, taken as 0.00."
+        },
+        {
+          "label": "british_columbia_bracket_rate_line_12_return",
+          "name": null,
+          "reference": null,
+          "amount": "0",
+          "unit": {
+            "name": "core/percent",
+            "placement": "after",
+            "singular": "%",
+            "plural": "%",
+            "spaced": false,
+            "as_percentage": true
+          },
+          "text": "Line 12 of BC428 (0.00) gives 0%."
+        },
+        {
+          "label": "british_columbia_bracket_rate_line_5_return",
+          "name": null,
+          "reference": null,
+          "amount": "0.077",
+          "unit": {
+            "name": "core/percent",
+            "placement": "after",
+            "singular": "%",
+            "plural": "%",
+            "spaced": false,
+            "as_percentage": true
+          },
+          "text": "Line 5 of BC428 (0.077) gives 7.7%."
+        },
+        {
+          "label": "british_columbia_reduction_clawback_return",
+          "name": null,
+          "reference": null,
+          "amount": "1577.61",
+          "unit": {
+            "name": "ca/cad",
+            "placement": "before",
+            "singular": "CA$",
+            "plural": "CA$",
+            "spaced": false,
+            "as_percentage": false
+          },
+          "text": "Line 78 of BC428 (CA$1577.61) gives CA$1577.61."
+        },
+        {
+          "label": "british_columbia_reduction_slope",
+          "name": null,
+          "reference": null,
+          "amount": "0.0356",
+          "unit": {
+            "name": "core/percent",
+            "placement": "after",
+            "singular": "%",
+            "plural": "%",
+            "spaced": false,
+            "as_percentage": true
+          },
+          "text": "British columbia reduction clawback return (CA$1577.61) is over 0.005, so the rate is 3.56%."
+        },
+        {
+          "label": "british_columbia_tax_after_reduction_return",
+          "name": null,
+          "reference": null,
+          "amount": "3162.39",
+          "unit": {
+            "name": "ca/cad",
+            "placement": "before",
+            "singular": "CA$",
+            "plural": "CA$",
+            "spaced": false,
+            "as_percentage": false
+          },
+          "text": "Line 80 of BC428 (CA$3162.39) gives CA$3162.39."
+        },
+        {
+          "label": "british_columbia_rate_gate",
+          "name": null,
+          "reference": null,
+          "amount": "1",
+          "unit": {
+            "name": "core/percent",
+            "placement": "after",
+            "singular": "%",
+            "plural": "%",
+            "spaced": false,
+            "as_percentage": true
+          },
+          "text": "British columbia tax after reduction return (CA$3162.39) is over 0.005, so the rate is 100%."
+        },
+        {
+          "label": "british_columbia_tax_reduction_return",
+          "name": null,
+          "reference": null,
+          "amount": "0.00",
+          "unit": {
+            "name": "ca/cad",
+            "placement": "before",
+            "singular": "CA$",
+            "plural": "CA$",
+            "spaced": false,
+            "as_percentage": false
+          },
+          "text": "Line 79 of BC428 (CA$0.00) gives CA$0.00."
+        },
+        {
+          "label": "british_columbia_reduction_gate",
+          "name": null,
+          "reference": null,
+          "amount": "0",
+          "unit": {
+            "name": "core/percent",
+            "placement": "after",
+            "singular": "%",
+            "plural": "%",
+            "spaced": false,
+            "as_percentage": true
+          },
+          "text": "British columbia tax reduction return (CA$0.00) is in the band starting at 0.00, so the band is a flat amount and the rate is 0%."
+        },
+        {
+          "label": "british_columbia_reduction_phase_out_rate",
+          "name": null,
+          "reference": null,
+          "amount": "0",
+          "unit": {
+            "name": "core/percent",
+            "placement": "after",
+            "singular": "%",
+            "plural": "%",
+            "spaced": false,
+            "as_percentage": true
+          },
+          "text": "British columbia reduction slope (3.56%) of british columbia reduction gate (0%) gives 0% (not rounded)."
+        },
+        {
+          "label": "federal_bracket_rate_return",
+          "name": null,
+          "reference": null,
+          "amount": "0.205",
+          "unit": {
+            "name": "core/percent",
+            "placement": "after",
+            "singular": "%",
+            "plural": "%",
+            "spaced": false,
+            "as_percentage": true
+          },
+          "text": "Line 73 of T1 Income Tax and Benefit Return, Steps 5 and 6 (0.205) gives 20.5%."
+        },
+        {
+          "label": "federal_tax_after_credits_return",
+          "name": null,
+          "reference": null,
+          "amount": "7585.64",
+          "unit": {
+            "name": "ca/cad",
+            "placement": "before",
+            "singular": "CA$",
+            "plural": "CA$",
+            "spaced": false,
+            "as_percentage": false
+          },
+          "text": "Line 42900 of T1 Income Tax and Benefit Return, Steps 5 and 6 (CA$7585.64) gives CA$7585.64."
+        },
+        {
+          "label": "federal_rate_gate",
+          "name": null,
+          "reference": null,
+          "amount": "1",
+          "unit": {
+            "name": "core/percent",
+            "placement": "after",
+            "singular": "%",
+            "plural": "%",
+            "spaced": false,
+            "as_percentage": true
+          },
+          "text": "Federal tax after credits return (CA$7585.64) is over 0.005, so the rate is 100%."
+        },
+        {
+          "label": "federal_marginal_rate",
+          "name": null,
+          "reference": null,
+          "amount": "0.205",
+          "unit": {
+            "name": "core/percent",
+            "placement": "after",
+            "singular": "%",
+            "plural": "%",
+            "spaced": false,
+            "as_percentage": true
+          },
+          "text": "Federal bracket rate return (20.5%) of federal rate gate (100%) gives 20.5% (not rounded)."
+        },
+        {
           "label": "refund_or_balance_owing",
           "name": "Refund or balance owing",
           "reference": "167",
@@ -2835,6 +3053,96 @@
             "as_percentage": false
           },
           "text": "Line 167 of T1 Income Tax and Benefit Return, Steps 5 and 6 (CA$10748.03) gives CA$10748.03."
+        },
+        {
+          "label": "total_payable",
+          "name": null,
+          "reference": null,
+          "amount": "10748.03",
+          "unit": {
+            "name": "ca/cad",
+            "placement": "before",
+            "singular": "CA$",
+            "plural": "CA$",
+            "spaced": false,
+            "as_percentage": false
+          },
+          "text": "Line 43500 of T1 Income Tax and Benefit Return, Steps 5 and 6 (CA$10748.03) gives CA$10748.03."
+        },
+        {
+          "label": "average_income_tax_rate",
+          "name": null,
+          "reference": null,
+          "amount": "0.1535",
+          "unit": {
+            "name": "core/percent",
+            "placement": "after",
+            "singular": "%",
+            "plural": "%",
+            "spaced": false,
+            "as_percentage": true
+          },
+          "text": "Line 43500 of T1 Income Tax and Benefit Return, Steps 5 and 6 (CA$10748.03) divided by line 10100 (CA$70000.00) gives 15.35% (rounded half-up to 0.0001)."
+        },
+        {
+          "label": "british_columbia_bracket_rate_return",
+          "name": null,
+          "reference": null,
+          "amount": "0.077",
+          "unit": {
+            "name": "core/percent",
+            "placement": "after",
+            "singular": "%",
+            "plural": "%",
+            "spaced": false,
+            "as_percentage": true
+          },
+          "text": "British columbia bracket rate line 5 return (7.7%) plus british columbia bracket rate line 12 return (0%) gives 7.7% (not rounded)."
+        },
+        {
+          "label": "british_columbia_bracket_rate_with_reduction",
+          "name": null,
+          "reference": null,
+          "amount": "0.077",
+          "unit": {
+            "name": "core/percent",
+            "placement": "after",
+            "singular": "%",
+            "plural": "%",
+            "spaced": false,
+            "as_percentage": true
+          },
+          "text": "British columbia bracket rate return (7.7%) plus british columbia reduction phase out rate (0%) gives 7.7% (not rounded)."
+        },
+        {
+          "label": "british_columbia_marginal_rate",
+          "name": null,
+          "reference": null,
+          "amount": "0.077",
+          "unit": {
+            "name": "core/percent",
+            "placement": "after",
+            "singular": "%",
+            "plural": "%",
+            "spaced": false,
+            "as_percentage": true
+          },
+          "text": "British columbia bracket rate with reduction (7.7%) of british columbia rate gate (100%) gives 7.7% (not rounded)."
+        },
+        {
+          "label": "marginal_tax_rate",
+          "name": null,
+          "reference": null,
+          "amount": "0.282",
+          "unit": {
+            "name": "core/percent",
+            "placement": "after",
+            "singular": "%",
+            "plural": "%",
+            "spaced": false,
+            "as_percentage": true
+          },
+          "text": "Federal marginal rate (20.5%) plus british columbia marginal rate (7.7%) gives 28.2% (not rounded)."
         }
       ]
     }

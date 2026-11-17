@@ -6,8 +6,7 @@ import { cad, months } from '../test/units';
 import { adapters } from './index';
 import { caBcAdapter } from './ca-bc';
 
-// The fixture is engine-generated: tax-engine computed it locally, because the
-// service does not serve British Columbia yet.
+// A saved response from the running service for $70,000 in 2025.
 const r2025 = fixture2025 as ComputeTakeHomeCalculationResponse;
 
 function figures(response: ComputeTakeHomeCalculationResponse) {
