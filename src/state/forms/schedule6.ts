@@ -20,7 +20,7 @@ export const schedule6: FormPageSpec = {
       heading: 'What you earned from work',
       lines: 'Lines 1–6',
       paragraph:
-        'The Canada Workers Benefit starts with what you earned from working. The form uses this to work out how much benefit you could get. Someone who was a full-time student for more than 13 weeks in the year cannot claim, unless a child lived with them.',
+        'The Canada Workers Benefit starts with what you earned from working. The form uses this to work out how much benefit you could get. Someone who was a full-time student for more than 13 weeks in the year cannot claim, unless they had an eligible dependant. That is a child under 19 who lived with them on December 31. Someone who was in prison for 90 days or more cannot claim. A diplomat or their family cannot claim either.',
       example: 'Your pay from work is {pay}.',
       figures: {
         pay: result('$70,000', 'cwb_family_working_income'),

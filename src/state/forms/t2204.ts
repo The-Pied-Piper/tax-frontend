@@ -20,7 +20,7 @@ export const t2204: FormPageSpec = {
       heading: 'Pay that EI counts',
       lines: 'Lines 1–3',
       paragraph:
-        'EI is only charged on pay up to a yearly limit. The form takes your pay and cuts it off at that limit, which is {max} in 2025. Insured pay under {exempt} is entered as zero, so none of it counts, and all of your EI payments come back to you. The form also works out your pay less {exempt}, never below zero. It uses that to decide your refund and your EI credit.',
+        'EI is only charged on pay up to a yearly limit. The form takes your pay and cuts it off at that limit, which is {max} in 2025. If you only work for an employer and your insured pay is under {exempt}, it is entered as zero, so none of it counts, and all of your EI payments come back to you. The form also works out your pay less {exempt}, never below zero. It uses that to decide your refund and your EI credit.',
       example:
         'Your pay is more than the limit, so EI counts only {counted} of it.',
       figures: {
@@ -48,7 +48,7 @@ export const t2204: FormPageSpec = {
       heading: 'Your EI refund',
       lines: 'Lines 13–16',
       paragraph:
-        'If your employer took off more than the most you owe, the extra is an overpayment. It comes back to you as a refund. If not, the refund is zero. The refund is paid only if the overpayment is more than $1. Line 16 is the amount that goes onto the EI credit line (31200) of your return and onto your provincial form.',
+        'If your employer took off more than the most you owe, the extra is an overpayment. It comes back to you as a refund. If not, the refund is zero. The refund is paid only if the overpayment is more than $1. Line 16 is the amount that goes onto the EI credit line (31200) of your return and line 58300 of your provincial form.',
       example:
         'The amount taken off is {taken}, less the most you owe of {most}. The overpayment is {extra}.',
       figures: {
