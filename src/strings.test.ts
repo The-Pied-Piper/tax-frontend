@@ -1,3 +1,4 @@
+import { longestSentence } from './test/formText';
 import { strings } from './strings';
 
 describe('the shared site copy', () => {
@@ -21,10 +22,7 @@ describe('the shared site copy', () => {
       strings.formPage.notice(2025, '$70,000'),
       strings.intro,
     ]) {
-      for (const sentence of text.split(/(?<=[.!?])\s+/)) {
-        const count = sentence.split(/\s+/).filter(Boolean).length;
-        expect(count, sentence).toBeLessThanOrEqual(40);
-      }
+      expect(longestSentence(text), text).toBeLessThanOrEqual(40);
     }
   });
 });

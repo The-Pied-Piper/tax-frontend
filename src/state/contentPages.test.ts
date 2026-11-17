@@ -1,5 +1,6 @@
 import { DESCRIPTION_LIMIT, TITLE_LIMIT } from '../../build/salaryPages/limits';
 import { copyRules, everyString } from '../test/copyRules';
+import { longestSentence } from '../test/formText';
 import { contentPages, paragraph } from './contentPages';
 import { isContentSlug, METHODOLOGY_SLUG } from './siteLinks';
 
@@ -105,10 +106,7 @@ describe('the methodology page', () => {
 
   it('keeps every sentence to 40 words or fewer', () => {
     for (const text of everyString(page?.sections)) {
-      for (const sentence of text.split(/(?<=[.!?])\s+/)) {
-        const count = sentence.split(/\s+/).filter(Boolean).length;
-        expect(count, sentence).toBeLessThanOrEqual(40);
-      }
+      expect(longestSentence(text), text).toBeLessThanOrEqual(40);
     }
   });
 
