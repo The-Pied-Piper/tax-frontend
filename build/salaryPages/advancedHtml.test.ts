@@ -129,4 +129,25 @@ describe('advanced view in the written CA-ON page', () => {
   it('does not render a checkbox for the advanced view', () => {
     expect(fold().querySelector('input[type="checkbox"]')).toBeNull();
   });
+
+  function formDetails(formKey: string): Element {
+    const group = groups.find((g) => g.form === formKey);
+    if (!group) throw new Error(`no group for ${formKey}`);
+    const found = Array.from(fold().querySelectorAll('details')).find((d) =>
+      d.querySelector('summary')?.textContent.includes(group.name),
+    );
+    if (!found) throw new Error(`no details for ${formKey}`);
+    return found;
+  }
+
+  it('links the ON428 heading to its form page with a plain anchor', () => {
+    const link = formDetails('ca-on/on428').querySelector('summary a');
+    expect(link?.getAttribute('href')).toBe('/forms/on428/');
+    expect(link?.textContent).toContain('What is this form?');
+    expect(html).toMatch(/<a [^>]*href="\/forms\/on428\/"/);
+  });
+
+  it('puts no link on the T2204 heading, whose page is not published', () => {
+    expect(formDetails('ca/t2204').querySelector('summary a')).toBeNull();
+  });
 });

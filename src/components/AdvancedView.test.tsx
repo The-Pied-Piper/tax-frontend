@@ -4,6 +4,8 @@ import type { AdvancedGroup } from '../adapters';
 import { AdvancedView } from './AdvancedView';
 import { strings } from '../strings';
 import { cad, months } from '../test/units';
+import { caOnAdapter } from '../adapters/ca-on';
+import { compute70000 } from '../test/syntheticPages';
 
 const groups: AdvancedGroup[] = [
   {
@@ -444,5 +446,78 @@ describe('AdvancedView', () => {
       await userEvent.click(summary());
       expect(section()).toHaveAttribute('open');
     });
+  });
+});
+
+describe('AdvancedView form link', () => {
+  const real = caOnAdapter.adapt(compute70000).advanced;
+  const on428 = real.find((g) => g.form === 'ca-on/on428');
+  const unmapped = real.find((g) => g.form === 'ca-on/return');
+  const t2204 = real.find((g) => g.form === 'ca/t2204');
+
+  function linkOf(name: string) {
+    return within(form(name)).queryByRole('link', {
+      name: /What is this form\?/,
+    });
+  }
+
+  function pick(group: AdvancedGroup | undefined): AdvancedGroup {
+    if (!group) throw new Error('missing fixture group');
+    return group;
+  }
+
+  it('links a mapped, published form to its page', () => {
+    const group = pick(on428);
+    render(<AdvancedView groups={[group]} />);
+    const link = linkOf(group.name);
+    expect(link).toHaveAttribute('href', '/forms/on428/');
+    expect(link).toHaveTextContent('What is this form?');
+  });
+
+  it('has no link for a form with no map entry', () => {
+    const group = pick(unmapped);
+    render(<AdvancedView groups={[group]} />);
+    expect(screen.queryByRole('link')).not.toBeInTheDocument();
+  });
+
+  it('has no link for a mapped form whose page is not published', () => {
+    const group = pick(t2204);
+    render(<AdvancedView groups={[group]} />);
+    expect(screen.queryByRole('link')).not.toBeInTheDocument();
+  });
+
+  it('is a plain link in the heading, outside the line list, named for the form', () => {
+    const group = pick(on428);
+    render(<AdvancedView groups={[group]} />);
+    const link = linkOf(group.name);
+    expect(link?.tagName).toBe('A');
+    expect(link?.closest('button')).toBeNull();
+    expect(link?.closest('summary')).not.toBeNull();
+    expect(link?.closest('dl')).toBeNull();
+    expect(link).toHaveAccessibleName(new RegExp(group.name));
+  });
+
+  it('does not open or close the form when clicked', async () => {
+    const group = pick(on428);
+    render(<AdvancedView groups={[group]} />);
+    await open();
+    const details = form(group.name);
+    const link = linkOf(group.name);
+    if (!link) throw new Error('no link');
+    link.addEventListener('click', (event) => {
+      event.preventDefault();
+    });
+    await userEvent.click(link);
+    expect(details).not.toHaveAttribute('open');
+  });
+
+  it('can be reached with the keyboard', async () => {
+    const group = pick(on428);
+    render(<AdvancedView groups={[group]} />);
+    await open();
+    const link = linkOf(group.name);
+    await userEvent.tab();
+    await userEvent.tab();
+    expect(link).toHaveFocus();
   });
 });
