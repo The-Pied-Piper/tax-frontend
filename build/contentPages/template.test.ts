@@ -44,6 +44,13 @@ describe('content.html', () => {
     expect(sharedHead(content)).toEqual(sharedHead(calculator));
   });
 
+  it('has no structured data of its own, like the calculator: each page gets its own breadcrumb block when built', () => {
+    const ld = 'script[type="application/ld+json"]';
+    expect(content.querySelector(ld)).toBeNull();
+    expect(calculator.querySelector(ld)).toBeNull();
+    expect(sharedHead(content)).toEqual(sharedHead(calculator));
+  });
+
   it('has an empty #root and no data block', () => {
     expect(content.getElementById('root')?.children).toHaveLength(0);
     expect(content.querySelector('script[type="application/json"]')).toBeNull();
