@@ -500,7 +500,7 @@ describe('AdvancedView form link', () => {
   });
 
   it('has no link for a group whose page is not published', () => {
-    const group = pick(t2204);
+    const group = { ...pick(t2204), page: 'no-such-page' };
     render(<AdvancedView groups={[group]} />);
     expect(screen.queryByRole('link')).not.toBeInTheDocument();
   });

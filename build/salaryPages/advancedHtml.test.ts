@@ -147,7 +147,7 @@ describe('advanced view in the written CA-ON page', () => {
     expect(html).toMatch(/<a [^>]*href="\/forms\/on428\/"/);
   });
 
-  it('puts no link on the T2204 heading, whose page is not published', () => {
-    expect(formDetails('ca/t2204').querySelector('summary a')).toBeNull();
+  it('puts no link on the return summary heading, which has no page', () => {
+    expect(formDetails('ca-on/return').querySelector('summary a')).toBeNull();
   });
 });

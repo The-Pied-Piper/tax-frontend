@@ -33,6 +33,6 @@ describe('formPageLink', () => {
 
   it('defaults to the pages that are published', () => {
     expect(formPageLink('on428')).toBe('/forms/on428/');
-    expect(formPageLink('t2204')).toBeNull();
+    expect(formPageLink('no-such-page')).toBeNull();
   });
 });
