@@ -126,11 +126,11 @@ export const strings = {
   salaryLinks: {
     label: 'More salaries',
     previous: (salary: string, takeHome: string) =>
-      `Previous: ${salary}, you keep ${takeHome}`,
+      `Previous: ${salary} salary, ${takeHome} take-home a year`,
     next: (salary: string, takeHome: string) =>
-      `Next: ${salary}, you keep ${takeHome}`,
+      `Next: ${salary} salary, ${takeHome} take-home a year`,
     other: (salary: string, takeHome: string) =>
-      `${salary}, you keep ${takeHome}`,
+      `${salary} salary, ${takeHome} take-home a year`,
     calculator: 'Back to the calculator',
     others: 'Other salaries',
   },
