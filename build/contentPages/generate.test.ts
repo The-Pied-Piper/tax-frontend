@@ -1,0 +1,196 @@
+import { existsSync, readFileSync, readdirSync } from 'node:fs';
+import { join } from 'node:path';
+import {
+  siteUrl as site,
+  template,
+  tmpDirs,
+} from '../../src/test/generatedSite';
+import {
+  parentSpec,
+  plainSpec,
+  sampleSpec,
+} from '../../src/test/contentPageData';
+import type { ContentPageSpec } from '../../src/state/contentPages';
+import { DESCRIPTION_LIMIT, TITLE_LIMIT } from '../salaryPages/limits';
+import { generateContentPages } from './generate';
+
+const outDir = tmpDirs('content-pages');
+
+/** Stands in for the real render; echoes what it was given. */
+function render(spec: ContentPageSpec): string {
+  return `<main><h1>${spec.heading}</h1><p>rendered ${spec.slug}</p></main>`;
+}
+
+function run(
+  dir: string,
+  pages: ContentPageSpec[],
+  options: { siteUrl?: string | null; render?: typeof render } = {},
+) {
+  // Wrapped so a throw at once and a rejection look the same to the tests.
+  return Promise.resolve().then(() =>
+    generateContentPages({
+      outDir: dir,
+      template,
+      pages,
+      render: options.render ?? render,
+      siteUrl: options.siteUrl === undefined ? site : options.siteUrl,
+    }),
+  );
+}
+
+function files(dir: string): string[] {
+  return readdirSync(dir, { recursive: true }).map(String);
+}
+
+function parse(dir: string, file: string) {
+  return new DOMParser().parseFromString(
+    readFileSync(join(dir, file), 'utf8'),
+    'text/html',
+  );
+}
+
+describe('generateContentPages with one entry', () => {
+  it('writes <slug>/index.html and reports it, relative to the output folder', async () => {
+    const dir = outDir();
+    const { written } = await run(dir, [plainSpec]);
+    expect(written).toEqual(['plain-page/index.html']);
+    expect(existsSync(join(dir, 'plain-page', 'index.html'))).toBe(true);
+    expect(files(dir).filter((f) => f.endsWith('.html'))).toEqual([
+      join('plain-page', 'index.html'),
+    ]);
+  });
+
+  it('puts the rendered page in #root', async () => {
+    const dir = outDir();
+    await run(dir, [plainSpec]);
+    const page = parse(dir, 'plain-page/index.html');
+    expect(page.querySelector('#root h1')?.textContent).toBe(plainSpec.heading);
+    expect(page.getElementById('root')?.textContent).toContain(
+      'rendered plain-page',
+    );
+  });
+
+  it('gives the page its own title, description, canonical and og:url', async () => {
+    const dir = outDir();
+    await run(dir, [plainSpec]);
+    const page = parse(dir, 'plain-page/index.html');
+    expect(page.title).toBe(plainSpec.title);
+    expect(
+      page.querySelector('meta[name="description"]')?.getAttribute('content'),
+    ).toBe(plainSpec.description);
+    expect(
+      page.querySelector('link[rel="canonical"]')?.getAttribute('href'),
+    ).toBe(`${site}/plain-page/`);
+    expect(
+      page.querySelector('meta[property="og:url"]')?.getAttribute('content'),
+    ).toBe(`${site}/plain-page/`);
+  });
+
+  it('writes a nested slug into nested folders', async () => {
+    const dir = outDir();
+    const nested = { ...plainSpec, slug: 'forms/bc428' };
+    const { written } = await run(dir, [nested]);
+    expect(written).toEqual(['forms/bc428/index.html']);
+    expect(existsSync(join(dir, 'forms', 'bc428', 'index.html'))).toBe(true);
+  });
+
+  it('leaves canonical and og:url alone when there is no site address', async () => {
+    const dir = outDir();
+    await run(dir, [plainSpec], { siteUrl: null });
+    const page = parse(dir, 'plain-page/index.html');
+    expect(page.querySelector('link[rel="canonical"]')).toBeNull();
+    expect(page.querySelector('meta[property="og:url"]')).toBeNull();
+  });
+
+  it('writes nothing for an empty list', async () => {
+    const dir = outDir();
+    const { written } = await run(dir, []);
+    expect(written).toEqual([]);
+    expect(files(dir)).toEqual([]);
+  });
+
+  it('writes every page of a longer list, in list order', async () => {
+    const dir = outDir();
+    const { written } = await run(dir, [parentSpec, sampleSpec]);
+    expect(written).toEqual([
+      'sample-hub/index.html',
+      'sample-page/index.html',
+    ]);
+  });
+});
+
+describe('generateContentPages validation', () => {
+  // The call may throw at once or reject; both count as an error.
+  async function fails(pages: ContentPageSpec[], dir = outDir()) {
+    const attempt = async () => run(dir, pages);
+    await expect(attempt()).rejects.toThrow();
+    return dir;
+  }
+
+  it('rejects an invalid slug and names it', async () => {
+    const bad = { ...plainSpec, slug: 'Not Valid' };
+    await expect(run(outDir(), [bad])).rejects.toThrow(/Not Valid/);
+  });
+
+  it('rejects a repeated slug and names it', async () => {
+    await expect(
+      run(outDir(), [plainSpec, { ...plainSpec, title: 'Other' }]),
+    ).rejects.toThrow(/plain-page/);
+  });
+
+  it('rejects a title of 60 characters or more', async () => {
+    const dir = await fails([{ ...plainSpec, title: 'x'.repeat(TITLE_LIMIT) }]);
+    expect(files(dir)).toEqual([]);
+  });
+
+  it('accepts a title one character under the limit', async () => {
+    const { written } = await run(outDir(), [
+      { ...plainSpec, title: 'x'.repeat(TITLE_LIMIT - 1) },
+    ]);
+    expect(written).toHaveLength(1);
+  });
+
+  it('rejects a description of 160 characters or more', async () => {
+    const dir = await fails([
+      { ...plainSpec, description: 'x'.repeat(DESCRIPTION_LIMIT) },
+    ]);
+    expect(files(dir)).toEqual([]);
+  });
+
+  it('accepts a description one character under the limit', async () => {
+    const { written } = await run(outDir(), [
+      { ...plainSpec, description: 'x'.repeat(DESCRIPTION_LIMIT - 1) },
+    ]);
+    expect(written).toHaveLength(1);
+  });
+
+  it('rejects a trail step that is not a listed page', async () => {
+    const dir = await fails([sampleSpec]);
+    expect(files(dir)).toEqual([]);
+  });
+
+  it('accepts a trail step that is a listed page', async () => {
+    const { written } = await run(outDir(), [parentSpec, sampleSpec]);
+    expect(written).toHaveLength(2);
+  });
+
+  it('writes no file at all when one entry of several is invalid', async () => {
+    const dir = await fails([
+      plainSpec,
+      { ...parentSpec, title: 'x'.repeat(TITLE_LIMIT) },
+    ]);
+    expect(files(dir)).toEqual([]);
+  });
+
+  it('writes no file when rendering one page fails', async () => {
+    const dir = outDir();
+    const failing = (spec: ContentPageSpec) => {
+      if (spec.slug === 'sample-page') throw new Error('render broke');
+      return render(spec);
+    };
+    await expect(
+      run(dir, [parentSpec, sampleSpec], { render: failing }),
+    ).rejects.toThrow(/render broke/);
+    expect(files(dir)).toEqual([]);
+  });
+});

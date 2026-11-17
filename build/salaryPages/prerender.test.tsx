@@ -1,6 +1,11 @@
 import { render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { renderSalaryApp, renderSalaryIndexNav } from './prerender';
+import {
+  renderContentPage,
+  renderSalaryApp,
+  renderSalaryIndexNav,
+} from './prerender';
+import { sampleSpec } from '../../src/test/contentPageData';
 import { ontarioIndex } from '../../src/test/salaryIndexData';
 import { pageMeta } from './pageMeta';
 import { salaryLinks } from './links';
@@ -270,5 +275,16 @@ describe('renderSalaryIndexNav (the static nav of the home page)', () => {
     document.body.innerHTML = renderSalaryIndexNav(ontarioIndex);
     const nav = screen.getByRole('navigation', { name: 'Popular salaries' });
     expect(within(nav).getAllByRole('link')).toHaveLength(25);
+  });
+});
+
+describe('renderContentPage', () => {
+  it('is the real content page as a string, footer and theme slot included', () => {
+    const html = renderContentPage(sampleSpec);
+    const page = new DOMParser().parseFromString(html, 'text/html');
+    expect(page.querySelector('h1')?.textContent).toBe(sampleSpec.heading);
+    expect(page.querySelector('#content-theme-toggle')).not.toBeNull();
+    expect(page.querySelector('footer a[href="/methodology/"]')).not.toBeNull();
+    expect(page.querySelector('footer')?.textContent).toContain(strings.footer);
   });
 });

@@ -22,6 +22,8 @@ import jurisdictions from './api/fixtures/jurisdictions.json';
 import { server } from './mocks/server';
 import { strings } from './strings';
 import { fixtureClient } from './test/fixtureClient';
+import { renderSalaryApp } from '../build/salaryPages/prerender';
+import type { SalaryPageData } from './state/useTakeHome';
 
 // Most tests below were written when the first listed year, 2025, was the
 // default: App here takes a 2025 clock unless a test passes its own.
@@ -987,3 +989,58 @@ describe('App, British Columbia page through the mock service', () => {
     expect(card.getByText('$15,782.26')).toBeVisible();
   });
 });
+
+describe.each(['light', 'dark'] as const)(
+  'App site footer in the %s theme',
+  (theme) => {
+    beforeEach(() => {
+      document.documentElement.dataset.theme = theme;
+    });
+    afterEach(() => {
+      delete document.documentElement.dataset.theme;
+    });
+
+    it('has the site links above the disclaimer on the calculator', () => {
+      render(<App client={fixtureClient()} />);
+      const footer = screen.getByRole('contentinfo');
+      const nav = within(footer).getByRole('navigation', {
+        name: strings.siteNav.label,
+      });
+      expect(
+        within(nav)
+          .getAllByRole('link')
+          .map((a) => [a.textContent, a.getAttribute('href')]),
+      ).toEqual([
+        ['How we calculate', '/methodology/'],
+        ['Ontario', '/ca-on/'],
+        ['Alberta', '/ca-ab/'],
+        ['British Columbia', '/ca-bc/'],
+      ]);
+      expect(nav).toHaveTextContent('Provinces:');
+      expect(footer).toHaveTextContent(strings.footer);
+    });
+
+    it('has the same footer links in the pre-rendered salary page', () => {
+      const data: SalaryPageData = {
+        jurisdictions: jurisdictions.jurisdictions,
+        response: compute2026 as SalaryPageData['response'],
+        jurisdictionCode: 'CA-ON',
+        year: 2026,
+        salary: '70000',
+      };
+      const page = new DOMParser().parseFromString(
+        renderSalaryApp(data),
+        'text/html',
+      );
+      const hrefs = [
+        ...page.querySelectorAll(
+          `footer nav[aria-label="${strings.siteNav.label}"] a[href]`,
+        ),
+      ].map((a) => a.getAttribute('href'));
+      expect(hrefs).toEqual(['/methodology/', '/ca-on/', '/ca-ab/', '/ca-bc/']);
+      expect(page.querySelector('footer')?.textContent).toContain(
+        strings.footer,
+      );
+    });
+  },
+);
