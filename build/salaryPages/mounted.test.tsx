@@ -1,6 +1,7 @@
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { App } from '../../src/App';
+import type { ApiClient } from '../../src/api';
 import { strings } from '../../src/strings';
 import { fixtureClient } from '../../src/test/fixtureClient';
 import {
@@ -224,5 +225,67 @@ describe('recalculating on a mounted salary page', () => {
   it('does not add a history entry', async () => {
     const before = await recalculateTo30000();
     expect(window.history.length).toBe(before.entries);
+  });
+});
+
+describe('while a mounted salary page recalculates', () => {
+  async function holdRequest() {
+    const base = fixtureClient(undefined, compute30000);
+    let release: () => void = () => {};
+    const client: ApiClient = {
+      listJurisdictions: (query) => base.listJurisdictions(query),
+      computeTakeHomeCalculation: (body) =>
+        new Promise((resolve) => {
+          release = () => {
+            resolve(base.computeTakeHomeCalculation(body));
+          };
+        }),
+    };
+    const user = userEvent.setup();
+    const { container } = render(
+      <App
+        client={client}
+        initial={withLinks(pageData(compute70000, '70000'))}
+      />,
+    );
+    await user.click(
+      screen.getByRole('button', { name: strings.form.calculate }),
+    );
+    return { container, release };
+  }
+
+  it('keeps the old answer in place, with the form still below it', async () => {
+    const { container } = await holdRequest();
+    expect(screen.getAllByText('$53,786.25').length).toBeGreaterThan(0);
+    const card = screen.getByRole('heading', { name: strings.answer.heading });
+    const form = screen.getByLabelText(strings.form.place);
+    expect(
+      card.compareDocumentPosition(form) & Node.DOCUMENT_POSITION_FOLLOWING,
+    ).toBeTruthy();
+    expect(container.querySelector('[aria-busy="true"]')).not.toBeNull();
+  });
+
+  it('marks the old answer busy and unusable, and says it is calculating', async () => {
+    const { container } = await holdRequest();
+    expect(container.querySelector('[aria-busy="true"]')).not.toBeNull();
+    const old = container.querySelector('[inert]');
+    expect(old).not.toBeNull();
+    expect(old).toContainElement(
+      screen.getByRole('heading', { name: strings.answer.heading }),
+    );
+    const status = screen.getByRole('status');
+    expect(status).toHaveTextContent(strings.form.calculating);
+    expect(old).not.toContainElement(status);
+  });
+
+  it('shows the new figures and drops the busy mark when the answer arrives', async () => {
+    const { container, release } = await holdRequest();
+    release();
+    await waitFor(() => {
+      expect(screen.getAllByText('$27,550.43').length).toBeGreaterThan(0);
+    });
+    expect(container.querySelector('[aria-busy="true"]')).toBeNull();
+    expect(container.querySelector('[inert]')).toBeNull();
+    expect(screen.getByRole('status')).toBeEmptyDOMElement();
   });
 });

@@ -29,24 +29,33 @@ export type JurisdictionsState =
     }
   | { status: 'failed' };
 
-/** One request at a time; a new request clears the previous answer. */
+/**
+ * One request at a time; a new request clears the previous answer, though
+ * `loading` still carries it for a page that keeps showing it.
+ */
 export type RequestState =
   | { status: 'idle' }
-  | { status: 'loading' }
   | {
-      status: 'success';
-      /** What was asked, kept so the card names the place and year it answers. */
-      asked: {
-        jurisdictionName: string;
-        year: number;
-        jurisdictionCode: string;
-      };
-      response: ComputeTakeHomeCalculationResponse;
-      adapted: AdaptedResult;
-      /** Links of a pre-built page; set only by the seed, so a new calculation has none. */
-      links?: SalaryPageLinks;
+      status: 'loading';
+      /** The answer on screen when the request started, so a page can keep showing it. */
+      previous?: SuccessState;
     }
+  | SuccessState
   | { status: 'error'; error: unknown };
+
+export type SuccessState = {
+  status: 'success';
+  /** What was asked, kept so the card names the place and year it answers. */
+  asked: {
+    jurisdictionName: string;
+    year: number;
+    jurisdictionCode: string;
+  };
+  response: ComputeTakeHomeCalculationResponse;
+  adapted: AdaptedResult;
+  /** Links of a pre-built page; set only by the seed, so a new calculation has none. */
+  links?: SalaryPageLinks;
+};
 
 export type FormValues = {
   jurisdictionCode: string;
@@ -233,7 +242,10 @@ export function useTakeHome(
       jurisdictionCode;
     latest.current += 1;
     const mine = latest.current;
-    setRequest({ status: 'loading' });
+    setRequest((r) => ({
+      status: 'loading',
+      previous: r.status === 'success' ? r : undefined,
+    }));
     client
       .computeTakeHomeCalculation({
         jurisdiction_code: jurisdictionCode,

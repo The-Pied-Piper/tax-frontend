@@ -6,6 +6,7 @@ import { Breadcrumb } from './components/Breadcrumb';
 import { Breakdown } from './components/Breakdown';
 import { ErrorNotice } from './components/ErrorNotice';
 import { LearnMore } from './components/LearnMore';
+import { PendingAnswer } from './components/PendingAnswer';
 import { ProvisionalNotice } from './components/ProvisionalNotice';
 import { SalaryForm } from './components/SalaryForm';
 import { SalaryLinks } from './components/SalaryLinks';
@@ -29,26 +30,63 @@ type Props = {
 export function App({ client, registry, initial, clock }: Props) {
   const page = useTakeHome(client, registry, initial, clock);
   const { request } = page;
+  // A pre-built salary page keeps its old answer on screen, faded, while a new
+  // one loads, so the page does not move; the calculator page clears it.
+  const answerFirst = initial !== undefined;
+  const pending = request.status === 'loading';
+  const shown =
+    request.status === 'success'
+      ? request
+      : answerFirst && request.status === 'loading'
+        ? request.previous
+        : undefined;
   // Only a pre-built page carries a summary; a fresh calculation does not.
-  const text =
-    request.status === 'success' && request.links
-      ? salaryPageText(
-          request.response,
-          request.asked.jurisdictionName,
-          request.asked.year,
-        )
-      : null;
+  const text = shown?.links
+    ? salaryPageText(
+        shown.response,
+        shown.asked.jurisdictionName,
+        shown.asked.year,
+      )
+    : null;
   // A pre-built salary page leads with its answer, so the first thing read, on
   // screen and in the source, is the figure; the provisional note sits just
   // under it and the form below. The calculator page has no answer yet, so its
   // form and note keep their old places. The order is fixed for the life of the
   // page: after Calculate the answer is a fresh one with no summary or links,
   // but the form stays below it, so the layout does not flip.
-  const answerFirst = initial !== undefined;
-  const notice =
-    page.request.status === 'success' && page.request.response.provisional ? (
-      <ProvisionalNotice year={page.request.asked.year} />
-    ) : null;
+  const notice = shown?.response.provisional ? (
+    <ProvisionalNotice year={shown.asked.year} />
+  ) : null;
+  const answer = shown ? (
+    <>
+      <AnswerCard
+        salary={shown.response.salary}
+        totalDeductions={shown.response.total_deductions}
+        takeHome={shown.response.take_home}
+        unit={shown.adapted.unit}
+        averageRate={shown.response.average_income_tax_rate}
+        marginalRate={shown.response.marginal_income_tax_rate}
+        place={shown.asked.jurisdictionName}
+        year={shown.asked.year}
+        payPeriod={page.payPeriod}
+        onPayPeriodChange={page.setPayPeriod}
+      >
+        <Breakdown
+          rows={shown.adapted.rows}
+          totals={shown.adapted.totals}
+          payPeriod={page.payPeriod}
+        />
+        <AdvancedView groups={shown.adapted.advanced} />
+      </AnswerCard>
+      {answerFirst && notice}
+      {text && (
+        <section className="page-summary-section">
+          <h2>{strings.summaryHeading}</h2>
+          <p className="page-summary">{text.paragraph}</p>
+        </section>
+      )}
+    </>
+  ) : null;
   const controls = (
     <SalaryForm
       jurisdictionsState={page.jurisdictionsState}
@@ -59,6 +97,7 @@ export function App({ client, registry, initial, clock }: Props) {
       }
       canSubmit={page.canSubmit}
       loading={page.request.status === 'loading'}
+      showProgress={answerFirst}
       onJurisdictionChange={page.setJurisdictionCode}
       onYearChange={page.setYear}
       onSalaryChange={page.setSalary}
@@ -68,14 +107,14 @@ export function App({ client, registry, initial, clock }: Props) {
   return (
     <>
       <main>
-        {request.status === 'success' && request.links && (
+        {shown?.links && (
           <Breadcrumb
             {...salaryBreadcrumb(
-              request.links.hub,
+              shown.links.hub,
               displayWholeMoney(
-                request.response.salary,
+                shown.response.salary,
                 'annually',
-                request.adapted.unit,
+                shown.adapted.unit,
               ),
             )}
           />
@@ -92,48 +131,16 @@ export function App({ client, registry, initial, clock }: Props) {
           <ErrorNotice message={page.failure.message} />
         )}
         {!answerFirst && notice}
-        {page.request.status === 'success' && (
-          <>
-            <AnswerCard
-              salary={page.request.response.salary}
-              totalDeductions={page.request.response.total_deductions}
-              takeHome={page.request.response.take_home}
-              unit={page.request.adapted.unit}
-              averageRate={page.request.response.average_income_tax_rate}
-              marginalRate={page.request.response.marginal_income_tax_rate}
-              place={page.request.asked.jurisdictionName}
-              year={page.request.asked.year}
-              payPeriod={page.payPeriod}
-              onPayPeriodChange={page.setPayPeriod}
-            >
-              <Breakdown
-                rows={page.request.adapted.rows}
-                totals={page.request.adapted.totals}
-                payPeriod={page.payPeriod}
-              />
-              <AdvancedView groups={page.request.adapted.advanced} />
-            </AnswerCard>
-            {answerFirst && notice}
-            {text && (
-              <section className="page-summary-section">
-                <h2>{strings.summaryHeading}</h2>
-                <p className="page-summary">{text.paragraph}</p>
-              </section>
-            )}
-          </>
+        {answerFirst && answer ? (
+          <PendingAnswer pending={pending}>{answer}</PendingAnswer>
+        ) : (
+          answer
         )}
         {answerFirst && controls}
-        {page.request.status === 'success' && (
+        {shown?.links && (
           <>
-            {page.request.links && (
-              <SalaryLinks
-                links={page.request.links}
-                unit={page.request.adapted.unit}
-              />
-            )}
-            {page.request.links && (
-              <LearnMore links={page.request.links.learnMore} />
-            )}
+            <SalaryLinks links={shown.links} unit={shown.adapted.unit} />
+            <LearnMore links={shown.links.learnMore} />
           </>
         )}
         <StarLink />
