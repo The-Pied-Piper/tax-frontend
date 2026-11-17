@@ -7,7 +7,7 @@ import {
   type ListJurisdictionsResponse,
 } from '../../src/api';
 import { dollarSign } from '../../src/adapters/fallback';
-import { languageCode } from '../../src/strings';
+import { languageCode, strings } from '../../src/strings';
 import type { Unit } from '../../src/adapters';
 import type { SalaryPageData } from '../../src/state/useTakeHome';
 import { pageUrl } from './address';
@@ -118,7 +118,11 @@ export async function generateSalaryPages(
   );
   const pages: { path: string; html: string }[] = [];
   for (const { province, steps, responses } of fetched) {
+    // The name the hubs use, so the breadcrumb and the hub's own title agree.
     const placeName =
+      (strings.siteNav.provinceNames as Record<string, string | undefined>)[
+        province.slug
+      ] ??
       list.jurisdictions.find((j) => j.code === province.code)?.name ??
       province.code;
     // Links go only to the pages of this province that are about to be written.
