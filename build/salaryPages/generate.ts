@@ -75,24 +75,22 @@ export async function generateSalaryPages(
     );
   }
 
-  if (options.siteUrl) {
-    const names = strings.siteNav.provinceNames as Record<
-      string,
-      string | undefined
-    >;
-    const missing = provinces.filter(
-      (p) => !list.jurisdictions.some((j) => j.code === p.code),
+  const placeNames = strings.siteNav.provinceNames as Record<
+    string,
+    string | undefined
+  >;
+  const missing = provinces.filter(
+    (p) => !list.jurisdictions.some((j) => j.code === p.code),
+  );
+  if (options.siteUrl && missing.length > 0) {
+    throw new Error(
+      missing
+        .map(
+          (p) =>
+            `${placeNames[p.slug] ?? p.code} (${p.code}) is listed in build/salaryPages/provinces.ts but the API at ${baseUrl} does not return it. Release the service with it first, or take it out of the list.`,
+        )
+        .join('\n'),
     );
-    if (missing.length > 0) {
-      throw new Error(
-        missing
-          .map(
-            (p) =>
-              `${names[p.slug] ?? p.code} (${p.code}) is listed in build/salaryPages/provinces.ts but the API at ${baseUrl} does not return it. Release the service with it first, or take it out of the list.`,
-          )
-          .join('\n'),
-      );
-    }
   }
 
   const fetched: {
@@ -102,7 +100,7 @@ export async function generateSalaryPages(
   }[] = [];
   const skipped: string[] = [];
   for (const province of provinces) {
-    if (!list.jurisdictions.some((j) => j.code === province.code)) {
+    if (missing.includes(province)) {
       skipped.push(province.code);
       continue;
     }
@@ -144,9 +142,7 @@ export async function generateSalaryPages(
   for (const { province, steps, responses } of fetched) {
     // The name the hubs use, so the breadcrumb and the hub's own title agree.
     const placeName =
-      (strings.siteNav.provinceNames as Record<string, string | undefined>)[
-        province.slug
-      ] ??
+      placeNames[province.slug] ??
       list.jurisdictions.find((j) => j.code === province.code)?.name ??
       province.code;
     // Links go only to the pages of this province that are about to be written.
