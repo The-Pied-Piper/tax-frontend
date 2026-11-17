@@ -14,6 +14,7 @@ import { pageDates } from './salaryPages/lastmod';
 import { rewriteSitemap } from './salaryPages/sitemap';
 import { contentPages, type ContentPageSpec } from '../src/state/contentPages';
 import { hubPages } from './contentPages/hubs';
+import { withSalaryLinks } from './contentPages/forms';
 import type { SalaryPageData } from '../src/state/useTakeHome';
 
 /** The built template of the content pages: it loads only the theme switch, and is removed from dist once they are written. */
@@ -131,7 +132,7 @@ export function salaryPages(
         const content = await generateContentPages({
           outDir,
           template: await readFile(contentFile, 'utf8'),
-          pages: [...contentPages, ...hubs],
+          pages: [...withSalaryLinks(contentPages, built), ...hubs],
           render: renderContentPage,
           siteUrl,
         });
