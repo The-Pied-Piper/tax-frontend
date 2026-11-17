@@ -2,6 +2,7 @@ import { act, renderHook, waitFor } from '@testing-library/react';
 import type { ApiClient, ComputeTakeHomeCalculationResponse } from '../api';
 import computeFixture from '../api/fixtures/compute-on-2026-70000.json';
 import jurisdictions from '../api/fixtures/jurisdictions.json';
+import { ontarioTargets } from '../test/pageLinks';
 import { useTakeHome, type SalaryPageData } from './useTakeHome';
 
 const compute = computeFixture as ComputeTakeHomeCalculationResponse;
@@ -94,6 +95,7 @@ describe('useTakeHome links of a pre-built page', () => {
     previous: { salary: '65000', href: '/ca-on/65000/' },
     next: { salary: '75000', href: '/ca-on/75000/' },
     others: [{ salary: '60000', href: '/ca-on/60000/' }],
+    ...ontarioTargets,
   };
   const withLinks: SalaryPageData = { ...initial, links };
 

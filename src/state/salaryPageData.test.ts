@@ -3,6 +3,7 @@ import computeFixture from '../api/fixtures/compute-on-2026-70000.json';
 import jurisdictions from '../api/fixtures/jurisdictions.json';
 import { readUnit } from '../adapters/fallback';
 import { cad } from '../test/units';
+import { ontarioTargets } from '../test/pageLinks';
 import { parseSalaryPageData, SALARY_PAGE_DATA_ID } from './salaryPageData';
 
 const response = computeFixture as ComputeTakeHomeCalculationResponse;
@@ -124,6 +125,7 @@ describe('parseSalaryPageData links (#81)', () => {
     previous: { salary: '65000', href: '/ca-on/65000/' },
     next: { salary: '75000', href: '/ca-on/75000/' },
     others: [{ salary: '60000', href: '/ca-on/60000/' }],
+    ...ontarioTargets,
   };
 
   it('keeps good links', () => {
@@ -190,6 +192,69 @@ describe('parseSalaryPageData links (#81)', () => {
       parse({
         ...valid,
         links: { ...links, others: [{ salary: '1', href: bad }] },
+      }),
+    ).toBeNull();
+  });
+});
+
+describe('parseSalaryPageData hub and learnMore links (#150)', () => {
+  const links = {
+    calculator: '/',
+    previous: null,
+    next: null,
+    others: [],
+    ...ontarioTargets,
+  };
+
+  it('keeps a well-formed hub and learnMore list', () => {
+    expect(parse({ ...valid, links })).toEqual({ ...valid, links });
+  });
+
+  it('keeps a learnMore list with no form link', () => {
+    const two = { ...links, learnMore: ontarioTargets.learnMore.slice(0, 2) };
+    expect(parse({ ...valid, links: two })).toEqual({ ...valid, links: two });
+  });
+
+  it.each([
+    ['no hub', { ...links, hub: undefined }],
+    ['no learnMore', { ...links, learnMore: undefined }],
+    [
+      'a hub with a number label',
+      { ...links, hub: { label: 5, href: '/ca-on/' } },
+    ],
+    ['a hub with no label', { ...links, hub: { href: '/ca-on/' } }],
+    ['learnMore not a list', { ...links, learnMore: {} }],
+    ['learnMore holding a non-link', { ...links, learnMore: [null] }],
+    [
+      'a learnMore link with a number label',
+      { ...links, learnMore: [{ label: 1, href: '/methodology/' }] },
+    ],
+  ])('is null for links with %s', (_name, bad) => {
+    expect(parse({ ...valid, links: bad })).toBeNull();
+  });
+
+  it.each(['ca-on/', '//evil.example/', 'https://evil.example/', '/a b/', ''])(
+    'is null when the hub href is %j',
+    (href) => {
+      expect(
+        parse({
+          ...valid,
+          links: { ...links, hub: { label: 'Ontario', href } },
+        }),
+      ).toBeNull();
+    },
+  );
+
+  it.each([
+    'methodology/',
+    '//evil.example/',
+    'javascript:alert(1)',
+    '/\\evil',
+  ])('is null when a learnMore href is %j', (href) => {
+    expect(
+      parse({
+        ...valid,
+        links: { ...links, learnMore: [{ label: 'x', href }] },
       }),
     ).toBeNull();
   });

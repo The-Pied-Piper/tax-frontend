@@ -9,6 +9,7 @@ import {
   compute70000,
   pageData,
 } from '../../src/test/syntheticPages';
+import { bareLinks } from '../../src/test/pageLinks';
 import { renderSalaryApp } from './prerender';
 
 // The calculator mounted from a page's data block must agree with the static
@@ -16,12 +17,7 @@ import { renderSalaryApp } from './prerender';
 // recalculating on it must stay on the same address.
 // A pre-built page carries its links; only such a page shows the summary and
 // the "After Tax in" heading.
-const links = {
-  calculator: '/',
-  previous: null,
-  next: null,
-  others: [],
-};
+const links = bareLinks;
 const withLinks = (data: ReturnType<typeof pageData>) => ({ ...data, links });
 const pages = [
   { salary: '30000', data: withLinks(pageData(compute30000, '30000')) },
@@ -132,6 +128,45 @@ describe('the page text before the bundle loads is the text after it mounts (#82
       expect(about).toContain('About this estimate');
     },
   );
+});
+
+describe('the breadcrumb and Learn more links before the bundle loads match those after it mounts (#150)', () => {
+  const navs = (root: ParentNode) => [
+    root.querySelector(`nav[aria-label="${strings.siteNav.breadcrumb}"]`)
+      ?.outerHTML,
+    Array.from(root.querySelectorAll('nav')).find((n) =>
+      /learn more/i.test(n.getAttribute('aria-label') ?? n.textContent),
+    )?.outerHTML,
+  ];
+
+  it.each(each)('has the same two navs for $%s', (salary, data) => {
+    const { container } = render(<App initial={data} />);
+    const mounted = navs(container);
+    expect(mounted[0]).toBeDefined();
+    expect(mounted[1]).toBeDefined();
+    expect(mounted).toEqual(navs(staticPage(salary)));
+  });
+
+  it.each(each)('has the breadcrumb before the h1 for $%s', (_salary, data) => {
+    const { container } = render(<App initial={data} />);
+    const crumbs = container.querySelector(
+      `nav[aria-label="${strings.siteNav.breadcrumb}"]`,
+    );
+    const h1 = container.querySelector('h1');
+    expect(
+      crumbs?.compareDocumentPosition(h1 as Node) &
+        Node.DOCUMENT_POSITION_FOLLOWING,
+    ).toBeTruthy();
+  });
+
+  it('shows no breadcrumb on the home calculator', () => {
+    const { container } = render(<App />);
+    expect(
+      container.querySelector(
+        `nav[aria-label="${strings.siteNav.breadcrumb}"]`,
+      ),
+    ).toBeNull();
+  });
 });
 
 describe('recalculating on a mounted salary page', () => {

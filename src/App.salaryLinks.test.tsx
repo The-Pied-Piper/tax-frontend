@@ -4,6 +4,7 @@ import { App } from './App';
 import type { ApiClient } from './api';
 import { strings } from './strings';
 import { compute70000, pageData } from './test/syntheticPages';
+import { ontarioTargets } from './test/pageLinks';
 import jurisdictions from './api/fixtures/jurisdictions.json';
 
 // The page's links come from the hook's request state, the nearby list from
@@ -14,6 +15,7 @@ const links = {
   previous: { salary: '65000', href: '/ca-on/65000/' },
   next: { salary: '75000', href: '/ca-on/75000/' },
   others: [],
+  ...ontarioTargets,
 };
 const seeded = { ...pageData(compute70000, '70000'), links };
 

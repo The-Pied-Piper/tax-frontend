@@ -1,3 +1,4 @@
+import { publishedSlugs } from '../../src/test/pageLinks';
 import { existsSync, readFileSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import {
@@ -45,6 +46,7 @@ async function build(
   const dir = outDir();
   writeFileSync(join(dir, 'index.html'), template);
   const { written: salaryFiles, built } = await generateSalaryPages({
+    published: publishedSlugs,
     fetch: fakeFetch(
       options.list === 'alberta'
         ? withAlberta
