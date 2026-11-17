@@ -1,5 +1,6 @@
 import type { ComputeTakeHomeCalculationResponse } from '../api';
 import { strings } from '../strings';
+import { pageOfForm } from './formPages';
 import type { AdaptedResult, AdvancedGroup, Unit } from './types';
 
 /**
@@ -61,7 +62,14 @@ export function advancedGroups(
       ];
     });
     if (lines.length === 0) return [];
-    return [{ form: form.form, name: form.name.trim() || form.form, lines }];
+    return [
+      {
+        form: form.form,
+        name: form.name.trim() || form.form,
+        page: pageOfForm(form.form),
+        lines,
+      },
+    ];
   });
 }
 

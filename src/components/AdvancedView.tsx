@@ -32,7 +32,7 @@ export function AdvancedView({ groups }: Props) {
 
 function FormGroup({ group }: { group: AdvancedGroup }) {
   const nameId = useId();
-  const pageHref = formPageLink(group.form);
+  const pageHref = group.page === null ? null : formPageLink(group.page);
   return (
     <details className={styles.form} aria-labelledby={nameId}>
       <summary className={styles.formSummary}>
