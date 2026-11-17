@@ -2,7 +2,7 @@ import { render, screen, within } from '@testing-library/react';
 import { renderToString } from 'react-dom/server';
 import { ContentPage } from './ContentPage';
 import type { ContentPageSpec } from '../state/contentPages';
-import { formContentPage } from '../state/formPage';
+import { formContentPage, type FormPageSpec } from '../state/formPage';
 import { formPages } from '../state/formPages';
 import { isSitePath } from '../state/salaryPageData';
 import { sampleFormSpec } from '../test/contentPageData';
@@ -17,6 +17,16 @@ const pageWith = (salaryPageWritten?: boolean): ContentPageSpec => ({
   ...page,
   form: { ...form, salaryPageWritten },
 });
+
+/** The sample as a federal form: the same parts, marked as shared by the federal pages. */
+const federalPageWith = (salaryPageWritten?: boolean): ContentPageSpec => {
+  const federal = formContentPage({
+    ...sampleFormSpec,
+    federal: true,
+  } as FormPageSpec);
+  if (!federal.form) throw new Error('the federal sample has no body');
+  return { ...federal, form: { ...federal.form, salaryPageWritten } };
+};
 
 describe('a form page', () => {
   it('shows the notice with the year and the example salary', () => {
@@ -99,6 +109,47 @@ describe('a form page', () => {
       ['How we calculate', '/methodology/'],
     ]);
   });
+
+  it('ends with the province hubs, the methodology and the Ontario salary page on a federal page', () => {
+    render(<ContentPage {...federalPageWith(true)} />);
+    const related = screen.getByRole('navigation', {
+      name: strings.formPage.related,
+    });
+    expect(
+      within(related)
+        .getAllByRole('link')
+        .map((a) => [a.textContent, a.getAttribute('href')]),
+    ).toEqual([
+      ['Ontario forms and salary pages', '/ca-on/'],
+      ['Alberta forms and salary pages', '/ca-ab/'],
+      ['British Columbia forms and salary pages', '/ca-bc/'],
+      ['How we calculate', '/methodology/'],
+      ['See an Ontario $70,000 example', '/ca-on/70000/'],
+    ]);
+  });
+
+  it.each([
+    ['is false', false],
+    ['is not set', undefined],
+  ])(
+    'has no salary link on a federal page when the salary page flag %s',
+    (_, flag) => {
+      render(<ContentPage {...federalPageWith(flag)} />);
+      const related = screen.getByRole('navigation', {
+        name: strings.formPage.related,
+      });
+      expect(
+        within(related)
+          .getAllByRole('link')
+          .map((a) => [a.textContent, a.getAttribute('href')]),
+      ).toEqual([
+        ['Ontario forms and salary pages', '/ca-on/'],
+        ['Alberta forms and salary pages', '/ca-ab/'],
+        ['British Columbia forms and salary pages', '/ca-bc/'],
+        ['How we calculate', '/methodology/'],
+      ]);
+    },
+  );
 
   it('keeps the theme switch and the footer of every content page', () => {
     render(<ContentPage {...page} />);
