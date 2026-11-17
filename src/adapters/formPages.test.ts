@@ -38,10 +38,15 @@ describe('FORM_PAGE_OF', () => {
     }
   });
 
-  it('has an entry for every published page', () => {
+  // The T4 slip is read, not computed, so the service has no form of that
+  // name and the advanced view has no heading for it to link from.
+  const NO_ENGINE_FORM = ['t4'];
+
+  it('has an entry for every published page that has an engine form', () => {
     const targets = new Set(Object.values(FORM_PAGE_OF));
     expect(formPages.length).toBeGreaterThan(0);
     for (const page of formPages) {
+      if (NO_ENGINE_FORM.includes(page.id)) continue;
       expect(targets).toContain(page.id);
     }
   });
