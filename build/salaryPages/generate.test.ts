@@ -821,3 +821,123 @@ describe('a 429 from the API is retried', () => {
     expect(readdirSync(dir)).toEqual([]);
   });
 });
+
+describe('retry waits are not cut short by the client timeout', () => {
+  afterEach(() => {
+    vi.useRealTimers();
+  });
+
+  /** Waits by moving the fake clock, so any timer the build holds sees the time pass. */
+  const clockSleep = async (ms: number) => {
+    await vi.advanceTimersByTimeAsync(ms);
+  };
+
+  function throttledSalary(times: number, headers?: Record<string, string>) {
+    let seen = 0;
+    return fakeApi((body) =>
+      body.salary === '70000' && seen++ < times
+        ? new Response('slow down', { status: 429, headers })
+        : seventyThousand(),
+    );
+  }
+
+  it('builds every page after two 429s that each say Retry-After 20', async () => {
+    vi.useFakeTimers();
+    const api = throttledSalary(2, { 'Retry-After': '20' });
+    const result = await generateSalaryPages({
+      published: publishedSlugs,
+      fetch: api.fetch,
+      baseUrl,
+      provinces: ontarioOnly,
+      outDir: outDir(),
+      template,
+      render,
+      retry: { sleep: clockSleep },
+    });
+    expect(result.written).toHaveLength(25);
+  });
+
+  it('succeeds on the sixth and last try with the default attempts', async () => {
+    vi.useFakeTimers();
+    const api = throttledSalary(5);
+    const result = await generateSalaryPages({
+      published: publishedSlugs,
+      fetch: api.fetch,
+      baseUrl,
+      provinces: ontarioOnly,
+      outDir: outDir(),
+      template,
+      render,
+      retry: { sleep: clockSleep },
+    });
+    expect(result.written).toHaveLength(25);
+    expect(api.calls.filter((c) => c.method === 'POST')).toHaveLength(30);
+  });
+});
+
+describe('the number of tries in a 429 failure', () => {
+  const sleep = () => Promise.resolve();
+  const always429 = () => new Response('slow down', { status: 429 });
+
+  function attempt(attempts: number) {
+    const api = fakeApi(always429);
+    return generateSalaryPages({
+      published: publishedSlugs,
+      fetch: api.fetch,
+      baseUrl,
+      provinces: ontarioOnly,
+      outDir: outDir(),
+      template,
+      render,
+      retry: { attempts, sleep },
+    });
+  }
+
+  it('says "after 1 try" for a single try', async () => {
+    await expect(attempt(1)).rejects.toThrow(/after 1 try(?!\w)/);
+  });
+
+  it('treats 0 attempts as one try', async () => {
+    await expect(attempt(0)).rejects.toThrow(/after 1 try(?!\w)/);
+  });
+
+  it('says "after 2 tries" for two', async () => {
+    await expect(attempt(2)).rejects.toThrow(/after 2 tries/);
+  });
+});
+
+describe('the total wait for 429s is budgeted', () => {
+  it('fails the build, naming the page, rather than wait past maxTotalWaitMs', async () => {
+    const api = fakeApi(
+      () =>
+        new Response('slow down', {
+          status: 429,
+          headers: { 'Retry-After': '60' },
+        }),
+    );
+    const waits: number[] = [];
+    const dir = outDir();
+    const attempt = generateSalaryPages({
+      published: publishedSlugs,
+      fetch: api.fetch,
+      baseUrl,
+      provinces: ontarioOnly,
+      outDir: dir,
+      template,
+      render,
+      retry: {
+        maxTotalWaitMs: 100000,
+        sleep: (ms) => {
+          waits.push(ms);
+          return Promise.resolve();
+        },
+      },
+    });
+    await expect(attempt).rejects.toThrow(/ca-on\/30000/);
+    await expect(attempt).rejects.toThrow(/429/);
+    // One full wait fits in the budget; the second would pass it, so it is never made.
+    expect(waits).toEqual([60000]);
+    expect(api.calls.filter((c) => c.method === 'POST')).toHaveLength(2);
+    expect(readdirSync(dir)).toEqual([]);
+  });
+});

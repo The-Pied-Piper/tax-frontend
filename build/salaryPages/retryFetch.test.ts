@@ -156,4 +156,104 @@ describe('retryingFetch', () => {
       [url, 'POST'],
     ]);
   });
+
+  it.each([0, -3])('clamps attempts of %i to one try', async (attempts) => {
+    const { inner, calls } = scripted(tooMany());
+    const { delays, sleep } = recorder();
+    const res = await retryingFetch(inner, { sleep, attempts })(url);
+    expect(res.status).toBe(429);
+    expect(calls).toHaveLength(1);
+    expect(delays).toEqual([]);
+  });
+
+  it('cancels the body of a 429 it retries', async () => {
+    const cancelled: number[] = [];
+    let n = 0;
+    const inner: typeof fetch = () => {
+      const at = n++;
+      if (at > 0) return Promise.resolve(new Response('ok'));
+      const body = new ReadableStream<Uint8Array>({
+        pull(controller) {
+          controller.enqueue(new Uint8Array([1]));
+        },
+        cancel() {
+          cancelled.push(at);
+        },
+      });
+      return Promise.resolve(new Response(body, { status: 429 }));
+    };
+    const { sleep } = recorder();
+    const res = await retryingFetch(inner, { sleep })(url);
+    expect(res.status).toBe(200);
+    expect(cancelled).toEqual([0]);
+  });
+});
+
+describe('retryingFetch per-try timeout', () => {
+  afterEach(() => {
+    vi.useRealTimers();
+  });
+
+  /** An inner fetch that never answers and rejects when its signal aborts. */
+  function hanging() {
+    const signals: (AbortSignal | undefined)[] = [];
+    const inner: typeof fetch = (_input, init) => {
+      signals.push(init?.signal ?? undefined);
+      return new Promise<Response>((_resolve, reject) => {
+        init?.signal?.addEventListener('abort', () => {
+          reject(
+            init.signal?.reason instanceof Error
+              ? init.signal.reason
+              : new DOMException('aborted', 'AbortError'),
+          );
+        });
+      });
+    };
+    return { inner, signals };
+  }
+
+  it('aborts a hung try after tryTimeoutMs, without retrying it', async () => {
+    vi.useFakeTimers();
+    const { inner, signals } = hanging();
+    const { delays, sleep } = recorder();
+    let outcome: 'pending' | 'rejected' | 'resolved' = 'pending';
+    const run = retryingFetch(inner, { sleep, tryTimeoutMs: 500 })(url).then(
+      () => (outcome = 'resolved'),
+      () => (outcome = 'rejected'),
+    );
+    await vi.advanceTimersByTimeAsync(499);
+    expect(outcome).toBe('pending');
+    await vi.advanceTimersByTimeAsync(1);
+    void run;
+    expect(outcome).toBe('rejected');
+    expect(signals).toHaveLength(1);
+    expect(signals[0]?.aborted).toBe(true);
+    expect(delays).toEqual([]);
+  });
+
+  it('also aborts the try when the caller aborts', async () => {
+    const { inner, signals } = hanging();
+    const { sleep } = recorder();
+    const caller = new AbortController();
+    const run = retryingFetch(inner, { sleep })(url, {
+      signal: caller.signal,
+    });
+    caller.abort();
+    await expect(run).rejects.toBeInstanceOf(Error);
+    expect(signals[0]?.aborted).toBe(true);
+  });
+
+  it('does not count the sleeps against the try timeout', async () => {
+    vi.useFakeTimers();
+    const { inner, calls } = scripted(
+      tooMany({ 'Retry-After': '20' }),
+      new Response('ok'),
+    );
+    const sleep = async (ms: number) => {
+      await vi.advanceTimersByTimeAsync(ms);
+    };
+    const res = await retryingFetch(inner, { sleep, tryTimeoutMs: 1000 })(url);
+    expect(res.status).toBe(200);
+    expect(calls).toHaveLength(2);
+  });
 });

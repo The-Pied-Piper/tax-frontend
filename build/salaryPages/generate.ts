@@ -20,7 +20,23 @@ import { DESCRIPTION_LIMIT, TITLE_LIMIT } from './limits';
 import { salaryLinks } from './links';
 import { provinceLinks } from '../../src/state/salaryPageLinks';
 import { salaries, type Province } from './provinces';
-import { DEFAULT_ATTEMPTS, retryingFetch } from './retryFetch';
+import {
+  DEFAULT_ATTEMPTS,
+  DEFAULT_TRY_TIMEOUT_MS,
+  MAX_WAIT_MS,
+  retryingFetch,
+} from './retryFetch';
+
+/** The most time, in milliseconds, all the waits for 429s in one build may add up to. */
+const DEFAULT_MAX_TOTAL_WAIT_MS = 600000;
+
+/** The waits for 429s have used up the build's budget. */
+class WaitBudgetError extends Error {
+  constructor() {
+    super('the API kept answering 429 and the wait budget was spent');
+    this.name = 'WaitBudgetError';
+  }
+}
 
 /** What was built for one province: its salary steps, lowest first, and the unit of its answers. */
 export type BuiltProvince = {
@@ -47,10 +63,16 @@ export type GenerateOptions = {
    */
   siteUrl?: string | null;
   /**
-   * How a 429 from the API is retried: `attempts` tries in all per call (default 6) and
-   * the `sleep` between them (a real timer by default; tests pass an instant one).
+   * How a 429 from the API is retried: `attempts` tries in all per call (default 6, at
+   * least 1), the `sleep` between them (a real timer by default; tests pass an instant
+   * one) and `maxTotalWaitMs`, the most all the waits of the whole build may add up to
+   * (default 10 minutes); a wait that would pass it fails the build instead.
    */
-  retry?: { attempts?: number; sleep?: (ms: number) => Promise<void> };
+  retry?: {
+    attempts?: number;
+    sleep?: (ms: number) => Promise<void>;
+    maxTotalWaitMs?: number;
+  };
 };
 
 export type GenerateResult = {
@@ -65,9 +87,12 @@ export type GenerateResult = {
 function reason(error: unknown, attempts: number): string {
   if (error instanceof ApiError) {
     const status = `status ${error.status.toString()}`;
-    return error.status === 429
-      ? `${status} after ${attempts.toString()} tries`
-      : status;
+    if (error.status !== 429) return status;
+    return `${status} after ${attempts.toString()} ${attempts === 1 ? 'try' : 'tries'}`;
+  }
+  // The client wraps what the fetch throws, so the budget error is its cause.
+  if (error instanceof Error && error.cause instanceof WaitBudgetError) {
+    return error.cause.message;
   }
   return error instanceof Error ? error.message : 'unknown error';
 }
@@ -77,13 +102,30 @@ export async function generateSalaryPages(
   options: GenerateOptions,
 ): Promise<GenerateResult> {
   const { baseUrl, provinces, outDir, template, render } = options;
-  const attempts = options.retry?.attempts ?? DEFAULT_ATTEMPTS;
+  const attempts = Math.max(1, options.retry?.attempts ?? DEFAULT_ATTEMPTS);
+  const sleepFor =
+    options.retry?.sleep ??
+    ((ms: number) =>
+      new Promise<void>((resolve) => {
+        setTimeout(resolve, ms);
+      }));
+  const maxTotalWaitMs =
+    options.retry?.maxTotalWaitMs ?? DEFAULT_MAX_TOTAL_WAIT_MS;
+  let waited = 0;
+  // One running total for the whole build, so a long throttle fails it rather than stall it.
+  const budgetedSleep = (ms: number) => {
+    if (waited + ms > maxTotalWaitMs)
+      return Promise.reject(new WaitBudgetError());
+    waited += ms;
+    return sleepFor(ms);
+  };
   const client = createApiClient({
     baseUrl,
-    fetch: retryingFetch(options.fetch, {
-      attempts,
-      sleep: options.retry?.sleep,
-    }),
+    fetch: retryingFetch(options.fetch, { attempts, sleep: budgetedSleep }),
+    // The client's one timer spans every try and wait of a call, so it must outlast them
+    // all (each try has its own timer inside retryingFetch); the 1 s is slack.
+    timeoutMs:
+      attempts * DEFAULT_TRY_TIMEOUT_MS + (attempts - 1) * MAX_WAIT_MS + 1000,
   });
 
   let list: ListJurisdictionsResponse;
