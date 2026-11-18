@@ -46,6 +46,14 @@ export const provinces: Province[] = [
     to: 150000,
     step: 5000,
   },
+  {
+    code: 'CA-SK',
+    slug: 'ca-sk',
+    year: TAX_YEAR,
+    from: 30000,
+    to: 150000,
+    step: 5000,
+  },
 ];
 
 export function salaries(province: Province): number[] {
