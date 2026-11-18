@@ -1,10 +1,23 @@
-import { FOOTER_PROVINCE_SLUGS } from '../../src/state/siteLinks';
-import { hubOnlySlugs, provinces, salaries, TAX_YEAR } from './provinces';
+import {
+  FOOTER_PROVINCE_SLUGS,
+  PROVINCES_WITHOUT_SALARY_PAGES,
+} from '../../src/state/siteLinks';
+import { provinces, salaries, TAX_YEAR } from './provinces';
 
 describe('the province list', () => {
   it('has a page list entry, or a hub-only entry, for every province the footer links to', () => {
-    const slugs = [...provinces.map((p) => p.slug), ...hubOnlySlugs];
+    const slugs = [
+      ...provinces.map((p) => p.slug),
+      ...PROVINCES_WITHOUT_SALARY_PAGES,
+    ];
     for (const slug of FOOTER_PROVINCE_SLUGS) expect(slugs).toContain(slug);
+  });
+
+  it('lists no province both here and as one with a hub but no salary pages', () => {
+    const slugs = provinces.map((p) => p.slug);
+    for (const slug of PROVINCES_WITHOUT_SALARY_PAGES) {
+      expect(slugs, slug).not.toContain(slug);
+    }
   });
 
   it('has Ontario, Alberta then British Columbia, each from $30,000 to $150,000 in $5,000 steps', () => {

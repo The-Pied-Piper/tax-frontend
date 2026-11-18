@@ -22,7 +22,7 @@ export function hubPages(
   built: BuiltProvince[],
   provinceList: Province[],
   published: ReadonlySet<string>,
-  hubOnly: readonly string[] = [],
+  hubOnly: readonly string[],
 ): ContentPageSpec[] {
   const slugs = [...provinceList.map((province) => province.slug), ...hubOnly];
   const listed = slugs.map((slug) => {

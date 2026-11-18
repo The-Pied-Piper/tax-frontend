@@ -47,7 +47,7 @@ async function build() {
   const { written: pageFiles } = await generateContentPages({
     outDir: dir,
     template,
-    pages: [...contentPages, ...hubPages(built, provinces, published)],
+    pages: [...contentPages, ...hubPages(built, provinces, published, [])],
     render: renderContentPage,
     siteUrl: site,
   });

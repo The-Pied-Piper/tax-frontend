@@ -69,7 +69,7 @@ async function build(siteUrl: string | null): Promise<string> {
     template: contentTemplate,
     pages: [
       ...withSalaryLinks(contentPages, built),
-      ...hubPages(built, provinces, base),
+      ...hubPages(built, provinces, base, []),
     ],
     render: renderContentPage,
     siteUrl,

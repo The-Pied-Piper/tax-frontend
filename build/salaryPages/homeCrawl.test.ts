@@ -17,7 +17,11 @@ import {
   sitemapLocs,
 } from '../../src/test/crawlSite';
 import { contentPages } from '../../src/state/contentPages';
-import { contentPath, FOOTER_PROVINCE_SLUGS } from '../../src/state/siteLinks';
+import {
+  contentPath,
+  FOOTER_PROVINCE_SLUGS,
+  PROVINCES_WITHOUT_SALARY_PAGES,
+} from '../../src/state/siteLinks';
 import { generateContentPages } from '../contentPages/generate';
 import { withSalaryLinks } from '../contentPages/forms';
 import { hubPages } from '../contentPages/hubs';
@@ -28,7 +32,7 @@ import {
   renderSalaryApp,
   renderSiteFooter,
 } from './prerender';
-import { hubOnlySlugs, provinces } from './provinces';
+import { provinces } from './provinces';
 import { rewriteSitemap } from './sitemap';
 
 // Each page carries the advanced lines, so building and parsing many pages
@@ -73,7 +77,7 @@ async function build(
   const hubs =
     options.withHubs === false
       ? []
-      : hubPages(built, provinces, base, hubOnlySlugs);
+      : hubPages(built, provinces, base, PROVINCES_WITHOUT_SALARY_PAGES);
   const { written: pageFiles } = await generateContentPages({
     outDir: dir,
     template,

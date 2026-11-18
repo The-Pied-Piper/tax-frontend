@@ -40,12 +40,20 @@ function hubOf(pages: ContentPageSpec[], slug: string): ContentPageSpec {
 
 describe('hubPages', () => {
   it('makes one hub per listed province, in list order, at the province slug', () => {
-    const pages = hubPages([ontarioBuilt, albertaBuilt], provinces, new Set());
+    const pages = hubPages(
+      [ontarioBuilt, albertaBuilt],
+      provinces,
+      new Set(),
+      [],
+    );
     expect(pages.map((p) => p.slug)).toEqual(provinces.map((p) => p.slug));
   });
 
   it('links each salary that was built, with the money label and the page address', () => {
-    const page = hubOf(hubPages([ontarioBuilt], provinces, new Set()), 'ca-on');
+    const page = hubOf(
+      hubPages([ontarioBuilt], provinces, new Set(), []),
+      'ca-on',
+    );
     expect(gridOf(page)?.links).toEqual(
       ontarioBuilt.salaries.map((salary) => ({
         label: displayWholeMoney(salary, 'annually', unit),
@@ -55,7 +63,12 @@ describe('hubPages', () => {
   });
 
   it('gives each hub only its own province salaries', () => {
-    const pages = hubPages([ontarioBuilt, albertaBuilt], provinces, new Set());
+    const pages = hubPages(
+      [ontarioBuilt, albertaBuilt],
+      provinces,
+      new Set(),
+      [],
+    );
     const hrefs = pages.map((p) => gridOf(p)?.links.map((l) => l.href));
     expect(hrefs[0]).toEqual([
       '/ca-on/30000/',
@@ -66,7 +79,7 @@ describe('hubPages', () => {
   });
 
   it('still makes the hub of a province the API did not return, with no salary section', () => {
-    const pages = hubPages([ontarioBuilt], provinces, new Set());
+    const pages = hubPages([ontarioBuilt], provinces, new Set(), []);
     expect(pages).toHaveLength(provinces.length);
     const skipped = hubOf(pages, 'ca-ab');
     expect(gridOf(skipped)).toBeUndefined();
@@ -77,7 +90,7 @@ describe('hubPages', () => {
   });
 
   it('makes every hub with no salary section when nothing was built', () => {
-    const pages = hubPages([], provinces, new Set());
+    const pages = hubPages([], provinces, new Set(), []);
     expect(pages).toHaveLength(provinces.length);
     for (const page of pages) expect(gridOf(page)).toBeUndefined();
   });
@@ -120,7 +133,7 @@ describe('hubPages', () => {
   });
 
   it('throws, naming the province, when a listed province has no hub text', () => {
-    expect(() => hubPages([], [...provinces, xland], new Set())).toThrow(
+    expect(() => hubPages([], [...provinces, xland], new Set(), [])).toThrow(
       'Hubs: ca-xx has no hub text',
     );
   });
@@ -130,6 +143,7 @@ describe('hubPages', () => {
       [ontarioBuilt],
       provinces,
       new Set([formSlug('on428')]),
+      [],
     );
     const items = (page?.sections ?? [])
       .flatMap((s) => s.blocks)
@@ -141,7 +155,7 @@ describe('hubPages', () => {
   });
 
   it('counts the other hubs as published, so every hub links the others', () => {
-    const pages = hubPages([ontarioBuilt], provinces, new Set());
+    const pages = hubPages([ontarioBuilt], provinces, new Set(), []);
     const row = pages[0]?.sections
       .flatMap((s) => s.blocks)
       .find((b): b is LinksBlock => b.kind === 'links' && b.layout === 'row');
@@ -157,6 +171,7 @@ describe('hubPages', () => {
       [],
       provinces,
       new Set(contentPages.map((p) => p.slug)),
+      [],
     );
     expect(pages.map((p) => p.slug)).not.toContain('methodology');
   });
