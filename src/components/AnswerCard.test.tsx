@@ -137,4 +137,36 @@ describe('AnswerCard', () => {
     );
     expect(screen.getByText(strings.answer.marginalRate.help)).toBeVisible();
   });
+
+  it('opens the taken-off help on click and not before', async () => {
+    render(<AnswerCard {...base} />);
+    const { name, help } = strings.answer.takenOff;
+    expect(help).toBe(
+      'Income tax, Canada Pension Plan and Employment Insurance, less credits paid to you. A minus means you take home more than your salary.',
+    );
+    expect(screen.getByText(help)).not.toBeVisible();
+    await userEvent.click(
+      screen.getByRole('button', { name: strings.breakdown.helpButton(name) }),
+    );
+    expect(screen.getByText(help)).toBeVisible();
+  });
+
+  it('shows a negative amount taken off with its help available', () => {
+    render(
+      <AnswerCard
+        {...base}
+        salary="1500.00"
+        totalDeductions="-180.00"
+        takeHome="1680.00"
+        place="Manitoba"
+      />,
+    );
+    expect(screen.getByText('-$180.00')).toBeInTheDocument();
+    expect(
+      screen.getByRole('button', {
+        name: strings.breakdown.helpButton(strings.answer.takenOff.name),
+      }),
+    ).toBeInTheDocument();
+    expect(screen.getByText(strings.answer.takenOff.help)).toBeInTheDocument();
+  });
 });

@@ -111,9 +111,13 @@ function answerRow(page: Document, label: string): string | undefined {
   const card = Array.from(page.querySelectorAll('section')).find(
     (s) => s.querySelector('h2')?.textContent === strings.answer.heading,
   );
-  const row = Array.from(card?.querySelectorAll('dl > div') ?? []).find(
-    (r) => r.querySelector('dt')?.textContent === label,
-  );
+  const row = Array.from(card?.querySelectorAll('dl > div') ?? []).find((r) => {
+    const dt = r.querySelector('dt');
+    return (
+      dt?.textContent === label ||
+      dt?.querySelector('span > span')?.textContent === label
+    );
+  });
   return row?.querySelector('dd')?.textContent;
 }
 
@@ -135,7 +139,9 @@ describe('each built page carries the figures the API gave for its own salary', 
   it.each(expected)(
     'shows $takenOff as the total taken off on the page for $salary',
     ({ salary, takenOff }) => {
-      expect(answerRow(pageOf(salary), strings.answer.takenOff)).toBe(takenOff);
+      expect(answerRow(pageOf(salary), strings.answer.takenOff.name)).toBe(
+        takenOff,
+      );
     },
   );
 
