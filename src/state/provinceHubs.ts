@@ -104,6 +104,28 @@ export const provinceHubs: ProvinceHubText[] = [
       },
     ],
   },
+  {
+    slug: 'ca-mb',
+    own: [
+      {
+        id: 'mb428',
+        name: 'Form MB428: Manitoba Tax',
+        description: 'Works out how much income tax you owe Manitoba.',
+      },
+      {
+        id: 'mb428-a',
+        name: 'Schedule MB428-A: Manitoba Family Tax Benefit',
+        description:
+          'Lowers your Manitoba tax if your income is low. You do not need a spouse or child. It is not paid to you as cash.',
+      },
+      {
+        id: 'mb479',
+        name: 'Form MB479: Manitoba credits',
+        description:
+          'Works out Manitoba credits that can lower your tax or be paid to you.',
+      },
+    ],
+  },
 ];
 
 /** A form as a list entry: linked only when its page is published. */
@@ -129,7 +151,11 @@ export function hubPage(
   published: ReadonlySet<string>,
   otherHubs: ContentLink[],
 ): ContentPageSpec {
-  const title = `${name}: forms and take-home examples`;
+  // A hub with no salary pages must not promise salary examples.
+  const withSalaries = salaryLinks.length > 0;
+  const title = withSalaries
+    ? `${name}: forms and take-home examples`
+    : `${name}: forms behind take-home pay`;
   const salaries: ContentBlock[] = [
     paragraph(
       'Pick a salary to see the whole breakdown, step by step. Salary not listed? Use the ',
@@ -146,9 +172,13 @@ export function hubPage(
   return {
     slug: text.slug,
     title,
-    description: `The forms behind take-home pay in ${name}, each explained in plain words, with full salary examples to look at.`,
+    description: withSalaries
+      ? `The forms behind take-home pay in ${name}, each explained in plain words, with full salary examples to look at.`
+      : `The forms behind take-home pay in ${name}, each explained in plain words.`,
     heading: title,
-    lede: `Everything this site uses to work out take-home pay in ${name}, in one place. Each form is explained in plain words, and each salary page shows a full example.`,
+    lede: withSalaries
+      ? `Everything this site uses to work out take-home pay in ${name}, in one place. Each form is explained in plain words, and each salary page shows a full example.`
+      : `Everything this site uses to work out take-home pay in ${name}, in one place. Each form is explained in plain words.`,
     trail: [],
     sections: [
       {
@@ -177,7 +207,7 @@ export function hubPage(
           },
         ],
       },
-      ...(salaryLinks.length === 0
+      ...(!withSalaries
         ? []
         : [{ heading: 'Take-home pay by salary', blocks: salaries }]),
       {

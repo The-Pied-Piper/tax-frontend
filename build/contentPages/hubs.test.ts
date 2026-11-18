@@ -82,6 +82,43 @@ describe('hubPages', () => {
     for (const page of pages) expect(gridOf(page)).toBeUndefined();
   });
 
+  it('makes the hub of a hub-only province after the listed ones, with no salary section', () => {
+    const pages = hubPages([ontarioBuilt], provinces, new Set(), ['ca-mb']);
+    expect(pages.map((p) => p.slug)).toEqual([
+      ...provinces.map((p) => p.slug),
+      'ca-mb',
+    ]);
+    const manitoba = hubOf(pages, 'ca-mb');
+    expect(gridOf(manitoba)).toBeUndefined();
+    expect(
+      manitoba.sections.some((s) => s.heading === 'Take-home pay by salary'),
+    ).toBe(false);
+  });
+
+  it('links the hub-only province from every other hub, and links them back', () => {
+    const pages = hubPages([], provinces, new Set(), ['ca-mb']);
+    const hrefsOf = (page: ContentPageSpec) =>
+      page.sections
+        .flatMap((s) => s.blocks)
+        .filter(
+          (b): b is LinksBlock => b.kind === 'links' && b.layout === 'row',
+        )
+        .flatMap((b) => b.links.map((l) => l.href));
+    expect(hrefsOf(hubOf(pages, 'ca-on'))).toContain('/ca-mb/');
+    expect(hrefsOf(hubOf(pages, 'ca-mb'))).toEqual([
+      '/methodology/',
+      '/ca-on/',
+      '/ca-ab/',
+      '/ca-bc/',
+    ]);
+  });
+
+  it('throws, naming the province, when a hub-only province has no hub text', () => {
+    expect(() => hubPages([], provinces, new Set(), ['ca-xx'])).toThrow(
+      'Hubs: ca-xx has no hub text',
+    );
+  });
+
   it('throws, naming the province, when a listed province has no hub text', () => {
     expect(() => hubPages([], [...provinces, xland], new Set())).toThrow(
       'Hubs: ca-xx has no hub text',

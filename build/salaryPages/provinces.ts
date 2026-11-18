@@ -1,3 +1,5 @@
+import { PROVINCES_WITHOUT_SALARY_PAGES } from '../../src/state/siteLinks';
+
 /** The tax year of every pre-built page: the one build setting. Change it each January. */
 export const TAX_YEAR = 2026;
 
@@ -39,6 +41,14 @@ export const provinces: Province[] = [
     step: 5000,
   },
 ];
+
+/**
+ * The slugs of provinces that have a hub page but no salary pages yet, because
+ * the API does not serve them. A hub appears after the listed provinces' hubs.
+ * When the API serves one, move it into `provinces` (with its code, year and
+ * range) and take it out of here.
+ */
+export const hubOnlySlugs: string[] = [...PROVINCES_WITHOUT_SALARY_PAGES];
 
 export function salaries(province: Province): number[] {
   const { code, from, to, step } = province;

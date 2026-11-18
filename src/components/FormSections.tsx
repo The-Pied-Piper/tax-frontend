@@ -5,6 +5,7 @@ import { splitFigures, type FormBody } from '../state/formPage';
 import {
   contentPath,
   FOOTER_PROVINCE_SLUGS,
+  PROVINCES_WITHOUT_SALARY_PAGES,
   METHODOLOGY_SLUG,
   salaryPagePath,
 } from '../state/siteLinks';
@@ -110,7 +111,10 @@ export function FormSections({
         {federal === true ? (
           FOOTER_PROVINCE_SLUGS.map((slug) => (
             <a key={slug} href={contentPath(slug)}>
-              {strings.formPage.hub(strings.siteNav.provinceNames[slug])}
+              {strings.formPage.hub(
+                strings.siteNav.provinceNames[slug],
+                !PROVINCES_WITHOUT_SALARY_PAGES.includes(slug),
+              )}
             </a>
           ))
         ) : (

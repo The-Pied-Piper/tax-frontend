@@ -20,10 +20,20 @@ export const HOME_PATH = '/';
 export const NOT_FOUND_FILE = '404.html';
 
 /** The province pages the footer links to, in the order shown. Their names are in `strings.siteNav.provinceNames`. */
-export const FOOTER_PROVINCE_SLUGS = ['ca-on', 'ca-ab', 'ca-bc'] as const;
+export const FOOTER_PROVINCE_SLUGS = [
+  'ca-on',
+  'ca-ab',
+  'ca-bc',
+  'ca-mb',
+] as const;
 
 /** The province pages the footer links to, by slug. */
 export type FooterProvinceSlug = (typeof FOOTER_PROVINCE_SLUGS)[number];
+
+/** The footer provinces that have a hub but no salary pages yet (the API does not serve them); their hubs promise no salary examples. */
+export const PROVINCES_WITHOUT_SALARY_PAGES: readonly FooterProvinceSlug[] = [
+  'ca-mb',
+];
 
 /** Whether this is a slug: lower-case letters, digits and hyphens, in segments separated by "/". */
 export function isContentSlug(slug: string): boolean {

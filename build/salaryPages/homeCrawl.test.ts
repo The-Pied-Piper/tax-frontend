@@ -28,7 +28,7 @@ import {
   renderSalaryApp,
   renderSiteFooter,
 } from './prerender';
-import { provinces } from './provinces';
+import { hubOnlySlugs, provinces } from './provinces';
 import { rewriteSitemap } from './sitemap';
 
 // Each page carries the advanced lines, so building and parsing many pages
@@ -71,7 +71,9 @@ async function build(
   });
   const base = new Set(contentPages.map((page) => page.slug));
   const hubs =
-    options.withHubs === false ? [] : hubPages(built, provinces, base);
+    options.withHubs === false
+      ? []
+      : hubPages(built, provinces, base, hubOnlySlugs);
   const { written: pageFiles } = await generateContentPages({
     outDir: dir,
     template,
@@ -225,7 +227,7 @@ describe('crawl from the built home page', () => {
     async () => {
       const { dir, written } = await build({ list: 'alberta' });
       const links = internalLinks(dir, ['index.html', ...written]);
-      expect(links.filter((l) => l.file === 'index.html')).toHaveLength(4);
+      expect(links.filter((l) => l.file === 'index.html')).toHaveLength(5);
       for (const { file, target } of links) {
         expect(existsSync(join(dir, target)), `${file} -> ${target}`).toBe(
           true,

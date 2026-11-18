@@ -341,7 +341,7 @@ describe('renderSiteFooter (the static footer of the home page)', () => {
       within(nav)
         .getAllByRole('link')
         .map((a) => a.getAttribute('href')),
-    ).toEqual(['/methodology/', '/ca-on/', '/ca-ab/', '/ca-bc/']);
+    ).toEqual(['/methodology/', '/ca-on/', '/ca-ab/', '/ca-bc/', '/ca-mb/']);
     expect(document.body).toHaveTextContent(strings.footer);
   });
 });

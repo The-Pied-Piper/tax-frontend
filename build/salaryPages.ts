@@ -9,7 +9,7 @@ import { formPageIdDefine } from './formPageIds';
 import { generateSalaryPages } from './salaryPages/generate';
 import { generateContentPages } from './contentPages/generate';
 import { generateNotFoundPage } from './contentPages/notFound';
-import { provinces } from './salaryPages/provinces';
+import { hubOnlySlugs, provinces } from './salaryPages/provinces';
 import { rewriteHome } from './salaryPages/home';
 import { pageDates } from './salaryPages/lastmod';
 import { rewriteSitemap } from './salaryPages/sitemap';
@@ -131,6 +131,7 @@ export function salaryPages(
           built,
           provinces,
           new Set(contentPages.map((page) => page.slug)),
+          hubOnlySlugs,
         );
         const content = await generateContentPages({
           outDir,

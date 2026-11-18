@@ -82,8 +82,13 @@ describe('footer targets', () => {
     expect(METHODOLOGY_SLUG).toBe('methodology');
   });
 
-  it('lists Ontario, Alberta and British Columbia, in that order', () => {
-    expect([...FOOTER_PROVINCE_SLUGS]).toEqual(['ca-on', 'ca-ab', 'ca-bc']);
+  it('lists Ontario, Alberta, British Columbia and Manitoba, in that order', () => {
+    expect([...FOOTER_PROVINCE_SLUGS]).toEqual([
+      'ca-on',
+      'ca-ab',
+      'ca-bc',
+      'ca-mb',
+    ]);
   });
 
   it('gives the calculator the root address', () => {
