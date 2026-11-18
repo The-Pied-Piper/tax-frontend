@@ -172,6 +172,15 @@ describe('Ontario adapter', () => {
     );
   });
 
+  it('explains a negative Total taken off in its help', () => {
+    const total = caOnAdapter
+      .adapt(r2025)
+      .totals.find((r) => r.id === 'total-taken-off');
+    expect(total?.help).toBe(
+      'Tax, Canada Pension Plan and Employment Insurance, less credits paid to you. Salary minus this is take-home. A minus means take-home is above salary.',
+    );
+  });
+
   it('falls back when the response has no trace', () => {
     const noTrace: ComputeTakeHomeCalculationResponse = {
       ...r2025,
