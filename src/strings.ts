@@ -241,5 +241,27 @@ export const strings = {
         help: 'Federal and British Columbia income tax added together.',
       },
     },
+    caSk: {
+      cpp2Zero: 'nothing',
+      saskatchewanTax: {
+        name: 'Saskatchewan income tax',
+        help: 'Income tax owed to Saskatchewan after the Saskatchewan credits that apply to you.',
+      },
+      totalTax: {
+        name: 'Total income tax',
+        help: 'Federal and Saskatchewan income tax added together.',
+      },
+    },
+    caMb: {
+      cpp2Zero: 'nothing',
+      manitobaTax: {
+        name: 'Manitoba income tax',
+        help: 'Income tax owed to Manitoba after the Manitoba credits that apply to you.',
+      },
+      totalTax: {
+        name: 'Total income tax',
+        help: 'Federal and Manitoba income tax added together.',
+      },
+    },
   },
 };
