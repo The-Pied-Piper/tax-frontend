@@ -111,10 +111,16 @@ describe.each(FOOTER_PROVINCE_SLUGS)('the hub page for %s', (slug) => {
     expect(how).toBeDefined();
     const words = everyString(how?.blocks).join(' ');
     expect(words).toContain(
-      `income tax, which has a federal part and a ${name} part`,
+      `income tax, which comes in two parts: federal tax and ${name} tax`,
     );
     expect(words).toContain('Canada Pension Plan');
     expect(words).toContain('EI');
+  });
+
+  it('puts no "a" before a province name that starts with a vowel', () => {
+    const how = section(page, `How your ${name} take-home is worked out`);
+    const words = everyString(how?.blocks).join(' ');
+    expect(words).not.toMatch(/\ba [AEIOU]/);
   });
 
   it('says EI can pay you if you lose your job, not that it does', () => {
