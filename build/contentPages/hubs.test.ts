@@ -123,14 +123,7 @@ describe('hubPages', () => {
       '/ca-on/',
       '/ca-ab/',
       '/ca-bc/',
-    ]);
-    const both = hubPages([], provinces, new Set(), ['ca-mb', 'ca-sk']);
-    expect(hrefsOf(hubOf(both, 'ca-sk'))).toEqual([
-      '/methodology/',
-      '/ca-on/',
-      '/ca-ab/',
-      '/ca-bc/',
-      '/ca-mb/',
+      '/ca-sk/',
     ]);
   });
 
@@ -171,6 +164,7 @@ describe('hubPages', () => {
       '/methodology/',
       '/ca-ab/',
       '/ca-bc/',
+      '/ca-sk/',
     ]);
   });
 
