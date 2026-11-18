@@ -4,7 +4,6 @@
  * unsupported jurisdictions itself.
  */
 export const COMING_SOON: readonly { code: string; name: string }[] = [
-  { code: 'CA-MB', name: 'Manitoba' },
   { code: 'CA-NB', name: 'New Brunswick' },
   { code: 'CA-NL', name: 'Newfoundland and Labrador' },
   { code: 'CA-NT', name: 'Northwest Territories' },

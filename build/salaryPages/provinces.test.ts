@@ -20,7 +20,7 @@ describe('the province list', () => {
     }
   });
 
-  it('has Ontario, Alberta then British Columbia, each from $30,000 to $150,000 in $5,000 steps', () => {
+  it('has Ontario, Alberta, British Columbia then Manitoba, each from $30,000 to $150,000 in $5,000 steps', () => {
     expect(provinces).toEqual([
       {
         code: 'CA-ON',
@@ -41,6 +41,14 @@ describe('the province list', () => {
       {
         code: 'CA-BC',
         slug: 'ca-bc',
+        year: TAX_YEAR,
+        from: 30000,
+        to: 150000,
+        step: 5000,
+      },
+      {
+        code: 'CA-MB',
+        slug: 'ca-mb',
         year: TAX_YEAR,
         from: 30000,
         to: 150000,

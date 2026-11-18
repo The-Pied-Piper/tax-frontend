@@ -33,7 +33,6 @@ export type FooterProvinceSlug = (typeof FOOTER_PROVINCE_SLUGS)[number];
 
 /** The footer provinces that have a hub but no salary pages yet (the API does not serve them); their hubs promise no salary examples. */
 export const PROVINCES_WITHOUT_SALARY_PAGES: readonly FooterProvinceSlug[] = [
-  'ca-mb',
   'ca-sk',
 ];
 

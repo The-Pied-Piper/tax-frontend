@@ -499,7 +499,7 @@ describe('App form', () => {
     ).toBeEnabled();
     expect(
       within(place).getByRole('option', {
-        name: 'Manitoba (Coming Soon)',
+        name: 'Quebec (Coming Soon)',
       }),
     ).toBeDisabled();
   });
