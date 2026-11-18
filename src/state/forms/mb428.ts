@@ -2,6 +2,7 @@ import { figuresOf, type FormPageSpec } from '../formPage';
 
 const { result, printed } = figuresOf('ca-mb/mb428_credits');
 const main = figuresOf('ca-mb/mb428');
+const sheet = figuresOf('ca-mb/worksheet_mb428');
 
 /** Form MB428 in plain words. The figures are the 2025 form's, at a $70,000 salary. */
 export const mb428: FormPageSpec = {
@@ -68,6 +69,34 @@ export const mb428: FormPageSpec = {
         ei: result('$1,077.48', 'mb428_ei_premiums_line_21'),
         total: result('$20,149.23', 'mb428_credits_total_line_51'),
         discount: result('$2,176.12', 'mb428_credits_at_rate_line_53'),
+      },
+    },
+    {
+      id: 'basic-amount',
+      heading: 'The basic personal amount worksheet',
+      lines: 'Line 9',
+      paragraph:
+        'Line 9 of the form is the basic personal amount, and it comes from a short worksheet. The full amount is {full}. If your net income is under {threshold}, the worksheet sends you straight to the full amount. Net income is the amount on line 23600 of your return. If it is {threshold} or more, the worksheet takes part of the amount off. It divides the part of your net income above {threshold} by {range}. That share of the full amount is taken off, so the amount shrinks as income grows, and it is zero at very high incomes. The result goes onto line 9.',
+      example:
+        'Your net income is {income}. That is under {threshold}, so you keep the full {basic}.',
+      figures: {
+        full: sheet.result(
+          '$15,780',
+          'worksheet_mb428_basic_personal_amount_line_1',
+        ),
+        threshold: sheet.result(
+          '$200,000',
+          'worksheet_mb428_basic_personal_amount_line_3',
+        ),
+        range: sheet.result(
+          '$200,000',
+          'worksheet_mb428_basic_personal_amount_line_5',
+        ),
+        income: sheet.result('$69,335', 'worksheet_mb428_line_2'),
+        basic: sheet.result(
+          '$15,780',
+          'worksheet_mb428_basic_personal_amount_line_9',
+        ),
       },
     },
     {
