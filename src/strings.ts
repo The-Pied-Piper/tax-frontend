@@ -18,6 +18,7 @@ export const strings = {
       'ca-on': 'Ontario',
       'ca-ab': 'Alberta',
       'ca-bc': 'British Columbia',
+      'ca-mb': 'Manitoba',
     },
   },
   formPage: {
@@ -27,7 +28,8 @@ export const strings = {
       `Our calculator follows the published form. It is made for a single person whose only income is a salary. This page covers only the lines it uses, with figures from the ${year.toString()} form. Examples use a ${salary} salary. This is an estimate, not tax advice.`,
     example: (salary: string) => `At ${salary}`,
     related: 'Related',
-    hub: (place: string) => `${place} forms and salary pages`,
+    hub: (place: string, withSalaries = true) =>
+      withSalaries ? `${place} forms and salary pages` : `${place} forms`,
     salaryExample: (salary: string) => `See a ${salary} example`,
     // Federal pages show the Ontario example; Ontario is the province the figures use.
     federalSalaryExample: (salary: string) =>

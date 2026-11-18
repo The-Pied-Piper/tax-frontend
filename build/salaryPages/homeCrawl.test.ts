@@ -17,7 +17,11 @@ import {
   sitemapLocs,
 } from '../../src/test/crawlSite';
 import { contentPages } from '../../src/state/contentPages';
-import { contentPath, FOOTER_PROVINCE_SLUGS } from '../../src/state/siteLinks';
+import {
+  contentPath,
+  FOOTER_PROVINCE_SLUGS,
+  PROVINCES_WITHOUT_SALARY_PAGES,
+} from '../../src/state/siteLinks';
 import { generateContentPages } from '../contentPages/generate';
 import { withSalaryLinks } from '../contentPages/forms';
 import { hubPages } from '../contentPages/hubs';
@@ -71,7 +75,9 @@ async function build(
   });
   const base = new Set(contentPages.map((page) => page.slug));
   const hubs =
-    options.withHubs === false ? [] : hubPages(built, provinces, base);
+    options.withHubs === false
+      ? []
+      : hubPages(built, provinces, base, PROVINCES_WITHOUT_SALARY_PAGES);
   const { written: pageFiles } = await generateContentPages({
     outDir: dir,
     template,
@@ -225,7 +231,7 @@ describe('crawl from the built home page', () => {
     async () => {
       const { dir, written } = await build({ list: 'alberta' });
       const links = internalLinks(dir, ['index.html', ...written]);
-      expect(links.filter((l) => l.file === 'index.html')).toHaveLength(4);
+      expect(links.filter((l) => l.file === 'index.html')).toHaveLength(5);
       for (const { file, target } of links) {
         expect(existsSync(join(dir, target)), `${file} -> ${target}`).toBe(
           true,

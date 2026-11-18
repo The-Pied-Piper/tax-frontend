@@ -38,6 +38,11 @@ const OWN: Record<Slug, (readonly [string, string])[]> = {
     ['bc428', 'Form BC428: British Columbia Tax'],
     ['bc479', 'Form BC479: British Columbia credits'],
   ],
+  'ca-mb': [
+    ['mb428', 'Form MB428: Manitoba Tax'],
+    ['mb428-a', 'Schedule MB428-A: Manitoba Family Tax Benefit'],
+    ['mb479', 'Form MB479: Manitoba credits'],
+  ],
 };
 
 const SALARIES = ['30000', '35000', '40000'];
@@ -251,9 +256,50 @@ describe.each(FOOTER_PROVINCE_SLUGS)('the hub page for %s', (slug) => {
   });
 });
 
+describe('a hub with no salary pages', () => {
+  const page = build('ca-mb', [], []);
+
+  it('promises no salary examples in its title, description or lede', () => {
+    expect(page.title).toBe('Manitoba: forms behind take-home pay');
+    expect(page.heading).toBe('Manitoba: forms behind take-home pay');
+    expect(page.description).toBe(
+      'The forms behind take-home pay in Manitoba, each explained in plain words.',
+    );
+    expect(page.lede).toBe(
+      'Everything this site uses to work out take-home pay in Manitoba, in one place. Each form is explained in plain words.',
+    );
+    for (const text of [page.title, page.description, page.lede ?? '']) {
+      expect(text).not.toMatch(/salary|example/i);
+    }
+  });
+
+  it('has no salary section and links no form that has no page', () => {
+    expect(
+      page.sections.some((s) => s.heading === 'Take-home pay by salary'),
+    ).toBe(false);
+    const own = lists(page)[0];
+    for (const item of own?.items ?? []) expect(item.href).toBeUndefined();
+  });
+
+  it('says the same in the plain words of the printed Manitoba form titles', () => {
+    const items = lists(page)[0]?.items ?? [];
+    expect(items.map((i) => i.description)).toEqual([
+      'Works out how much income tax you owe Manitoba.',
+      'Lowers your Manitoba tax if your income is low. You do not need a spouse or child. It is not paid to you as cash.',
+      'Works out Manitoba credits that can lower your tax or be paid to you.',
+    ]);
+  });
+});
+
 describe('province names', () => {
   it('are not written into the hub text: the name is always the one given', () => {
-    const page = hubPage(textOf('ca-on'), 'Zedland', [], new Set(), []);
+    const page = hubPage(
+      textOf('ca-on'),
+      'Zedland',
+      salaryLinks,
+      new Set(),
+      [],
+    );
     expect(page.heading).toBe('Zedland: forms and take-home examples');
     expect(page.lede).not.toContain('Ontario');
     expect(page.description).not.toContain('Ontario');

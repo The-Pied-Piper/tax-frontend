@@ -13,37 +13,39 @@ import type { Province } from '../salaryPages/provinces';
  * the API did not return still gets its hub in a build without a site URL
  * (with one, the salary build has already failed), with no salary section.
  * `published` holds the slugs of the other content pages: forms with a page
- * there are linked, and every hub counts as published.
+ * there are linked, and every hub counts as published. `hubOnly` holds the
+ * slugs of provinces with a hub but no salary pages (the API does not serve
+ * them yet); their hubs come after the listed provinces' and have no salary
+ * section.
  */
 export function hubPages(
   built: BuiltProvince[],
   provinceList: Province[],
   published: ReadonlySet<string>,
+  hubOnly: readonly string[],
 ): ContentPageSpec[] {
-  const listed = provinceList.map((province) => {
-    const text = provinceHubs.find((hub) => hub.slug === province.slug);
-    if (!text) throw new Error(`Hubs: ${province.slug} has no hub text`);
-    return { province, text, name: strings.siteNav.provinceNames[text.slug] };
+  const slugs = [...provinceList.map((province) => province.slug), ...hubOnly];
+  const listed = slugs.map((slug) => {
+    const text = provinceHubs.find((hub) => hub.slug === slug);
+    if (!text) throw new Error(`Hubs: ${slug} has no hub text`);
+    return { slug, text, name: strings.siteNav.provinceNames[text.slug] };
   });
-  const everyPublished = new Set([
-    ...published,
-    ...listed.map(({ province }) => province.slug),
-  ]);
-  return listed.map(({ province, text, name }) => {
-    const found = built.find((b) => b.province.slug === province.slug);
+  const everyPublished = new Set([...published, ...slugs]);
+  return listed.map(({ slug, text, name }) => {
+    const found = built.find((b) => b.province.slug === slug);
     const salaryLinks = (found?.salaries ?? []).map((salary) => ({
       label: displayWholeMoney(
         salary,
         'annually',
         found?.unit ?? strings.fallbackUnit,
       ),
-      href: pagePath(province.slug, salary),
+      href: pagePath(slug, salary),
     }));
     const otherHubs = listed
-      .filter((other) => other.province.slug !== province.slug)
+      .filter((other) => other.slug !== slug)
       .map((other) => ({
         label: other.name,
-        href: contentPath(other.province.slug),
+        href: contentPath(other.slug),
       }));
     return hubPage(text, name, salaryLinks, everyPublished, otherHubs);
   });

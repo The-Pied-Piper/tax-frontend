@@ -15,6 +15,7 @@ import { pageDates } from './salaryPages/lastmod';
 import { rewriteSitemap } from './salaryPages/sitemap';
 import { contentPages, type ContentPageSpec } from '../src/state/contentPages';
 import { notFoundPage } from '../src/state/notFoundPage';
+import { PROVINCES_WITHOUT_SALARY_PAGES } from '../src/state/siteLinks';
 import { hubPages } from './contentPages/hubs';
 import { withSalaryLinks } from './contentPages/forms';
 import type { SalaryPageData } from '../src/state/useTakeHome';
@@ -131,6 +132,7 @@ export function salaryPages(
           built,
           provinces,
           new Set(contentPages.map((page) => page.slug)),
+          PROVINCES_WITHOUT_SALARY_PAGES,
         );
         const content = await generateContentPages({
           outDir,
