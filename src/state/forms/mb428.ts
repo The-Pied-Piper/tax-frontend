@@ -88,7 +88,7 @@ export const mb428: FormPageSpec = {
       heading: 'Your Manitoba tax',
       lines: 'Lines 66–82',
       paragraph:
-        'The last line is your Manitoba tax. The lines before it cover extra tax for minimum tax purposes, and credits like political gifts, a foreign tax credit and investing in a Manitoba business. We do not use them. The total then goes onto your return. Manitoba’s refundable credits are on a different form, Form MB479, and do not go here.',
+        'The last line is your Manitoba tax. The lines before it cover extra tax for minimum tax purposes, and credits like political contributions, a foreign tax credit and investing in a Manitoba business. We do not use them. The total then goes onto your return. Manitoba’s refundable credits are on a different form, Form MB479, and do not go here.',
       example: 'Your Manitoba tax is {total}.',
       figures: {
         total: main.result('$5,747.59', 'mb428_manitoba_tax_line_82'),
