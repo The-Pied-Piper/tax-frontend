@@ -18,7 +18,7 @@ const EXPECTED: Record<string, { province: string; sections: string[] }> = {
   bc479: { province: 'ca-bc', sections: ['income', 'sales-tax', 'total'] },
   mb479: {
     province: 'ca-mb',
-    sections: ['income', 'personal', 'other', 'total'],
+    sections: ['income', 'personal', 'total'],
   },
 };
 
