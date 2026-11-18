@@ -1,6 +1,8 @@
 import { caAbAdapter } from './ca-ab';
 import { caBcAdapter } from './ca-bc';
+import { caMbAdapter } from './ca-mb';
 import { caOnAdapter } from './ca-on';
+import { caSkAdapter } from './ca-sk';
 import { AdapterRegistry } from './registry';
 
 export * from './types';
@@ -12,4 +14,6 @@ export { AdapterRegistry } from './registry';
 export const adapters = new AdapterRegistry();
 adapters.register(caAbAdapter);
 adapters.register(caBcAdapter);
+adapters.register(caMbAdapter);
 adapters.register(caOnAdapter);
+adapters.register(caSkAdapter);
