@@ -4,7 +4,7 @@
 
 **Enter a yearly salary and see what you would take home, with every step of the working shown.**
 
-It is for anyone in Canada who wants to understand their pay and not only see a total. It covers Ontario, Alberta and British Columbia for 2025 and 2026 (2026 uses provisional figures), for a single person on a salary.
+It is for anyone in Canada who wants to understand their pay and not only see a total. It covers Ontario, Alberta, British Columbia, Manitoba and Saskatchewan for 2025 and 2026 (2026 uses provisional figures), for a single person on a salary.
 
 **Try it: [aftertaxlens.com](https://aftertaxlens.com)**
 

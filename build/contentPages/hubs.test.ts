@@ -95,21 +95,26 @@ describe('hubPages', () => {
     for (const page of pages) expect(gridOf(page)).toBeUndefined();
   });
 
+  // No province is hub-only at present, so these tests list all but Saskatchewan and treat it as the hub-only one.
+  const withoutSk = provinces.filter((p) => p.slug !== 'ca-sk');
+
   it('makes the hub of a hub-only province after the listed ones, with no salary section', () => {
-    const pages = hubPages([ontarioBuilt], provinces, new Set(), ['ca-mb']);
+    const pages = hubPages([ontarioBuilt], withoutSk, new Set(), ['ca-sk']);
     expect(pages.map((p) => p.slug)).toEqual([
-      ...provinces.map((p) => p.slug),
-      'ca-mb',
+      ...withoutSk.map((p) => p.slug),
+      'ca-sk',
     ]);
-    const manitoba = hubOf(pages, 'ca-mb');
-    expect(gridOf(manitoba)).toBeUndefined();
+    const saskatchewan = hubOf(pages, 'ca-sk');
+    expect(gridOf(saskatchewan)).toBeUndefined();
     expect(
-      manitoba.sections.some((s) => s.heading === 'Take-home pay by salary'),
+      saskatchewan.sections.some(
+        (s) => s.heading === 'Take-home pay by salary',
+      ),
     ).toBe(false);
   });
 
   it('links the hub-only province from every other hub, and links them back', () => {
-    const pages = hubPages([], provinces, new Set(), ['ca-mb']);
+    const pages = hubPages([], withoutSk, new Set(), ['ca-sk']);
     const hrefsOf = (page: ContentPageSpec) =>
       page.sections
         .flatMap((s) => s.blocks)
@@ -117,13 +122,13 @@ describe('hubPages', () => {
           (b): b is LinksBlock => b.kind === 'links' && b.layout === 'row',
         )
         .flatMap((b) => b.links.map((l) => l.href));
-    expect(hrefsOf(hubOf(pages, 'ca-on'))).toContain('/ca-mb/');
-    expect(hrefsOf(hubOf(pages, 'ca-mb'))).toEqual([
+    expect(hrefsOf(hubOf(pages, 'ca-on'))).toContain('/ca-sk/');
+    expect(hrefsOf(hubOf(pages, 'ca-sk'))).toEqual([
       '/methodology/',
       '/ca-on/',
       '/ca-ab/',
       '/ca-bc/',
-      '/ca-sk/',
+      '/ca-mb/',
     ]);
   });
 
@@ -164,6 +169,7 @@ describe('hubPages', () => {
       '/methodology/',
       '/ca-ab/',
       '/ca-bc/',
+      '/ca-mb/',
       '/ca-sk/',
     ]);
   });

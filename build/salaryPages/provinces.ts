@@ -39,6 +39,14 @@ export const provinces: Province[] = [
     step: 5000,
   },
   {
+    code: 'CA-MB',
+    slug: 'ca-mb',
+    year: TAX_YEAR,
+    from: 30000,
+    to: 150000,
+    step: 5000,
+  },
+  {
     code: 'CA-SK',
     slug: 'ca-sk',
     year: TAX_YEAR,
