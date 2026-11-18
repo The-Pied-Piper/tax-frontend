@@ -1036,6 +1036,7 @@ describe.each(['light', 'dark'] as const)(
         ['Ontario', '/ca-on/'],
         ['Alberta', '/ca-ab/'],
         ['British Columbia', '/ca-bc/'],
+        ['Manitoba', '/ca-mb/'],
       ]);
       expect(nav).toHaveTextContent('Provinces:');
       expect(footer).toHaveTextContent(strings.footer);
@@ -1058,7 +1059,13 @@ describe.each(['light', 'dark'] as const)(
           `footer nav[aria-label="${strings.siteNav.label}"] a[href]`,
         ),
       ].map((a) => a.getAttribute('href'));
-      expect(hrefs).toEqual(['/methodology/', '/ca-on/', '/ca-ab/', '/ca-bc/']);
+      expect(hrefs).toEqual([
+        '/methodology/',
+        '/ca-on/',
+        '/ca-ab/',
+        '/ca-bc/',
+        '/ca-mb/',
+      ]);
       expect(page.querySelector('footer')?.textContent).toContain(
         strings.footer,
       );

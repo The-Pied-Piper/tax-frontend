@@ -30,7 +30,7 @@ const hrefs = (root: ParentNode) =>
   [...root.querySelectorAll('nav a')].map((a) => a.getAttribute('href'));
 
 describe('rewriteHome (dist/index.html)', () => {
-  it('links the methodology page and the three hubs in the static html', async () => {
+  it('links the methodology page and the four hubs in the static html', async () => {
     const { page } = await home();
     expect(page.querySelector('nav a[href="/methodology/"]')).not.toBeNull();
     for (const slug of FOOTER_PROVINCE_SLUGS) {
@@ -44,6 +44,7 @@ describe('rewriteHome (dist/index.html)', () => {
       '/ca-on/',
       '/ca-ab/',
       '/ca-bc/',
+      '/ca-mb/',
     ]);
   });
 

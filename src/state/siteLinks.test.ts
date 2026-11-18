@@ -9,6 +9,7 @@ import {
   isContentSlug,
   METHODOLOGY_SLUG,
   NOT_FOUND_FILE,
+  PROVINCES_WITHOUT_SALARY_PAGES,
 } from './siteLinks';
 
 // The one place that says where a content page lives.
@@ -82,8 +83,19 @@ describe('footer targets', () => {
     expect(METHODOLOGY_SLUG).toBe('methodology');
   });
 
-  it('lists Ontario, Alberta and British Columbia, in that order', () => {
-    expect([...FOOTER_PROVINCE_SLUGS]).toEqual(['ca-on', 'ca-ab', 'ca-bc']);
+  it('lists Ontario, Alberta, British Columbia and Manitoba, in that order', () => {
+    expect([...FOOTER_PROVINCE_SLUGS]).toEqual([
+      'ca-on',
+      'ca-ab',
+      'ca-bc',
+      'ca-mb',
+    ]);
+  });
+
+  it('lists only footer provinces as having no salary pages', () => {
+    for (const slug of PROVINCES_WITHOUT_SALARY_PAGES) {
+      expect(FOOTER_PROVINCE_SLUGS).toContain(slug);
+    }
   });
 
   it('gives the calculator the root address', () => {
