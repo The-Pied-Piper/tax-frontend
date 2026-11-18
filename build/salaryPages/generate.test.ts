@@ -941,3 +941,138 @@ describe('the total wait for 429s is budgeted', () => {
     expect(readdirSync(dir)).toEqual([]);
   });
 });
+
+describe('the calls are paced when asked', () => {
+  /** The number at a place in a list; throws rather than hide a missing one. */
+  function at(list: number[], index: number): number {
+    const value = list[index];
+    if (value === undefined) throw new Error(`no entry at ${index.toString()}`);
+    return value;
+  }
+
+  /** A fake clock: sleep records the wait and moves the clock on by it. */
+  function clock() {
+    let t = 5000;
+    const waits: number[] = [];
+    return {
+      now: () => t,
+      waits,
+      sleep: (ms: number) => {
+        waits.push(ms);
+        t += ms;
+        return Promise.resolve();
+      },
+    };
+  }
+
+  /** Wraps a fake API so each call's start time on the fake clock is noted. */
+  function startsOf(c: ReturnType<typeof clock>, inner: typeof fetch) {
+    const starts: number[] = [];
+    const fetchFake: typeof fetch = (input, init) => {
+      starts.push(c.now());
+      return inner(input, init);
+    };
+    return { fetch: fetchFake, starts };
+  }
+
+  function expectSpaced(starts: number[], gap: number) {
+    for (let n = 1; n < starts.length; n++) {
+      expect(at(starts, n) - at(starts, n - 1)).toBeGreaterThanOrEqual(gap);
+    }
+  }
+
+  it('starts each call at least the gap after the previous one, the list call included', async () => {
+    const c = clock();
+    const api = fakeApi(seventyThousand);
+    const timed = startsOf(c, api.fetch);
+    await generateSalaryPages({
+      published: publishedSlugs,
+      fetch: timed.fetch,
+      baseUrl,
+      provinces: ontarioOnly,
+      outDir: outDir(),
+      template,
+      render,
+      pace: { minGapMs: 200, sleep: c.sleep, now: c.now },
+    });
+    expect(timed.starts).toHaveLength(26);
+    expectSpaced(timed.starts, 200);
+    expect(c.waits).toHaveLength(25);
+  });
+
+  it('does not pace when no pace is given', async () => {
+    const c = clock();
+    const timed = startsOf(c, fakeApi(seventyThousand).fetch);
+    await generateSalaryPages({
+      published: publishedSlugs,
+      fetch: timed.fetch,
+      baseUrl,
+      provinces: ontarioOnly,
+      outDir: outDir(),
+      template,
+      render,
+    });
+    expect(c.waits).toEqual([]);
+  });
+
+  it('paces a retried 429 too: its second try starts a gap after the first', async () => {
+    const c = clock();
+    let seen = 0;
+    const api = fakeApi((body) =>
+      body.salary === '35000' && seen++ < 1
+        ? new Response('slow down', { status: 429 })
+        : seventyThousand(),
+    );
+    const timed = startsOf(c, api.fetch);
+    const result = await generateSalaryPages({
+      published: publishedSlugs,
+      fetch: timed.fetch,
+      baseUrl,
+      provinces: ontarioOnly,
+      outDir: outDir(),
+      template,
+      render,
+      retry: { attempts: 3, sleep: () => Promise.resolve() },
+      pace: { minGapMs: 200, sleep: c.sleep, now: c.now },
+    });
+    expect(result.written).toHaveLength(25);
+    // The list, 25 pages and the one extra try.
+    expect(timed.starts).toHaveLength(27);
+    expectSpaced(timed.starts, 200);
+    const tries = api.calls.filter((call) => {
+      const b = call.body as { salary?: string } | null;
+      return b?.salary === '35000';
+    });
+    expect(tries).toHaveLength(2);
+  });
+
+  it('writes all 125 pages of the real build, the list call first, every start 200 ms after the last', async () => {
+    const c = clock();
+    const listed = {
+      jurisdictions: provinces.map((p) => ({
+        code: p.code,
+        name: p.slug,
+        years: [{ year: p.year, provisional: false }],
+      })),
+    };
+    const api = fakeApi(seventyThousand, () => Response.json(listed));
+    const timed = startsOf(c, api.fetch);
+    const result = await generateSalaryPages({
+      published: publishedSlugs,
+      fetch: timed.fetch,
+      baseUrl,
+      provinces,
+      outDir: outDir(),
+      template,
+      render,
+      pace: { minGapMs: 200, sleep: c.sleep, now: c.now },
+    });
+    expect(result.written).toHaveLength(125);
+    expect(api.calls).toHaveLength(126);
+    expect(api.calls[0]?.url).toBe(`${baseUrl}/jurisdictions`);
+    expectSpaced(timed.starts, 200);
+    expect(
+      at(timed.starts, timed.starts.length - 1) - at(timed.starts, 0),
+    ).toBe(125 * 200);
+  });
+});

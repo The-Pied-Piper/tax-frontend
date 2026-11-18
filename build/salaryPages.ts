@@ -126,6 +126,8 @@ export function salaryPages(
           template,
           render: renderSalaryApp,
           siteUrl,
+          // The API allows 10 requests a second for everyone together, so the build takes 5.
+          pace: {},
         });
         await rewriteHome(outDir, renderSiteFooter);
         const hubs = hubPages(
