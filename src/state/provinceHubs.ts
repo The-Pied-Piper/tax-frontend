@@ -126,6 +126,16 @@ export const provinceHubs: ProvinceHubText[] = [
       },
     ],
   },
+  {
+    slug: 'ca-sk',
+    own: [
+      {
+        id: 'sk428',
+        name: 'Form SK428: Saskatchewan Tax',
+        description: 'Works out how much income tax you owe Saskatchewan.',
+      },
+    ],
+  },
 ];
 
 /** A form as a list entry: linked only when its page is published. */

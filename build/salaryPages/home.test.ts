@@ -45,6 +45,7 @@ describe('rewriteHome (dist/index.html)', () => {
       '/ca-ab/',
       '/ca-bc/',
       '/ca-mb/',
+      '/ca-sk/',
     ]);
   });
 
