@@ -135,6 +135,7 @@ describe('salaryPages closeBundle', () => {
       '/forms/ab428/',
       '/forms/bc428/',
       '/forms/bc479/',
+      '/forms/mb428-a/',
       '/forms/mb428/',
       '/forms/mb479/',
       '/forms/on428-a/',

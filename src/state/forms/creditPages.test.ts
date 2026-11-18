@@ -20,6 +20,10 @@ const EXPECTED: Record<string, { province: string; sections: string[] }> = {
     province: 'ca-mb',
     sections: ['income', 'personal', 'total'],
   },
+  'mb428-a': {
+    province: 'ca-mb',
+    sections: ['starting-amount', 'income', 'benefit'],
+  },
 };
 
 // The one fact each page must state plainly.
@@ -29,6 +33,7 @@ const FACT: Record<string, RegExp> = {
   'on428-a': /LIFT/,
   bc479: /paid to you even if you owe no BC tax/i,
   mb479: /you may get a refund for the difference/i,
+  'mb428-a': /Family Tax Benefit/,
 };
 
 /** A page's paragraphs and examples, each `{name}` shown as its figure. */
