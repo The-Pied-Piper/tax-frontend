@@ -20,6 +20,7 @@ import { DESCRIPTION_LIMIT, TITLE_LIMIT } from './limits';
 import { salaryLinks } from './links';
 import { provinceLinks } from '../../src/state/salaryPageLinks';
 import { salaries, type Province } from './provinces';
+import { DEFAULT_ATTEMPTS, retryingFetch } from './retryFetch';
 
 /** What was built for one province: its salary steps, lowest first, and the unit of its answers. */
 export type BuiltProvince = {
@@ -45,6 +46,11 @@ export type GenerateOptions = {
    * build before anything is fetched or written; without it such a province is skipped.
    */
   siteUrl?: string | null;
+  /**
+   * How a 429 from the API is retried: `attempts` tries in all per call (default 6) and
+   * the `sleep` between them (a real timer by default; tests pass an instant one).
+   */
+  retry?: { attempts?: number; sleep?: (ms: number) => Promise<void> };
 };
 
 export type GenerateResult = {
@@ -56,24 +62,36 @@ export type GenerateResult = {
   built: BuiltProvince[];
 };
 
-function reason(error: unknown): string {
-  if (error instanceof ApiError) return `status ${error.status.toString()}`;
+function reason(error: unknown, attempts: number): string {
+  if (error instanceof ApiError) {
+    const status = `status ${error.status.toString()}`;
+    return error.status === 429
+      ? `${status} after ${attempts.toString()} tries`
+      : status;
+  }
   return error instanceof Error ? error.message : 'unknown error';
 }
 
-/** Writes one finished page per listed province and salary step. Fails on the first API problem. */
+/** Writes one finished page per listed province and salary step. Retries a 429 from the API, then fails on the first API problem. */
 export async function generateSalaryPages(
   options: GenerateOptions,
 ): Promise<GenerateResult> {
   const { baseUrl, provinces, outDir, template, render } = options;
-  const client = createApiClient({ baseUrl, fetch: options.fetch });
+  const attempts = options.retry?.attempts ?? DEFAULT_ATTEMPTS;
+  const client = createApiClient({
+    baseUrl,
+    fetch: retryingFetch(options.fetch, {
+      attempts,
+      sleep: options.retry?.sleep,
+    }),
+  });
 
   let list: ListJurisdictionsResponse;
   try {
     list = await client.listJurisdictions();
   } catch (error) {
     throw new Error(
-      `Salary pages: GET ${baseUrl}/jurisdictions failed: ${reason(error)}`,
+      `Salary pages: GET ${baseUrl}/jurisdictions failed: ${reason(error, attempts)}`,
       { cause: error },
     );
   }
@@ -126,9 +144,12 @@ export async function generateSalaryPages(
           ) as ComputeTakeHomeCalculationResponse,
         );
       } catch (error) {
-        throw new Error(`Salary pages: ${page} failed: ${reason(error)}`, {
-          cause: error,
-        });
+        throw new Error(
+          `Salary pages: ${page} failed: ${reason(error, attempts)}`,
+          {
+            cause: error,
+          },
+        );
       }
     }
     fetched.push({ province, steps, responses });
