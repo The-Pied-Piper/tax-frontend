@@ -62,7 +62,12 @@ export function AnswerCard({
           <dd>{show(salary)}</dd>
         </div>
         <div className={styles.row}>
-          <dt>{strings.answer.takenOff}</dt>
+          <dt>
+            <HelpTerm
+              name={strings.answer.takenOff.name}
+              help={strings.answer.takenOff.help}
+            />
+          </dt>
           <dd>{show(totalDeductions)}</dd>
         </div>
         <div className={styles.totalRow}>

@@ -25,4 +25,20 @@ describe('the shared site copy', () => {
       expect(longestSentence(text), text).toBeLessThanOrEqual(40);
     }
   });
+
+  it('words the taken-off help verbatim and short', () => {
+    const takenOff = strings.answer.takenOff;
+    expect(takenOff.name).toBe('Taken off (tax and contributions)');
+    expect(takenOff.help).toBe(
+      'Income tax, Canada Pension Plan and Employment Insurance, less credits paid to you. A minus means you take home more than your salary.',
+    );
+    const total = strings.adapters.caFederal.totalTakenOff.help;
+    expect(total).toBe(
+      'Tax, Canada Pension Plan and Employment Insurance, less credits paid to you. Salary minus this is take-home. A minus means take-home is above salary.',
+    );
+    for (const text of [takenOff.help, total]) {
+      expect(text.length).toBeLessThanOrEqual(150);
+      expect(text).not.toMatch(/added together|CRA|checked/);
+    }
+  });
 });
