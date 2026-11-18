@@ -11,6 +11,7 @@ import { schedule6 } from './forms/schedule6';
 import { on428a } from './forms/on428a';
 import { bc479 } from './forms/bc479';
 import { mb428 } from './forms/mb428';
+import { mb479 } from './forms/mb479';
 import { mb428a } from './forms/mb428a';
 
 /** Every form that has a page. Adding a form is one entry here and one file in `forms/`. */
@@ -27,5 +28,6 @@ export const formPages: FormPageSpec[] = [
   on428a,
   bc479,
   mb428,
+  mb479,
   mb428a,
 ];

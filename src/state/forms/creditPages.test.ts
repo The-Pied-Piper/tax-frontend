@@ -16,6 +16,10 @@ const EXPECTED: Record<string, { province: string; sections: string[] }> = {
   },
   'on428-a': { province: 'ca-on', sections: ['credit', 'reduction'] },
   bc479: { province: 'ca-bc', sections: ['income', 'sales-tax', 'total'] },
+  mb479: {
+    province: 'ca-mb',
+    sections: ['income', 'personal', 'total'],
+  },
   'mb428-a': {
     province: 'ca-mb',
     sections: ['starting-amount', 'income', 'benefit'],
@@ -28,6 +32,7 @@ const FACT: Record<string, RegExp> = {
   'schedule-6': /Canada Workers Benefit/,
   'on428-a': /LIFT/,
   bc479: /paid to you even if you owe no BC tax/i,
+  mb479: /you may get a refund for the difference/i,
   'mb428-a': /Family Tax Benefit/,
 };
 
