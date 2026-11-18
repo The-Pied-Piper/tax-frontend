@@ -1,5 +1,15 @@
 {
   "salary": "70000.00",
+  "total_deductions": "18367.46",
+  "take_home": "51632.54",
+  "unit": {
+    "name": "ca/cad",
+    "placement": "before",
+    "singular": "CA$",
+    "plural": "CA$",
+    "spaced": false,
+    "as_percentage": false
+  },
   "provisional": false,
   "trace": [
     {
