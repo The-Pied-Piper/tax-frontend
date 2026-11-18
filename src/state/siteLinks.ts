@@ -25,6 +25,7 @@ export const FOOTER_PROVINCE_SLUGS = [
   'ca-ab',
   'ca-bc',
   'ca-mb',
+  'ca-sk',
 ] as const;
 
 /** The province pages the footer links to, by slug. */
@@ -33,6 +34,7 @@ export type FooterProvinceSlug = (typeof FOOTER_PROVINCE_SLUGS)[number];
 /** The footer provinces that have a hub but no salary pages yet (the API does not serve them); their hubs promise no salary examples. */
 export const PROVINCES_WITHOUT_SALARY_PAGES: readonly FooterProvinceSlug[] = [
   'ca-mb',
+  'ca-sk',
 ];
 
 /** Whether this is a slug: lower-case letters, digits and hyphens, in segments separated by "/". */

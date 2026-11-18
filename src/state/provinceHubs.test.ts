@@ -38,6 +38,7 @@ const OWN: Record<Slug, (readonly [string, string])[]> = {
     ['bc428', 'Form BC428: British Columbia Tax'],
     ['bc479', 'Form BC479: British Columbia credits'],
   ],
+  'ca-sk': [['sk428', 'Form SK428: Saskatchewan Tax']],
   'ca-mb': [
     ['mb428', 'Form MB428: Manitoba Tax'],
     ['mb428-a', 'Schedule MB428-A: Manitoba Family Tax Benefit'],
@@ -253,6 +254,20 @@ describe.each(FOOTER_PROVINCE_SLUGS)('the hub page for %s', (slug) => {
         expect(item.href, item.label).toBeUndefined();
       }
     }
+  });
+});
+
+describe('the Saskatchewan hub', () => {
+  const page = build('ca-sk', [], []);
+
+  it('promises no salary examples and describes its form in plain words', () => {
+    expect(page.title).toBe('Saskatchewan: forms behind take-home pay');
+    expect(
+      page.sections.some((s) => s.heading === 'Take-home pay by salary'),
+    ).toBe(false);
+    expect((lists(page)[0]?.items ?? []).map((i) => i.description)).toEqual([
+      'Works out how much income tax you owe Saskatchewan.',
+    ]);
   });
 });
 

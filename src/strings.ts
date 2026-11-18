@@ -19,6 +19,7 @@ export const strings = {
       'ca-ab': 'Alberta',
       'ca-bc': 'British Columbia',
       'ca-mb': 'Manitoba',
+      'ca-sk': 'Saskatchewan',
     },
   },
   formPage: {
