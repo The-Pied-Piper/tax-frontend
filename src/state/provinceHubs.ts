@@ -185,7 +185,7 @@ export function hubPage(
         heading: `How your ${name} take-home is worked out`,
         blocks: [
           paragraph(
-            `Take-home pay is your salary minus three things. The first is income tax, which has a federal part and a ${name} part. The second is your Canada Pension Plan payments, which build up your future pension. The third is Employment Insurance, or EI, which can pay you if you lose your job. The forms below are where each of those is worked out.`,
+            `Take-home pay is your salary minus three things. The first is income tax, which comes in two parts: federal tax and ${name} tax. The second is your Canada Pension Plan payments, which build up your future pension. The third is Employment Insurance, or EI, which can pay you if you lose your job. The forms below are where each of those is worked out.`,
           ),
         ],
       },
