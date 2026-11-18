@@ -11,6 +11,8 @@ export const FORM_PAGE_OF: Readonly<Record<string, string>> = {
   'ca-ab/ab428_credits': 'ab428',
   'ca-bc/bc428': 'bc428',
   'ca-bc/bc479': 'bc479',
+  'ca-mb/mb428': 'mb428',
+  'ca-mb/mb428_credits': 'mb428',
   'ca-mb/mb479': 'mb479',
   'ca/t1_taxable_income': 't1-income',
   'ca/t1_tax_and_credits': 't1-tax',

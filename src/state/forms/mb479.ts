@@ -1,6 +1,6 @@
 import { figuresOf, type FormPageSpec } from '../formPage';
 
-const { result } = figuresOf('ca-mb/mb479');
+const { result, printed } = figuresOf('ca-mb/mb479');
 
 /** Form MB479 in plain words. The figures are the 2025 form's, at a $70,000 salary. */
 export const mb479: FormPageSpec = {
@@ -37,7 +37,7 @@ export const mb479: FormPageSpec = {
         '{rate} of {income} is {cut}. That is more than the {basic} basic credit, so your personal tax credit is {credit}.',
       figures: {
         basic: result('$195', 'mb479_basic_credit_line_7'),
-        rate: result('1%', 'mb479_reduction_line_18'),
+        rate: printed('1%', '1% of line 6'),
         income: result('$69,335', 'mb479_family_income_line_6'),
         cut: result('$693.35', 'mb479_reduction_line_18'),
         credit: result('$0', 'mb479_personal_tax_credit_line_19'),
