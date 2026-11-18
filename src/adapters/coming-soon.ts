@@ -12,6 +12,5 @@ export const COMING_SOON: readonly { code: string; name: string }[] = [
   { code: 'CA-NU', name: 'Nunavut' },
   { code: 'CA-PE', name: 'Prince Edward Island' },
   { code: 'CA-QC', name: 'Quebec' },
-  { code: 'CA-SK', name: 'Saskatchewan' },
   { code: 'CA-YT', name: 'Yukon' },
 ];
