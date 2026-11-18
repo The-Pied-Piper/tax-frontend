@@ -1,5 +1,16 @@
 {
   "salary": "70000.00",
+  "total_deductions": "18367.46",
+  "take_home": "51632.54",
+  "unit": {
+    "name": "ca/cad",
+    "placement": "before",
+    "singular": "CA$",
+    "plural": "CA$",
+    "spaced": false,
+    "as_percentage": false
+  },
+  "provisional": false,
   "trace": [
     {
       "form": "ca/schedule_8",
@@ -7,6 +18,7 @@
       "lines": [
         {
           "label": "cpp_months",
+          "name": null,
           "reference": "A",
           "amount": "12",
           "unit": {
@@ -81,6 +93,7 @@
         },
         {
           "label": "cpp_part_3_line_2",
+          "name": null,
           "reference": "2",
           "amount": "70000.00",
           "unit": {
@@ -125,6 +138,7 @@
         },
         {
           "label": "cpp_part_3_line_5",
+          "name": null,
           "reference": "5",
           "amount": "70000.00",
           "unit": {
@@ -140,6 +154,7 @@
         {
           "label": "cpp_part_3_line_7_difference",
           "name": "Earnings left after the Canada Pension Plan exemption",
+          "reference": null,
           "amount": "66500.00",
           "unit": {
             "name": "ca/cad",
@@ -234,6 +249,7 @@
       "lines": [
         {
           "label": "deductions_from_net_income",
+          "name": null,
           "reference": "25700",
           "amount": "0",
           "unit": {
@@ -278,6 +294,7 @@
         },
         {
           "label": "deductions_from_total_income",
+          "name": null,
           "reference": "23300",
           "amount": "665.00",
           "unit": {
@@ -323,6 +340,7 @@
         {
           "label": "net_income_signed",
           "name": "Net income, which can be below zero",
+          "reference": null,
           "amount": "69335.00",
           "unit": {
             "name": "ca/cad",
@@ -387,6 +405,7 @@
         },
         {
           "label": "mb428_a_net_income_line_11",
+          "name": null,
           "reference": "11",
           "amount": "69335.00",
           "unit": {
@@ -401,6 +420,7 @@
         },
         {
           "label": "mb428_a_line_11",
+          "name": null,
           "reference": "11",
           "amount": "6240.15",
           "unit": {
@@ -415,6 +435,7 @@
         },
         {
           "label": "mb428_a_line_10",
+          "name": null,
           "reference": "10",
           "amount": "2065.00",
           "unit": {
@@ -429,6 +450,7 @@
         },
         {
           "label": "mb428_a_family_tax_benefit_line_12",
+          "name": null,
           "reference": "12",
           "amount": "0.00",
           "unit": {
@@ -449,6 +471,7 @@
       "lines": [
         {
           "label": "mb479_eia_mspd_number_line_56",
+          "name": null,
           "reference": "56",
           "amount": "1",
           "unit": {
@@ -479,6 +502,7 @@
         {
           "label": "mb479_fertility_treatment_credit_before_maximum_line_61",
           "name": "Fertility treatment credit before the maximum",
+          "reference": null,
           "amount": "0.00",
           "unit": {
             "name": "ca/cad",
@@ -492,6 +516,7 @@
         },
         {
           "label": "mb479_geothermal_heat_pump_cost_line_68",
+          "name": null,
           "reference": "68",
           "amount": "0",
           "unit": {
@@ -506,6 +531,7 @@
         },
         {
           "label": "mb479_geothermal_heat_pump_credit_line_68",
+          "name": null,
           "reference": "68",
           "amount": "0.00",
           "unit": {
@@ -550,6 +576,8 @@
         },
         {
           "label": "mb479_community_enterprise_development_tax_credit_maximum",
+          "name": null,
+          "reference": null,
           "amount": "27000.00",
           "unit": {
             "name": "ca/cad",
@@ -563,6 +591,7 @@
         },
         {
           "label": "mb479_community_enterprise_development_tax_credit_checked_line_75",
+          "name": null,
           "reference": "75",
           "amount": "0",
           "unit": {
@@ -577,6 +606,8 @@
         },
         {
           "label": "mb479_cultural_industries_printing_credit_maximum",
+          "name": null,
+          "reference": null,
           "amount": "1100000.00",
           "unit": {
             "name": "ca/cad",
@@ -605,6 +636,8 @@
         },
         {
           "label": "mb479_employee_share_purchase_credit_maximum",
+          "name": null,
+          "reference": null,
           "amount": "27000.00",
           "unit": {
             "name": "ca/cad",
@@ -618,6 +651,7 @@
         },
         {
           "label": "mb479_employee_share_purchase_credit_checked_line_77",
+          "name": null,
           "reference": "77",
           "amount": "0",
           "unit": {
@@ -632,6 +666,8 @@
         },
         {
           "label": "mb479_teaching_supplies_expenses_maximum",
+          "name": null,
+          "reference": null,
           "amount": "1000.00",
           "unit": {
             "name": "ca/cad",
@@ -646,6 +682,7 @@
         {
           "label": "mb479_teaching_supplies_expenses_checked_line_79",
           "name": "Eligible teaching supplies expenses",
+          "reference": null,
           "amount": "0",
           "unit": {
             "name": "ca/cad",
@@ -660,6 +697,7 @@
         {
           "label": "mb479_teaching_supplies_expenses_checked_line_79",
           "name": "Eligible teaching supplies expenses",
+          "reference": null,
           "amount": "0",
           "unit": {
             "name": "ca/cad",
@@ -673,6 +711,7 @@
         },
         {
           "label": "mb479_teaching_expense_credit_line_79",
+          "name": null,
           "reference": "79",
           "amount": "0.00",
           "unit": {
@@ -717,6 +756,7 @@
         },
         {
           "label": "mb479_family_income_before_benefits_line_3",
+          "name": null,
           "reference": "3",
           "amount": "69335.00",
           "unit": {
@@ -746,6 +786,7 @@
         },
         {
           "label": "mb479_family_income_column_1_line_5",
+          "name": null,
           "reference": "5",
           "amount": "69335.00",
           "unit": {
@@ -775,6 +816,7 @@
         },
         {
           "label": "mb479_family_income_line_6",
+          "name": null,
           "reference": "6",
           "amount": "69335.00",
           "unit": {
@@ -789,6 +831,7 @@
         },
         {
           "label": "mb479_reduction_line_18",
+          "name": null,
           "reference": "18",
           "amount": "693.35",
           "unit": {
@@ -803,6 +846,7 @@
         },
         {
           "label": "mb479_green_energy_purchaser_credit_line_67",
+          "name": null,
           "reference": "67",
           "amount": "0",
           "unit": {
@@ -817,6 +861,7 @@
         },
         {
           "label": "mb479_green_energy_credits_line_69",
+          "name": null,
           "reference": "69",
           "amount": "0.00",
           "unit": {
@@ -951,6 +996,7 @@
         },
         {
           "label": "mb479_homeowner_renter_senior_credits_line_53",
+          "name": null,
           "reference": "53",
           "amount": "0",
           "unit": {
@@ -965,6 +1011,7 @@
         },
         {
           "label": "mb479_credits_line_55",
+          "name": null,
           "reference": "55",
           "amount": "0.00",
           "unit": {
@@ -979,6 +1026,7 @@
         },
         {
           "label": "mb479_credits_line_57",
+          "name": null,
           "reference": "57",
           "amount": "0.00",
           "unit": {
@@ -1008,6 +1056,7 @@
         },
         {
           "label": "mb479_credits_line_60",
+          "name": null,
           "reference": "60",
           "amount": "0.00",
           "unit": {
@@ -1022,6 +1071,7 @@
         },
         {
           "label": "mb479_credits_line_62",
+          "name": null,
           "reference": "62",
           "amount": "0.00",
           "unit": {
@@ -1051,6 +1101,7 @@
         },
         {
           "label": "mb479_credits_line_64",
+          "name": null,
           "reference": "64",
           "amount": "0.00",
           "unit": {
@@ -1065,6 +1116,7 @@
         },
         {
           "label": "mb479_odour_control_credit_line_65",
+          "name": null,
           "reference": "65",
           "amount": "0",
           "unit": {
@@ -1079,6 +1131,7 @@
         },
         {
           "label": "mb479_credits_line_66",
+          "name": null,
           "reference": "66",
           "amount": "0.00",
           "unit": {
@@ -1093,6 +1146,7 @@
         },
         {
           "label": "mb479_credits_line_70",
+          "name": null,
           "reference": "70",
           "amount": "0.00",
           "unit": {
@@ -1107,6 +1161,7 @@
         },
         {
           "label": "mb479_book_publishing_credit_line_71",
+          "name": null,
           "reference": "71",
           "amount": "0",
           "unit": {
@@ -1121,6 +1176,7 @@
         },
         {
           "label": "mb479_credits_line_72",
+          "name": null,
           "reference": "72",
           "amount": "0.00",
           "unit": {
@@ -1150,6 +1206,7 @@
         },
         {
           "label": "mb479_credits_line_74",
+          "name": null,
           "reference": "74",
           "amount": "0.00",
           "unit": {
@@ -1164,6 +1221,7 @@
         },
         {
           "label": "mb479_community_enterprise_development_tax_credit_checked_line_75",
+          "name": null,
           "reference": "75",
           "amount": "0",
           "unit": {
@@ -1178,6 +1236,7 @@
         },
         {
           "label": "mb479_credits_line_76",
+          "name": null,
           "reference": "76",
           "amount": "0.00",
           "unit": {
@@ -1192,6 +1251,7 @@
         },
         {
           "label": "mb479_employee_share_purchase_credit_checked_line_77",
+          "name": null,
           "reference": "77",
           "amount": "0",
           "unit": {
@@ -1206,6 +1266,7 @@
         },
         {
           "label": "mb479_credits_line_78",
+          "name": null,
           "reference": "78",
           "amount": "0.00",
           "unit": {
@@ -1316,6 +1377,7 @@
         },
         {
           "label": "worksheet_mb428_line_2",
+          "name": null,
           "reference": "2",
           "amount": "69335.00",
           "unit": {
@@ -1330,6 +1392,7 @@
         },
         {
           "label": "worksheet_mb428_line_4",
+          "name": null,
           "reference": "4",
           "amount": "0.00",
           "unit": {
@@ -1344,12 +1407,15 @@
         },
         {
           "label": "worksheet_mb428_line_6",
+          "name": null,
           "reference": "6",
           "amount": "0",
+          "unit": null,
           "text": "Line 4 (CA$0.00) divided by line 5 (CA$200000.00) gives 0.00 (not rounded)."
         },
         {
           "label": "worksheet_mb428_line_8",
+          "name": null,
           "reference": "8",
           "amount": "0.00",
           "unit": {
@@ -1364,6 +1430,7 @@
         },
         {
           "label": "worksheet_mb428_basic_personal_amount_line_9",
+          "name": null,
           "reference": "9",
           "amount": "15780.00",
           "unit": {
@@ -1474,6 +1541,7 @@
         },
         {
           "label": "cwb_net_income_total_line_10",
+          "name": null,
           "reference": "10",
           "amount": "69335.00",
           "unit": {
@@ -1503,6 +1571,7 @@
         },
         {
           "label": "cwb_net_income_less_uccb_rdsp_line_12",
+          "name": null,
           "reference": "12",
           "amount": "69335.00",
           "unit": {
@@ -1517,6 +1586,7 @@
         },
         {
           "label": "cwb_family_net_income_line_13",
+          "name": null,
           "reference": "13",
           "amount": "69335.00",
           "unit": {
@@ -1561,6 +1631,7 @@
         },
         {
           "label": "cwb_net_income_over_base_amount",
+          "name": null,
           "reference": "25",
           "amount": "42480.00",
           "unit": {
@@ -1575,6 +1646,7 @@
         },
         {
           "label": "cwb_reduction_line_27",
+          "name": null,
           "reference": "27",
           "amount": "6372.00",
           "unit": {
@@ -1619,6 +1691,7 @@
         },
         {
           "label": "cwb_working_income_over_base_amount",
+          "name": null,
           "reference": "18",
           "amount": "67000.00",
           "unit": {
@@ -1633,6 +1706,7 @@
         },
         {
           "label": "cwb_working_income_rate_line_20",
+          "name": null,
           "reference": "20",
           "amount": "18090.00",
           "unit": {
@@ -1647,6 +1721,7 @@
         },
         {
           "label": "cwb_basic_benefit_line_22",
+          "name": null,
           "reference": "22",
           "amount": "1633.00",
           "unit": {
@@ -1661,6 +1736,7 @@
         },
         {
           "label": "cwb_benefit_line_28",
+          "name": null,
           "reference": "28",
           "amount": "0.00",
           "unit": {
@@ -1682,6 +1758,7 @@
         {
           "label": "t2204_exemption",
           "name": "Set amount taken off earnings",
+          "reference": null,
           "amount": "2000.00",
           "unit": {
             "name": "ca/cad",
@@ -1711,13 +1788,17 @@
         {
           "label": "t2204_line_1_count",
           "name": "Multiplier that is 1 unless the low-pay rule applies",
+          "reference": null,
           "amount": "0",
+          "unit": null,
           "text": "Condition 1 \"you have no self-employment earnings and your total EI insurable earnings on your T4 slips are less than $2,000\" (read line 2 (CA$0.00), \"Set amount taken off earnings\" (CA$2000.00), line 10100 (CA$70000.00)) does not apply."
         },
         {
           "label": "t2204_line_1_count",
           "name": "Multiplier that is 1 unless the low-pay rule applies",
+          "reference": null,
           "amount": "1",
+          "unit": null,
           "text": "No condition applies, so the count is 1."
         },
         {
@@ -1767,6 +1848,7 @@
         },
         {
           "label": "t2204_line_13",
+          "name": null,
           "reference": "13",
           "amount": "0.00",
           "unit": {
@@ -1797,6 +1879,7 @@
         {
           "label": "t2204_line_1_plus_2",
           "name": "Insured pay plus self-employment and other earnings eligible for EI, before the limit",
+          "reference": null,
           "amount": "70000.00",
           "unit": {
             "name": "ca/cad",
@@ -1810,6 +1893,7 @@
         },
         {
           "label": "t2204_line_3",
+          "name": null,
           "reference": "3",
           "amount": "65700.00",
           "unit": {
@@ -1824,6 +1908,7 @@
         },
         {
           "label": "t2204_line_7",
+          "name": null,
           "reference": "7",
           "amount": "63700.00",
           "unit": {
@@ -1868,6 +1953,7 @@
         },
         {
           "label": "t2204_line_6",
+          "name": null,
           "reference": "6",
           "amount": "1077.48",
           "unit": {
@@ -1882,6 +1968,7 @@
         },
         {
           "label": "t2204_line_8",
+          "name": null,
           "reference": "8",
           "amount": "0.00",
           "unit": {
@@ -1896,6 +1983,7 @@
         },
         {
           "label": "t2204_line_14",
+          "name": null,
           "reference": "14",
           "amount": "0.00",
           "unit": {
@@ -1925,17 +2013,24 @@
         },
         {
           "label": "t2204_line_15_count",
+          "name": null,
+          "reference": null,
           "amount": "0",
+          "unit": null,
           "text": "Condition 1 \"this amount is more than $1\" (read line 15 (CA$0.00)) does not apply."
         },
         {
           "label": "t2204_line_15_count",
+          "name": null,
+          "reference": null,
           "amount": "0",
+          "unit": null,
           "text": "No condition applies, so the count is 0."
         },
         {
           "label": "ei_overpayment",
           "name": "EI overpayment",
+          "reference": null,
           "amount": "0.00",
           "unit": {
             "name": "ca/cad",
@@ -1956,6 +2051,7 @@
         {
           "label": "mb428_pension_income_amount_maximum",
           "name": "Most you can claim for pension income",
+          "reference": null,
           "amount": "1000.00",
           "unit": {
             "name": "ca/cad",
@@ -2044,6 +2140,7 @@
         },
         {
           "label": "mb428_taxable_income_line_1",
+          "name": null,
           "reference": "1",
           "amount": "69335.00",
           "unit": {
@@ -2058,6 +2155,7 @@
         },
         {
           "label": "mb428_bracket_lower_bound_line_3",
+          "name": null,
           "reference": "3",
           "amount": "47000.00",
           "unit": {
@@ -2075,10 +2173,12 @@
           "name": "Rate",
           "reference": "5",
           "amount": "0.1275",
+          "unit": null,
           "text": "Line 1 (CA$69335.00) falls in a bracket with the rate 12.75%."
         },
         {
           "label": "mb428_bracket_tax_at_start_line_7",
+          "name": null,
           "reference": "7",
           "amount": "5076.00",
           "unit": {
@@ -2093,6 +2193,7 @@
         },
         {
           "label": "mb428_taxable_income_over_lower_bound_line_4",
+          "name": null,
           "reference": "4",
           "amount": "22335.00",
           "unit": {
@@ -2107,6 +2208,7 @@
         },
         {
           "label": "mb428_tax_on_excess_line_6",
+          "name": null,
           "reference": "6",
           "amount": "2847.71",
           "unit": {
@@ -2121,6 +2223,7 @@
         },
         {
           "label": "mb428_cpp_ei_and_other_line_28",
+          "name": null,
           "reference": "28",
           "amount": "4369.23",
           "unit": {
@@ -2135,6 +2238,7 @@
         },
         {
           "label": "mb428_credits_subtotal_line_18",
+          "name": null,
           "reference": "18",
           "amount": "15780.00",
           "unit": {
@@ -2149,6 +2253,7 @@
         },
         {
           "label": "mb428_credits_subtotal_line_29",
+          "name": null,
           "reference": "29",
           "amount": "20149.23",
           "unit": {
@@ -2178,6 +2283,7 @@
         },
         {
           "label": "mb428_credits_subtotal_line_33",
+          "name": null,
           "reference": "33",
           "amount": "20149.23",
           "unit": {
@@ -2192,6 +2298,7 @@
         },
         {
           "label": "mb428_credits_subtotal_line_36",
+          "name": null,
           "reference": "36",
           "amount": "20149.23",
           "unit": {
@@ -2206,6 +2313,7 @@
         },
         {
           "label": "mb428_credits_subtotal_line_42",
+          "name": null,
           "reference": "42",
           "amount": "20149.23",
           "unit": {
@@ -2220,6 +2328,7 @@
         },
         {
           "label": "mb428_medical_expenses_line_50",
+          "name": null,
           "reference": "50",
           "amount": "0",
           "unit": {
@@ -2234,6 +2343,7 @@
         },
         {
           "label": "mb428_credits_total_line_51",
+          "name": null,
           "reference": "51",
           "amount": "20149.23",
           "unit": {
@@ -2248,6 +2358,7 @@
         },
         {
           "label": "mb428_credits_at_rate_line_53",
+          "name": null,
           "reference": "53",
           "amount": "2176.12",
           "unit": {
@@ -2374,6 +2485,7 @@
         {
           "label": "mb428_venture_capital_credit_maximum",
           "name": "Venture capital credit maximum",
+          "reference": null,
           "amount": "120000.00",
           "unit": {
             "name": "ca/cad",
@@ -2447,6 +2559,7 @@
         },
         {
           "label": "mb428_credits_total_line_64",
+          "name": null,
           "reference": "64",
           "amount": "2176.12",
           "unit": {
@@ -2476,6 +2589,7 @@
         },
         {
           "label": "mb428_tax_before_credits_line_60",
+          "name": null,
           "reference": "60",
           "amount": "7923.71",
           "unit": {
@@ -2490,6 +2604,7 @@
         },
         {
           "label": "mb428_tax_after_credits_line_65",
+          "name": null,
           "reference": "65",
           "amount": "5747.59",
           "unit": {
@@ -2504,6 +2619,7 @@
         },
         {
           "label": "mb428_tax_line_67",
+          "name": null,
           "reference": "67",
           "amount": "5747.59",
           "unit": {
@@ -2533,6 +2649,7 @@
         },
         {
           "label": "mb428_tax_line_70",
+          "name": null,
           "reference": "70",
           "amount": "5747.59",
           "unit": {
@@ -2547,6 +2664,7 @@
         },
         {
           "label": "mb428_labour_sponsored_funds_credit_line_71",
+          "name": null,
           "reference": "71",
           "amount": "0",
           "unit": {
@@ -2561,6 +2679,7 @@
         },
         {
           "label": "mb428_tax_line_72",
+          "name": null,
           "reference": "72",
           "amount": "5747.59",
           "unit": {
@@ -2590,6 +2709,7 @@
         },
         {
           "label": "mb428_tax_line_74",
+          "name": null,
           "reference": "74",
           "amount": "5747.59",
           "unit": {
@@ -2619,6 +2739,7 @@
         },
         {
           "label": "mb428_tax_line_76",
+          "name": null,
           "reference": "76",
           "amount": "5747.59",
           "unit": {
@@ -2648,6 +2769,7 @@
         },
         {
           "label": "mb428_tax_line_78",
+          "name": null,
           "reference": "78",
           "amount": "5747.59",
           "unit": {
@@ -2677,6 +2799,7 @@
         },
         {
           "label": "mb428_tax_line_80",
+          "name": null,
           "reference": "80",
           "amount": "5747.59",
           "unit": {
@@ -2773,6 +2896,7 @@
         {
           "label": "basic_personal_amount_net_income_line_3",
           "name": "Amount from line 23600 of your return",
+          "reference": null,
           "amount": "69335.00",
           "unit": {
             "name": "ca/cad",
@@ -2861,6 +2985,7 @@
         },
         {
           "label": "federal_tax_taxable_income_line_70",
+          "name": null,
           "reference": "70",
           "amount": "69335.00",
           "unit": {
@@ -2875,6 +3000,7 @@
         },
         {
           "label": "federal_bracket_lower_bound_line_71",
+          "name": null,
           "reference": "71",
           "amount": "57375",
           "unit": {
@@ -2892,10 +3018,12 @@
           "name": "Rate",
           "reference": "73",
           "amount": "0.205",
+          "unit": null,
           "text": "Line 70 (CA$69335.00) falls in a bracket with the rate 20.5%."
         },
         {
           "label": "federal_tax_at_column_start_line_75",
+          "name": null,
           "reference": "75",
           "amount": "8319.38",
           "unit": {
@@ -2940,6 +3068,7 @@
         },
         {
           "label": "federal_taxable_income_over_lower_bound_line_72",
+          "name": null,
           "reference": "72",
           "amount": "11960.00",
           "unit": {
@@ -2954,6 +3083,7 @@
         },
         {
           "label": "federal_excess_times_column_rate_line_74",
+          "name": null,
           "reference": "74",
           "amount": "2451.80",
           "unit": {
@@ -2969,6 +3099,7 @@
         {
           "label": "canada_employment_amount_income",
           "name": "Employment income plus other employment income, before the limit",
+          "reference": null,
           "amount": "70000.00",
           "unit": {
             "name": "ca/cad",
@@ -2997,6 +3128,7 @@
         },
         {
           "label": "credit_amounts_line_84",
+          "name": null,
           "reference": "84",
           "amount": "16129.00",
           "unit": {
@@ -3011,6 +3143,7 @@
         },
         {
           "label": "credits_against_federal_tax",
+          "name": null,
           "reference": "41600",
           "amount": "0.00",
           "unit": {
@@ -3025,6 +3158,7 @@
         },
         {
           "label": "credits_subtotal_line_96",
+          "name": null,
           "reference": "96",
           "amount": "5840.23",
           "unit": {
@@ -3039,6 +3173,7 @@
         },
         {
           "label": "credit_amounts_line_98",
+          "name": null,
           "reference": "98",
           "amount": "21969.23",
           "unit": {
@@ -3053,6 +3188,7 @@
         },
         {
           "label": "credit_amounts_subtotal",
+          "name": null,
           "reference": "101",
           "amount": "21969.23",
           "unit": {
@@ -3067,6 +3203,7 @@
         },
         {
           "label": "credit_amounts_line_106",
+          "name": null,
           "reference": "106",
           "amount": "21969.23",
           "unit": {
@@ -3096,6 +3233,7 @@
         },
         {
           "label": "federal_tax_with_split_income",
+          "name": null,
           "reference": "40400",
           "amount": "10771.18",
           "unit": {
@@ -3110,6 +3248,7 @@
         },
         {
           "label": "non_refundable_credit_amounts",
+          "name": null,
           "reference": "33500",
           "amount": "21969.23",
           "unit": {
@@ -3124,6 +3263,7 @@
         },
         {
           "label": "credit_amounts_at_credit_rate",
+          "name": null,
           "reference": "33800",
           "amount": "3185.54",
           "unit": {
@@ -3153,6 +3293,7 @@
         },
         {
           "label": "credits_against_basic_federal_tax",
+          "name": null,
           "reference": "125",
           "amount": "3185.54",
           "unit": {
@@ -3182,6 +3323,7 @@
         },
         {
           "label": "federal_tax_with_surtax",
+          "name": null,
           "reference": "128",
           "amount": "7585.64",
           "unit": {
@@ -3196,6 +3338,7 @@
         },
         {
           "label": "federal_tax_less_foreign_tax_credit",
+          "name": null,
           "reference": "130",
           "amount": "7585.64",
           "unit": {
@@ -3210,6 +3353,7 @@
         },
         {
           "label": "federal_tax_with_itc_recapture",
+          "name": null,
           "reference": "132",
           "amount": "7585.64",
           "unit": {
@@ -3239,6 +3383,7 @@
         },
         {
           "label": "federal_tax_less_credits",
+          "name": null,
           "reference": "41700",
           "amount": "7585.64",
           "unit": {
