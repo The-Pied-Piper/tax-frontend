@@ -50,10 +50,8 @@ export const mb479: FormPageSpec = {
       paragraph:
         'The rest of the form is for credits that depend on things like owning or renting a home, your age, or what you spent. They help homeowners, renters, seniors, caregivers, teachers, and people who pay for fertility treatment. Others cover things like paid work experience, green energy purchases, book publishing and some Manitoba businesses. We do not count any of them, so they are left out of our total. If one applies to you, you may be owed more than we show.',
       example:
-        'Leaving them out, the Manitoba credits we count come to {total}.',
-      figures: {
-        total: result('$0', 'mb479_manitoba_credits_line_81'),
-      },
+        'None of these credits is in our total, so they add nothing to it.',
+      figures: {},
     },
     {
       id: 'total',
@@ -61,7 +59,7 @@ export const mb479: FormPageSpec = {
       lines: 'Lines 53–57 and 81',
       paragraph:
         'Lines 53 to 57 add up the credits so far, including your personal tax credit. For people who get certain Manitoba income assistance or disability support payments, they also multiply that total. We do not use that. The form then adds up the credits. The total goes onto line 47900 of your return. If your credits come to more than the tax you owe, you may get a refund for the difference.',
-      example: 'Your Manitoba credits come to {total}.',
+      example: 'The Manitoba credits we count come to {total}.',
       figures: {
         total: result('$0', 'mb479_manitoba_credits_line_81'),
       },
