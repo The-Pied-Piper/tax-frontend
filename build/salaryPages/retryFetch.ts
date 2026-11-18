@@ -20,7 +20,8 @@ export type RetryOptions = {
   tryTimeoutMs?: number;
 };
 
-function timer(ms: number): Promise<void> {
+/** Waits for the given milliseconds with a real timer. */
+export function timer(ms: number): Promise<void> {
   return new Promise((resolve) => {
     setTimeout(resolve, ms);
   });

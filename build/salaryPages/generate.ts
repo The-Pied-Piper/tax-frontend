@@ -25,6 +25,7 @@ import {
   DEFAULT_TRY_TIMEOUT_MS,
   MAX_WAIT_MS,
   retryingFetch,
+  timer,
 } from './retryFetch';
 
 /** The most time, in milliseconds, all the waits for 429s in one build may add up to. */
@@ -103,12 +104,7 @@ export async function generateSalaryPages(
 ): Promise<GenerateResult> {
   const { baseUrl, provinces, outDir, template, render } = options;
   const attempts = Math.max(1, options.retry?.attempts ?? DEFAULT_ATTEMPTS);
-  const sleepFor =
-    options.retry?.sleep ??
-    ((ms: number) =>
-      new Promise<void>((resolve) => {
-        setTimeout(resolve, ms);
-      }));
+  const sleepFor = options.retry?.sleep ?? timer;
   const maxTotalWaitMs =
     options.retry?.maxTotalWaitMs ?? DEFAULT_MAX_TOTAL_WAIT_MS;
   let waited = 0;
