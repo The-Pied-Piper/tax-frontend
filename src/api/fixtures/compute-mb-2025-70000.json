@@ -10,6 +10,28 @@
     "spaced": false,
     "as_percentage": false
   },
+  "average_income_tax_rate": {
+    "amount": "0.1905",
+    "unit": {
+      "name": "core/percent",
+      "placement": "after",
+      "singular": "%",
+      "plural": "%",
+      "spaced": false,
+      "as_percentage": true
+    }
+  },
+  "marginal_income_tax_rate": {
+    "amount": "0.3325",
+    "unit": {
+      "name": "core/percent",
+      "placement": "after",
+      "singular": "%",
+      "plural": "%",
+      "spaced": false,
+      "as_percentage": true
+    }
+  },
   "provisional": false,
   "trace": [
     {
@@ -3463,6 +3485,246 @@
       "name": "Return summary",
       "lines": [
         {
+          "label": "manitoba_base_amount_return",
+          "name": null,
+          "reference": null,
+          "amount": "15780.00",
+          "unit": {
+            "name": "ca/cad",
+            "placement": "before",
+            "singular": "CA$",
+            "plural": "CA$",
+            "spaced": false,
+            "as_percentage": false
+          },
+          "text": "Line 7 of Worksheet MB428 (CA$15780.00) gives CA$15780.00."
+        },
+        {
+          "label": "manitoba_basic_personal_amount_return",
+          "name": null,
+          "reference": null,
+          "amount": "15780.00",
+          "unit": {
+            "name": "ca/cad",
+            "placement": "before",
+            "singular": "CA$",
+            "plural": "CA$",
+            "spaced": false,
+            "as_percentage": false
+          },
+          "text": "Line 9 of Worksheet MB428 (CA$15780.00) gives CA$15780.00."
+        },
+        {
+          "label": "manitoba_basic_personal_amount_gate",
+          "name": null,
+          "reference": null,
+          "amount": "1",
+          "unit": {
+            "name": "core/percent",
+            "placement": "after",
+            "singular": "%",
+            "plural": "%",
+            "spaced": false,
+            "as_percentage": true
+          },
+          "text": "Manitoba basic personal amount return (CA$15780.00) is over 0.005, so the rate is 100%."
+        },
+        {
+          "label": "manitoba_bracket_rate_return",
+          "name": null,
+          "reference": null,
+          "amount": "0.1275",
+          "unit": {
+            "name": "core/percent",
+            "placement": "after",
+            "singular": "%",
+            "plural": "%",
+            "spaced": false,
+            "as_percentage": true
+          },
+          "text": "Line 5 of MB428 (0.1275) gives 12.75%."
+        },
+        {
+          "label": "manitoba_income_threshold_return",
+          "name": null,
+          "reference": null,
+          "amount": "200000.00",
+          "unit": {
+            "name": "ca/cad",
+            "placement": "before",
+            "singular": "CA$",
+            "plural": "CA$",
+            "spaced": false,
+            "as_percentage": false
+          },
+          "text": "Line 5 of Worksheet MB428 (CA$200000.00) gives CA$200000.00."
+        },
+        {
+          "label": "manitoba_phase_out_ratio",
+          "name": null,
+          "reference": null,
+          "amount": "0.0789",
+          "unit": {
+            "name": "core/percent",
+            "placement": "after",
+            "singular": "%",
+            "plural": "%",
+            "spaced": false,
+            "as_percentage": true
+          },
+          "text": "Manitoba base amount return (CA$15780.00) divided by manitoba income threshold return (CA$200000.00) gives 7.89% (not rounded)."
+        },
+        {
+          "label": "manitoba_phase_out_amount_return",
+          "name": null,
+          "reference": null,
+          "amount": "0.00",
+          "unit": {
+            "name": "ca/cad",
+            "placement": "before",
+            "singular": "CA$",
+            "plural": "CA$",
+            "spaced": false,
+            "as_percentage": false
+          },
+          "text": "Line 8 of Worksheet MB428 (CA$0.00) gives CA$0.00."
+        },
+        {
+          "label": "manitoba_reduction_slope",
+          "name": null,
+          "reference": null,
+          "amount": "0",
+          "unit": {
+            "name": "core/percent",
+            "placement": "after",
+            "singular": "%",
+            "plural": "%",
+            "spaced": false,
+            "as_percentage": true
+          },
+          "text": "Manitoba phase out amount return (CA$0.00) is in the band starting at 0.00, so the band is a flat amount and the rate is 0%."
+        },
+        {
+          "label": "manitoba_phase_out_credit_rate",
+          "name": null,
+          "reference": null,
+          "amount": "0",
+          "unit": {
+            "name": "core/percent",
+            "placement": "after",
+            "singular": "%",
+            "plural": "%",
+            "spaced": false,
+            "as_percentage": true
+          },
+          "text": "Manitoba reduction slope (0%) of manitoba phase out ratio (7.89%) gives 0% (not rounded)."
+        },
+        {
+          "label": "manitoba_phase_out_rate",
+          "name": null,
+          "reference": null,
+          "amount": "0",
+          "unit": {
+            "name": "core/percent",
+            "placement": "after",
+            "singular": "%",
+            "plural": "%",
+            "spaced": false,
+            "as_percentage": true
+          },
+          "text": "Manitoba phase out credit rate (0%) of manitoba basic personal amount gate (100%) gives 0% (not rounded)."
+        },
+        {
+          "label": "manitoba_tax_after_credits_return",
+          "name": null,
+          "reference": null,
+          "amount": "5747.59",
+          "unit": {
+            "name": "ca/cad",
+            "placement": "before",
+            "singular": "CA$",
+            "plural": "CA$",
+            "spaced": false,
+            "as_percentage": false
+          },
+          "text": "Line 65 of MB428 (CA$5747.59) gives CA$5747.59."
+        },
+        {
+          "label": "manitoba_rate_gate",
+          "name": null,
+          "reference": null,
+          "amount": "1",
+          "unit": {
+            "name": "core/percent",
+            "placement": "after",
+            "singular": "%",
+            "plural": "%",
+            "spaced": false,
+            "as_percentage": true
+          },
+          "text": "Manitoba tax after credits return (CA$5747.59) is over 0.005, so the rate is 100%."
+        },
+        {
+          "label": "federal_bracket_rate_return",
+          "name": null,
+          "reference": null,
+          "amount": "0.205",
+          "unit": {
+            "name": "core/percent",
+            "placement": "after",
+            "singular": "%",
+            "plural": "%",
+            "spaced": false,
+            "as_percentage": true
+          },
+          "text": "Line 73 of T1 Income Tax and Benefit Return, Steps 5 and 6 (0.205) gives 20.5%."
+        },
+        {
+          "label": "federal_tax_after_credits_return",
+          "name": null,
+          "reference": null,
+          "amount": "7585.64",
+          "unit": {
+            "name": "ca/cad",
+            "placement": "before",
+            "singular": "CA$",
+            "plural": "CA$",
+            "spaced": false,
+            "as_percentage": false
+          },
+          "text": "Line 42900 of T1 Income Tax and Benefit Return, Steps 5 and 6 (CA$7585.64) gives CA$7585.64."
+        },
+        {
+          "label": "federal_rate_gate",
+          "name": null,
+          "reference": null,
+          "amount": "1",
+          "unit": {
+            "name": "core/percent",
+            "placement": "after",
+            "singular": "%",
+            "plural": "%",
+            "spaced": false,
+            "as_percentage": true
+          },
+          "text": "Federal tax after credits return (CA$7585.64) is over 0.005, so the rate is 100%."
+        },
+        {
+          "label": "federal_marginal_rate",
+          "name": null,
+          "reference": null,
+          "amount": "0.205",
+          "unit": {
+            "name": "core/percent",
+            "placement": "after",
+            "singular": "%",
+            "plural": "%",
+            "spaced": false,
+            "as_percentage": true
+          },
+          "text": "Federal bracket rate return (20.5%) of federal rate gate (100%) gives 20.5% (not rounded)."
+        },
+        {
           "label": "refund_or_balance_owing",
           "name": "Refund or balance owing",
           "reference": "167",
@@ -3476,6 +3738,81 @@
             "as_percentage": false
           },
           "text": "Line 167 of T1 Income Tax and Benefit Return, Steps 5 and 6 (CA$13333.23) gives CA$13333.23."
+        },
+        {
+          "label": "total_payable",
+          "name": null,
+          "reference": null,
+          "amount": "13333.23",
+          "unit": {
+            "name": "ca/cad",
+            "placement": "before",
+            "singular": "CA$",
+            "plural": "CA$",
+            "spaced": false,
+            "as_percentage": false
+          },
+          "text": "Line 43500 of T1 Income Tax and Benefit Return, Steps 5 and 6 (CA$13333.23) gives CA$13333.23."
+        },
+        {
+          "label": "average_income_tax_rate",
+          "name": null,
+          "reference": null,
+          "amount": "0.1905",
+          "unit": {
+            "name": "core/percent",
+            "placement": "after",
+            "singular": "%",
+            "plural": "%",
+            "spaced": false,
+            "as_percentage": true
+          },
+          "text": "Line 43500 of T1 Income Tax and Benefit Return, Steps 5 and 6 (CA$13333.23) divided by line 10100 (CA$70000.00) gives 19.05% (rounded half-up to 0.0001)."
+        },
+        {
+          "label": "manitoba_bracket_rate_with_phase_out",
+          "name": null,
+          "reference": null,
+          "amount": "0.1275",
+          "unit": {
+            "name": "core/percent",
+            "placement": "after",
+            "singular": "%",
+            "plural": "%",
+            "spaced": false,
+            "as_percentage": true
+          },
+          "text": "Manitoba bracket rate return (12.75%) plus manitoba phase out rate (0%) gives 12.75% (not rounded)."
+        },
+        {
+          "label": "manitoba_marginal_rate",
+          "name": null,
+          "reference": null,
+          "amount": "0.1275",
+          "unit": {
+            "name": "core/percent",
+            "placement": "after",
+            "singular": "%",
+            "plural": "%",
+            "spaced": false,
+            "as_percentage": true
+          },
+          "text": "Manitoba bracket rate with phase out (12.75%) of manitoba rate gate (100%) gives 12.75% (not rounded)."
+        },
+        {
+          "label": "marginal_tax_rate",
+          "name": null,
+          "reference": null,
+          "amount": "0.3325",
+          "unit": {
+            "name": "core/percent",
+            "placement": "after",
+            "singular": "%",
+            "plural": "%",
+            "spaced": false,
+            "as_percentage": true
+          },
+          "text": "Federal marginal rate (20.5%) plus manitoba marginal rate (12.75%) gives 33.25% (not rounded)."
         }
       ]
     }
