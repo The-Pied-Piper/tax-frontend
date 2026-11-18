@@ -13,16 +13,16 @@ export const mb479: FormPageSpec = {
   description:
     'What Form MB479 is for and what each part asks, in plain words, with a worked example for a $70,000 salary.',
   intro:
-    'This form adds up the credits you can get from Manitoba. We count only the personal tax credit, which helps people on lower pay.',
+    'This form adds up the Manitoba credits you can claim, even if you do not have to pay any tax. We count only the personal tax credit.',
   sections: [
     {
       id: 'income',
       heading: 'Your income',
       lines: 'Lines 1–6',
       paragraph:
-        'The form starts with your income. Some credits get smaller as your income goes up, and the form uses your family income to work that out. It starts from your net income. It can also count the income of a spouse or partner, and adjust for some child and disability benefits. We use none of those.',
+        'The form starts with your income and builds it into your family income. It starts from your net income. It can also count the income of a spouse or partner, and adjust for some child and disability benefits. We use none of those, so for us your family income is your net income. Some credits get smaller as your family income goes up.',
       example:
-        'Your net income is {income}. The form calls that your family income.',
+        'Your net income is {income}. With no spouse or partner and none of those benefits, that is also your family income.',
       figures: {
         income: result('$69,335', 'mb479_net_income_line_1'),
       },
@@ -32,7 +32,7 @@ export const mb479: FormPageSpec = {
       heading: 'The personal tax credit',
       lines: 'Lines 7–19',
       paragraph:
-        'Everyone starts with a basic credit of {basic}. The form has extra credits for a spouse or partner, a dependant, a disability, children, and being 65 or older. We count only the basic credit. Then the credit shrinks. It takes off {rate} of your family income, and it cannot go below zero. These credits can be paid to you even if you do not have to pay any tax.',
+        'The form starts with a basic credit of {basic}. It has extra credits for a spouse or partner, a dependant, a disability, children, and being 65 or older. We count only the basic credit. Then the credit shrinks. It takes off {rate} of your family income, and it cannot go below zero.',
       example:
         '{rate} of {income} is {cut}. That is more than the {basic} basic credit, so your personal tax credit is {credit}.',
       figures: {
@@ -48,7 +48,7 @@ export const mb479: FormPageSpec = {
       heading: 'Credits we do not count',
       lines: 'Lines 20–52 and 58–80',
       paragraph:
-        'The rest of the form is for credits that depend on facts a salary does not show. They help homeowners, renters, seniors, caregivers, teachers, and people who pay for fertility treatment. Others cover things like paid work experience, green energy purchases, book publishing and some Manitoba businesses. We do not count any of them, so they are left out of our total. If one applies to you, you may be owed more than we show.',
+        'The rest of the form is for credits that depend on things like owning or renting a home, your age, or what you spent. They help homeowners, renters, seniors, caregivers, teachers, and people who pay for fertility treatment. Others cover things like paid work experience, green energy purchases, book publishing and some Manitoba businesses. We do not count any of them, so they are left out of our total. If one applies to you, you may be owed more than we show.',
       example:
         'Leaving them out, the Manitoba credits we count come to {total}.',
       figures: {
@@ -58,9 +58,9 @@ export const mb479: FormPageSpec = {
     {
       id: 'total',
       heading: 'Your Manitoba credits',
-      lines: 'Line 81',
+      lines: 'Lines 53–57 and 81',
       paragraph:
-        'The form adds up the credits. The total goes onto line 47900 of your return, where it counts with your other credits. If your credits come to more than the tax you owe, you may get a refund.',
+        'Lines 53 to 57 add up the credits so far, including your personal tax credit. For people who get certain Manitoba income assistance or disability support payments, they also multiply that total. We do not use that. The form then adds up the credits. The total goes onto line 47900 of your return. If your credits come to more than the tax you owe, you may get a refund for the difference.',
       example: 'Your Manitoba credits come to {total}.',
       figures: {
         total: result('$0', 'mb479_manitoba_credits_line_81'),

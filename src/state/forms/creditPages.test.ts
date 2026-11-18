@@ -28,7 +28,7 @@ const FACT: Record<string, RegExp> = {
   'schedule-6': /Canada Workers Benefit/,
   'on428-a': /LIFT/,
   bc479: /paid to you even if you owe no BC tax/i,
-  mb479: /paid to you even if you do not have to pay any tax/i,
+  mb479: /you may get a refund for the difference/i,
 };
 
 /** A page's paragraphs and examples, each `{name}` shown as its figure. */
