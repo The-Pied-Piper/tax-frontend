@@ -88,7 +88,10 @@ export const strings = {
       `out of ${salary}, ${place}, ${String(year)}`,
     salary: 'Salary before tax',
     takeHomeRow: 'Take-home',
-    takenOff: 'Taken off (tax and contributions)',
+    takenOff: {
+      name: 'Taken off (tax and contributions)',
+      help: 'Income tax, Canada Pension Plan and Employment Insurance, less credits paid to you. A minus means you take home more than your salary.',
+    },
     averageRate: {
       name: 'Average income tax rate',
       help: 'Your income tax divided by your salary. It is the share of your salary that goes to income tax, federal and provincial together.',
@@ -205,7 +208,7 @@ export const strings = {
       },
       totalTakenOff: {
         name: 'Total taken off',
-        help: 'Income tax, Canada Pension Plan and Employment Insurance added together. Your salary minus this is your estimated take-home pay.',
+        help: 'Tax, Canada Pension Plan and Employment Insurance, less credits paid to you. Salary minus this is take-home. A minus means take-home is above salary.',
       },
     },
     caOn: {
