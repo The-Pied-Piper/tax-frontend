@@ -34,7 +34,7 @@ export const mb479: FormPageSpec = {
       paragraph:
         'The form starts with a basic credit of {basic}. It has extra credits for a spouse or partner, a dependant, a disability, children, and being 65 or older. We count only the basic credit. Then the credit shrinks. It takes off {rate} of your family income, and it cannot go below zero.',
       example:
-        '{rate} of {income} is {cut}. That is more than the {basic} basic credit, so your personal tax credit is {credit}.',
+        'We count only the {basic} basic credit. {rate} of {income} is {cut}. That is more than {basic}, so your personal tax credit is {credit}.',
       figures: {
         basic: result('$195', 'mb479_basic_credit_line_7'),
         rate: printed('1%', '1% of line 6'),
