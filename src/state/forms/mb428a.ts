@@ -13,7 +13,7 @@ export const mb428a: FormPageSpec = {
   description:
     'What Schedule MB428-A is for and what each part asks, in plain words, with a worked example for a $70,000 salary.',
   intro:
-    'The Family Tax Benefit lowers your Manitoba tax if your income is low. You do not need a spouse or a child to claim it. It is not paid to you as cash. At $70,000 it is zero.',
+    'The Family Tax Benefit is an amount that can lower your Manitoba tax if your income is low. You do not need a spouse or a child to claim it. It is not paid to you as cash. At $70,000 it is zero.',
   sections: [
     {
       id: 'starting-amount',
@@ -33,7 +33,7 @@ export const mb428a: FormPageSpec = {
       heading: 'Less benefit as income rises',
       lines: 'Line 11',
       paragraph:
-        'The form takes {rate} of your net income. Net income is the figure on line 23600 of your return. The more you earn, the more is taken away.',
+        'The form takes {rate} of your own net income. Net income is the figure on line 23600 of your return. The more you earn, the more is taken away.',
       example: 'Your net income is {income}. {rate} of that is {cut}.',
       figures: {
         rate: printed('9%', '9% of line 11'),
@@ -46,7 +46,7 @@ export const mb428a: FormPageSpec = {
       heading: 'What is left',
       lines: 'Line 12',
       paragraph:
-        'The form takes the amount taken away on line 11 off the starting amount on line 10. If the answer is below zero, the form enters 0. What is left is your Family Tax Benefit. It goes on line 61470 of Form MB428 and lowers your Manitoba tax. It is not paid to you as cash.',
+        'The form takes the amount from line 11 off the starting amount on line 10. If the answer is below zero, the form enters 0. What is left is your Family Tax Benefit amount. It goes on line 61470 of Form MB428, where it is added to your other credit amounts. The credit rate is then applied to the total, and that is what lowers your Manitoba tax. It is not paid to you as cash.',
       example:
         '{total} less {cut} is below zero, so your Family Tax Benefit is {benefit}.',
       figures: {
