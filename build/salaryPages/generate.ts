@@ -20,6 +20,7 @@ import { DESCRIPTION_LIMIT, TITLE_LIMIT } from './limits';
 import { salaryLinks } from './links';
 import { provinceLinks } from '../../src/state/salaryPageLinks';
 import { salaries, type Province } from './provinces';
+import { pacedFetch, type PaceOptions } from './pacedFetch';
 import {
   DEFAULT_ATTEMPTS,
   DEFAULT_TRY_TIMEOUT_MS,
@@ -74,6 +75,12 @@ export type GenerateOptions = {
     sleep?: (ms: number) => Promise<void>;
     maxTotalWaitMs?: number;
   };
+  /**
+   * Spaces the API calls: each starts at least `minGapMs` (default 200, so 5 a second)
+   * after the previous one, with `sleep` and `now` as the clock (real ones by default;
+   * tests pass fakes). The retries of a 429 are spaced too. Absent, calls are not paced.
+   */
+  pace?: PaceOptions;
 };
 
 export type GenerateResult = {
@@ -117,7 +124,11 @@ export async function generateSalaryPages(
   };
   const client = createApiClient({
     baseUrl,
-    fetch: retryingFetch(options.fetch, { attempts, sleep: budgetedSleep }),
+    // Pacing sits under the retries, so a retried call is spaced like any other.
+    fetch: retryingFetch(
+      options.pace ? pacedFetch(options.fetch, options.pace) : options.fetch,
+      { attempts, sleep: budgetedSleep },
+    ),
     // The client's one timer spans every try and wait of a call, so it must outlast them
     // all (each try has its own timer inside retryingFetch); the 1 s is slack.
     timeoutMs:

@@ -33,6 +33,7 @@ vi.mock('vite', () => ({
 
 const generateCalls = vi.hoisted(() => ({
   published: [] as unknown[],
+  pace: [] as unknown[],
 }));
 
 vi.mock('./salaryPages/generate', async () => {
@@ -42,15 +43,18 @@ vi.mock('./salaryPages/generate', async () => {
     generateSalaryPages: async ({
       outDir,
       published,
+      pace,
     }: {
       outDir: string;
       published: unknown;
+      pace?: unknown;
     }): Promise<{
       written: string[];
       skipped: string[];
       built: never[];
     }> => {
       generateCalls.published.push(published);
+      generateCalls.pace.push(pace);
       const written = ['ca-on/30000/index.html', 'ca-on/35000/index.html'];
       for (const file of written) {
         await makeDir(joinPath(outDir, file, '..'), { recursive: true });
@@ -113,6 +117,21 @@ describe('salaryPages closeBundle', () => {
     expect(published).toEqual(new Set(contentPages.map((page) => page.slug)));
     expect((published as Set<string>).has('methodology')).toBe(true);
     expect((published as Set<string>).has('forms/on428')).toBe(true);
+  });
+
+  it('paces the real build to 5 API requests a second (#243)', async () => {
+    generateCalls.pace.length = 0;
+    await runCloseBundle(
+      salaryPages('https://api.example.com/api/v1', 'https://example.com'),
+    );
+    const [pace] = generateCalls.pace as [
+      { minGapMs?: number; sleep?: unknown; now?: unknown } | undefined,
+    ];
+    expect(pace).toBeDefined();
+    // Defaults: a real timer and the real clock, and a gap of 200 ms (5 a second) or unset.
+    expect(pace?.minGapMs ?? 200).toBe(200);
+    expect(pace?.sleep).toBeUndefined();
+    expect(pace?.now).toBeUndefined();
   });
 
   it('dates every page in the sitemap and keeps the dates in page-hashes.json', async () => {
