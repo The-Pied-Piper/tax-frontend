@@ -136,6 +136,17 @@ export const provinceHubs: ProvinceHubText[] = [
       },
     ],
   },
+  {
+    slug: 'ca-nl',
+    own: [
+      {
+        id: 'nl428',
+        name: 'Form NL428: Newfoundland and Labrador Tax',
+        description:
+          'Works out how much income tax you owe Newfoundland and Labrador.',
+      },
+    ],
+  },
 ];
 
 /** A form as a list entry: linked only when its page is published. */

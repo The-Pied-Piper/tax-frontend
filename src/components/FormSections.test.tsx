@@ -131,6 +131,7 @@ describe('a form page', () => {
       ['British Columbia forms and salary pages', '/ca-bc/'],
       ['Manitoba forms and salary pages', '/ca-mb/'],
       ['Saskatchewan forms and salary pages', '/ca-sk/'],
+      ['Newfoundland and Labrador forms', '/ca-nl/'],
       ['How we calculate', '/methodology/'],
       ['See an Ontario $70,000 example', '/ca-on/70000/'],
     ]);
@@ -156,6 +157,7 @@ describe('a form page', () => {
         ['British Columbia forms and salary pages', '/ca-bc/'],
         ['Manitoba forms and salary pages', '/ca-mb/'],
         ['Saskatchewan forms and salary pages', '/ca-sk/'],
+        ['Newfoundland and Labrador forms', '/ca-nl/'],
         ['How we calculate', '/methodology/'],
       ]);
     },

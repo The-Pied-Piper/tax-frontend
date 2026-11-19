@@ -348,6 +348,7 @@ describe('renderSiteFooter (the static footer of the home page)', () => {
       '/ca-bc/',
       '/ca-mb/',
       '/ca-sk/',
+      '/ca-nl/',
     ]);
     expect(document.body).toHaveTextContent(strings.footer);
   });

@@ -39,6 +39,7 @@ const OWN: Record<Slug, (readonly [string, string])[]> = {
     ['bc479', 'Form BC479: British Columbia credits'],
   ],
   'ca-sk': [['sk428', 'Form SK428: Saskatchewan Tax']],
+  'ca-nl': [['nl428', 'Form NL428: Newfoundland and Labrador Tax']],
   'ca-mb': [
     ['mb428', 'Form MB428: Manitoba Tax'],
     ['mb428-a', 'Schedule MB428-A: Manitoba Family Tax Benefit'],
@@ -267,6 +268,22 @@ describe('the Saskatchewan hub', () => {
     ).toBe(false);
     expect((lists(page)[0]?.items ?? []).map((i) => i.description)).toEqual([
       'Works out how much income tax you owe Saskatchewan.',
+    ]);
+  });
+});
+
+describe('the Newfoundland and Labrador hub', () => {
+  const page = build('ca-nl', [], []);
+
+  it('promises no salary examples and describes its form in plain words', () => {
+    expect(page.title).toBe(
+      'Newfoundland and Labrador: forms behind take-home pay',
+    );
+    expect(
+      page.sections.some((s) => s.heading === 'Take-home pay by salary'),
+    ).toBe(false);
+    expect((lists(page)[0]?.items ?? []).map((i) => i.description)).toEqual([
+      'Works out how much income tax you owe Newfoundland and Labrador.',
     ]);
   });
 });
