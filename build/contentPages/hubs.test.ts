@@ -130,6 +130,15 @@ describe('hubPages', () => {
       '/ca-bc/',
       '/ca-mb/',
     ]);
+    const both = hubPages([], withoutSk, new Set(), ['ca-sk', 'ca-nl']);
+    expect(hrefsOf(hubOf(both, 'ca-nl'))).toEqual([
+      '/methodology/',
+      '/ca-on/',
+      '/ca-ab/',
+      '/ca-bc/',
+      '/ca-mb/',
+      '/ca-sk/',
+    ]);
   });
 
   it('throws, naming the province, when a hub-only province has no hub text', () => {
