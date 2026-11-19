@@ -1,3 +1,6 @@
+import type { ComputeTakeHomeCalculationResponse } from '../api';
+import nlResponse from '../api/fixtures/compute-nl-2025-70000.json';
+import skResponse from '../api/fixtures/compute-sk-2025-70000.json';
 import { strings } from '../strings';
 import { compute70000 } from '../test/syntheticPages';
 import { advancedGroups, readUnit, responseUnit } from './fallback';
@@ -62,4 +65,22 @@ describe('the dollar sign', () => {
     expect(page['ca/schedule_8']).toBe('schedule-8');
     expect(page['ca-on/return']).toBeNull();
   });
+
+  it.each([
+    ['NL', nlResponse, 'ca-nl/nl428', 'nl428'],
+    ['SK', skResponse, 'ca-sk/sk428', 'sk428'],
+  ])(
+    'advancedGroups lists the %s form once, with the lines of its credits',
+    (_name, response, form, page) => {
+      const groups = advancedGroups(
+        response as unknown as ComputeTakeHomeCalculationResponse,
+      );
+      const names = groups.map((g) => g.name);
+      expect(new Set(names).size).toBe(names.length);
+      const own = groups.filter((g) => g.page === page);
+      expect(own.map((g) => g.form)).toEqual([
+        form.replace('428', '428_credits'),
+      ]);
+    },
+  );
 });

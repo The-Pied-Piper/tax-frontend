@@ -39,11 +39,29 @@ export function responseUnit(response: { unit?: Unit | null }): Unit {
   return readUnit(response.unit) ?? strings.fallbackUnit;
 }
 
+/**
+ * Joins the groups of forms that share one page (a province's main form and
+ * its credits worksheet) into one group, so the form is listed once. The
+ * joined group keeps the place and form key of the first.
+ */
+function mergeSharedPages(groups: AdvancedGroup[]): AdvancedGroup[] {
+  const merged: AdvancedGroup[] = [];
+  for (const group of groups) {
+    const first =
+      group.page === null
+        ? undefined
+        : merged.find((g) => g.page === group.page);
+    if (first) first.lines.push(...group.lines);
+    else merged.push({ ...group, lines: [...group.lines] });
+  }
+  return merged;
+}
+
 /** Groups every trace line by form for the advanced view. Same for every jurisdiction. */
 export function advancedGroups(
   response: ComputeTakeHomeCalculationResponse,
 ): AdvancedGroup[] {
-  return (response.trace ?? []).flatMap((form) => {
+  const groups = (response.trace ?? []).flatMap((form) => {
     // Only lines the form prints a number for are shown.
     const lines = form.lines.flatMap((line) => {
       const reference = line.reference?.trim();
@@ -71,6 +89,7 @@ export function advancedGroups(
       },
     ];
   });
+  return mergeSharedPages(groups);
 }
 
 /**
