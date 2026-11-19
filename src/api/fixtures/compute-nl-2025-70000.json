@@ -1,0 +1,3981 @@
+{
+  "salary": "70000.00",
+  "total_deductions": "18767.36",
+  "take_home": "51232.64",
+  "unit": {
+    "name": "ca/cad",
+    "placement": "before",
+    "singular": "CA$",
+    "plural": "CA$",
+    "spaced": false,
+    "as_percentage": false
+  },
+  "average_income_tax_rate": {
+    "amount": "0.1962",
+    "unit": {
+      "name": "core/percent",
+      "placement": "after",
+      "singular": "%",
+      "plural": "%",
+      "spaced": false,
+      "as_percentage": true
+    }
+  },
+  "marginal_income_tax_rate": {
+    "amount": "0.35",
+    "unit": {
+      "name": "core/percent",
+      "placement": "after",
+      "singular": "%",
+      "plural": "%",
+      "spaced": false,
+      "as_percentage": true
+    }
+  },
+  "provisional": false,
+  "trace": [
+    {
+      "form": "ca/schedule_8",
+      "name": "Schedule 8: Canada Pension Plan Contributions and Overpayment",
+      "lines": [
+        {
+          "label": "cpp_months",
+          "name": null,
+          "reference": "A",
+          "amount": "12",
+          "unit": {
+            "name": "core/months",
+            "placement": "after",
+            "singular": "month",
+            "plural": "months",
+            "spaced": true,
+            "as_percentage": false
+          },
+          "text": "No value given, so the form's default gives 12 months."
+        },
+        {
+          "label": "cpp_additional_maximum_pensionable_earnings",
+          "name": "Additional maximum pensionable earnings",
+          "reference": "D",
+          "amount": "81200.00",
+          "unit": {
+            "name": "ca/cad",
+            "placement": "before",
+            "singular": "CA$",
+            "plural": "CA$",
+            "spaced": false,
+            "as_percentage": false
+          },
+          "text": "Looking up line A (12 months) in the table gives CA$81200.00 for line D (rounded to the nearest cent)."
+        },
+        {
+          "label": "cpp_basic_exemption",
+          "name": "Maximum basic exemption",
+          "reference": "E",
+          "amount": "3500.00",
+          "unit": {
+            "name": "ca/cad",
+            "placement": "before",
+            "singular": "CA$",
+            "plural": "CA$",
+            "spaced": false,
+            "as_percentage": false
+          },
+          "text": "Looking up line A (12 months) in the table gives CA$3500.00 for line E (rounded to the nearest cent)."
+        },
+        {
+          "label": "cpp_maximum_pensionable_earnings",
+          "name": "Maximum pensionable earnings",
+          "reference": "B",
+          "amount": "71300.00",
+          "unit": {
+            "name": "ca/cad",
+            "placement": "before",
+            "singular": "CA$",
+            "plural": "CA$",
+            "spaced": false,
+            "as_percentage": false
+          },
+          "text": "Looking up line A (12 months) in the table gives CA$71300.00 for line B (rounded to the nearest cent)."
+        },
+        {
+          "label": "t4_cpp_pensionable_earnings_outside_quebec",
+          "name": "Total CPP pensionable earnings from box 26 of all of your T4 slips",
+          "reference": "1",
+          "amount": "70000.00",
+          "unit": {
+            "name": "ca/cad",
+            "placement": "before",
+            "singular": "CA$",
+            "plural": "CA$",
+            "spaced": false,
+            "as_percentage": false
+          },
+          "text": "Lesser of line 10100 (CA$70000.00) and the maximum per slip (CA$81200.00) gives CA$70000.00 (rounded to the nearest cent)."
+        },
+        {
+          "label": "cpp_part_3_line_2",
+          "name": null,
+          "reference": "2",
+          "amount": "70000.00",
+          "unit": {
+            "name": "ca/cad",
+            "placement": "before",
+            "singular": "CA$",
+            "plural": "CA$",
+            "spaced": false,
+            "as_percentage": false
+          },
+          "text": "Lesser of line D (CA$81200.00) and line 1 (CA$70000.00) gives CA$70000.00."
+        },
+        {
+          "label": "cpp_part_3_line_4",
+          "name": "Earnings subject to second additional contributions",
+          "reference": "4",
+          "amount": "0.00",
+          "unit": {
+            "name": "ca/cad",
+            "placement": "before",
+            "singular": "CA$",
+            "plural": "CA$",
+            "spaced": false,
+            "as_percentage": false
+          },
+          "text": "Line 2 (CA$70000.00) less line B (CA$71300.00), not below 0, gives CA$0.00 (rounded to the nearest cent)."
+        },
+        {
+          "label": "cpp_part_3_line_22",
+          "name": "Required second additional contributions on CPP pensionable earnings",
+          "reference": "22",
+          "amount": "0.00",
+          "unit": {
+            "name": "ca/cad",
+            "placement": "before",
+            "singular": "CA$",
+            "plural": "CA$",
+            "spaced": false,
+            "as_percentage": false
+          },
+          "text": "4% of the part of line 4 (CA$0.00) between 0.00 and 9900.00, which is 0.00, at most 396.00, gives CA$0.00 (rounded to the nearest cent)."
+        },
+        {
+          "label": "cpp_part_3_line_5",
+          "name": null,
+          "reference": "5",
+          "amount": "70000.00",
+          "unit": {
+            "name": "ca/cad",
+            "placement": "before",
+            "singular": "CA$",
+            "plural": "CA$",
+            "spaced": false,
+            "as_percentage": false
+          },
+          "text": "Line 2 (CA$70000.00) less line 4 (CA$0.00), not below 0, gives CA$70000.00 (rounded to the nearest cent)."
+        },
+        {
+          "label": "cpp_part_3_line_7_difference",
+          "name": "Earnings left after the Canada Pension Plan exemption",
+          "reference": null,
+          "amount": "66500.00",
+          "unit": {
+            "name": "ca/cad",
+            "placement": "before",
+            "singular": "CA$",
+            "plural": "CA$",
+            "spaced": false,
+            "as_percentage": false
+          },
+          "text": "Line 5 (CA$70000.00) less line E (CA$3500.00), not below 0, gives CA$66500.00 (rounded to the nearest cent)."
+        },
+        {
+          "label": "cpp_part_3_line_7",
+          "name": "Earnings subject to base and first additional contributions",
+          "reference": "7",
+          "amount": "66500.00",
+          "unit": {
+            "name": "ca/cad",
+            "placement": "before",
+            "singular": "CA$",
+            "plural": "CA$",
+            "spaced": false,
+            "as_percentage": false
+          },
+          "text": "Lesser of \"Earnings left after the Canada Pension Plan exemption\" (CA$66500.00) and the maximum (CA$67800.00) gives CA$66500.00 (rounded to the nearest cent)."
+        },
+        {
+          "label": "cpp_part_3_line_11",
+          "name": "Required base contributions on CPP pensionable earnings",
+          "reference": "11",
+          "amount": "3291.75",
+          "unit": {
+            "name": "ca/cad",
+            "placement": "before",
+            "singular": "CA$",
+            "plural": "CA$",
+            "spaced": false,
+            "as_percentage": false
+          },
+          "text": "4.95% of the part of line 7 (CA$66500.00) between 0.00 and 67800.00, which is 66500.00, at most 3356.10, gives CA$3291.75 (rounded to the nearest cent)."
+        },
+        {
+          "label": "cpp_part_3_line_12",
+          "name": "Required first additional contributions on CPP pensionable earnings",
+          "reference": "12",
+          "amount": "665.00",
+          "unit": {
+            "name": "ca/cad",
+            "placement": "before",
+            "singular": "CA$",
+            "plural": "CA$",
+            "spaced": false,
+            "as_percentage": false
+          },
+          "text": "1% of the part of line 7 (CA$66500.00) between 0.00 and 67800.00, which is 66500.00, at most 678.00, gives CA$665.00 (rounded to the nearest cent)."
+        },
+        {
+          "label": "schedule_8_cpp_base_contributions_on_return",
+          "name": "Base CPP contributions through employment income",
+          "reference": "25",
+          "amount": "3291.75",
+          "unit": {
+            "name": "ca/cad",
+            "placement": "before",
+            "singular": "CA$",
+            "plural": "CA$",
+            "spaced": false,
+            "as_percentage": false
+          },
+          "text": "Line 11 (CA$3291.75) gives CA$3291.75 (rounded to the nearest cent)."
+        },
+        {
+          "label": "schedule_8_cpp_enhanced_contributions_on_return",
+          "name": "Deduction for CPP enhanced contributions on employment income",
+          "reference": "28",
+          "amount": "665.00",
+          "unit": {
+            "name": "ca/cad",
+            "placement": "before",
+            "singular": "CA$",
+            "plural": "CA$",
+            "spaced": false,
+            "as_percentage": false
+          },
+          "text": "Line 12 (CA$665.00) plus line 22 (CA$0.00) gives CA$665.00 (rounded to the nearest cent)."
+        }
+      ]
+    },
+    {
+      "form": "ca/t1_taxable_income",
+      "name": "T1 Income Tax and Benefit Return, Steps 2 to 4: Total income, net income and taxable income",
+      "lines": [
+        {
+          "label": "deductions_from_net_income",
+          "name": null,
+          "reference": "25700",
+          "amount": "0",
+          "unit": {
+            "name": "ca/cad",
+            "placement": "before",
+            "singular": "CA$",
+            "plural": "CA$",
+            "spaced": false,
+            "as_percentage": false
+          },
+          "text": "No value given, so the form's default gives CA$0.00."
+        },
+        {
+          "label": "other_employment_income",
+          "name": "Other employment income",
+          "reference": "10400",
+          "amount": "0",
+          "unit": {
+            "name": "ca/cad",
+            "placement": "before",
+            "singular": "CA$",
+            "plural": "CA$",
+            "spaced": false,
+            "as_percentage": false
+          },
+          "text": "No value given, so the form's default gives CA$0.00."
+        },
+        {
+          "label": "social_benefits_repayment",
+          "name": "Social benefits repayment",
+          "reference": "23500",
+          "amount": "0",
+          "unit": {
+            "name": "ca/cad",
+            "placement": "before",
+            "singular": "CA$",
+            "plural": "CA$",
+            "spaced": false,
+            "as_percentage": false
+          },
+          "text": "No value given, so the form's default gives CA$0.00."
+        },
+        {
+          "label": "deductions_from_total_income",
+          "name": null,
+          "reference": "23300",
+          "amount": "665.00",
+          "unit": {
+            "name": "ca/cad",
+            "placement": "before",
+            "singular": "CA$",
+            "plural": "CA$",
+            "spaced": false,
+            "as_percentage": false
+          },
+          "text": "Line 28 of Schedule 8 (CA$665.00) gives CA$665.00."
+        },
+        {
+          "label": "total_income",
+          "name": "Total income",
+          "reference": "15000",
+          "amount": "70000.00",
+          "unit": {
+            "name": "ca/cad",
+            "placement": "before",
+            "singular": "CA$",
+            "plural": "CA$",
+            "spaced": false,
+            "as_percentage": false
+          },
+          "text": "Line 10100 (CA$70000.00) plus line 10400 (CA$0.00) gives CA$70000.00 (rounded to the nearest cent)."
+        },
+        {
+          "label": "net_income_before_adjustments",
+          "name": "Net income before adjustments",
+          "reference": "23400",
+          "amount": "69335.00",
+          "unit": {
+            "name": "ca/cad",
+            "placement": "before",
+            "singular": "CA$",
+            "plural": "CA$",
+            "spaced": false,
+            "as_percentage": false
+          },
+          "text": "Line 15000 (CA$70000.00) less line 23300 (CA$665.00) gives CA$69335.00 (rounded to the nearest cent)."
+        },
+        {
+          "label": "net_income_signed",
+          "name": "Net income, which can be below zero",
+          "reference": null,
+          "amount": "69335.00",
+          "unit": {
+            "name": "ca/cad",
+            "placement": "before",
+            "singular": "CA$",
+            "plural": "CA$",
+            "spaced": false,
+            "as_percentage": false
+          },
+          "text": "Line 23400 (CA$69335.00) less line 23500 (CA$0.00) gives CA$69335.00 (rounded to the nearest cent)."
+        },
+        {
+          "label": "net_income",
+          "name": "Net income",
+          "reference": "23600",
+          "amount": "69335.00",
+          "unit": {
+            "name": "ca/cad",
+            "placement": "before",
+            "singular": "CA$",
+            "plural": "CA$",
+            "spaced": false,
+            "as_percentage": false
+          },
+          "text": "Line 23400 (CA$69335.00) less line 23500 (CA$0.00), not below 0, gives CA$69335.00 (rounded to the nearest cent)."
+        },
+        {
+          "label": "taxable_income",
+          "name": "Taxable income",
+          "reference": "26000",
+          "amount": "69335.00",
+          "unit": {
+            "name": "ca/cad",
+            "placement": "before",
+            "singular": "CA$",
+            "plural": "CA$",
+            "spaced": false,
+            "as_percentage": false
+          },
+          "text": "Line 23600 (CA$69335.00) less line 25700 (CA$0.00), not below 0, gives CA$69335.00 (rounded to the nearest cent)."
+        }
+      ]
+    },
+    {
+      "form": "ca-nl/nl428_worksheet",
+      "name": "Worksheet NL428",
+      "lines": [
+        {
+          "label": "worksheet_nl428_age_amount_income_threshold_line_3",
+          "name": null,
+          "reference": "3",
+          "amount": "38712.00",
+          "unit": {
+            "name": "ca/cad",
+            "placement": "before",
+            "singular": "CA$",
+            "plural": "CA$",
+            "spaced": false,
+            "as_percentage": false
+          },
+          "text": "Credit amount of 38712.00 (rounded to the nearest cent)."
+        },
+        {
+          "label": "worksheet_nl428_age_amount_maximum_line_1",
+          "name": null,
+          "reference": "1",
+          "amount": "7064.00",
+          "unit": {
+            "name": "ca/cad",
+            "placement": "before",
+            "singular": "CA$",
+            "plural": "CA$",
+            "spaced": false,
+            "as_percentage": false
+          },
+          "text": "Credit amount of 7064.00 (rounded to the nearest cent)."
+        },
+        {
+          "label": "worksheet_nl428_disability_self_base_amount_line_1",
+          "name": null,
+          "reference": "1",
+          "amount": "7467.00",
+          "unit": {
+            "name": "ca/cad",
+            "placement": "before",
+            "singular": "CA$",
+            "plural": "CA$",
+            "spaced": false,
+            "as_percentage": false
+          },
+          "text": "Credit amount of 7467.00 (rounded to the nearest cent)."
+        },
+        {
+          "label": "worksheet_nl428_disability_self_care_threshold_line_4",
+          "name": null,
+          "reference": "4",
+          "amount": "2987.00",
+          "unit": {
+            "name": "ca/cad",
+            "placement": "before",
+            "singular": "CA$",
+            "plural": "CA$",
+            "spaced": false,
+            "as_percentage": false
+          },
+          "text": "Credit amount of 2987.00 (rounded to the nearest cent)."
+        },
+        {
+          "label": "worksheet_nl428_disability_self_supplement_maximum_line_2",
+          "name": null,
+          "reference": "2",
+          "amount": "3514.00",
+          "unit": {
+            "name": "ca/cad",
+            "placement": "before",
+            "singular": "CA$",
+            "plural": "CA$",
+            "spaced": false,
+            "as_percentage": false
+          },
+          "text": "Credit amount of 3514.00 (rounded to the nearest cent)."
+        },
+        {
+          "label": "worksheet_nl428_age_amount_net_income_line_2",
+          "name": null,
+          "reference": "2",
+          "amount": "69335.00",
+          "unit": {
+            "name": "ca/cad",
+            "placement": "before",
+            "singular": "CA$",
+            "plural": "CA$",
+            "spaced": false,
+            "as_percentage": false
+          },
+          "text": "Line 23600 of T1 Income Tax and Benefit Return, Steps 2 to 4 (CA$69335.00) gives CA$69335.00."
+        },
+        {
+          "label": "worksheet_nl428_age_amount_line_4",
+          "name": null,
+          "reference": "4",
+          "amount": "30623.00",
+          "unit": {
+            "name": "ca/cad",
+            "placement": "before",
+            "singular": "CA$",
+            "plural": "CA$",
+            "spaced": false,
+            "as_percentage": false
+          },
+          "text": "Line 2 (CA$69335.00) less line 3 (CA$38712.00), not below 0, gives CA$30623.00 (rounded to the nearest cent)."
+        },
+        {
+          "label": "worksheet_nl428_age_amount_line_6",
+          "name": null,
+          "reference": "6",
+          "amount": "4593.45",
+          "unit": {
+            "name": "ca/cad",
+            "placement": "before",
+            "singular": "CA$",
+            "plural": "CA$",
+            "spaced": false,
+            "as_percentage": false
+          },
+          "text": "15% of line 4 (CA$30623.00) gives CA$4593.45 (rounded to the nearest cent)."
+        },
+        {
+          "label": "worksheet_nl428_age_amount_line_7",
+          "name": null,
+          "reference": "7",
+          "amount": "2470.55",
+          "unit": {
+            "name": "ca/cad",
+            "placement": "before",
+            "singular": "CA$",
+            "plural": "CA$",
+            "spaced": false,
+            "as_percentage": false
+          },
+          "text": "Line 1 (CA$7064.00) less line 6 (CA$4593.45), not below 0, gives CA$2470.55 (rounded to the nearest cent)."
+        },
+        {
+          "label": "disability_self_care_expenses",
+          "name": "Total child care and attendant care expenses for you, claimed by you or another person",
+          "reference": "3",
+          "amount": "0",
+          "unit": {
+            "name": "ca/cad",
+            "placement": "before",
+            "singular": "CA$",
+            "plural": "CA$",
+            "spaced": false,
+            "as_percentage": false
+          },
+          "text": "Left blank, taken as CA$0.00."
+        },
+        {
+          "label": "worksheet_nl428_disability_self_care_over_threshold_line_5",
+          "name": null,
+          "reference": "5",
+          "amount": "0.00",
+          "unit": {
+            "name": "ca/cad",
+            "placement": "before",
+            "singular": "CA$",
+            "plural": "CA$",
+            "spaced": false,
+            "as_percentage": false
+          },
+          "text": "\"Total child care and attendant care expenses for you, claimed by you or another person\" (CA$0.00) less line 4 (CA$2987.00), not below 0, gives CA$0.00 (rounded to the nearest cent)."
+        },
+        {
+          "label": "worksheet_nl428_disability_self_supplement_line_6",
+          "name": null,
+          "reference": "6",
+          "amount": "3514.00",
+          "unit": {
+            "name": "ca/cad",
+            "placement": "before",
+            "singular": "CA$",
+            "plural": "CA$",
+            "spaced": false,
+            "as_percentage": false
+          },
+          "text": "Line 2 (CA$3514.00) less line 5 (CA$0.00), not below 0, gives CA$3514.00 (rounded to the nearest cent)."
+        },
+        {
+          "label": "worksheet_nl428_disability_self_line_7",
+          "name": null,
+          "reference": "7",
+          "amount": "10981.00",
+          "unit": {
+            "name": "ca/cad",
+            "placement": "before",
+            "singular": "CA$",
+            "plural": "CA$",
+            "spaced": false,
+            "as_percentage": false
+          },
+          "text": "Line 1 (CA$7467.00) plus line 6 (CA$3514.00) gives CA$10981.00 (rounded to the nearest cent)."
+        }
+      ]
+    },
+    {
+      "form": "ca/schedule_6",
+      "name": "Schedule 6: Canada Workers Benefit",
+      "lines": [
+        {
+          "label": "other_employment_income",
+          "name": "Other employment income",
+          "reference": "10400",
+          "amount": "0",
+          "unit": {
+            "name": "ca/cad",
+            "placement": "before",
+            "singular": "CA$",
+            "plural": "CA$",
+            "spaced": false,
+            "as_percentage": false
+          },
+          "text": "No value given, so the form's default gives CA$0.00."
+        },
+        {
+          "label": "cwb_base_amount",
+          "name": "Base amount",
+          "reference": "17",
+          "amount": "3000.00",
+          "unit": {
+            "name": "ca/cad",
+            "placement": "before",
+            "singular": "CA$",
+            "plural": "CA$",
+            "spaced": false,
+            "as_percentage": false
+          },
+          "text": "Credit amount of 3000.00 (rounded to the nearest cent)."
+        },
+        {
+          "label": "cwb_maximum",
+          "name": "Maximum benefit",
+          "reference": "21",
+          "amount": "1633.00",
+          "unit": {
+            "name": "ca/cad",
+            "placement": "before",
+            "singular": "CA$",
+            "plural": "CA$",
+            "spaced": false,
+            "as_percentage": false
+          },
+          "text": "Credit amount of 1633.00 (rounded to the nearest cent)."
+        },
+        {
+          "label": "cwb_reduction_threshold",
+          "name": "Base amount",
+          "reference": "24",
+          "amount": "26855.00",
+          "unit": {
+            "name": "ca/cad",
+            "placement": "before",
+            "singular": "CA$",
+            "plural": "CA$",
+            "spaced": false,
+            "as_percentage": false
+          },
+          "text": "Credit amount of 26855.00 (rounded to the nearest cent)."
+        },
+        {
+          "label": "cwb_net_income_line_7",
+          "name": "Net income from line 23600 of the return",
+          "reference": "7",
+          "amount": "69335.00",
+          "unit": {
+            "name": "ca/cad",
+            "placement": "before",
+            "singular": "CA$",
+            "plural": "CA$",
+            "spaced": false,
+            "as_percentage": false
+          },
+          "text": "\"Net income, which can be below zero\" of T1 Income Tax and Benefit Return, Steps 2 to 4 (CA$69335.00) gives CA$69335.00."
+        },
+        {
+          "label": "cwb_employment_income",
+          "name": "Employment income and other employment income from line 10100 and line 10400 of the return",
+          "reference": "1",
+          "amount": "70000.00",
+          "unit": {
+            "name": "ca/cad",
+            "placement": "before",
+            "singular": "CA$",
+            "plural": "CA$",
+            "spaced": false,
+            "as_percentage": false
+          },
+          "text": "Line 10100 (CA$70000.00) plus line 10400 (CA$0.00) gives CA$70000.00 (rounded to the nearest cent)."
+        },
+        {
+          "label": "cwb_net_income_total_line_10",
+          "name": null,
+          "reference": "10",
+          "amount": "69335.00",
+          "unit": {
+            "name": "ca/cad",
+            "placement": "before",
+            "singular": "CA$",
+            "plural": "CA$",
+            "spaced": false,
+            "as_percentage": false
+          },
+          "text": "Line 7 (CA$69335.00) gives CA$69335.00 (rounded to the nearest cent)."
+        },
+        {
+          "label": "uccb_and_rdsp_income",
+          "name": "Total of UCCB (line 11700 of the return) and RDSP income (line 12500 of the return)",
+          "reference": "11",
+          "amount": "0",
+          "unit": {
+            "name": "ca/cad",
+            "placement": "before",
+            "singular": "CA$",
+            "plural": "CA$",
+            "spaced": false,
+            "as_percentage": false
+          },
+          "text": "Left blank, taken as CA$0.00."
+        },
+        {
+          "label": "cwb_net_income_less_uccb_rdsp_line_12",
+          "name": null,
+          "reference": "12",
+          "amount": "69335.00",
+          "unit": {
+            "name": "ca/cad",
+            "placement": "before",
+            "singular": "CA$",
+            "plural": "CA$",
+            "spaced": false,
+            "as_percentage": false
+          },
+          "text": "Line 10 (CA$69335.00) less line 11 (CA$0.00), not below 0, gives CA$69335.00 (rounded to the nearest cent)."
+        },
+        {
+          "label": "cwb_family_net_income_line_13",
+          "name": null,
+          "reference": "13",
+          "amount": "69335.00",
+          "unit": {
+            "name": "ca/cad",
+            "placement": "before",
+            "singular": "CA$",
+            "plural": "CA$",
+            "spaced": false,
+            "as_percentage": false
+          },
+          "text": "Line 12 (CA$69335.00) gives CA$69335.00 (rounded to the nearest cent)."
+        },
+        {
+          "label": "cwb_secondary_earner_exemption",
+          "name": "Secondary earner exemption",
+          "reference": "14",
+          "amount": "0",
+          "unit": {
+            "name": "ca/cad",
+            "placement": "before",
+            "singular": "CA$",
+            "plural": "CA$",
+            "spaced": false,
+            "as_percentage": false
+          },
+          "text": "Left blank, taken as CA$0.00."
+        },
+        {
+          "label": "adjusted_family_net_income",
+          "name": "Adjusted family net income",
+          "reference": "15",
+          "amount": "69335.00",
+          "unit": {
+            "name": "ca/cad",
+            "placement": "before",
+            "singular": "CA$",
+            "plural": "CA$",
+            "spaced": false,
+            "as_percentage": false
+          },
+          "text": "Line 13 (CA$69335.00) less line 14 (CA$0.00) gives CA$69335.00 (rounded to the nearest cent)."
+        },
+        {
+          "label": "cwb_net_income_over_base_amount",
+          "name": null,
+          "reference": "25",
+          "amount": "42480.00",
+          "unit": {
+            "name": "ca/cad",
+            "placement": "before",
+            "singular": "CA$",
+            "plural": "CA$",
+            "spaced": false,
+            "as_percentage": false
+          },
+          "text": "Line 15 (CA$69335.00) less line 24 (CA$26855.00), not below 0, gives CA$42480.00 (rounded to the nearest cent)."
+        },
+        {
+          "label": "cwb_reduction_line_27",
+          "name": null,
+          "reference": "27",
+          "amount": "6372.00",
+          "unit": {
+            "name": "ca/cad",
+            "placement": "before",
+            "singular": "CA$",
+            "plural": "CA$",
+            "spaced": false,
+            "as_percentage": false
+          },
+          "text": "15% of line 25 (CA$42480.00) gives CA$6372.00 (rounded to the nearest cent)."
+        },
+        {
+          "label": "working_income",
+          "name": "Working income",
+          "reference": "5",
+          "amount": "70000.00",
+          "unit": {
+            "name": "ca/cad",
+            "placement": "before",
+            "singular": "CA$",
+            "plural": "CA$",
+            "spaced": false,
+            "as_percentage": false
+          },
+          "text": "Line 1 (CA$70000.00) gives CA$70000.00 (rounded to the nearest cent)."
+        },
+        {
+          "label": "cwb_family_working_income",
+          "name": "Family working income",
+          "reference": "6",
+          "amount": "70000.00",
+          "unit": {
+            "name": "ca/cad",
+            "placement": "before",
+            "singular": "CA$",
+            "plural": "CA$",
+            "spaced": false,
+            "as_percentage": false
+          },
+          "text": "Line 5 (CA$70000.00) gives CA$70000.00 (rounded to the nearest cent)."
+        },
+        {
+          "label": "cwb_working_income_over_base_amount",
+          "name": null,
+          "reference": "18",
+          "amount": "67000.00",
+          "unit": {
+            "name": "ca/cad",
+            "placement": "before",
+            "singular": "CA$",
+            "plural": "CA$",
+            "spaced": false,
+            "as_percentage": false
+          },
+          "text": "Line 6 (CA$70000.00) less line 17 (CA$3000.00), not below 0, gives CA$67000.00 (rounded to the nearest cent)."
+        },
+        {
+          "label": "cwb_working_income_rate_line_20",
+          "name": null,
+          "reference": "20",
+          "amount": "18090.00",
+          "unit": {
+            "name": "ca/cad",
+            "placement": "before",
+            "singular": "CA$",
+            "plural": "CA$",
+            "spaced": false,
+            "as_percentage": false
+          },
+          "text": "27% of line 18 (CA$67000.00) gives CA$18090.00 (rounded to the nearest cent)."
+        },
+        {
+          "label": "cwb_basic_benefit_line_22",
+          "name": null,
+          "reference": "22",
+          "amount": "1633.00",
+          "unit": {
+            "name": "ca/cad",
+            "placement": "before",
+            "singular": "CA$",
+            "plural": "CA$",
+            "spaced": false,
+            "as_percentage": false
+          },
+          "text": "Lesser of line 20 (CA$18090.00) and line 21 (CA$1633.00) gives CA$1633.00."
+        },
+        {
+          "label": "cwb_benefit_line_28",
+          "name": null,
+          "reference": "28",
+          "amount": "0.00",
+          "unit": {
+            "name": "ca/cad",
+            "placement": "before",
+            "singular": "CA$",
+            "plural": "CA$",
+            "spaced": false,
+            "as_percentage": false
+          },
+          "text": "Line 22 (CA$1633.00) less line 27 (CA$6372.00), not below 0, gives CA$0.00 (rounded to the nearest cent)."
+        }
+      ]
+    },
+    {
+      "form": "ca/t2204",
+      "name": "Form T2204: Employee Overpayment of Employment Insurance Premiums",
+      "lines": [
+        {
+          "label": "t2204_exemption",
+          "name": "Set amount taken off earnings",
+          "reference": null,
+          "amount": "2000.00",
+          "unit": {
+            "name": "ca/cad",
+            "placement": "before",
+            "singular": "CA$",
+            "plural": "CA$",
+            "spaced": false,
+            "as_percentage": false
+          },
+          "text": "Credit amount of 2000.00 (rounded to the nearest cent)."
+        },
+        {
+          "label": "t2204_self_employment_earnings",
+          "name": "Total self-employment and other earnings eligible for the EI program for access to EI special benefits",
+          "reference": "2",
+          "amount": "0",
+          "unit": {
+            "name": "ca/cad",
+            "placement": "before",
+            "singular": "CA$",
+            "plural": "CA$",
+            "spaced": false,
+            "as_percentage": false
+          },
+          "text": "Left blank, taken as CA$0.00."
+        },
+        {
+          "label": "t2204_line_1_count",
+          "name": "Multiplier that is 1 unless the low-pay rule applies",
+          "reference": null,
+          "amount": "0",
+          "unit": null,
+          "text": "Condition 1 \"you have no self-employment earnings and your total EI insurable earnings on your T4 slips are less than $2,000\" (read line 2 (CA$0.00), \"Set amount taken off earnings\" (CA$2000.00), line 10100 (CA$70000.00)) does not apply."
+        },
+        {
+          "label": "t2204_line_1_count",
+          "name": "Multiplier that is 1 unless the low-pay rule applies",
+          "reference": null,
+          "amount": "1",
+          "unit": null,
+          "text": "No condition applies, so the count is 1."
+        },
+        {
+          "label": "t2204_line_1",
+          "name": "Total EI insurable earnings",
+          "reference": "1",
+          "amount": "70000.00",
+          "unit": {
+            "name": "ca/cad",
+            "placement": "before",
+            "singular": "CA$",
+            "plural": "CA$",
+            "spaced": false,
+            "as_percentage": false
+          },
+          "text": "Line 10100 (CA$70000.00) for each of \"Multiplier that is 1 unless the low-pay rule applies\" (1) gives CA$70000.00 (rounded to the nearest cent)."
+        },
+        {
+          "label": "t2204_line_10",
+          "name": "Required premiums",
+          "reference": "10",
+          "amount": "1077.48",
+          "unit": {
+            "name": "ca/cad",
+            "placement": "before",
+            "singular": "CA$",
+            "plural": "CA$",
+            "spaced": false,
+            "as_percentage": false
+          },
+          "text": "1.64% of the part of line 1 (CA$70000.00) between 0.00 and 65700.00, which is 65700.00, at most 1077.48, gives CA$1077.48 (rounded to the nearest cent)."
+        },
+        {
+          "label": "t2204_premiums_deducted",
+          "name": "Total premiums deducted",
+          "reference": "4",
+          "amount": "1077.48",
+          "unit": {
+            "name": "ca/cad",
+            "placement": "before",
+            "singular": "CA$",
+            "plural": "CA$",
+            "spaced": false,
+            "as_percentage": false
+          },
+          "text": "1.64% of the part of line 1 (CA$70000.00) between 0.00 and 65700.00, which is 65700.00, at most 1077.48, gives CA$1077.48 (rounded to the nearest cent)."
+        },
+        {
+          "label": "t2204_line_13",
+          "name": null,
+          "reference": "13",
+          "amount": "0.00",
+          "unit": {
+            "name": "ca/cad",
+            "placement": "before",
+            "singular": "CA$",
+            "plural": "CA$",
+            "spaced": false,
+            "as_percentage": false
+          },
+          "text": "\"Total premiums deducted\" (CA$1077.48) less line 10 (CA$1077.48), not below 0, gives CA$0.00 (rounded to the nearest cent)."
+        },
+        {
+          "label": "t2204_self_employment_earnings",
+          "name": "Total self-employment and other earnings eligible for the EI program for access to EI special benefits",
+          "reference": "2",
+          "amount": "0",
+          "unit": {
+            "name": "ca/cad",
+            "placement": "before",
+            "singular": "CA$",
+            "plural": "CA$",
+            "spaced": false,
+            "as_percentage": false
+          },
+          "text": "Left blank, taken as CA$0.00."
+        },
+        {
+          "label": "t2204_line_1_plus_2",
+          "name": "Insured pay plus self-employment and other earnings eligible for EI, before the limit",
+          "reference": null,
+          "amount": "70000.00",
+          "unit": {
+            "name": "ca/cad",
+            "placement": "before",
+            "singular": "CA$",
+            "plural": "CA$",
+            "spaced": false,
+            "as_percentage": false
+          },
+          "text": "Line 1 (CA$70000.00) plus line 2 (CA$0.00) gives CA$70000.00 (rounded to the nearest cent)."
+        },
+        {
+          "label": "t2204_line_3",
+          "name": null,
+          "reference": "3",
+          "amount": "65700.00",
+          "unit": {
+            "name": "ca/cad",
+            "placement": "before",
+            "singular": "CA$",
+            "plural": "CA$",
+            "spaced": false,
+            "as_percentage": false
+          },
+          "text": "Lesser of \"Insured pay plus self-employment and other earnings eligible for EI, before the limit\" (CA$70000.00) and the maximum (CA$65700.00) gives CA$65700.00 (rounded to the nearest cent)."
+        },
+        {
+          "label": "t2204_line_7",
+          "name": null,
+          "reference": "7",
+          "amount": "63700.00",
+          "unit": {
+            "name": "ca/cad",
+            "placement": "before",
+            "singular": "CA$",
+            "plural": "CA$",
+            "spaced": false,
+            "as_percentage": false
+          },
+          "text": "Line 3 (CA$65700.00) less \"Set amount taken off earnings\" (CA$2000.00), not below 0, gives CA$63700.00 (rounded to the nearest cent)."
+        },
+        {
+          "label": "t2204_line_16",
+          "name": "Non-refundable tax credit for employment insurance premiums through employment",
+          "reference": "16",
+          "amount": "1077.48",
+          "unit": {
+            "name": "ca/cad",
+            "placement": "before",
+            "singular": "CA$",
+            "plural": "CA$",
+            "spaced": false,
+            "as_percentage": false
+          },
+          "text": "Least of line 7 (CA$63700.00), \"Total premiums deducted\" (CA$1077.48) and line 10 (CA$1077.48) gives CA$1077.48."
+        },
+        {
+          "label": "t2204_line_5",
+          "name": "Total premiums payable (if applicable)",
+          "reference": "5",
+          "amount": "0",
+          "unit": {
+            "name": "ca/cad",
+            "placement": "before",
+            "singular": "CA$",
+            "plural": "CA$",
+            "spaced": false,
+            "as_percentage": false
+          },
+          "text": "Left blank, taken as CA$0.00."
+        },
+        {
+          "label": "t2204_line_6",
+          "name": null,
+          "reference": "6",
+          "amount": "1077.48",
+          "unit": {
+            "name": "ca/cad",
+            "placement": "before",
+            "singular": "CA$",
+            "plural": "CA$",
+            "spaced": false,
+            "as_percentage": false
+          },
+          "text": "\"Total premiums deducted\" (CA$1077.48) plus line 5 (CA$0.00) gives CA$1077.48 (rounded to the nearest cent)."
+        },
+        {
+          "label": "t2204_line_8",
+          "name": null,
+          "reference": "8",
+          "amount": "0.00",
+          "unit": {
+            "name": "ca/cad",
+            "placement": "before",
+            "singular": "CA$",
+            "plural": "CA$",
+            "spaced": false,
+            "as_percentage": false
+          },
+          "text": "Line 6 (CA$1077.48) less line 7 (CA$63700.00), not below 0, gives CA$0.00 (rounded to the nearest cent)."
+        },
+        {
+          "label": "t2204_line_14",
+          "name": null,
+          "reference": "14",
+          "amount": "0.00",
+          "unit": {
+            "name": "ca/cad",
+            "placement": "before",
+            "singular": "CA$",
+            "plural": "CA$",
+            "spaced": false,
+            "as_percentage": false
+          },
+          "text": "Greater of line 8 (CA$0.00) and line 13 (CA$0.00) gives CA$0.00."
+        },
+        {
+          "label": "t2204_line_15",
+          "name": "Employment insurance overpayment",
+          "reference": "15",
+          "amount": "0.00",
+          "unit": {
+            "name": "ca/cad",
+            "placement": "before",
+            "singular": "CA$",
+            "plural": "CA$",
+            "spaced": false,
+            "as_percentage": false
+          },
+          "text": "Lesser of \"Total premiums deducted\" (CA$1077.48) and line 14 (CA$0.00) gives CA$0.00."
+        },
+        {
+          "label": "t2204_line_15_count",
+          "name": null,
+          "reference": null,
+          "amount": "0",
+          "unit": null,
+          "text": "Condition 1 \"this amount is more than $1\" (read line 15 (CA$0.00)) does not apply."
+        },
+        {
+          "label": "t2204_line_15_count",
+          "name": null,
+          "reference": null,
+          "amount": "0",
+          "unit": null,
+          "text": "No condition applies, so the count is 0."
+        },
+        {
+          "label": "ei_overpayment",
+          "name": "EI overpayment",
+          "reference": null,
+          "amount": "0.00",
+          "unit": {
+            "name": "ca/cad",
+            "placement": "before",
+            "singular": "CA$",
+            "plural": "CA$",
+            "spaced": false,
+            "as_percentage": false
+          },
+          "text": "Line 15 (CA$0.00) for each of t2204 line 15 count (0) gives CA$0.00 (rounded to the nearest cent)."
+        }
+      ]
+    },
+    {
+      "form": "ca-nl/nl428_credits",
+      "name": "Form NL428: Newfoundland and Labrador Tax",
+      "lines": [
+        {
+          "label": "nl428_disability_amount_self_claimed_line_40",
+          "name": null,
+          "reference": "40",
+          "amount": "0",
+          "unit": null,
+          "text": "Left blank, taken as 0."
+        },
+        {
+          "label": "nl428_disability_amount_self_claimed_checked_line_40",
+          "name": "Disability amount for self claimed",
+          "reference": null,
+          "amount": "0",
+          "unit": null,
+          "text": "Line 40 (0), a yes or no answer of 0 or 1."
+        },
+        {
+          "label": "born_in_1960_or_earlier",
+          "name": "Age amount (if you were born in 1960 or earlier)",
+          "reference": "58080",
+          "amount": "0",
+          "unit": null,
+          "text": "Left blank, taken as 0."
+        },
+        {
+          "label": "born_in_1960_or_earlier_checked",
+          "name": "Born in 1960 or earlier",
+          "reference": null,
+          "amount": "0",
+          "unit": null,
+          "text": "Line 58080 (0), a yes or no answer of 0 or 1."
+        },
+        {
+          "label": "under_18_on_december_31",
+          "name": "Disability amount for self (if you were under 18 years of age on December 31, 2025)",
+          "reference": "58440",
+          "amount": "0",
+          "unit": null,
+          "text": "Left blank, taken as 0."
+        },
+        {
+          "label": "under_18_on_december_31_checked",
+          "name": null,
+          "reference": null,
+          "amount": "0",
+          "unit": null,
+          "text": "Line 58440 (0), a yes or no answer of 0 or 1."
+        },
+        {
+          "label": "basic_personal_amount",
+          "name": "Basic personal amount",
+          "reference": "16",
+          "amount": "11067.00",
+          "unit": {
+            "name": "ca/cad",
+            "placement": "before",
+            "singular": "CA$",
+            "plural": "CA$",
+            "spaced": false,
+            "as_percentage": false
+          },
+          "text": "Credit amount of 11067.00 (rounded to the nearest cent)."
+        },
+        {
+          "label": "disability_amount_self",
+          "name": null,
+          "reference": null,
+          "amount": "7467.00",
+          "unit": null,
+          "text": "Credit amount of 7467.00 (rounded to the nearest cent)."
+        },
+        {
+          "label": "eligible_dependant_amount_base",
+          "name": null,
+          "reference": null,
+          "amount": "9948.00",
+          "unit": null,
+          "text": "Credit amount of 9948.00 (rounded to the nearest cent)."
+        },
+        {
+          "label": "eligible_dependant_amount_maximum",
+          "name": null,
+          "reference": null,
+          "amount": "9043.00",
+          "unit": null,
+          "text": "Credit amount of 9043.00 (rounded to the nearest cent)."
+        },
+        {
+          "label": "nl428_pension_income_amount_maximum",
+          "name": null,
+          "reference": null,
+          "amount": "1000.00",
+          "unit": {
+            "name": "ca/cad",
+            "placement": "before",
+            "singular": "CA$",
+            "plural": "CA$",
+            "spaced": false,
+            "as_percentage": false
+          },
+          "text": "Credit amount of 1000.00 (rounded to the nearest cent)."
+        },
+        {
+          "label": "nl428_pension_income_amount_line_37",
+          "name": "Pension income amount",
+          "reference": "37",
+          "amount": "0",
+          "unit": {
+            "name": "ca/cad",
+            "placement": "before",
+            "singular": "CA$",
+            "plural": "CA$",
+            "spaced": false,
+            "as_percentage": false
+          },
+          "text": "Blank because \"Pension income amount\" was blank."
+        },
+        {
+          "label": "spouse_amount_base",
+          "name": null,
+          "reference": null,
+          "amount": "9948.00",
+          "unit": null,
+          "text": "Credit amount of 9948.00 (rounded to the nearest cent)."
+        },
+        {
+          "label": "spouse_amount_maximum",
+          "name": null,
+          "reference": null,
+          "amount": "9043.00",
+          "unit": null,
+          "text": "Credit amount of 9043.00 (rounded to the nearest cent)."
+        },
+        {
+          "label": "nl428_age_amount_worksheet_line_17",
+          "name": "Age amount from Worksheet NL428",
+          "reference": null,
+          "amount": "2470.55",
+          "unit": {
+            "name": "ca/cad",
+            "placement": "before",
+            "singular": "CA$",
+            "plural": "CA$",
+            "spaced": false,
+            "as_percentage": false
+          },
+          "text": "Line 7 of Worksheet NL428 (CA$2470.55) gives CA$2470.55."
+        },
+        {
+          "label": "nl428_cpp_contributions_line_27",
+          "name": "CPP or QPP contributions",
+          "reference": "27",
+          "amount": "3291.75",
+          "unit": {
+            "name": "ca/cad",
+            "placement": "before",
+            "singular": "CA$",
+            "plural": "CA$",
+            "spaced": false,
+            "as_percentage": false
+          },
+          "text": "Line 25 of Schedule 8 (CA$3291.75) gives CA$3291.75."
+        },
+        {
+          "label": "nl428_disability_amount_self_worksheet_line_40",
+          "name": null,
+          "reference": null,
+          "amount": "10981.00",
+          "unit": {
+            "name": "ca/cad",
+            "placement": "before",
+            "singular": "CA$",
+            "plural": "CA$",
+            "spaced": false,
+            "as_percentage": false
+          },
+          "text": "Line 7 of Worksheet NL428 (CA$10981.00) gives CA$10981.00."
+        },
+        {
+          "label": "nl428_disability_amount_self_basis_line_40",
+          "name": "Disability amount for self if you claim it",
+          "reference": null,
+          "amount": "7467.00",
+          "unit": {
+            "name": "ca/cad",
+            "placement": "before",
+            "singular": "CA$",
+            "plural": "CA$",
+            "spaced": false,
+            "as_percentage": false
+          },
+          "text": "Disability amount self (7467.00), chosen because under 18 on december 31 checked (0) is 0."
+        },
+        {
+          "label": "nl428_ei_premiums_line_29",
+          "name": "Employment insurance premiums",
+          "reference": "29",
+          "amount": "1077.48",
+          "unit": {
+            "name": "ca/cad",
+            "placement": "before",
+            "singular": "CA$",
+            "plural": "CA$",
+            "spaced": false,
+            "as_percentage": false
+          },
+          "text": "Line 16 of T2204 (CA$1077.48) gives CA$1077.48."
+        },
+        {
+          "label": "nl428_net_income_line_49",
+          "name": null,
+          "reference": "49",
+          "amount": "69335.00",
+          "unit": {
+            "name": "ca/cad",
+            "placement": "before",
+            "singular": "CA$",
+            "plural": "CA$",
+            "spaced": false,
+            "as_percentage": false
+          },
+          "text": "Line 23600 of T1 Income Tax and Benefit Return, Steps 2 to 4 (CA$69335.00) gives CA$69335.00."
+        },
+        {
+          "label": "nl428_medical_expenses_rate_amount_line_51",
+          "name": null,
+          "reference": "51",
+          "amount": "2080.05",
+          "unit": {
+            "name": "ca/cad",
+            "placement": "before",
+            "singular": "CA$",
+            "plural": "CA$",
+            "spaced": false,
+            "as_percentage": false
+          },
+          "text": "3% of line 49 (CA$69335.00) gives CA$2080.05 (rounded to the nearest cent)."
+        },
+        {
+          "label": "nl428_medical_expenses_limited_amount_line_52",
+          "name": null,
+          "reference": "52",
+          "amount": "2080.05",
+          "unit": {
+            "name": "ca/cad",
+            "placement": "before",
+            "singular": "CA$",
+            "plural": "CA$",
+            "spaced": false,
+            "as_percentage": false
+          },
+          "text": "Lesser of line 51 (CA$2080.05) and the medical expense dollar limit (CA$2410.00) gives CA$2080.05 (rounded to the nearest cent)."
+        },
+        {
+          "label": "nl428_taxable_income_line_1",
+          "name": null,
+          "reference": "1",
+          "amount": "69335.00",
+          "unit": {
+            "name": "ca/cad",
+            "placement": "before",
+            "singular": "CA$",
+            "plural": "CA$",
+            "spaced": false,
+            "as_percentage": false
+          },
+          "text": "Line 26000 of T1 Income Tax and Benefit Return, Steps 2 to 4 (CA$69335.00) gives CA$69335.00."
+        },
+        {
+          "label": "nl428_bracket_lower_bound_line_10",
+          "name": null,
+          "reference": "10",
+          "amount": "0",
+          "unit": {
+            "name": "ca/cad",
+            "placement": "before",
+            "singular": "CA$",
+            "plural": "CA$",
+            "spaced": false,
+            "as_percentage": false
+          },
+          "text": "Line 1 (CA$69335.00) is outside the range of the bracket table, so it is left blank."
+        },
+        {
+          "label": "nl428_bracket_lower_bound_line_3",
+          "name": null,
+          "reference": "3",
+          "amount": "44192.00",
+          "unit": {
+            "name": "ca/cad",
+            "placement": "before",
+            "singular": "CA$",
+            "plural": "CA$",
+            "spaced": false,
+            "as_percentage": false
+          },
+          "text": "Line 1 (CA$69335.00) falls in the bracket that starts at CA$44192.00."
+        },
+        {
+          "label": "nl428_bracket_rate_line_12",
+          "name": "Rate",
+          "reference": "12",
+          "amount": "0",
+          "unit": null,
+          "text": "Line 1 (CA$69335.00) is outside the range of the bracket table, so it is left blank."
+        },
+        {
+          "label": "nl428_bracket_rate_line_5",
+          "name": "Rate",
+          "reference": "5",
+          "amount": "0.145",
+          "unit": null,
+          "text": "Line 1 (CA$69335.00) falls in a bracket with the rate 14.5%."
+        },
+        {
+          "label": "nl428_bracket_tax_at_start_line_14",
+          "name": null,
+          "reference": "14",
+          "amount": "0",
+          "unit": {
+            "name": "ca/cad",
+            "placement": "before",
+            "singular": "CA$",
+            "plural": "CA$",
+            "spaced": false,
+            "as_percentage": false
+          },
+          "text": "Line 1 (CA$69335.00) is outside the range of the bracket table, so it is left blank."
+        },
+        {
+          "label": "nl428_bracket_tax_at_start_line_7",
+          "name": null,
+          "reference": "7",
+          "amount": "3844.70",
+          "unit": {
+            "name": "ca/cad",
+            "placement": "before",
+            "singular": "CA$",
+            "plural": "CA$",
+            "spaced": false,
+            "as_percentage": false
+          },
+          "text": "Line 1 (CA$69335.00) falls in a bracket with CA$3844.70 of tax on the income below it."
+        },
+        {
+          "label": "nl428_eligible_dependant_amount_before_maximum_line_23",
+          "name": null,
+          "reference": null,
+          "amount": "0",
+          "unit": {
+            "name": "ca/cad",
+            "placement": "before",
+            "singular": "CA$",
+            "plural": "CA$",
+            "spaced": false,
+            "as_percentage": false
+          },
+          "text": "Blank because line 22 was blank."
+        },
+        {
+          "label": "nl428_eligible_dependant_amount_line_23",
+          "name": null,
+          "reference": "23",
+          "amount": "0",
+          "unit": {
+            "name": "ca/cad",
+            "placement": "before",
+            "singular": "CA$",
+            "plural": "CA$",
+            "spaced": false,
+            "as_percentage": false
+          },
+          "text": "Blank because nothing was supplied for it."
+        },
+        {
+          "label": "nl428_medical_expenses_line_48",
+          "name": "Amount from line 33099 of your return",
+          "reference": "48",
+          "amount": "0",
+          "unit": {
+            "name": "ca/cad",
+            "placement": "before",
+            "singular": "CA$",
+            "plural": "CA$",
+            "spaced": false,
+            "as_percentage": false
+          },
+          "text": "Left blank, taken as CA$0.00."
+        },
+        {
+          "label": "nl428_medical_expenses_over_limit_line_53",
+          "name": null,
+          "reference": "53",
+          "amount": "0.00",
+          "unit": {
+            "name": "ca/cad",
+            "placement": "before",
+            "singular": "CA$",
+            "plural": "CA$",
+            "spaced": false,
+            "as_percentage": false
+          },
+          "text": "Line 48 (CA$0.00) less line 52 (CA$2080.05), not below 0, gives CA$0.00 (rounded to the nearest cent)."
+        },
+        {
+          "label": "nl428_spouse_amount_before_maximum_line_20",
+          "name": null,
+          "reference": null,
+          "amount": "0",
+          "unit": {
+            "name": "ca/cad",
+            "placement": "before",
+            "singular": "CA$",
+            "plural": "CA$",
+            "spaced": false,
+            "as_percentage": false
+          },
+          "text": "Blank because line 19 was blank."
+        },
+        {
+          "label": "nl428_spouse_amount_line_20",
+          "name": null,
+          "reference": "20",
+          "amount": "0",
+          "unit": {
+            "name": "ca/cad",
+            "placement": "before",
+            "singular": "CA$",
+            "plural": "CA$",
+            "spaced": false,
+            "as_percentage": false
+          },
+          "text": "Blank because nothing was supplied for it."
+        },
+        {
+          "label": "nl428_taxable_income_over_lower_bound_line_11",
+          "name": null,
+          "reference": "11",
+          "amount": "0",
+          "unit": {
+            "name": "ca/cad",
+            "placement": "before",
+            "singular": "CA$",
+            "plural": "CA$",
+            "spaced": false,
+            "as_percentage": false
+          },
+          "text": "Blank because line 10 was blank."
+        },
+        {
+          "label": "nl428_tax_on_excess_line_13",
+          "name": null,
+          "reference": "13",
+          "amount": "0",
+          "unit": {
+            "name": "ca/cad",
+            "placement": "before",
+            "singular": "CA$",
+            "plural": "CA$",
+            "spaced": false,
+            "as_percentage": false
+          },
+          "text": "Blank because line 12 and line 11 were blank."
+        },
+        {
+          "label": "nl428_taxable_income_over_lower_bound_line_4",
+          "name": null,
+          "reference": "4",
+          "amount": "25143.00",
+          "unit": {
+            "name": "ca/cad",
+            "placement": "before",
+            "singular": "CA$",
+            "plural": "CA$",
+            "spaced": false,
+            "as_percentage": false
+          },
+          "text": "Line 1 (CA$69335.00) less line 3 (CA$44192.00), not below 0, gives CA$25143.00 (rounded to the nearest cent)."
+        },
+        {
+          "label": "nl428_tax_on_excess_line_6",
+          "name": null,
+          "reference": "6",
+          "amount": "3645.74",
+          "unit": {
+            "name": "ca/cad",
+            "placement": "before",
+            "singular": "CA$",
+            "plural": "CA$",
+            "spaced": false,
+            "as_percentage": false
+          },
+          "text": "Line 5 (14.5%) of line 4 (CA$25143.00) gives CA$3645.74 (rounded to the nearest cent)."
+        },
+        {
+          "label": "nl428_adoption_expenses_line_34",
+          "name": "Adoption expenses",
+          "reference": "34",
+          "amount": "0",
+          "unit": {
+            "name": "ca/cad",
+            "placement": "before",
+            "singular": "CA$",
+            "plural": "CA$",
+            "spaced": false,
+            "as_percentage": false
+          },
+          "text": "Left blank, taken as CA$0.00."
+        },
+        {
+          "label": "nl428_child_care_amount_line_33",
+          "name": "Child care amount",
+          "reference": "33",
+          "amount": "0",
+          "unit": {
+            "name": "ca/cad",
+            "placement": "before",
+            "singular": "CA$",
+            "plural": "CA$",
+            "spaced": false,
+            "as_percentage": false
+          },
+          "text": "Left blank, taken as CA$0.00."
+        },
+        {
+          "label": "nl428_ei_premiums_line_30",
+          "name": "Amount from line 31217 of your return",
+          "reference": "30",
+          "amount": "0",
+          "unit": {
+            "name": "ca/cad",
+            "placement": "before",
+            "singular": "CA$",
+            "plural": "CA$",
+            "spaced": false,
+            "as_percentage": false
+          },
+          "text": "Left blank, taken as CA$0.00."
+        },
+        {
+          "label": "nl428_qpp_contributions_line_28",
+          "name": "Amount from line 31000 of your return",
+          "reference": "28",
+          "amount": "0",
+          "unit": {
+            "name": "ca/cad",
+            "placement": "before",
+            "singular": "CA$",
+            "plural": "CA$",
+            "spaced": false,
+            "as_percentage": false
+          },
+          "text": "Left blank, taken as CA$0.00."
+        },
+        {
+          "label": "nl428_search_and_rescue_volunteers_amount_line_32",
+          "name": "Search and rescue volunteers' amount",
+          "reference": "32",
+          "amount": "0",
+          "unit": {
+            "name": "ca/cad",
+            "placement": "before",
+            "singular": "CA$",
+            "plural": "CA$",
+            "spaced": false,
+            "as_percentage": false
+          },
+          "text": "Left blank, taken as CA$0.00."
+        },
+        {
+          "label": "nl428_volunteer_firefighters_amount_line_31",
+          "name": "Volunteer firefighters' amount",
+          "reference": "31",
+          "amount": "0",
+          "unit": {
+            "name": "ca/cad",
+            "placement": "before",
+            "singular": "CA$",
+            "plural": "CA$",
+            "spaced": false,
+            "as_percentage": false
+          },
+          "text": "Left blank, taken as CA$0.00."
+        },
+        {
+          "label": "nl428_cpp_ei_and_other_line_35",
+          "name": null,
+          "reference": "35",
+          "amount": "4369.23",
+          "unit": {
+            "name": "ca/cad",
+            "placement": "before",
+            "singular": "CA$",
+            "plural": "CA$",
+            "spaced": false,
+            "as_percentage": false
+          },
+          "text": "Line 27 (CA$3291.75) plus line 28 (CA$0.00) plus line 29 (CA$1077.48) plus line 30 (CA$0.00) plus line 31 (CA$0.00) plus line 32 (CA$0.00) plus line 33 (CA$0.00) plus line 34 (CA$0.00) gives CA$4369.23 (rounded to the nearest cent)."
+        },
+        {
+          "label": "nl428_allowable_medical_expenses_for_other_dependants_line_54",
+          "name": "Allowable amount of medical expenses for other dependants (use Worksheet NL428)",
+          "reference": "54",
+          "amount": "0",
+          "unit": {
+            "name": "ca/cad",
+            "placement": "before",
+            "singular": "CA$",
+            "plural": "CA$",
+            "spaced": false,
+            "as_percentage": false
+          },
+          "text": "Left blank, taken as CA$0.00."
+        },
+        {
+          "label": "nl428_medical_expenses_allowable_line_55",
+          "name": null,
+          "reference": "55",
+          "amount": "0.00",
+          "unit": {
+            "name": "ca/cad",
+            "placement": "before",
+            "singular": "CA$",
+            "plural": "CA$",
+            "spaced": false,
+            "as_percentage": false
+          },
+          "text": "Line 53 (CA$0.00) plus line 54 (CA$0.00) gives CA$0.00 (rounded to the nearest cent)."
+        },
+        {
+          "label": "nl428_tax_on_taxable_income_line_15",
+          "name": "Newfoundland and Labrador tax on taxable income",
+          "reference": "15",
+          "amount": "0",
+          "unit": {
+            "name": "ca/cad",
+            "placement": "before",
+            "singular": "CA$",
+            "plural": "CA$",
+            "spaced": false,
+            "as_percentage": false
+          },
+          "text": "Blank because line 14 and line 13 were blank."
+        },
+        {
+          "label": "nl428_tax_on_taxable_income_line_8",
+          "name": "Newfoundland and Labrador tax on taxable income",
+          "reference": "8",
+          "amount": "7490.44",
+          "unit": {
+            "name": "ca/cad",
+            "placement": "before",
+            "singular": "CA$",
+            "plural": "CA$",
+            "spaced": false,
+            "as_percentage": false
+          },
+          "text": "Line 6 (CA$3645.74) plus line 7 (CA$3844.70) gives CA$7490.44 (rounded to the nearest cent)."
+        },
+        {
+          "label": "nl428_age_amount_line_17",
+          "name": "Age amount",
+          "reference": "17",
+          "amount": "0.00",
+          "unit": {
+            "name": "ca/cad",
+            "placement": "before",
+            "singular": "CA$",
+            "plural": "CA$",
+            "spaced": false,
+            "as_percentage": false
+          },
+          "text": "\"Age amount from Worksheet NL428\" (CA$2470.55) for each of \"Born in 1960 or earlier\" (0) gives CA$0.00 (rounded to the nearest cent)."
+        },
+        {
+          "label": "nl428_eligible_dependant_amount_line_23",
+          "name": null,
+          "reference": "23",
+          "amount": "0",
+          "unit": {
+            "name": "ca/cad",
+            "placement": "before",
+            "singular": "CA$",
+            "plural": "CA$",
+            "spaced": false,
+            "as_percentage": false
+          },
+          "text": "Left blank, taken as CA$0.00."
+        },
+        {
+          "label": "nl428_infirm_dependants_amount_line_24",
+          "name": "Amount for infirm dependants age 18 or older (use Worksheet NL428)",
+          "reference": "24",
+          "amount": "0",
+          "unit": {
+            "name": "ca/cad",
+            "placement": "before",
+            "singular": "CA$",
+            "plural": "CA$",
+            "spaced": false,
+            "as_percentage": false
+          },
+          "text": "Left blank, taken as CA$0.00."
+        },
+        {
+          "label": "nl428_spouse_amount_line_20",
+          "name": null,
+          "reference": "20",
+          "amount": "0",
+          "unit": {
+            "name": "ca/cad",
+            "placement": "before",
+            "singular": "CA$",
+            "plural": "CA$",
+            "spaced": false,
+            "as_percentage": false
+          },
+          "text": "Left blank, taken as CA$0.00."
+        },
+        {
+          "label": "nl428_credits_subtotal_line_25",
+          "name": null,
+          "reference": "25",
+          "amount": "11067.00",
+          "unit": {
+            "name": "ca/cad",
+            "placement": "before",
+            "singular": "CA$",
+            "plural": "CA$",
+            "spaced": false,
+            "as_percentage": false
+          },
+          "text": "Line 16 (CA$11067.00) plus line 17 (CA$0.00) plus line 20 (CA$0.00) plus line 23 (CA$0.00) plus line 24 (CA$0.00) gives CA$11067.00 (rounded to the nearest cent)."
+        },
+        {
+          "label": "nl428_credits_subtotal_line_36",
+          "name": null,
+          "reference": "36",
+          "amount": "15436.23",
+          "unit": {
+            "name": "ca/cad",
+            "placement": "before",
+            "singular": "CA$",
+            "plural": "CA$",
+            "spaced": false,
+            "as_percentage": false
+          },
+          "text": "Line 25 (CA$11067.00) plus line 35 (CA$4369.23) gives CA$15436.23 (rounded to the nearest cent)."
+        },
+        {
+          "label": "nl428_caregiver_amount_line_38",
+          "name": "Caregiver amount",
+          "reference": "38",
+          "amount": "0",
+          "unit": {
+            "name": "ca/cad",
+            "placement": "before",
+            "singular": "CA$",
+            "plural": "CA$",
+            "spaced": false,
+            "as_percentage": false
+          },
+          "text": "Left blank, taken as CA$0.00."
+        },
+        {
+          "label": "nl428_pension_income_amount_line_37",
+          "name": "Pension income amount",
+          "reference": "37",
+          "amount": "0",
+          "unit": {
+            "name": "ca/cad",
+            "placement": "before",
+            "singular": "CA$",
+            "plural": "CA$",
+            "spaced": false,
+            "as_percentage": false
+          },
+          "text": "Left blank, taken as CA$0.00."
+        },
+        {
+          "label": "nl428_credits_subtotal_line_39",
+          "name": null,
+          "reference": "39",
+          "amount": "15436.23",
+          "unit": {
+            "name": "ca/cad",
+            "placement": "before",
+            "singular": "CA$",
+            "plural": "CA$",
+            "spaced": false,
+            "as_percentage": false
+          },
+          "text": "Line 36 (CA$15436.23) plus \"Pension income amount\" (CA$0.00) plus line 38 (CA$0.00) gives CA$15436.23 (rounded to the nearest cent)."
+        },
+        {
+          "label": "nl428_disability_amount_self_line_40",
+          "name": "Disability amount for self",
+          "reference": "40",
+          "amount": "0.00",
+          "unit": {
+            "name": "ca/cad",
+            "placement": "before",
+            "singular": "CA$",
+            "plural": "CA$",
+            "spaced": false,
+            "as_percentage": false
+          },
+          "text": "\"Disability amount for self if you claim it\" (CA$7467.00) for each of \"Disability amount for self claimed\" (0) gives CA$0.00 (rounded to the nearest cent)."
+        },
+        {
+          "label": "nl428_disability_amount_transferred_from_a_dependant_line_41",
+          "name": "Disability amount transferred from a dependant (use Worksheet NL428)",
+          "reference": "41",
+          "amount": "0",
+          "unit": {
+            "name": "ca/cad",
+            "placement": "before",
+            "singular": "CA$",
+            "plural": "CA$",
+            "spaced": false,
+            "as_percentage": false
+          },
+          "text": "Left blank, taken as CA$0.00."
+        },
+        {
+          "label": "nl428_credits_subtotal_line_42",
+          "name": null,
+          "reference": "42",
+          "amount": "15436.23",
+          "unit": {
+            "name": "ca/cad",
+            "placement": "before",
+            "singular": "CA$",
+            "plural": "CA$",
+            "spaced": false,
+            "as_percentage": false
+          },
+          "text": "Line 39 (CA$15436.23) plus \"Disability amount for self\" (CA$0.00) plus line 41 (CA$0.00) gives CA$15436.23 (rounded to the nearest cent)."
+        },
+        {
+          "label": "nl428_amounts_transferred_from_your_spouse_or_common_law_partner_line_46",
+          "name": "Amounts transferred from your spouse or common-law partner (attach Schedule NL(S2))",
+          "reference": "46",
+          "amount": "0",
+          "unit": {
+            "name": "ca/cad",
+            "placement": "before",
+            "singular": "CA$",
+            "plural": "CA$",
+            "spaced": false,
+            "as_percentage": false
+          },
+          "text": "Left blank, taken as CA$0.00."
+        },
+        {
+          "label": "nl428_student_loan_interest_line_43",
+          "name": "Interest paid on your student loans (amount from line 31900 of your return)",
+          "reference": "43",
+          "amount": "0",
+          "unit": {
+            "name": "ca/cad",
+            "placement": "before",
+            "singular": "CA$",
+            "plural": "CA$",
+            "spaced": false,
+            "as_percentage": false
+          },
+          "text": "Left blank, taken as CA$0.00."
+        },
+        {
+          "label": "nl428_tuition_and_education_amounts_line_44",
+          "name": "Your tuition and education amounts (attach Schedule NL(S11))",
+          "reference": "44",
+          "amount": "0",
+          "unit": {
+            "name": "ca/cad",
+            "placement": "before",
+            "singular": "CA$",
+            "plural": "CA$",
+            "spaced": false,
+            "as_percentage": false
+          },
+          "text": "Left blank, taken as CA$0.00."
+        },
+        {
+          "label": "nl428_tuition_and_education_amounts_transferred_from_a_child_or_grandchild_line_45",
+          "name": "Tuition and education amounts transferred from a child or grandchild",
+          "reference": "45",
+          "amount": "0",
+          "unit": {
+            "name": "ca/cad",
+            "placement": "before",
+            "singular": "CA$",
+            "plural": "CA$",
+            "spaced": false,
+            "as_percentage": false
+          },
+          "text": "Left blank, taken as CA$0.00."
+        },
+        {
+          "label": "nl428_credits_subtotal_line_47",
+          "name": null,
+          "reference": "47",
+          "amount": "15436.23",
+          "unit": {
+            "name": "ca/cad",
+            "placement": "before",
+            "singular": "CA$",
+            "plural": "CA$",
+            "spaced": false,
+            "as_percentage": false
+          },
+          "text": "Line 42 (CA$15436.23) plus line 43 (CA$0.00) plus line 44 (CA$0.00) plus line 45 (CA$0.00) plus line 46 (CA$0.00) gives CA$15436.23 (rounded to the nearest cent)."
+        },
+        {
+          "label": "nl428_credits_total_line_56",
+          "name": null,
+          "reference": "56",
+          "amount": "15436.23",
+          "unit": {
+            "name": "ca/cad",
+            "placement": "before",
+            "singular": "CA$",
+            "plural": "CA$",
+            "spaced": false,
+            "as_percentage": false
+          },
+          "text": "Line 47 (CA$15436.23) plus line 55 (CA$0.00) gives CA$15436.23 (rounded to the nearest cent)."
+        },
+        {
+          "label": "nl428_credits_at_rate_line_58",
+          "name": null,
+          "reference": "58",
+          "amount": "1342.95",
+          "unit": {
+            "name": "ca/cad",
+            "placement": "before",
+            "singular": "CA$",
+            "plural": "CA$",
+            "spaced": false,
+            "as_percentage": false
+          },
+          "text": "8.7% of line 56 (CA$15436.23) gives CA$1342.95 (rounded to the nearest cent)."
+        },
+        {
+          "label": "nl428_donations_and_gifts_credit_line_61",
+          "name": "Donations and gifts",
+          "reference": "61",
+          "amount": "0",
+          "unit": {
+            "name": "ca/cad",
+            "placement": "before",
+            "singular": "CA$",
+            "plural": "CA$",
+            "spaced": false,
+            "as_percentage": false
+          },
+          "text": "Left blank, taken as CA$0.00."
+        },
+        {
+          "label": "nl428_non_refundable_credits_line_62",
+          "name": "Newfoundland and Labrador non-refundable tax credits",
+          "reference": "62",
+          "amount": "1342.95",
+          "unit": {
+            "name": "ca/cad",
+            "placement": "before",
+            "singular": "CA$",
+            "plural": "CA$",
+            "spaced": false,
+            "as_percentage": false
+          },
+          "text": "Line 58 (CA$1342.95) plus line 61 (CA$0.00) gives CA$1342.95 (rounded to the nearest cent)."
+        }
+      ]
+    },
+    {
+      "form": "ca-nl/nl428",
+      "name": "Form NL428: Newfoundland and Labrador Tax",
+      "lines": [
+        {
+          "label": "nl428_newfoundland_and_labrador_tax_on_taxable_income_line_63",
+          "name": "Newfoundland and Labrador tax on taxable income from line 8 or 15",
+          "reference": "63",
+          "amount": "7490.44",
+          "unit": {
+            "name": "ca/cad",
+            "placement": "before",
+            "singular": "CA$",
+            "plural": "CA$",
+            "spaced": false,
+            "as_percentage": false
+          },
+          "text": "Line 8 of NL428 (CA$7490.44), with line 15 of NL428 left blank, gives CA$7490.44."
+        },
+        {
+          "label": "nl428_reduction_for_spouse_or_common_law_partner_claimed_checked_line_96",
+          "name": null,
+          "reference": null,
+          "amount": "0",
+          "unit": null,
+          "text": "Blank because line 96 was blank."
+        },
+        {
+          "label": "nl428_t691_amount_line_71",
+          "name": "Amount from line 14 of Part 7 of Form T691",
+          "reference": "71 (Form T691)",
+          "amount": "0",
+          "unit": {
+            "name": "ca/cad",
+            "placement": "before",
+            "singular": "CA$",
+            "plural": "CA$",
+            "spaced": false,
+            "as_percentage": false
+          },
+          "text": "Left blank, taken as CA$0.00."
+        },
+        {
+          "label": "nl428_additional_tax_minimum_tax_line_71",
+          "name": "Newfoundland and Labrador additional tax for minimum tax purposes",
+          "reference": "71",
+          "amount": "0.00",
+          "unit": {
+            "name": "ca/cad",
+            "placement": "before",
+            "singular": "CA$",
+            "plural": "CA$",
+            "spaced": false,
+            "as_percentage": false
+          },
+          "text": "60% of 71 (Form T691) (CA$0.00) gives CA$0.00 (rounded to the nearest cent)."
+        },
+        {
+          "label": "nl428_minimum_tax_carryover_amount_line_68",
+          "name": null,
+          "reference": "68 box A",
+          "amount": "0",
+          "unit": {
+            "name": "ca/cad",
+            "placement": "before",
+            "singular": "CA$",
+            "plural": "CA$",
+            "spaced": false,
+            "as_percentage": false
+          },
+          "text": "Left blank, taken as CA$0.00."
+        },
+        {
+          "label": "nl428_minimum_tax_carryover_line_68",
+          "name": "Newfoundland and Labrador minimum tax carryover",
+          "reference": "68",
+          "amount": "0.00",
+          "unit": {
+            "name": "ca/cad",
+            "placement": "before",
+            "singular": "CA$",
+            "plural": "CA$",
+            "spaced": false,
+            "as_percentage": false
+          },
+          "text": "60% of line 68 box A (CA$0.00) gives CA$0.00 (rounded to the nearest cent)."
+        },
+        {
+          "label": "low_income_reduction_basic",
+          "name": "Basic reduction",
+          "reference": "95",
+          "amount": "997.00",
+          "unit": {
+            "name": "ca/cad",
+            "placement": "before",
+            "singular": "CA$",
+            "plural": "CA$",
+            "spaced": false,
+            "as_percentage": false
+          },
+          "text": "Credit amount of 997.00 (rounded to the nearest cent)."
+        },
+        {
+          "label": "low_income_reduction_spouse",
+          "name": null,
+          "reference": null,
+          "amount": "557.00",
+          "unit": {
+            "name": "ca/cad",
+            "placement": "before",
+            "singular": "CA$",
+            "plural": "CA$",
+            "spaced": false,
+            "as_percentage": false
+          },
+          "text": "Credit amount of 557.00 (rounded to the nearest cent)."
+        },
+        {
+          "label": "low_income_threshold",
+          "name": "Low-income threshold",
+          "reference": null,
+          "amount": "23928.00",
+          "unit": {
+            "name": "ca/cad",
+            "placement": "before",
+            "singular": "CA$",
+            "plural": "CA$",
+            "spaced": false,
+            "as_percentage": false
+          },
+          "text": "Credit amount of 23928.00 (rounded to the nearest cent)."
+        },
+        {
+          "label": "low_income_threshold_with_spouse_or_dependant",
+          "name": "Low-income threshold when line 96 or line 97 is claimed",
+          "reference": null,
+          "amount": "40460.00",
+          "unit": {
+            "name": "ca/cad",
+            "placement": "before",
+            "singular": "CA$",
+            "plural": "CA$",
+            "spaced": false,
+            "as_percentage": false
+          },
+          "text": "Credit amount of 40460.00 (rounded to the nearest cent)."
+        },
+        {
+          "label": "nl428_political_contribution_tax_credit_maximum",
+          "name": null,
+          "reference": null,
+          "amount": "500.00",
+          "unit": {
+            "name": "ca/cad",
+            "placement": "before",
+            "singular": "CA$",
+            "plural": "CA$",
+            "spaced": false,
+            "as_percentage": false
+          },
+          "text": "Credit amount of 500.00 (rounded to the nearest cent)."
+        },
+        {
+          "label": "nl428_political_contribution_tax_credit_line_76",
+          "name": "Newfoundland and Labrador political contribution tax credit",
+          "reference": "76",
+          "amount": "0",
+          "unit": {
+            "name": "ca/cad",
+            "placement": "before",
+            "singular": "CA$",
+            "plural": "CA$",
+            "spaced": false,
+            "as_percentage": false
+          },
+          "text": "Blank because \"Newfoundland and Labrador political contribution tax credit\" was blank."
+        },
+        {
+          "label": "nl428_eligible_dependant_claimed_line_97",
+          "name": null,
+          "reference": null,
+          "amount": "0",
+          "unit": {
+            "name": "ca/cad",
+            "placement": "before",
+            "singular": "CA$",
+            "plural": "CA$",
+            "spaced": false,
+            "as_percentage": false
+          },
+          "text": "Blank because line 23 of NL428 (item 1 of nl428 credits.nl428 eligible dependant amount line 23) was blank."
+        },
+        {
+          "label": "nl428_low_income_reduction_dependant_before_check_line_97",
+          "name": null,
+          "reference": null,
+          "amount": "0",
+          "unit": {
+            "name": "ca/cad",
+            "placement": "before",
+            "singular": "CA$",
+            "plural": "CA$",
+            "spaced": false,
+            "as_percentage": false
+          },
+          "text": "Blank because nothing was supplied for it."
+        },
+        {
+          "label": "nl428_net_income_line_88",
+          "name": "Net income from line 23600 of the return",
+          "reference": "88 (column 1)",
+          "amount": "69335.00",
+          "unit": {
+            "name": "ca/cad",
+            "placement": "before",
+            "singular": "CA$",
+            "plural": "CA$",
+            "spaced": false,
+            "as_percentage": false
+          },
+          "text": "\"Net income, which can be below zero\" of T1 Income Tax and Benefit Return, Steps 2 to 4 (CA$69335.00) gives CA$69335.00."
+        },
+        {
+          "label": "nl428_non_refundable_credits_line_66",
+          "name": "Newfoundland and Labrador non-refundable tax credits from line 62",
+          "reference": "66",
+          "amount": "1342.95",
+          "unit": {
+            "name": "ca/cad",
+            "placement": "before",
+            "singular": "CA$",
+            "plural": "CA$",
+            "spaced": false,
+            "as_percentage": false
+          },
+          "text": "Line 62 of NL428 (CA$1342.95) gives CA$1342.95."
+        },
+        {
+          "label": "nl428_dividend_tax_credit_line_67",
+          "name": "Newfoundland and Labrador dividend tax credit (use Worksheet NL428)",
+          "reference": "67",
+          "amount": "0",
+          "unit": {
+            "name": "ca/cad",
+            "placement": "before",
+            "singular": "CA$",
+            "plural": "CA$",
+            "spaced": false,
+            "as_percentage": false
+          },
+          "text": "Left blank, taken as CA$0.00."
+        },
+        {
+          "label": "nl428_credits_total_line_69",
+          "name": null,
+          "reference": "69",
+          "amount": "1342.95",
+          "unit": {
+            "name": "ca/cad",
+            "placement": "before",
+            "singular": "CA$",
+            "plural": "CA$",
+            "spaced": false,
+            "as_percentage": false
+          },
+          "text": "Line 66 (CA$1342.95) plus line 67 (CA$0.00) plus line 68 (CA$0.00) gives CA$1342.95 (rounded to the nearest cent)."
+        },
+        {
+          "label": "nl428_uccb_rdsp_repayments_line_89",
+          "name": "Total of the universal child care benefit (UCCB) repayment (line 21300 of the return) and the registered disability savings plan (RDSP) income repayment (included on line 23200 of the return)",
+          "reference": "89",
+          "amount": "0",
+          "unit": {
+            "name": "ca/cad",
+            "placement": "before",
+            "singular": "CA$",
+            "plural": "CA$",
+            "spaced": false,
+            "as_percentage": false
+          },
+          "text": "Left blank, taken as CA$0.00."
+        },
+        {
+          "label": "nl428_family_income_line_90",
+          "name": null,
+          "reference": "90 (column 1)",
+          "amount": "69335.00",
+          "unit": {
+            "name": "ca/cad",
+            "placement": "before",
+            "singular": "CA$",
+            "plural": "CA$",
+            "spaced": false,
+            "as_percentage": false
+          },
+          "text": "88 (column 1) (CA$69335.00) plus line 89 (CA$0.00) gives CA$69335.00 (rounded to the nearest cent)."
+        },
+        {
+          "label": "nl428_uccb_rdsp_income_line_91",
+          "name": "Total of the UCCB income (line 11700 of the return) and the RDSP income (line 12500 of the return)",
+          "reference": "91",
+          "amount": "0",
+          "unit": {
+            "name": "ca/cad",
+            "placement": "before",
+            "singular": "CA$",
+            "plural": "CA$",
+            "spaced": false,
+            "as_percentage": false
+          },
+          "text": "Left blank, taken as CA$0.00."
+        },
+        {
+          "label": "nl428_family_income_less_uccb_rdsp_line_92",
+          "name": null,
+          "reference": "92 (column 1)",
+          "amount": "69335.00",
+          "unit": {
+            "name": "ca/cad",
+            "placement": "before",
+            "singular": "CA$",
+            "plural": "CA$",
+            "spaced": false,
+            "as_percentage": false
+          },
+          "text": "90 (column 1) (CA$69335.00) less line 91 (CA$0.00), not below 0, gives CA$69335.00 (rounded to the nearest cent)."
+        },
+        {
+          "label": "nl428_spouse_family_income_line_90",
+          "name": null,
+          "reference": "90 (column 2)",
+          "amount": "0",
+          "unit": {
+            "name": "ca/cad",
+            "placement": "before",
+            "singular": "CA$",
+            "plural": "CA$",
+            "spaced": false,
+            "as_percentage": false
+          },
+          "text": "Blank because 88 (column 2) was blank."
+        },
+        {
+          "label": "nl428_spouse_family_income_less_uccb_rdsp_line_92",
+          "name": null,
+          "reference": "92 (column 2)",
+          "amount": "0",
+          "unit": {
+            "name": "ca/cad",
+            "placement": "before",
+            "singular": "CA$",
+            "plural": "CA$",
+            "spaced": false,
+            "as_percentage": false
+          },
+          "text": "Blank because 90 (column 2) was blank."
+        },
+        {
+          "label": "nl428_spouse_family_income_less_uccb_rdsp_line_92",
+          "name": null,
+          "reference": "92 (column 2)",
+          "amount": "0",
+          "unit": {
+            "name": "ca/cad",
+            "placement": "before",
+            "singular": "CA$",
+            "plural": "CA$",
+            "spaced": false,
+            "as_percentage": false
+          },
+          "text": "Left blank, taken as CA$0.00."
+        },
+        {
+          "label": "nl428_adjusted_family_income_line_93",
+          "name": "Adjusted family income",
+          "reference": "93",
+          "amount": "69335.00",
+          "unit": {
+            "name": "ca/cad",
+            "placement": "before",
+            "singular": "CA$",
+            "plural": "CA$",
+            "spaced": false,
+            "as_percentage": false
+          },
+          "text": "92 (column 1) (CA$69335.00) plus 92 (column 2) (CA$0.00) gives CA$69335.00 (rounded to the nearest cent)."
+        },
+        {
+          "label": "nl428_tax_on_split_income_line_64",
+          "name": "Newfoundland and Labrador tax on split income",
+          "reference": "64",
+          "amount": "0",
+          "unit": {
+            "name": "ca/cad",
+            "placement": "before",
+            "singular": "CA$",
+            "plural": "CA$",
+            "spaced": false,
+            "as_percentage": false
+          },
+          "text": "Left blank, taken as CA$0.00."
+        },
+        {
+          "label": "nl428_tax_before_credits_line_65",
+          "name": null,
+          "reference": "65",
+          "amount": "7490.44",
+          "unit": {
+            "name": "ca/cad",
+            "placement": "before",
+            "singular": "CA$",
+            "plural": "CA$",
+            "spaced": false,
+            "as_percentage": false
+          },
+          "text": "Line 63 (CA$7490.44) plus line 64 (CA$0.00) gives CA$7490.44 (rounded to the nearest cent)."
+        },
+        {
+          "label": "nl428_tax_line_70",
+          "name": null,
+          "reference": "70",
+          "amount": "6147.49",
+          "unit": {
+            "name": "ca/cad",
+            "placement": "before",
+            "singular": "CA$",
+            "plural": "CA$",
+            "spaced": false,
+            "as_percentage": false
+          },
+          "text": "Line 65 (CA$7490.44) less line 69 (CA$1342.95), not below 0, gives CA$6147.49 (rounded to the nearest cent)."
+        },
+        {
+          "label": "nl428_tax_with_minimum_tax_line_72",
+          "name": null,
+          "reference": "72",
+          "amount": "6147.49",
+          "unit": {
+            "name": "ca/cad",
+            "placement": "before",
+            "singular": "CA$",
+            "plural": "CA$",
+            "spaced": false,
+            "as_percentage": false
+          },
+          "text": "Line 70 (CA$6147.49) plus line 71 (CA$0.00) gives CA$6147.49 (rounded to the nearest cent)."
+        },
+        {
+          "label": "nl428_provincial_foreign_tax_credit_line_73",
+          "name": "Provincial foreign tax credit",
+          "reference": "73",
+          "amount": "0",
+          "unit": {
+            "name": "ca/cad",
+            "placement": "before",
+            "singular": "CA$",
+            "plural": "CA$",
+            "spaced": false,
+            "as_percentage": false
+          },
+          "text": "Left blank, taken as CA$0.00."
+        },
+        {
+          "label": "nl428_tax_line_74",
+          "name": null,
+          "reference": "74",
+          "amount": "6147.49",
+          "unit": {
+            "name": "ca/cad",
+            "placement": "before",
+            "singular": "CA$",
+            "plural": "CA$",
+            "spaced": false,
+            "as_percentage": false
+          },
+          "text": "Line 72 (CA$6147.49) less line 73 (CA$0.00), not below 0, gives CA$6147.49 (rounded to the nearest cent)."
+        },
+        {
+          "label": "nl428_political_contribution_tax_credit_line_76",
+          "name": "Newfoundland and Labrador political contribution tax credit",
+          "reference": "76",
+          "amount": "0",
+          "unit": {
+            "name": "ca/cad",
+            "placement": "before",
+            "singular": "CA$",
+            "plural": "CA$",
+            "spaced": false,
+            "as_percentage": false
+          },
+          "text": "Left blank, taken as CA$0.00."
+        },
+        {
+          "label": "nl428_tax_line_77",
+          "name": null,
+          "reference": "77",
+          "amount": "6147.49",
+          "unit": {
+            "name": "ca/cad",
+            "placement": "before",
+            "singular": "CA$",
+            "plural": "CA$",
+            "spaced": false,
+            "as_percentage": false
+          },
+          "text": "Line 74 (CA$6147.49) less \"Newfoundland and Labrador political contribution tax credit\" (CA$0.00), not below 0, gives CA$6147.49 (rounded to the nearest cent)."
+        },
+        {
+          "label": "nl428_direct_equity_tax_credit_line_78",
+          "name": "Direct equity tax credit",
+          "reference": "78",
+          "amount": "0",
+          "unit": {
+            "name": "ca/cad",
+            "placement": "before",
+            "singular": "CA$",
+            "plural": "CA$",
+            "spaced": false,
+            "as_percentage": false
+          },
+          "text": "Left blank, taken as CA$0.00."
+        },
+        {
+          "label": "nl428_tax_line_79",
+          "name": null,
+          "reference": "79",
+          "amount": "6147.49",
+          "unit": {
+            "name": "ca/cad",
+            "placement": "before",
+            "singular": "CA$",
+            "plural": "CA$",
+            "spaced": false,
+            "as_percentage": false
+          },
+          "text": "Line 77 (CA$6147.49) less line 78 (CA$0.00), not below 0, gives CA$6147.49 (rounded to the nearest cent)."
+        },
+        {
+          "label": "nl428_resort_property_investment_tax_credit_line_80",
+          "name": "Resort property investment tax credit",
+          "reference": "80",
+          "amount": "0",
+          "unit": {
+            "name": "ca/cad",
+            "placement": "before",
+            "singular": "CA$",
+            "plural": "CA$",
+            "spaced": false,
+            "as_percentage": false
+          },
+          "text": "Left blank, taken as CA$0.00."
+        },
+        {
+          "label": "nl428_tax_line_81",
+          "name": null,
+          "reference": "81",
+          "amount": "6147.49",
+          "unit": {
+            "name": "ca/cad",
+            "placement": "before",
+            "singular": "CA$",
+            "plural": "CA$",
+            "spaced": false,
+            "as_percentage": false
+          },
+          "text": "Line 79 (CA$6147.49) less line 80 (CA$0.00), not below 0, gives CA$6147.49 (rounded to the nearest cent)."
+        },
+        {
+          "label": "nl428_venture_capital_tax_credit_line_84",
+          "name": null,
+          "reference": "84",
+          "amount": "0",
+          "unit": {
+            "name": "ca/cad",
+            "placement": "before",
+            "singular": "CA$",
+            "plural": "CA$",
+            "spaced": false,
+            "as_percentage": false
+          },
+          "text": "Left blank, taken as CA$0.00."
+        },
+        {
+          "label": "nl428_tax_line_85",
+          "name": null,
+          "reference": "85",
+          "amount": "6147.49",
+          "unit": {
+            "name": "ca/cad",
+            "placement": "before",
+            "singular": "CA$",
+            "plural": "CA$",
+            "spaced": false,
+            "as_percentage": false
+          },
+          "text": "Line 81 (CA$6147.49) less line 84 (CA$0.00), not below 0, gives CA$6147.49 (rounded to the nearest cent)."
+        },
+        {
+          "label": "nl428_unused_low_income_reduction_from_spouse_line_86",
+          "name": "Unused low-income tax reduction from your spouse or common-law partner",
+          "reference": "86",
+          "amount": "0",
+          "unit": {
+            "name": "ca/cad",
+            "placement": "before",
+            "singular": "CA$",
+            "plural": "CA$",
+            "spaced": false,
+            "as_percentage": false
+          },
+          "text": "Left blank, taken as CA$0.00."
+        },
+        {
+          "label": "nl428_tax_line_87",
+          "name": null,
+          "reference": "87",
+          "amount": "6147.49",
+          "unit": {
+            "name": "ca/cad",
+            "placement": "before",
+            "singular": "CA$",
+            "plural": "CA$",
+            "spaced": false,
+            "as_percentage": false
+          },
+          "text": "Line 85 (CA$6147.49) less line 86 (CA$0.00), not below 0, gives CA$6147.49 (rounded to the nearest cent)."
+        },
+        {
+          "label": "nl428_unused_low_income_reduction_from_spouse_line_86",
+          "name": "Unused low-income tax reduction from your spouse or common-law partner",
+          "reference": "86",
+          "amount": "0",
+          "unit": {
+            "name": "ca/cad",
+            "placement": "before",
+            "singular": "CA$",
+            "plural": "CA$",
+            "spaced": false,
+            "as_percentage": false
+          },
+          "text": "Left blank, taken as CA$0.00."
+        },
+        {
+          "label": "nl428_unused_low_income_reduction_from_spouse_claimed_line_86",
+          "name": "Unused low-income tax reduction from your spouse or common-law partner, with a blank counted as 0",
+          "reference": null,
+          "amount": "0.00",
+          "unit": {
+            "name": "ca/cad",
+            "placement": "before",
+            "singular": "CA$",
+            "plural": "CA$",
+            "spaced": false,
+            "as_percentage": false
+          },
+          "text": "Line 86 (CA$0.00) gives CA$0.00 (rounded to the nearest cent)."
+        },
+        {
+          "label": "nl428_line_104_line_86_gate",
+          "name": "Multiplier that is 0 when you claim your spouse's or common-law partner's unused reduction",
+          "reference": null,
+          "amount": "1",
+          "unit": {
+            "name": "ca/cad",
+            "placement": "before",
+            "singular": "CA$",
+            "plural": "CA$",
+            "spaced": false,
+            "as_percentage": false
+          },
+          "text": "\"Unused low-income tax reduction from your spouse or common-law partner, with a blank counted as 0\" (CA$0.00) is in the band starting at 0.00, so the amount is CA$1.00 (not rounded)."
+        },
+        {
+          "label": "nl428_reduction_for_spouse_or_common_law_partner_line_96",
+          "name": "Reduction for spouse or common-law partner",
+          "reference": "96",
+          "amount": "0",
+          "unit": {
+            "name": "ca/cad",
+            "placement": "before",
+            "singular": "CA$",
+            "plural": "CA$",
+            "spaced": false,
+            "as_percentage": false
+          },
+          "text": "Blank because nothing was supplied for it."
+        },
+        {
+          "label": "nl428_reduction_for_spouse_or_common_law_partner_line_96",
+          "name": "Reduction for spouse or common-law partner",
+          "reference": "96",
+          "amount": "0",
+          "unit": {
+            "name": "ca/cad",
+            "placement": "before",
+            "singular": "CA$",
+            "plural": "CA$",
+            "spaced": false,
+            "as_percentage": false
+          },
+          "text": "Left blank, taken as CA$0.00."
+        },
+        {
+          "label": "nl428_low_income_reduction_dependant_most_line_97",
+          "name": null,
+          "reference": null,
+          "amount": "557.00",
+          "unit": {
+            "name": "ca/cad",
+            "placement": "before",
+            "singular": "CA$",
+            "plural": "CA$",
+            "spaced": false,
+            "as_percentage": false
+          },
+          "text": "Low income reduction spouse (CA$557.00) less \"Reduction for spouse or common-law partner\" (CA$0.00) gives CA$557.00 (rounded to the nearest cent)."
+        },
+        {
+          "label": "nl428_low_income_reduction_dependant_line_97",
+          "name": "Reduction for an eligible dependant claimed on line 58160",
+          "reference": "97",
+          "amount": "0",
+          "unit": {
+            "name": "ca/cad",
+            "placement": "before",
+            "singular": "CA$",
+            "plural": "CA$",
+            "spaced": false,
+            "as_percentage": false
+          },
+          "text": "Blank because nothing was supplied for it."
+        },
+        {
+          "label": "nl428_low_income_reduction_dependant_line_97",
+          "name": "Reduction for an eligible dependant claimed on line 58160",
+          "reference": "97",
+          "amount": "0",
+          "unit": {
+            "name": "ca/cad",
+            "placement": "before",
+            "singular": "CA$",
+            "plural": "CA$",
+            "spaced": false,
+            "as_percentage": false
+          },
+          "text": "Left blank, taken as CA$0.00."
+        },
+        {
+          "label": "nl428_reduction_for_spouse_or_common_law_partner_line_96",
+          "name": "Reduction for spouse or common-law partner",
+          "reference": "96",
+          "amount": "0",
+          "unit": {
+            "name": "ca/cad",
+            "placement": "before",
+            "singular": "CA$",
+            "plural": "CA$",
+            "spaced": false,
+            "as_percentage": false
+          },
+          "text": "Left blank, taken as CA$0.00."
+        },
+        {
+          "label": "nl428_low_income_threshold_conditions_count_line_100",
+          "name": "Amount claimed on line 96 or line 97, counted as 1 or 0",
+          "reference": null,
+          "amount": "0",
+          "unit": null,
+          "text": "Condition 1 \"You claimed an amount on line 96\" (read \"Reduction for spouse or common-law partner\" (CA$0.00)) does not apply."
+        },
+        {
+          "label": "nl428_low_income_threshold_conditions_count_line_100",
+          "name": "Amount claimed on line 96 or line 97, counted as 1 or 0",
+          "reference": null,
+          "amount": "0",
+          "unit": null,
+          "text": "Condition 2 \"You claimed an amount on line 97\" (read line 97 (CA$0.00)) does not apply."
+        },
+        {
+          "label": "nl428_low_income_threshold_conditions_count_line_100",
+          "name": "Amount claimed on line 96 or line 97, counted as 1 or 0",
+          "reference": null,
+          "amount": "0",
+          "unit": null,
+          "text": "No condition applies, so the count is 0."
+        },
+        {
+          "label": "nl428_low_income_threshold_line_100",
+          "name": null,
+          "reference": "100",
+          "amount": "23928.00",
+          "unit": {
+            "name": "ca/cad",
+            "placement": "before",
+            "singular": "CA$",
+            "plural": "CA$",
+            "spaced": false,
+            "as_percentage": false
+          },
+          "text": "\"Low-income threshold\" (CA$23928.00), chosen because \"Amount claimed on line 96 or line 97, counted as 1 or 0\" (0) is 0."
+        },
+        {
+          "label": "nl428_line_101",
+          "name": null,
+          "reference": "101",
+          "amount": "45407.00",
+          "unit": {
+            "name": "ca/cad",
+            "placement": "before",
+            "singular": "CA$",
+            "plural": "CA$",
+            "spaced": false,
+            "as_percentage": false
+          },
+          "text": "Line 93 (CA$69335.00) less line 100 (CA$23928.00), not below 0, gives CA$45407.00 (rounded to the nearest cent)."
+        },
+        {
+          "label": "nl428_line_103",
+          "name": null,
+          "reference": "103",
+          "amount": "7265.12",
+          "unit": {
+            "name": "ca/cad",
+            "placement": "before",
+            "singular": "CA$",
+            "plural": "CA$",
+            "spaced": false,
+            "as_percentage": false
+          },
+          "text": "16% of line 101 (CA$45407.00) gives CA$7265.12 (rounded to the nearest cent)."
+        },
+        {
+          "label": "nl428_low_income_reduction_dependant_line_97",
+          "name": "Reduction for an eligible dependant claimed on line 58160",
+          "reference": "97",
+          "amount": "0",
+          "unit": {
+            "name": "ca/cad",
+            "placement": "before",
+            "singular": "CA$",
+            "plural": "CA$",
+            "spaced": false,
+            "as_percentage": false
+          },
+          "text": "Left blank, taken as CA$0.00."
+        },
+        {
+          "label": "nl428_reduction_for_spouse_or_common_law_partner_line_96",
+          "name": "Reduction for spouse or common-law partner",
+          "reference": "96",
+          "amount": "0",
+          "unit": {
+            "name": "ca/cad",
+            "placement": "before",
+            "singular": "CA$",
+            "plural": "CA$",
+            "spaced": false,
+            "as_percentage": false
+          },
+          "text": "Left blank, taken as CA$0.00."
+        },
+        {
+          "label": "nl428_low_income_reduction_before_maximum_line_98",
+          "name": "Low-income reduction before the maximum",
+          "reference": null,
+          "amount": "997.00",
+          "unit": {
+            "name": "ca/cad",
+            "placement": "before",
+            "singular": "CA$",
+            "plural": "CA$",
+            "spaced": false,
+            "as_percentage": false
+          },
+          "text": "Line 95 (CA$997.00) plus \"Reduction for spouse or common-law partner\" (CA$0.00) plus line 97 (CA$0.00) gives CA$997.00 (rounded to the nearest cent)."
+        },
+        {
+          "label": "nl428_low_income_reduction_line_98",
+          "name": null,
+          "reference": "98",
+          "amount": "997.00",
+          "unit": {
+            "name": "ca/cad",
+            "placement": "before",
+            "singular": "CA$",
+            "plural": "CA$",
+            "spaced": false,
+            "as_percentage": false
+          },
+          "text": "Lesser of \"Low-income reduction before the maximum\" (CA$997.00) and the low-income reduction maximum (CA$1554.00) gives CA$997.00 (rounded to the nearest cent)."
+        },
+        {
+          "label": "nl428_line_104_before_line_86_check",
+          "name": "Low-income tax reduction before the line 86 rule",
+          "reference": null,
+          "amount": "0.00",
+          "unit": {
+            "name": "ca/cad",
+            "placement": "before",
+            "singular": "CA$",
+            "plural": "CA$",
+            "spaced": false,
+            "as_percentage": false
+          },
+          "text": "Line 98 (CA$997.00) less line 103 (CA$7265.12), not below 0, gives CA$0.00 (rounded to the nearest cent)."
+        },
+        {
+          "label": "nl428_line_104",
+          "name": "Newfoundland and Labrador low-income tax reduction",
+          "reference": "104",
+          "amount": "0.00",
+          "unit": {
+            "name": "ca/cad",
+            "placement": "before",
+            "singular": "CA$",
+            "plural": "CA$",
+            "spaced": false,
+            "as_percentage": false
+          },
+          "text": "\"Low-income tax reduction before the line 86 rule\" (CA$0.00) multiplied by \"Multiplier that is 0 when you claim your spouse's or common-law partner's unused reduction\" (CA$1.00) gives CA$0.00 (rounded to the nearest cent)."
+        },
+        {
+          "label": "nl428_newfoundland_and_labrador_tax_line_105",
+          "name": null,
+          "reference": "105",
+          "amount": "6147.49",
+          "unit": {
+            "name": "ca/cad",
+            "placement": "before",
+            "singular": "CA$",
+            "plural": "CA$",
+            "spaced": false,
+            "as_percentage": false
+          },
+          "text": "Line 87 (CA$6147.49) less line 104 (CA$0.00), not below 0, gives CA$6147.49 (rounded to the nearest cent)."
+        }
+      ]
+    },
+    {
+      "form": "ca/t1_tax_and_credits",
+      "name": "T1 Income Tax and Benefit Return, Steps 5 and 6: Federal tax, and refund or balance owing",
+      "lines": [
+        {
+          "label": "federal_foreign_tax_credit",
+          "name": "Federal foreign tax credit",
+          "reference": "40500",
+          "amount": "0",
+          "unit": {
+            "name": "ca/cad",
+            "placement": "before",
+            "singular": "CA$",
+            "plural": "CA$",
+            "spaced": false,
+            "as_percentage": false
+          },
+          "text": "No value given, so the form's default gives CA$0.00."
+        },
+        {
+          "label": "federal_logging_tax_credit",
+          "name": "Federal logging tax credit",
+          "reference": "133",
+          "amount": "0",
+          "unit": {
+            "name": "ca/cad",
+            "placement": "before",
+            "singular": "CA$",
+            "plural": "CA$",
+            "spaced": false,
+            "as_percentage": false
+          },
+          "text": "No value given, so the form's default gives CA$0.00."
+        },
+        {
+          "label": "other_employment_income",
+          "name": "Other employment income",
+          "reference": "10400",
+          "amount": "0",
+          "unit": {
+            "name": "ca/cad",
+            "placement": "before",
+            "singular": "CA$",
+            "plural": "CA$",
+            "spaced": false,
+            "as_percentage": false
+          },
+          "text": "No value given, so the form's default gives CA$0.00."
+        },
+        {
+          "label": "basic_personal_amount_net_income_line_3",
+          "name": "Amount from line 23600 of your return",
+          "reference": null,
+          "amount": "69335.00",
+          "unit": {
+            "name": "ca/cad",
+            "placement": "before",
+            "singular": "CA$",
+            "plural": "CA$",
+            "spaced": false,
+            "as_percentage": false
+          },
+          "text": "Line 23600 of T1 Income Tax and Benefit Return, Steps 2 to 4 (CA$69335.00) gives CA$69335.00."
+        },
+        {
+          "label": "basic_personal_amount",
+          "name": "Basic personal amount",
+          "reference": "30000",
+          "amount": "16129.00",
+          "unit": {
+            "name": "ca/cad",
+            "placement": "before",
+            "singular": "CA$",
+            "plural": "CA$",
+            "spaced": false,
+            "as_percentage": false
+          },
+          "text": "14538.00 plus 1591.00, less 0.00 (the reduction for \"Amount from line 23600 of your return\" (CA$69335.00) over 177882.00, spread over a range of 75532.00), not below 14538.00, gives CA$16129.00 (rounded to the nearest cent)."
+        },
+        {
+          "label": "cpp_base_contributions_line_86",
+          "name": "Base CPP or QPP contributions through employment income",
+          "reference": "30800",
+          "amount": "3291.75",
+          "unit": {
+            "name": "ca/cad",
+            "placement": "before",
+            "singular": "CA$",
+            "plural": "CA$",
+            "spaced": false,
+            "as_percentage": false
+          },
+          "text": "Line 25 of Schedule 8 (CA$3291.75) gives CA$3291.75."
+        },
+        {
+          "label": "cwb_line_45300",
+          "name": "Canada workers benefit (CWB)",
+          "reference": "45300",
+          "amount": "0.00",
+          "unit": {
+            "name": "ca/cad",
+            "placement": "before",
+            "singular": "CA$",
+            "plural": "CA$",
+            "spaced": false,
+            "as_percentage": false
+          },
+          "text": "Line 28 of Schedule 6 (CA$0.00) gives CA$0.00."
+        },
+        {
+          "label": "ei_overpayment_line_45000",
+          "name": "Employment insurance (EI) overpayment",
+          "reference": "45000",
+          "amount": "0.00",
+          "unit": {
+            "name": "ca/cad",
+            "placement": "before",
+            "singular": "CA$",
+            "plural": "CA$",
+            "spaced": false,
+            "as_percentage": false
+          },
+          "text": "\"EI overpayment\" of T2204 (CA$0.00) gives CA$0.00."
+        },
+        {
+          "label": "ei_premiums_line_88",
+          "name": "Employment insurance premiums through employment",
+          "reference": "31200",
+          "amount": "1077.48",
+          "unit": {
+            "name": "ca/cad",
+            "placement": "before",
+            "singular": "CA$",
+            "plural": "CA$",
+            "spaced": false,
+            "as_percentage": false
+          },
+          "text": "Line 16 of T2204 (CA$1077.48) gives CA$1077.48."
+        },
+        {
+          "label": "federal_tax_taxable_income_line_70",
+          "name": null,
+          "reference": "70",
+          "amount": "69335.00",
+          "unit": {
+            "name": "ca/cad",
+            "placement": "before",
+            "singular": "CA$",
+            "plural": "CA$",
+            "spaced": false,
+            "as_percentage": false
+          },
+          "text": "Line 26000 of T1 Income Tax and Benefit Return, Steps 2 to 4 (CA$69335.00) gives CA$69335.00."
+        },
+        {
+          "label": "federal_bracket_lower_bound_line_71",
+          "name": null,
+          "reference": "71",
+          "amount": "57375",
+          "unit": {
+            "name": "ca/cad",
+            "placement": "before",
+            "singular": "CA$",
+            "plural": "CA$",
+            "spaced": false,
+            "as_percentage": false
+          },
+          "text": "Line 70 (CA$69335.00) falls in the bracket that starts at CA$57375.00."
+        },
+        {
+          "label": "federal_bracket_column_rate_line_73",
+          "name": "Rate",
+          "reference": "73",
+          "amount": "0.205",
+          "unit": null,
+          "text": "Line 70 (CA$69335.00) falls in a bracket with the rate 20.5%."
+        },
+        {
+          "label": "federal_tax_at_column_start_line_75",
+          "name": null,
+          "reference": "75",
+          "amount": "8319.38",
+          "unit": {
+            "name": "ca/cad",
+            "placement": "before",
+            "singular": "CA$",
+            "plural": "CA$",
+            "spaced": false,
+            "as_percentage": false
+          },
+          "text": "Line 70 (CA$69335.00) falls in a bracket with CA$8319.38 of tax on the income below it."
+        },
+        {
+          "label": "provincial_credits_line_47900",
+          "name": "Provincial or territorial credits",
+          "reference": "47900",
+          "amount": "0",
+          "unit": {
+            "name": "ca/cad",
+            "placement": "before",
+            "singular": "CA$",
+            "plural": "CA$",
+            "spaced": false,
+            "as_percentage": false
+          },
+          "text": "Blank because nothing was supplied for it."
+        },
+        {
+          "label": "provincial_tax_line_42800",
+          "name": "Provincial or territorial tax",
+          "reference": "42800",
+          "amount": "6147.49",
+          "unit": {
+            "name": "ca/cad",
+            "placement": "before",
+            "singular": "CA$",
+            "plural": "CA$",
+            "spaced": false,
+            "as_percentage": false
+          },
+          "text": "Line 105 of NL428 (CA$6147.49) gives CA$6147.49."
+        },
+        {
+          "label": "federal_taxable_income_over_lower_bound_line_72",
+          "name": null,
+          "reference": "72",
+          "amount": "11960.00",
+          "unit": {
+            "name": "ca/cad",
+            "placement": "before",
+            "singular": "CA$",
+            "plural": "CA$",
+            "spaced": false,
+            "as_percentage": false
+          },
+          "text": "Line 70 (CA$69335.00) less line 71 (CA$57375.00), not below 0, gives CA$11960.00 (rounded to the nearest cent)."
+        },
+        {
+          "label": "federal_excess_times_column_rate_line_74",
+          "name": null,
+          "reference": "74",
+          "amount": "2451.80",
+          "unit": {
+            "name": "ca/cad",
+            "placement": "before",
+            "singular": "CA$",
+            "plural": "CA$",
+            "spaced": false,
+            "as_percentage": false
+          },
+          "text": "Line 73 (20.5%) of line 72 (CA$11960.00) gives CA$2451.80 (rounded to the nearest cent)."
+        },
+        {
+          "label": "canada_employment_amount_income",
+          "name": "Employment income plus other employment income, before the limit",
+          "reference": null,
+          "amount": "70000.00",
+          "unit": {
+            "name": "ca/cad",
+            "placement": "before",
+            "singular": "CA$",
+            "plural": "CA$",
+            "spaced": false,
+            "as_percentage": false
+          },
+          "text": "Line 10100 (CA$70000.00) plus line 10400 (CA$0.00) gives CA$70000.00 (rounded to the nearest cent)."
+        },
+        {
+          "label": "canada_employment_amount",
+          "name": "Canada employment amount",
+          "reference": "31260",
+          "amount": "1471.00",
+          "unit": {
+            "name": "ca/cad",
+            "placement": "before",
+            "singular": "CA$",
+            "plural": "CA$",
+            "spaced": false,
+            "as_percentage": false
+          },
+          "text": "Lesser of \"Employment income plus other employment income, before the limit\" (CA$70000.00) and the Canada employment amount (CA$1471.00) gives CA$1471.00 (rounded to the nearest cent)."
+        },
+        {
+          "label": "credit_amounts_line_84",
+          "name": null,
+          "reference": "84",
+          "amount": "16129.00",
+          "unit": {
+            "name": "ca/cad",
+            "placement": "before",
+            "singular": "CA$",
+            "plural": "CA$",
+            "spaced": false,
+            "as_percentage": false
+          },
+          "text": "Line 30000 (CA$16129.00) gives CA$16129.00 (rounded to the nearest cent)."
+        },
+        {
+          "label": "credits_against_federal_tax",
+          "name": null,
+          "reference": "41600",
+          "amount": "0.00",
+          "unit": {
+            "name": "ca/cad",
+            "placement": "before",
+            "singular": "CA$",
+            "plural": "CA$",
+            "spaced": false,
+            "as_percentage": false
+          },
+          "text": "Nothing to add, so CA$0.00."
+        },
+        {
+          "label": "credits_subtotal_line_96",
+          "name": null,
+          "reference": "96",
+          "amount": "5840.23",
+          "unit": {
+            "name": "ca/cad",
+            "placement": "before",
+            "singular": "CA$",
+            "plural": "CA$",
+            "spaced": false,
+            "as_percentage": false
+          },
+          "text": "Line 30800 (CA$3291.75) plus line 31200 (CA$1077.48) plus line 31260 (CA$1471.00) gives CA$5840.23 (rounded to the nearest cent)."
+        },
+        {
+          "label": "credit_amounts_line_98",
+          "name": null,
+          "reference": "98",
+          "amount": "21969.23",
+          "unit": {
+            "name": "ca/cad",
+            "placement": "before",
+            "singular": "CA$",
+            "plural": "CA$",
+            "spaced": false,
+            "as_percentage": false
+          },
+          "text": "Line 84 (CA$16129.00) plus line 96 (CA$5840.23) gives CA$21969.23 (rounded to the nearest cent)."
+        },
+        {
+          "label": "credit_amounts_subtotal",
+          "name": null,
+          "reference": "101",
+          "amount": "21969.23",
+          "unit": {
+            "name": "ca/cad",
+            "placement": "before",
+            "singular": "CA$",
+            "plural": "CA$",
+            "spaced": false,
+            "as_percentage": false
+          },
+          "text": "Line 98 (CA$21969.23) gives CA$21969.23 (rounded to the nearest cent)."
+        },
+        {
+          "label": "credit_amounts_line_106",
+          "name": null,
+          "reference": "106",
+          "amount": "21969.23",
+          "unit": {
+            "name": "ca/cad",
+            "placement": "before",
+            "singular": "CA$",
+            "plural": "CA$",
+            "spaced": false,
+            "as_percentage": false
+          },
+          "text": "Line 101 (CA$21969.23) gives CA$21969.23 (rounded to the nearest cent)."
+        },
+        {
+          "label": "federal_tax_on_taxable_income_line_76",
+          "name": "Federal tax on taxable income",
+          "reference": "76",
+          "amount": "10771.18",
+          "unit": {
+            "name": "ca/cad",
+            "placement": "before",
+            "singular": "CA$",
+            "plural": "CA$",
+            "spaced": false,
+            "as_percentage": false
+          },
+          "text": "Line 74 (CA$2451.80) plus line 75 (CA$8319.38) gives CA$10771.18 (rounded to the nearest cent)."
+        },
+        {
+          "label": "federal_tax_with_split_income",
+          "name": null,
+          "reference": "40400",
+          "amount": "10771.18",
+          "unit": {
+            "name": "ca/cad",
+            "placement": "before",
+            "singular": "CA$",
+            "plural": "CA$",
+            "spaced": false,
+            "as_percentage": false
+          },
+          "text": "Line 76 (CA$10771.18) gives CA$10771.18 (rounded to the nearest cent)."
+        },
+        {
+          "label": "non_refundable_credit_amounts",
+          "name": null,
+          "reference": "33500",
+          "amount": "21969.23",
+          "unit": {
+            "name": "ca/cad",
+            "placement": "before",
+            "singular": "CA$",
+            "plural": "CA$",
+            "spaced": false,
+            "as_percentage": false
+          },
+          "text": "Line 106 (CA$21969.23) gives CA$21969.23 (rounded to the nearest cent)."
+        },
+        {
+          "label": "credit_amounts_at_credit_rate",
+          "name": null,
+          "reference": "33800",
+          "amount": "3185.54",
+          "unit": {
+            "name": "ca/cad",
+            "placement": "before",
+            "singular": "CA$",
+            "plural": "CA$",
+            "spaced": false,
+            "as_percentage": false
+          },
+          "text": "14.5% of line 33500 (CA$21969.23) gives CA$3185.54 (rounded to the nearest cent)."
+        },
+        {
+          "label": "non_refundable_tax_credits",
+          "name": "Total federal non-refundable tax credits",
+          "reference": "35000",
+          "amount": "3185.54",
+          "unit": {
+            "name": "ca/cad",
+            "placement": "before",
+            "singular": "CA$",
+            "plural": "CA$",
+            "spaced": false,
+            "as_percentage": false
+          },
+          "text": "Line 33800 (CA$3185.54) gives CA$3185.54 (rounded to the nearest cent)."
+        },
+        {
+          "label": "credits_against_basic_federal_tax",
+          "name": null,
+          "reference": "125",
+          "amount": "3185.54",
+          "unit": {
+            "name": "ca/cad",
+            "placement": "before",
+            "singular": "CA$",
+            "plural": "CA$",
+            "spaced": false,
+            "as_percentage": false
+          },
+          "text": "Line 35000 (CA$3185.54) gives CA$3185.54 (rounded to the nearest cent)."
+        },
+        {
+          "label": "federal_tax_after_credits",
+          "name": "Basic federal tax",
+          "reference": "42900",
+          "amount": "7585.64",
+          "unit": {
+            "name": "ca/cad",
+            "placement": "before",
+            "singular": "CA$",
+            "plural": "CA$",
+            "spaced": false,
+            "as_percentage": false
+          },
+          "text": "Line 40400 (CA$10771.18) less line 125 (CA$3185.54), not below 0, gives CA$7585.64 (rounded to the nearest cent)."
+        },
+        {
+          "label": "federal_tax_with_surtax",
+          "name": null,
+          "reference": "128",
+          "amount": "7585.64",
+          "unit": {
+            "name": "ca/cad",
+            "placement": "before",
+            "singular": "CA$",
+            "plural": "CA$",
+            "spaced": false,
+            "as_percentage": false
+          },
+          "text": "Line 42900 (CA$7585.64) gives CA$7585.64 (rounded to the nearest cent)."
+        },
+        {
+          "label": "federal_tax_less_foreign_tax_credit",
+          "name": null,
+          "reference": "130",
+          "amount": "7585.64",
+          "unit": {
+            "name": "ca/cad",
+            "placement": "before",
+            "singular": "CA$",
+            "plural": "CA$",
+            "spaced": false,
+            "as_percentage": false
+          },
+          "text": "Line 128 (CA$7585.64) less line 40500 (CA$0.00) gives CA$7585.64 (rounded to the nearest cent)."
+        },
+        {
+          "label": "federal_tax_with_itc_recapture",
+          "name": null,
+          "reference": "132",
+          "amount": "7585.64",
+          "unit": {
+            "name": "ca/cad",
+            "placement": "before",
+            "singular": "CA$",
+            "plural": "CA$",
+            "spaced": false,
+            "as_percentage": false
+          },
+          "text": "Line 130 (CA$7585.64) gives CA$7585.64 (rounded to the nearest cent)."
+        },
+        {
+          "label": "federal_tax",
+          "name": "Federal tax",
+          "reference": "40600",
+          "amount": "7585.64",
+          "unit": {
+            "name": "ca/cad",
+            "placement": "before",
+            "singular": "CA$",
+            "plural": "CA$",
+            "spaced": false,
+            "as_percentage": false
+          },
+          "text": "Line 132 (CA$7585.64) less line 133 (CA$0.00), not below 0, gives CA$7585.64 (rounded to the nearest cent)."
+        },
+        {
+          "label": "federal_tax_less_credits",
+          "name": null,
+          "reference": "41700",
+          "amount": "7585.64",
+          "unit": {
+            "name": "ca/cad",
+            "placement": "before",
+            "singular": "CA$",
+            "plural": "CA$",
+            "spaced": false,
+            "as_percentage": false
+          },
+          "text": "Line 40600 (CA$7585.64) less line 41600 (CA$0.00), not below 0, gives CA$7585.64 (rounded to the nearest cent)."
+        },
+        {
+          "label": "net_federal_tax",
+          "name": "Net federal tax",
+          "reference": "42000",
+          "amount": "7585.64",
+          "unit": {
+            "name": "ca/cad",
+            "placement": "before",
+            "singular": "CA$",
+            "plural": "CA$",
+            "spaced": false,
+            "as_percentage": false
+          },
+          "text": "Line 41700 (CA$7585.64) gives CA$7585.64 (rounded to the nearest cent)."
+        },
+        {
+          "label": "provincial_credits_line_47900",
+          "name": "Provincial or territorial credits",
+          "reference": "47900",
+          "amount": "0",
+          "unit": {
+            "name": "ca/cad",
+            "placement": "before",
+            "singular": "CA$",
+            "plural": "CA$",
+            "spaced": false,
+            "as_percentage": false
+          },
+          "text": "Left blank, taken as CA$0.00."
+        },
+        {
+          "label": "total_credits",
+          "name": "Total credits",
+          "reference": "48200",
+          "amount": "0.00",
+          "unit": {
+            "name": "ca/cad",
+            "placement": "before",
+            "singular": "CA$",
+            "plural": "CA$",
+            "spaced": false,
+            "as_percentage": false
+          },
+          "text": "Line 45000 (CA$0.00) plus line 45300 (CA$0.00) plus line 47900 (CA$0.00) gives CA$0.00 (rounded to the nearest cent)."
+        },
+        {
+          "label": "total_payable",
+          "name": "Total payable",
+          "reference": "43500",
+          "amount": "13733.13",
+          "unit": {
+            "name": "ca/cad",
+            "placement": "before",
+            "singular": "CA$",
+            "plural": "CA$",
+            "spaced": false,
+            "as_percentage": false
+          },
+          "text": "Line 42000 (CA$7585.64) plus line 42800 (CA$6147.49) gives CA$13733.13 (rounded to the nearest cent)."
+        },
+        {
+          "label": "refund_or_balance_owing",
+          "name": "Refund or balance owing",
+          "reference": "167",
+          "amount": "13733.13",
+          "unit": {
+            "name": "ca/cad",
+            "placement": "before",
+            "singular": "CA$",
+            "plural": "CA$",
+            "spaced": false,
+            "as_percentage": false
+          },
+          "text": "Line 43500 (CA$13733.13) less line 48200 (CA$0.00) gives CA$13733.13 (rounded to the nearest cent)."
+        }
+      ]
+    },
+    {
+      "form": "ca-nl/return",
+      "name": "Return summary",
+      "lines": [
+        {
+          "label": "nl428_bracket_rate_line_12",
+          "name": null,
+          "reference": null,
+          "amount": "0",
+          "unit": null,
+          "text": "Line 12 of NL428 (item 1 of nl428 credits.nl428 bracket rate line 12): left blank, taken as 0.00."
+        },
+        {
+          "label": "newfoundland_and_labrador_bracket_rate_line_12_return",
+          "name": null,
+          "reference": null,
+          "amount": "0",
+          "unit": {
+            "name": "core/percent",
+            "placement": "after",
+            "singular": "%",
+            "plural": "%",
+            "spaced": false,
+            "as_percentage": true
+          },
+          "text": "Line 12 of NL428 (0.00) gives 0%."
+        },
+        {
+          "label": "newfoundland_and_labrador_bracket_rate_line_5_return",
+          "name": null,
+          "reference": null,
+          "amount": "0.145",
+          "unit": {
+            "name": "core/percent",
+            "placement": "after",
+            "singular": "%",
+            "plural": "%",
+            "spaced": false,
+            "as_percentage": true
+          },
+          "text": "Line 5 of NL428 (0.145) gives 14.5%."
+        },
+        {
+          "label": "newfoundland_and_labrador_tax_after_credits_return",
+          "name": null,
+          "reference": null,
+          "amount": "6147.49",
+          "unit": {
+            "name": "ca/cad",
+            "placement": "before",
+            "singular": "CA$",
+            "plural": "CA$",
+            "spaced": false,
+            "as_percentage": false
+          },
+          "text": "Line 85 of NL428 (CA$6147.49) gives CA$6147.49."
+        },
+        {
+          "label": "newfoundland_and_labrador_rate_gate",
+          "name": null,
+          "reference": null,
+          "amount": "1",
+          "unit": {
+            "name": "core/percent",
+            "placement": "after",
+            "singular": "%",
+            "plural": "%",
+            "spaced": false,
+            "as_percentage": true
+          },
+          "text": "Newfoundland and labrador tax after credits return (CA$6147.49) is over 0.005, so the rate is 100%."
+        },
+        {
+          "label": "federal_bracket_rate_return",
+          "name": null,
+          "reference": null,
+          "amount": "0.205",
+          "unit": {
+            "name": "core/percent",
+            "placement": "after",
+            "singular": "%",
+            "plural": "%",
+            "spaced": false,
+            "as_percentage": true
+          },
+          "text": "Line 73 of T1 Income Tax and Benefit Return, Steps 5 and 6 (0.205) gives 20.5%."
+        },
+        {
+          "label": "federal_tax_after_credits_return",
+          "name": null,
+          "reference": null,
+          "amount": "7585.64",
+          "unit": {
+            "name": "ca/cad",
+            "placement": "before",
+            "singular": "CA$",
+            "plural": "CA$",
+            "spaced": false,
+            "as_percentage": false
+          },
+          "text": "Line 42900 of T1 Income Tax and Benefit Return, Steps 5 and 6 (CA$7585.64) gives CA$7585.64."
+        },
+        {
+          "label": "federal_rate_gate",
+          "name": null,
+          "reference": null,
+          "amount": "1",
+          "unit": {
+            "name": "core/percent",
+            "placement": "after",
+            "singular": "%",
+            "plural": "%",
+            "spaced": false,
+            "as_percentage": true
+          },
+          "text": "Federal tax after credits return (CA$7585.64) is over 0.005, so the rate is 100%."
+        },
+        {
+          "label": "federal_marginal_rate",
+          "name": null,
+          "reference": null,
+          "amount": "0.205",
+          "unit": {
+            "name": "core/percent",
+            "placement": "after",
+            "singular": "%",
+            "plural": "%",
+            "spaced": false,
+            "as_percentage": true
+          },
+          "text": "Federal bracket rate return (20.5%) of federal rate gate (100%) gives 20.5% (not rounded)."
+        },
+        {
+          "label": "refund_or_balance_owing",
+          "name": "Refund or balance owing",
+          "reference": "167",
+          "amount": "13733.13",
+          "unit": {
+            "name": "ca/cad",
+            "placement": "before",
+            "singular": "CA$",
+            "plural": "CA$",
+            "spaced": false,
+            "as_percentage": false
+          },
+          "text": "Line 167 of T1 Income Tax and Benefit Return, Steps 5 and 6 (CA$13733.13) gives CA$13733.13."
+        },
+        {
+          "label": "total_payable",
+          "name": null,
+          "reference": null,
+          "amount": "13733.13",
+          "unit": {
+            "name": "ca/cad",
+            "placement": "before",
+            "singular": "CA$",
+            "plural": "CA$",
+            "spaced": false,
+            "as_percentage": false
+          },
+          "text": "Line 43500 of T1 Income Tax and Benefit Return, Steps 5 and 6 (CA$13733.13) gives CA$13733.13."
+        },
+        {
+          "label": "average_income_tax_rate",
+          "name": null,
+          "reference": null,
+          "amount": "0.1962",
+          "unit": {
+            "name": "core/percent",
+            "placement": "after",
+            "singular": "%",
+            "plural": "%",
+            "spaced": false,
+            "as_percentage": true
+          },
+          "text": "Line 43500 of T1 Income Tax and Benefit Return, Steps 5 and 6 (CA$13733.13) divided by line 10100 (CA$70000.00) gives 19.62% (rounded half-up to 0.0001)."
+        },
+        {
+          "label": "newfoundland_and_labrador_bracket_rate_return",
+          "name": null,
+          "reference": null,
+          "amount": "0.145",
+          "unit": {
+            "name": "core/percent",
+            "placement": "after",
+            "singular": "%",
+            "plural": "%",
+            "spaced": false,
+            "as_percentage": true
+          },
+          "text": "Newfoundland and labrador bracket rate line 5 return (14.5%) plus newfoundland and labrador bracket rate line 12 return (0%) gives 14.5% (not rounded)."
+        },
+        {
+          "label": "newfoundland_and_labrador_marginal_rate",
+          "name": null,
+          "reference": null,
+          "amount": "0.145",
+          "unit": {
+            "name": "core/percent",
+            "placement": "after",
+            "singular": "%",
+            "plural": "%",
+            "spaced": false,
+            "as_percentage": true
+          },
+          "text": "Newfoundland and labrador bracket rate return (14.5%) of newfoundland and labrador rate gate (100%) gives 14.5% (not rounded)."
+        },
+        {
+          "label": "marginal_tax_rate",
+          "name": null,
+          "reference": null,
+          "amount": "0.35",
+          "unit": {
+            "name": "core/percent",
+            "placement": "after",
+            "singular": "%",
+            "plural": "%",
+            "spaced": false,
+            "as_percentage": true
+          },
+          "text": "Federal marginal rate (20.5%) plus newfoundland and labrador marginal rate (14.5%) gives 35% (not rounded)."
+        }
+      ]
+    }
+  ]
+}
