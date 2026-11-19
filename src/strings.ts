@@ -20,6 +20,7 @@ export const strings = {
       'ca-bc': 'British Columbia',
       'ca-mb': 'Manitoba',
       'ca-sk': 'Saskatchewan',
+      'ca-nl': 'Newfoundland and Labrador',
     },
   },
   formPage: {
