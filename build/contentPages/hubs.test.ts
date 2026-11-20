@@ -95,26 +95,26 @@ describe('hubPages', () => {
     for (const page of pages) expect(gridOf(page)).toBeUndefined();
   });
 
-  // No province is hub-only at present, so these tests list all but Saskatchewan and treat it as the hub-only one.
-  const withoutSk = provinces.filter((p) => p.slug !== 'ca-sk');
+  // No province is hub-only at present, so these tests list all but Newfoundland and Labrador and treat it as the hub-only one.
+  const withoutNl = provinces.filter((p) => p.slug !== 'ca-nl');
 
   it('makes the hub of a hub-only province after the listed ones, with no salary section', () => {
-    const pages = hubPages([ontarioBuilt], withoutSk, new Set(), ['ca-sk']);
+    const pages = hubPages([ontarioBuilt], withoutNl, new Set(), ['ca-nl']);
     expect(pages.map((p) => p.slug)).toEqual([
-      ...withoutSk.map((p) => p.slug),
-      'ca-sk',
+      ...withoutNl.map((p) => p.slug),
+      'ca-nl',
     ]);
-    const saskatchewan = hubOf(pages, 'ca-sk');
-    expect(gridOf(saskatchewan)).toBeUndefined();
+    const newfoundland = hubOf(pages, 'ca-nl');
+    expect(gridOf(newfoundland)).toBeUndefined();
     expect(
-      saskatchewan.sections.some(
+      newfoundland.sections.some(
         (s) => s.heading === 'Take-home pay by salary',
       ),
     ).toBe(false);
   });
 
   it('links the hub-only province from every other hub, and links them back', () => {
-    const pages = hubPages([], withoutSk, new Set(), ['ca-sk']);
+    const pages = hubPages([], withoutNl, new Set(), ['ca-nl']);
     const hrefsOf = (page: ContentPageSpec) =>
       page.sections
         .flatMap((s) => s.blocks)
@@ -122,16 +122,8 @@ describe('hubPages', () => {
           (b): b is LinksBlock => b.kind === 'links' && b.layout === 'row',
         )
         .flatMap((b) => b.links.map((l) => l.href));
-    expect(hrefsOf(hubOf(pages, 'ca-on'))).toContain('/ca-sk/');
-    expect(hrefsOf(hubOf(pages, 'ca-sk'))).toEqual([
-      '/methodology/',
-      '/ca-on/',
-      '/ca-ab/',
-      '/ca-bc/',
-      '/ca-mb/',
-    ]);
-    const both = hubPages([], withoutSk, new Set(), ['ca-sk', 'ca-nl']);
-    expect(hrefsOf(hubOf(both, 'ca-nl'))).toEqual([
+    expect(hrefsOf(hubOf(pages, 'ca-on'))).toContain('/ca-nl/');
+    expect(hrefsOf(hubOf(pages, 'ca-nl'))).toEqual([
       '/methodology/',
       '/ca-on/',
       '/ca-ab/',
@@ -180,6 +172,7 @@ describe('hubPages', () => {
       '/ca-bc/',
       '/ca-mb/',
       '/ca-sk/',
+      '/ca-nl/',
     ]);
   });
 
