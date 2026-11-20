@@ -65,7 +65,7 @@ describe('British Columbia adapter', () => {
     // Groups are sorted by title; a title is listed once.
     expect(result.advanced.map((g) => g.name)).toEqual(
       [...new Set(numbered.map((f) => f.name))].sort((a, b) =>
-        a.localeCompare(b),
+        a.localeCompare(b, 'en'),
       ),
     );
     expect(result.advanced.flatMap((g) => g.lines)).toHaveLength(

@@ -92,7 +92,9 @@ describe('the dollar sign', () => {
   it('advancedGroups sorts the groups by title', () => {
     for (const response of [rNl, rSk]) {
       const names = advancedGroups(response).map((g) => g.name);
-      expect(names).toEqual([...names].sort((a, b) => a.localeCompare(b)));
+      expect(names).toEqual(
+        [...names].sort((a, b) => a.localeCompare(b, 'en')),
+      );
     }
   });
 
@@ -102,13 +104,14 @@ describe('the dollar sign', () => {
       name,
       lines: [{ reference, text: 'x', amount: '1' }],
     });
-    const response = {
+    const response: ComputeTakeHomeCalculationResponse = {
+      ...rNl,
       trace: [
         part('x/b1', 'B title', '1'),
         part('x/a', 'A title', '2'),
         part('x/b2', 'B title', '3'),
       ],
-    } as unknown as ComputeTakeHomeCalculationResponse;
+    };
     const groups = advancedGroups(response);
     expect(groups.map((g) => g.name)).toEqual(['A title', 'B title']);
     expect(groups[1]?.form).toBe('x/b1');

@@ -50,13 +50,15 @@ function mergeSameTitle(groups: AdvancedGroup[]): AdvancedGroup[] {
   for (const group of groups) {
     const first = merged.get(group.name);
     if (first) {
-      first.lines.push(...group.lines);
+      for (const line of group.lines) first.lines.push(line);
       first.page ??= group.page;
     } else {
       merged.set(group.name, { ...group, lines: [...group.lines] });
     }
   }
-  return [...merged.values()].sort((a, b) => a.name.localeCompare(b.name));
+  return [...merged.values()].sort((a, b) =>
+    a.name.localeCompare(b.name, 'en'),
+  );
 }
 
 /** Groups every trace line by form title for the advanced view. Same for every jurisdiction. */

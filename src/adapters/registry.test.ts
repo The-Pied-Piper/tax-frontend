@@ -118,7 +118,7 @@ describe('advancedGroups', () => {
     const groups = advancedGroups(response);
     expect(groups.map((g) => g.name)).toEqual(
       [...new Set((response.trace ?? []).map((f) => f.name))].sort((a, b) =>
-        a.localeCompare(b),
+        a.localeCompare(b, 'en'),
       ),
     );
     expect(
