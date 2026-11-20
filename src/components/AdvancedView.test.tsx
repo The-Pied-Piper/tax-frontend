@@ -389,6 +389,30 @@ describe('AdvancedView', () => {
             unit: cad,
           },
           {
+            label: 'Whole dollars',
+            reference: '13',
+            amount: '70000',
+            detail: 'd',
+            named: true,
+            unit: cad,
+          },
+          {
+            label: 'One decimal',
+            reference: '14',
+            amount: '1471.5',
+            detail: 'd',
+            named: true,
+            unit: cad,
+          },
+          {
+            label: 'Whole count',
+            reference: '15',
+            amount: '3',
+            detail: 'd',
+            named: true,
+            unit: null,
+          },
+          {
             label: 'Ontario rate',
             reference: '12',
             amount: '0.0915',
@@ -416,6 +440,17 @@ describe('AdvancedView', () => {
       await openForm();
       expect(screen.getByText('12 months')).toBeVisible();
       expect(screen.getByText('1 month')).toBeVisible();
+    });
+
+    it('shows two decimals on a dollar line the API sent without them', async () => {
+      await openForm();
+      expect(screen.getByText('$70,000.00')).toBeVisible();
+      expect(screen.getByText('$1,471.50')).toBeVisible();
+    });
+
+    it('leaves a count with no unit as sent', async () => {
+      await openForm();
+      expect(screen.getByText('3')).toBeVisible();
     });
 
     it('shows a bare amount for a line with no unit', async () => {
