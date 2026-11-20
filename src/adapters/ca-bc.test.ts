@@ -62,12 +62,11 @@ describe('British Columbia adapter', () => {
         lines: f.lines.filter((l) => (l.reference ?? '').trim() !== ''),
       }))
       .filter((f) => f.lines.length > 0);
-    // Groups are sorted by title; a title is listed once.
-    expect(result.advanced.map((g) => g.name)).toEqual(
-      [...new Set(numbered.map((f) => f.name))].sort((a, b) =>
-        a.localeCompare(b, 'en'),
-      ),
-    );
+    // Groups keep the API's order; a title is listed once.
+    expect(result.advanced.map((g) => g.name)).toEqual([
+      ...new Set(numbered.map((f) => f.name)),
+    ]);
+    expect(result.advanced.at(-1)?.form).toMatch(/\/return$/);
     expect(result.advanced.flatMap((g) => g.lines)).toHaveLength(
       numbered.flatMap((f) => f.lines).length,
     );
