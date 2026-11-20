@@ -1,6 +1,6 @@
 import { HOME_PATH, contentPath } from './siteLinks';
 import { strings } from '../strings';
-import { contentBreadcrumb, salaryBreadcrumb } from './breadcrumbs';
+import { contentBreadcrumb, homeStep, salaryBreadcrumb } from './breadcrumbs';
 
 // The one place the visible trail is worked out: the breadcrumb on a page and
 // the structured data in its head both come from these functions.
@@ -33,15 +33,28 @@ describe('contentBreadcrumb', () => {
 });
 
 describe('salaryBreadcrumb', () => {
-  it('is Calculator, then the hub link, then the salary label as the current page', () => {
+  it('is Home, then the hub link, then the salary label as the current page', () => {
     expect(
       salaryBreadcrumb({ label: 'Ontario', href: '/ca-on/' }, '$75,000'),
     ).toEqual({
       steps: [
-        { label: strings.siteNav.calculator, href: HOME_PATH },
+        { label: strings.siteNav.home, href: HOME_PATH },
         { label: 'Ontario', href: '/ca-on/' },
       ],
       current: '$75,000',
     });
+  });
+});
+
+describe('homeStep', () => {
+  it('is the first step of every trail', () => {
+    const first = homeStep();
+    expect(first).toEqual({ label: 'Home', href: HOME_PATH });
+    expect(contentBreadcrumb({ heading: 'X', trail: [] }).steps[0]).toEqual(
+      first,
+    );
+    expect(
+      salaryBreadcrumb({ label: 'Ontario', href: '/ca-on/' }, '$1').steps[0],
+    ).toEqual(first);
   });
 });

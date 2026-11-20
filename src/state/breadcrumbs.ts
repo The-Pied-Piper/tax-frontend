@@ -9,13 +9,18 @@ export type BreadcrumbTrail = {
   current: string;
 };
 
+/** The first step of every trail, so the home link reads the same on every page and in the structured data. */
+export function homeStep(): PageLink {
+  return { label: strings.siteNav.home, href: HOME_PATH };
+}
+
 /** The trail of a content page: Home, the pages of its trail, then its heading. */
 export function contentBreadcrumb(
   spec: Pick<ContentPageSpec, 'heading' | 'trail'>,
 ): BreadcrumbTrail {
   return {
     steps: [
-      { label: strings.siteNav.home, href: HOME_PATH },
+      homeStep(),
       ...spec.trail.map((step) => ({
         label: step.label,
         href: contentPath(step.slug),
@@ -25,13 +30,13 @@ export function contentBreadcrumb(
   };
 }
 
-/** The trail of a salary page: the calculator, the province hub, then the salary shown. */
+/** The trail of a salary page: Home, the province hub, then the salary shown. */
 export function salaryBreadcrumb(
   hub: PageLink,
   salaryLabel: string,
 ): BreadcrumbTrail {
   return {
-    steps: [{ label: strings.siteNav.calculator, href: HOME_PATH }, hub],
+    steps: [homeStep(), hub],
     current: salaryLabel,
   };
 }

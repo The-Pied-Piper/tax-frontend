@@ -11,7 +11,7 @@ type Props = {
   current: string;
 };
 
-/** The trail from the calculator down to the current page. */
+/** The trail from Home down to the current page. */
 export function Breadcrumb({ steps, current }: Props) {
   return (
     <nav aria-label={strings.siteNav.breadcrumb} className={styles.crumbs}>
