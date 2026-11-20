@@ -40,24 +40,28 @@ export function responseUnit(response: { unit?: Unit | null }): Unit {
 }
 
 /**
- * Joins the groups of forms that share one page (a province's main form and
- * its credits worksheet) into one group, so the form is listed once. The
- * joined group keeps the position, form key and page of the first.
+ * Joins the forms the API gives the same title (a province's main form and its
+ * credits are two engine forms with one title) into one group, so a title is
+ * listed once, and sorts the groups by title. The joined group keeps the form
+ * key of its first part and the first page any part has.
  */
-function mergeSharedPages(groups: AdvancedGroup[]): AdvancedGroup[] {
-  const merged: AdvancedGroup[] = [];
+function mergeSameTitle(groups: AdvancedGroup[]): AdvancedGroup[] {
+  const merged = new Map<string, AdvancedGroup>();
   for (const group of groups) {
-    const first =
-      group.page === null
-        ? undefined
-        : merged.find((g) => g.page === group.page);
-    if (first) first.lines.push(...group.lines);
-    else merged.push({ ...group, lines: [...group.lines] });
+    const first = merged.get(group.name);
+    if (first) {
+      for (const line of group.lines) first.lines.push(line);
+      first.page ??= group.page;
+    } else {
+      merged.set(group.name, { ...group, lines: [...group.lines] });
+    }
   }
-  return merged;
+  return [...merged.values()].sort((a, b) =>
+    a.name.localeCompare(b.name, 'en'),
+  );
 }
 
-/** Groups every trace line by form for the advanced view. Same for every jurisdiction. */
+/** Groups every trace line by form title for the advanced view. Same for every jurisdiction. */
 export function advancedGroups(
   response: ComputeTakeHomeCalculationResponse,
 ): AdvancedGroup[] {
@@ -89,7 +93,7 @@ export function advancedGroups(
       },
     ];
   });
-  return mergeSharedPages(groups);
+  return mergeSameTitle(groups);
 }
 
 /**

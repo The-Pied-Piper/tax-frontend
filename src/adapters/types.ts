@@ -34,11 +34,11 @@ export interface AdvancedLine {
   named: boolean;
 }
 
-/** All lines of one form, in the order the API returned them. */
+/** All lines of the forms that share one title, in the order the API returned them. */
 export interface AdvancedGroup {
   /** Form identifier, as the API sent it. */
   form: string;
-  /** The API's display name of the form. */
+  /** The API's title of the form; parts with the same title are one group. */
   name: string;
   /** The id of the form's page, or null for a form with no page. */
   page: string | null;
