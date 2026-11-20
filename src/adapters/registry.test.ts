@@ -122,7 +122,7 @@ describe('advancedGroups', () => {
       ),
     );
     expect(
-      groups.find((g) => g.lines[0]?.label === 'Line A')?.lines[0],
+      groups.flatMap((g) => g.lines).find((l) => l.label === 'Line A'),
     ).toEqual({
       label: 'Line A',
       reference: 'A',
@@ -178,14 +178,6 @@ describe('advancedGroups', () => {
     ]);
     expect(groups[2]?.lines).toEqual([
       {
-        label: 'Named figure',
-        reference: '65',
-        amount: '1.00',
-        detail: 't',
-        named: true,
-        unit: months,
-      },
-      {
         label: 'Line 2',
         reference: '2',
         amount: null,
@@ -200,6 +192,14 @@ describe('advancedGroups', () => {
         detail: strings.advanced.noDetail,
         named: false,
         unit: null,
+      },
+      {
+        label: 'Named figure',
+        reference: '65',
+        amount: '1.00',
+        detail: 't',
+        named: true,
+        unit: months,
       },
     ]);
   });

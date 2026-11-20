@@ -4,6 +4,7 @@ import skResponse from '../api/fixtures/compute-sk-2025-70000.json';
 import { strings } from '../strings';
 import { compute70000 } from '../test/syntheticPages';
 import { advancedGroups, readUnit, responseUnit } from './fallback';
+import { compareReferences } from './lineOrder';
 
 const rawCad = {
   name: 'ca/cad',
@@ -116,5 +117,37 @@ describe('the dollar sign', () => {
     expect(groups.map((g) => g.name)).toEqual(['A title', 'B title']);
     expect(groups[1]?.form).toBe('x/b1');
     expect(groups[1]?.lines.map((l) => l.reference)).toEqual(['1', '3']);
+  });
+
+  it('advancedGroups puts the lines of a joined group in form order', () => {
+    const part = (form: string, refs: string[]) => ({
+      form,
+      name: 'Same title',
+      lines: refs.map((reference) => ({ reference, text: 'x', amount: '1' })),
+    });
+    const response: ComputeTakeHomeCalculationResponse = {
+      ...rNl,
+      trace: [
+        part('x/one', ['63', '8']),
+        part('x/two', ['105', '9', '64 box A']),
+      ],
+    };
+    const [group] = advancedGroups(response);
+    expect(group?.lines.map((l) => l.reference)).toEqual([
+      '8',
+      '9',
+      '63',
+      '64 box A',
+      '105',
+    ]);
+  });
+
+  it('advancedGroups sorts the lines of every real form by reference', () => {
+    for (const response of [rNl, rSk, compute70000]) {
+      for (const group of advancedGroups(response)) {
+        const refs = group.lines.map((l) => l.reference ?? '');
+        expect(refs).toEqual([...refs].sort((a, b) => compareReferences(a, b)));
+      }
+    }
   });
 });

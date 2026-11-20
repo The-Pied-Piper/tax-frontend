@@ -11,7 +11,7 @@ type Props = {
 };
 
 // Display only: every trace line, grouped by form title and sorted by
-// title. Always yearly, so there is no pay period here.
+// title, lines in form order. Always yearly, so there is no pay period here.
 export function AdvancedView({ groups }: Props) {
   const headingId = useId();
   if (groups.length === 0) return null;

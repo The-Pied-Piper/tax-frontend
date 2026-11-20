@@ -1,6 +1,7 @@
 import type { ComputeTakeHomeCalculationResponse } from '../api';
 import { strings } from '../strings';
 import { pageOfForm } from './formPages';
+import { sortByReference } from './lineOrder';
 import type { AdaptedResult, AdvancedGroup, Unit } from './types';
 
 /**
@@ -42,7 +43,7 @@ export function responseUnit(response: { unit?: Unit | null }): Unit {
 /**
  * Joins the forms the API gives the same title (a province's main form and its
  * credits are two engine forms with one title) into one group, so a title is
- * listed once, and sorts the groups by title. The joined group keeps the form
+ * listed once, sorts each group's lines by reference (printed-form order), and sorts the groups by title. The joined group keeps the form
  * key of its first part and the first page any part has.
  */
 function mergeSameTitle(groups: AdvancedGroup[]): AdvancedGroup[] {
@@ -56,9 +57,9 @@ function mergeSameTitle(groups: AdvancedGroup[]): AdvancedGroup[] {
       merged.set(group.name, { ...group, lines: [...group.lines] });
     }
   }
-  return [...merged.values()].sort((a, b) =>
-    a.name.localeCompare(b.name, 'en'),
-  );
+  return [...merged.values()]
+    .map((group) => ({ ...group, lines: sortByReference(group.lines) }))
+    .sort((a, b) => a.name.localeCompare(b.name, 'en'));
 }
 
 /** Groups every trace line by form title for the advanced view. Same for every jurisdiction. */
