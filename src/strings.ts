@@ -10,7 +10,6 @@ export const strings = {
   siteNav: {
     label: 'Site',
     breadcrumb: 'Breadcrumb',
-    calculator: 'Calculator',
     home: 'Home',
     methodology: 'How we calculate',
     provinces: 'Provinces:',

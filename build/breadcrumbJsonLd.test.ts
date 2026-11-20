@@ -3,7 +3,7 @@ import { breadcrumbJsonLd } from './breadcrumbJsonLd';
 const site = 'https://example.test';
 const trail = {
   steps: [
-    { label: 'Calculator', href: '/' },
+    { label: 'Home', href: '/' },
     { label: 'Ontario', href: '/ca-on/' },
   ],
   current: '$75,000',
@@ -35,7 +35,7 @@ describe('breadcrumbJsonLd', () => {
         {
           '@type': 'ListItem',
           position: 1,
-          name: 'Calculator',
+          name: 'Home',
           item: 'https://example.test/',
         },
         {

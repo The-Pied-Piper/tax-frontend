@@ -383,7 +383,7 @@ describe('breadcrumb and learn-more links in the static page (#150)', () => {
   const learnMore = () =>
     screen.getByRole('navigation', { name: /learn more about this estimate/i });
 
-  it('has the breadcrumb Calculator / Ontario / $70,000 in the HTML, with no script run', () => {
+  it('has the breadcrumb Home / Ontario / $70,000 in the HTML, with no script run', () => {
     show(withLinks);
     const nav = crumbs();
     expect(within(nav).getByRole('list').tagName).toBe('OL');
@@ -392,7 +392,7 @@ describe('breadcrumb and learn-more links in the static page (#150)', () => {
         .getAllByRole('link')
         .map((a) => [a.textContent, a.getAttribute('href')]),
     ).toEqual([
-      ['Calculator', '/'],
+      ['Home', '/'],
       ['Ontario', '/ca-on/'],
     ]);
     const current = within(nav).getByText('$70,000');

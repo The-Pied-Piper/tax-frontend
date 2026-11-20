@@ -3,7 +3,7 @@ import { strings } from '../strings';
 import { Breadcrumb } from './Breadcrumb';
 
 const steps = [
-  { label: 'Calculator', href: '/' },
+  { label: 'Home', href: '/' },
   { label: 'Ontario', href: '/ca-on/' },
 ];
 
@@ -35,7 +35,7 @@ describe('Breadcrumb', () => {
         .getAllByRole('link')
         .map((a) => [a.textContent, a.getAttribute('href')]),
     ).toEqual([
-      ['Calculator', '/'],
+      ['Home', '/'],
       ['Ontario', '/ca-on/'],
     ]);
   });
