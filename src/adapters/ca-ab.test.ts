@@ -76,9 +76,9 @@ describe('Alberta adapter', () => {
         lines: f.lines.filter((l) => (l.reference ?? '').trim() !== ''),
       }))
       .filter((f) => f.lines.length > 0);
-    expect(result.advanced.map((g) => g.form)).toEqual(
-      numbered.map((f) => f.form),
-    );
+    // A province's main form and its credits share one page and one group.
+    const names = result.advanced.map((g) => g.name);
+    expect(new Set(names).size).toBe(names.length);
     expect(result.advanced.flatMap((g) => g.lines)).toHaveLength(
       numbered.flatMap((f) => f.lines).length,
     );
