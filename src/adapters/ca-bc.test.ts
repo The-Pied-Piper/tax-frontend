@@ -58,11 +58,15 @@ describe('British Columbia adapter', () => {
     const numbered = (r2025.trace ?? [])
       .map((f) => ({
         form: f.form,
+        name: f.name,
         lines: f.lines.filter((l) => (l.reference ?? '').trim() !== ''),
       }))
       .filter((f) => f.lines.length > 0);
-    expect(result.advanced.map((g) => g.form)).toEqual(
-      numbered.map((f) => f.form),
+    // Groups are sorted by title; a title is listed once.
+    expect(result.advanced.map((g) => g.name)).toEqual(
+      [...new Set(numbered.map((f) => f.name))].sort((a, b) =>
+        a.localeCompare(b),
+      ),
     );
     expect(result.advanced.flatMap((g) => g.lines)).toHaveLength(
       numbered.flatMap((f) => f.lines).length,

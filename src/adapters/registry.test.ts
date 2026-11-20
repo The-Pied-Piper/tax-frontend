@@ -114,12 +114,16 @@ describe('AdapterRegistry', () => {
 });
 
 describe('advancedGroups', () => {
-  it('groups lines by form in API order and keeps amounts as text', () => {
+  it('groups lines by form title, sorted, and keeps amounts as text', () => {
     const groups = advancedGroups(response);
-    expect(groups.map((g) => g.form)).toEqual(
-      (response.trace ?? []).map((f) => f.form),
+    expect(groups.map((g) => g.name)).toEqual(
+      [...new Set((response.trace ?? []).map((f) => f.name))].sort((a, b) =>
+        a.localeCompare(b),
+      ),
     );
-    expect(groups[0]?.lines[0]).toEqual({
+    expect(
+      groups.find((g) => g.lines[0]?.label === 'Line A')?.lines[0],
+    ).toEqual({
       label: 'Line A',
       reference: 'A',
       amount: '12',
@@ -168,11 +172,11 @@ describe('advancedGroups', () => {
       ],
     });
     expect(groups.map((g) => g.name)).toEqual([
-      'Example form',
-      'ex/other',
       'ex/blank',
+      'ex/other',
+      'Example form',
     ]);
-    expect(groups[0]?.lines).toEqual([
+    expect(groups[2]?.lines).toEqual([
       {
         label: 'Named figure',
         reference: '65',

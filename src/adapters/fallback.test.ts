@@ -70,15 +70,48 @@ describe('the dollar sign', () => {
     expect(page['ca-on/return']).toBeNull();
   });
 
-  it('advancedGroups lists the NL form once, with the lines of its credits', () => {
+  it('advancedGroups lists the NL form once, with the lines of both parts', () => {
     const own = advancedGroups(rNl).filter((g) => g.page === 'nl428');
     expect(own).toHaveLength(1);
     expect(own[0]?.lines).toHaveLength(106);
   });
 
-  it('advancedGroups lists the SK form once, with the lines of its credits', () => {
+  it('advancedGroups lists the SK form once, with the lines of both parts', () => {
     const own = advancedGroups(rSk).filter((g) => g.page === 'sk428');
     expect(own).toHaveLength(1);
     expect(own[0]?.lines).toHaveLength(49);
+  });
+
+  it('advancedGroups never repeats a title', () => {
+    for (const response of [rNl, rSk]) {
+      const names = advancedGroups(response).map((g) => g.name);
+      expect(new Set(names).size).toBe(names.length);
+    }
+  });
+
+  it('advancedGroups sorts the groups by title', () => {
+    for (const response of [rNl, rSk]) {
+      const names = advancedGroups(response).map((g) => g.name);
+      expect(names).toEqual([...names].sort((a, b) => a.localeCompare(b)));
+    }
+  });
+
+  it('advancedGroups joins forms that share a title, wherever they sit', () => {
+    const part = (form: string, name: string, reference: string) => ({
+      form,
+      name,
+      lines: [{ reference, text: 'x', amount: '1' }],
+    });
+    const response = {
+      trace: [
+        part('x/b1', 'B title', '1'),
+        part('x/a', 'A title', '2'),
+        part('x/b2', 'B title', '3'),
+      ],
+    } as unknown as ComputeTakeHomeCalculationResponse;
+    const groups = advancedGroups(response);
+    expect(groups.map((g) => g.name)).toEqual(['A title', 'B title']);
+    expect(groups[1]?.form).toBe('x/b1');
+    expect(groups[1]?.lines.map((l) => l.reference)).toEqual(['1', '3']);
   });
 });
