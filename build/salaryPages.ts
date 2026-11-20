@@ -9,13 +9,18 @@ import { formPageIdDefine } from './formPageIds';
 import { generateSalaryPages } from './salaryPages/generate';
 import { generateContentPages } from './contentPages/generate';
 import { generateNotFoundPage } from './contentPages/notFound';
+import { generateMovedPages } from './contentPages/moved';
 import { provinces } from './salaryPages/provinces';
 import { rewriteHome } from './salaryPages/home';
 import { pageDates } from './salaryPages/lastmod';
 import { rewriteSitemap } from './salaryPages/sitemap';
 import { contentPages, type ContentPageSpec } from '../src/state/contentPages';
 import { notFoundPage } from '../src/state/notFoundPage';
-import { PROVINCES_WITHOUT_SALARY_PAGES } from '../src/state/siteLinks';
+import {
+  contentSlugOfFile,
+  MOVED_PAGES,
+  PROVINCES_WITHOUT_SALARY_PAGES,
+} from '../src/state/siteLinks';
 import { hubPages } from './contentPages/hubs';
 import { withSalaryLinks } from './contentPages/forms';
 import type { SalaryPageData } from '../src/state/useTakeHome';
@@ -148,6 +153,16 @@ export function salaryPages(
           template: await readFile(contentFile, 'utf8'),
           render: renderContentPage,
           spec: notFoundPage,
+        });
+        await generateMovedPages({
+          outDir,
+          template: await readFile(contentFile, 'utf8'),
+          render: renderContentPage,
+          moved: MOVED_PAGES,
+          written: new Set(
+            content.written.map((file) => contentSlugOfFile(file)),
+          ),
+          siteUrl,
         });
         const everyPage = [...written, ...content.written];
         const lastmods = await pageDates(

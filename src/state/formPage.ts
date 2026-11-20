@@ -15,6 +15,8 @@ export type FormSection = {
   /** The address fragment, such as `credits`: lower-case, readable, unique on the page. */
   id: string;
   heading: string;
+  /** The step group the part belongs to, shown as a heading above its first part. Set on every part of a page or none. */
+  group?: string;
   /** The form lines this part covers, as shown in the pill: `Line 1` or `Lines 3–8`. */
   lines: string;
   /** One short paragraph. `{name}` shows the figure `name` in monospace. */

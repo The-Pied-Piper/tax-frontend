@@ -34,6 +34,19 @@ function Words({
   );
 }
 
+/** A part's heading: under a step group's heading it is one level lower. */
+function Title({
+  id,
+  grouped,
+  children,
+}: {
+  id: string;
+  grouped: boolean;
+  children: string;
+}) {
+  return grouped ? <h3 id={id}>{children}</h3> : <h2 id={id}>{children}</h2>;
+}
+
 /**
  * The parts of a form page: a notice, the contents, then one section per group
  * of lines, each with its own address, line numbers, a paragraph and a worked
@@ -69,43 +82,53 @@ export function FormSections({
           ))}
         </ol>
       </nav>
-      {sections.map((section) => (
-        <section
-          key={section.id}
-          id={section.id}
-          aria-labelledby={`${section.id}-heading`}
-          className={styles.section}
-        >
-          <div className={styles.heading}>
-            <h2 id={`${section.id}-heading`}>{section.heading}</h2>
-            <a
-              className={styles.permalink}
-              href={`#${section.id}`}
-              aria-label={strings.formPage.permalink(section.heading)}
-            >
-              #
-            </a>
-            <span className={styles.pill}>{section.lines}</span>
-          </div>
-          <p>
-            <Words text={section.paragraph} figures={section.figures} />
-          </p>
-          <div className={styles.example}>
-            <span className={styles.exampleLabel}>
-              {strings.formPage.example(salary)}
-            </span>
-            <Words text={section.example} figures={section.figures} />
-          </div>
-          {section.links !== undefined && section.links.length > 0 && (
-            <div className={styles.links}>
-              {section.links.map((link, at) => (
-                <a key={`${at.toString()}-${link.href}`} href={link.href}>
-                  {link.label}
-                </a>
-              ))}
+      {sections.map((section, at) => (
+        <Fragment key={section.id}>
+          {section.group !== undefined &&
+            section.group !== sections[at - 1]?.group && (
+              <h2 className={styles.group}>{section.group}</h2>
+            )}
+          <section
+            id={section.id}
+            aria-labelledby={`${section.id}-heading`}
+            className={styles.section}
+          >
+            <div className={styles.heading}>
+              <Title
+                id={`${section.id}-heading`}
+                grouped={section.group !== undefined}
+              >
+                {section.heading}
+              </Title>
+              <a
+                className={styles.permalink}
+                href={`#${section.id}`}
+                aria-label={strings.formPage.permalink(section.heading)}
+              >
+                #
+              </a>
+              <span className={styles.pill}>{section.lines}</span>
             </div>
-          )}
-        </section>
+            <p>
+              <Words text={section.paragraph} figures={section.figures} />
+            </p>
+            <div className={styles.example}>
+              <span className={styles.exampleLabel}>
+                {strings.formPage.example(salary)}
+              </span>
+              <Words text={section.example} figures={section.figures} />
+            </div>
+            {section.links !== undefined && section.links.length > 0 && (
+              <div className={styles.links}>
+                {section.links.map((link, at) => (
+                  <a key={`${at.toString()}-${link.href}`} href={link.href}>
+                    {link.label}
+                  </a>
+                ))}
+              </div>
+            )}
+          </section>
+        </Fragment>
       ))}
       <nav aria-label={strings.formPage.related} className={styles.related}>
         {federal === true ? (

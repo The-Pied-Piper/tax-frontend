@@ -58,7 +58,7 @@ describe('isSalaryPageSlug', () => {
       'ca-on',
       'methodology',
       'forms/bc428',
-      'forms/t1-income',
+      'forms/t1',
       'ca-on/70000/extra',
       'ca-on/70k',
       'Ca-On/70000',

@@ -164,8 +164,7 @@ describe('salaryPages closeBundle', () => {
       '/forms/schedule-6/',
       '/forms/schedule-8/',
       '/forms/sk428/',
-      '/forms/t1-income/',
-      '/forms/t1-tax/',
+      '/forms/t1/',
       '/forms/t2204/',
       '/forms/t4/',
       '/methodology/',
@@ -173,10 +172,28 @@ describe('salaryPages closeBundle', () => {
 
     const sitemap = await readFile(join(root, 'dist', 'sitemap.xml'), 'utf8');
     const urls = sitemap.match(/<url>[\s\S]*?<\/url>/g) ?? [];
-    expect(urls).toHaveLength(26);
+    expect(urls).toHaveLength(25);
     for (const url of urls) {
       expect(url).toMatch(/<lastmod>\d{4}-\d{2}-\d{2}<\/lastmod>/);
     }
+  });
+
+  it('writes a page at each old T1 address that points at the merged page, and keeps them out of the sitemap', async () => {
+    await runCloseBundle(
+      salaryPages('https://api.example.com/api/v1', 'https://example.com'),
+    );
+    for (const old of ['t1-income', 't1-tax']) {
+      const html = await readFile(
+        join(root, 'dist', 'forms', old, 'index.html'),
+        'utf8',
+      );
+      expect(html).toContain('url=/forms/t1/');
+      expect(html).toContain('<meta name="robots" content="noindex" />');
+    }
+    const sitemap = await readFile(join(root, 'dist', 'sitemap.xml'), 'utf8');
+    expect(sitemap).not.toContain('t1-income');
+    expect(sitemap).not.toContain('t1-tax');
+    expect(sitemap).toContain('/forms/t1/');
   });
 
   it('writes no page list and no sitemap without a site address', async () => {

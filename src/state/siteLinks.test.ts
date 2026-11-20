@@ -123,7 +123,7 @@ describe('formSlug', () => {
   });
 
   it('gives a valid slug and the address a form page is served at', () => {
-    expect(isContentSlug(formSlug('t1-income'))).toBe(true);
+    expect(isContentSlug(formSlug('t1'))).toBe(true);
     expect(contentPath(formSlug('bc428'))).toBe('/forms/bc428/');
     expect(contentFile(formSlug('bc428'))).toBe('forms/bc428/index.html');
   });

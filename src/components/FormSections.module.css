@@ -68,9 +68,18 @@
   color: var(--fg);
 }
 
-.section h2 {
+.section h2,
+.section h3 {
   margin: 0;
   font: inherit;
+}
+
+.group {
+  margin: 28px 0 0;
+  font-size: 20px;
+  font-weight: 600;
+  line-height: 1.3;
+  color: var(--fg);
 }
 
 .permalink {

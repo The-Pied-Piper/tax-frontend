@@ -212,7 +212,7 @@ describe.each(formPages)('the headings on the $name page', (spec) => {
       const el = sections[at];
       if (el === undefined) throw new Error(`no section at ${at.toString()}`);
       expect(el.id).toBe(section.id);
-      const h2 = el.querySelector('h2');
+      const h2 = el.querySelector('h2, h3');
       expect(h2?.textContent).toBe(section.heading);
       const permalink = el.querySelector(`a[href="#${section.id}"]`);
       expect(permalink).not.toBeNull();
@@ -326,5 +326,25 @@ describe('the links of a form part', () => {
         .getAllByRole('link')
         .map((a) => a.getAttribute('href')),
     ).toEqual(['#second']);
+  });
+});
+
+describe('a form page with step groups', () => {
+  const grouped: FormPageSpec = {
+    ...sampleFormSpec,
+    sections: sampleFormSpec.sections.map((section, at) => ({
+      ...section,
+      group: at === 0 ? 'Group A' : 'Group B',
+    })),
+  };
+
+  it('shows each group once, as a heading above its parts, which sit one level lower', () => {
+    render(<ContentPage {...formContentPage(grouped)} />);
+    expect(
+      screen.getAllByRole('heading', { level: 2 }).map((h) => h.textContent),
+    ).toEqual(expect.arrayContaining(['Group A', 'Group B']));
+    expect(
+      screen.getAllByRole('heading', { level: 3 }).map((h) => h.textContent),
+    ).toEqual(['First part', 'Second part']);
   });
 });
