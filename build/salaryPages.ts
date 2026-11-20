@@ -156,10 +156,13 @@ export function salaryPages(
         });
         await generateMovedPages({
           outDir,
+          template: await readFile(contentFile, 'utf8'),
+          render: renderContentPage,
           moved: MOVED_PAGES,
           written: new Set(
             content.written.map((file) => contentSlugOfFile(file)),
           ),
+          siteUrl,
         });
         const everyPage = [...written, ...content.written];
         const lastmods = await pageDates(

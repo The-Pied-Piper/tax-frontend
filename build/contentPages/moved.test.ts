@@ -1,62 +1,76 @@
-import { mkdtempSync, readFileSync, rmSync } from 'node:fs';
-import { tmpdir } from 'node:os';
-import { join } from 'node:path';
-import { generateMovedPages, movedPageHtml } from './moved';
-import { MOVED_PAGES } from '../../src/state/siteLinks';
+import { readdirSync } from 'node:fs';
+import { renderContentPage } from '../salaryPages/prerender';
+import {
+  siteUrl as site,
+  contentTemplate as template,
+  tmpDirs,
+} from '../../src/test/generatedSite';
+import { parse } from '../../src/test/crawlSite';
 import { formPages } from '../../src/state/formPages';
+import { MOVED_PAGES } from '../../src/state/siteLinks';
+import { generateMovedPages } from './moved';
 
-const dirs: string[] = [];
-afterAll(() => {
-  for (const d of dirs) rmSync(d, { recursive: true, force: true });
-});
-const tmp = () => {
-  const d = mkdtempSync(join(tmpdir(), 'moved-'));
-  dirs.push(d);
-  return d;
-};
+const outDir = tmpDirs('moved');
 
-describe('a moved page', () => {
-  it('sends the reader and search engines to the new address', () => {
-    const html = movedPageHtml('forms/t1');
-    expect(html).toContain(
-      '<meta http-equiv="refresh" content="0; url=/forms/t1/" />',
+async function run(
+  dir: string,
+  moved: Record<string, string>,
+  written: string[],
+  siteUrl: string | null = site,
+) {
+  return generateMovedPages({
+    outDir: dir,
+    template,
+    render: renderContentPage,
+    moved,
+    written: new Set(written),
+    siteUrl,
+  });
+}
+
+describe('generateMovedPages', () => {
+  it('writes one file at each old address and returns them', async () => {
+    const dir = outDir();
+    const files = await run(dir, { 'forms/old': 'forms/new' }, ['forms/new']);
+    expect(files).toEqual(['forms/old/index.html']);
+    expect(readdirSync(dir, { recursive: true }).map(String)).toContain(
+      'forms/old/index.html',
     );
-    expect(html).toContain('<link rel="canonical" href="/forms/t1/" />');
-    expect(html).toContain('<meta name="robots" content="noindex" />');
-    expect(html).toContain('<a href="/forms/t1/">');
   });
 
-  it('is written at each old address', async () => {
-    const outDir = tmp();
-    const files = await generateMovedPages({
-      outDir,
-      moved: { 'forms/old': 'forms/new' },
-      written: new Set(['forms/new']),
-    });
-    expect(files).toEqual(['forms/old/index.html']);
-    expect(readFileSync(join(outDir, files[0] ?? ''), 'utf8')).toContain(
-      'url=/forms/new/',
-    );
+  it('sends the reader to the new address and asks search engines to index that one', async () => {
+    const dir = outDir();
+    await run(dir, { 'forms/old': 'forms/new' }, ['forms/new']);
+    const page = parse(dir, 'forms/old/index.html');
+    expect(
+      page.querySelector('meta[http-equiv="refresh"]')?.getAttribute('content'),
+    ).toBe('0; url=/forms/new/');
+    expect(
+      page.querySelector('meta[name="robots"]')?.getAttribute('content'),
+    ).toBe('noindex');
+    const canonicals = page.querySelectorAll('link[rel="canonical"]');
+    expect(canonicals).toHaveLength(1);
+    expect(canonicals[0]?.getAttribute('href')).toBe(`${site}/forms/new/`);
+    expect(page.querySelector('a[href="/forms/new/"]')).not.toBeNull();
+  });
+
+  it('has no canonical link without a site address', async () => {
+    const dir = outDir();
+    await run(dir, { 'forms/old': 'forms/new' }, ['forms/new'], null);
+    const page = parse(dir, 'forms/old/index.html');
+    expect(page.querySelector('link[rel="canonical"]')).toBeNull();
   });
 
   it('refuses a target that was not written, or an old address that is a page', async () => {
     await expect(
-      generateMovedPages({
-        outDir: tmp(),
-        moved: { 'forms/old': 'forms/new' },
-        written: new Set(),
-      }),
+      run(outDir(), { 'forms/old': 'forms/new' }, []),
     ).rejects.toThrow(/not written/);
     await expect(
-      generateMovedPages({
-        outDir: tmp(),
-        moved: { 'forms/old': 'forms/new' },
-        written: new Set(['forms/old', 'forms/new']),
-      }),
+      run(outDir(), { 'forms/old': 'forms/new' }, ['forms/old', 'forms/new']),
     ).rejects.toThrow(/also a listed page/);
   });
 
-  it('covers the two old T1 addresses and none is a listed form page', () => {
+  it('covers the two old T1 addresses, and none is a listed form page', () => {
     expect(MOVED_PAGES).toEqual({
       'forms/t1-income': 'forms/t1',
       'forms/t1-tax': 'forms/t1',
