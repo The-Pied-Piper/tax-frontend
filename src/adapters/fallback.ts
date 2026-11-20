@@ -42,8 +42,9 @@ export function responseUnit(response: { unit?: Unit | null }): Unit {
 /**
  * Joins the forms the API gives the same title (a province's main form and its
  * credits are two engine forms with one title) into one group, so a title is
- * listed once, and sorts the groups by title. The joined group keeps the form
- * key of its first part and the first page any part has.
+ * listed once. Groups stay in the order the API returns them, and a joined
+ * group sits where its first part appeared. It keeps the form key of its
+ * first part and the first page any part has.
  */
 function mergeSameTitle(groups: AdvancedGroup[]): AdvancedGroup[] {
   const merged = new Map<string, AdvancedGroup>();
@@ -56,9 +57,7 @@ function mergeSameTitle(groups: AdvancedGroup[]): AdvancedGroup[] {
       merged.set(group.name, { ...group, lines: [...group.lines] });
     }
   }
-  return [...merged.values()].sort((a, b) =>
-    a.name.localeCompare(b.name, 'en'),
-  );
+  return [...merged.values()];
 }
 
 /** Groups every trace line by form title for the advanced view. Same for every jurisdiction. */

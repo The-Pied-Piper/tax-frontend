@@ -89,12 +89,18 @@ describe('the dollar sign', () => {
     }
   });
 
-  it('advancedGroups sorts the groups by title', () => {
-    for (const response of [rNl, rSk]) {
-      const names = advancedGroups(response).map((g) => g.name);
-      expect(names).toEqual(
-        [...names].sort((a, b) => a.localeCompare(b, 'en')),
-      );
+  it('advancedGroups keeps the API order and lists the return summary last', () => {
+    for (const response of [rNl, rSk, compute70000]) {
+      const groups = advancedGroups(response);
+      const apiOrder = [
+        ...new Set(
+          (response.trace ?? [])
+            .filter((f) => f.lines.some((l) => l.reference?.trim()))
+            .map((f) => f.name),
+        ),
+      ];
+      expect(groups.map((g) => g.name)).toEqual(apiOrder);
+      expect(groups.at(-1)?.form).toMatch(/\/return$/);
     }
   });
 
@@ -113,8 +119,8 @@ describe('the dollar sign', () => {
       ],
     };
     const groups = advancedGroups(response);
-    expect(groups.map((g) => g.name)).toEqual(['A title', 'B title']);
-    expect(groups[1]?.form).toBe('x/b1');
-    expect(groups[1]?.lines.map((l) => l.reference)).toEqual(['1', '3']);
+    expect(groups.map((g) => g.name)).toEqual(['B title', 'A title']);
+    expect(groups[0]?.form).toBe('x/b1');
+    expect(groups[0]?.lines.map((l) => l.reference)).toEqual(['1', '3']);
   });
 });
