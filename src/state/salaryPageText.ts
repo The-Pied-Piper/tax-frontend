@@ -2,9 +2,7 @@ import { responseUnit } from '../adapters/fallback';
 import type { ComputeTakeHomeCalculationResponse } from '../api';
 import { displayMoney, displayRate, displayWholeMoney } from '../money/format';
 import { strings } from '../strings';
-
-/** A title must be shorter than this many characters (the same limit as build/salaryPages/limits.ts). */
-const TITLE_LIMIT = 60;
+import { TITLE_LIMIT } from './pageLimits';
 
 /** The text of one salary page, all built from that page's own answer. */
 export type SalaryPageText = {

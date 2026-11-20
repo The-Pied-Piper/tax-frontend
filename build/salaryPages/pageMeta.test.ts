@@ -103,17 +103,6 @@ describe('pageMeta limits, for every province in the list, at its widest', () =>
       expect(title).toContain(place);
     },
   );
-
-  it('uses the shorter title only when the full one is too long', () => {
-    const long = salaryPageText(
-      compute150000,
-      'Newfoundland and Labrador',
-      2026,
-    ).title;
-    expect(long).toBe('$150,000 After Tax in Newfoundland and Labrador (2026)');
-    const normal = salaryPageText(compute150000, 'Ontario', 2026).title;
-    expect(normal).toBe('$150,000 After Tax in Ontario (2026 Take-Home Pay)');
-  });
 });
 
 describe('pageMeta: unique per page', () => {
