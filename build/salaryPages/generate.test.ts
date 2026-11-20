@@ -1046,7 +1046,7 @@ describe('the calls are paced when asked', () => {
     expect(tries).toHaveLength(2);
   });
 
-  it('writes all 125 pages of the real build, the list call first, every start 200 ms after the last', async () => {
+  it('writes all 150 pages of the real build, the list call first, every start 200 ms after the last', async () => {
     const c = clock();
     const listed = {
       jurisdictions: provinces.map((p) => ({
@@ -1067,12 +1067,12 @@ describe('the calls are paced when asked', () => {
       render,
       pace: { minGapMs: 200, sleep: c.sleep, now: c.now },
     });
-    expect(result.written).toHaveLength(125);
-    expect(api.calls).toHaveLength(126);
+    expect(result.written).toHaveLength(150);
+    expect(api.calls).toHaveLength(151);
     expect(api.calls[0]?.url).toBe(`${baseUrl}/jurisdictions`);
     expectSpaced(timed.starts, 200);
     expect(
       at(timed.starts, timed.starts.length - 1) - at(timed.starts, 0),
-    ).toBe(125 * 200);
+    ).toBe(150 * 200);
   });
 });

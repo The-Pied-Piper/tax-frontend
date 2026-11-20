@@ -5,7 +5,6 @@
  */
 export const COMING_SOON: readonly { code: string; name: string }[] = [
   { code: 'CA-NB', name: 'New Brunswick' },
-  { code: 'CA-NL', name: 'Newfoundland and Labrador' },
   { code: 'CA-NT', name: 'Northwest Territories' },
   { code: 'CA-NS', name: 'Nova Scotia' },
   { code: 'CA-NU', name: 'Nunavut' },
