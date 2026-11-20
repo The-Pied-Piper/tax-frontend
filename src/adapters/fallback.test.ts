@@ -73,13 +73,13 @@ describe('the dollar sign', () => {
   it('advancedGroups lists the NL form once, with the lines of both parts', () => {
     const own = advancedGroups(rNl).filter((g) => g.page === 'nl428');
     expect(own).toHaveLength(1);
-    expect(own[0]?.lines).toHaveLength(98);
+    expect(own[0]?.lines).toHaveLength(102);
   });
 
   it('advancedGroups lists the SK form once, with the lines of both parts', () => {
     const own = advancedGroups(rSk).filter((g) => g.page === 'sk428');
     expect(own).toHaveLength(1);
-    expect(own[0]?.lines).toHaveLength(47);
+    expect(own[0]?.lines).toHaveLength(49);
   });
 
   it('advancedGroups never repeats a title', () => {
