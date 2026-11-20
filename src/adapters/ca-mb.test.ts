@@ -85,11 +85,12 @@ describe('Manitoba adapter', () => {
         lines: f.lines.filter((l) => (l.reference ?? '').trim() !== ''),
       }))
       .filter((f) => f.lines.length > 0);
-    // A province's main form and its credits share one title and one group.
+    // A province's main form and its credits share one title and one group. Less the
+    // 1 line(s) the credits part repeats from the main form: an input both read is listed once.
     const names = result.advanced.map((g) => g.name);
     expect(new Set(names).size).toBe(names.length);
     expect(result.advanced.flatMap((g) => g.lines)).toHaveLength(
-      numbered.flatMap((f) => f.lines).length,
+      numbered.flatMap((f) => f.lines).length - 1,
     );
   });
 

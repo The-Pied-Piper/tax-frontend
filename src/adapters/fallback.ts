@@ -44,14 +44,25 @@ export function responseUnit(response: { unit?: Unit | null }): Unit {
  * credits are two engine forms with one title) into one group, so a title is
  * listed once. Groups stay in the order the API returns them, and a joined
  * group sits where its first part appeared. It keeps the form key of its
- * first part and the first page any part has.
+ * first part and the first page any part has. Each part lists the inputs it
+ * reads, so an input two parts both read (line 10400 on the T1's two parts)
+ * would be listed twice: a line whose form reference, name and amount a
+ * group already lists is left out.
  */
 function mergeSameTitle(groups: AdvancedGroup[]): AdvancedGroup[] {
   const merged = new Map<string, AdvancedGroup>();
   for (const group of groups) {
     const first = merged.get(group.name);
     if (first) {
-      for (const line of group.lines) first.lines.push(line);
+      for (const line of group.lines) {
+        const listed = first.lines.some(
+          (other) =>
+            other.reference === line.reference &&
+            other.label === line.label &&
+            other.amount === line.amount,
+        );
+        if (!listed) first.lines.push(line);
+      }
       first.page ??= group.page;
     } else {
       merged.set(group.name, { ...group, lines: [...group.lines] });

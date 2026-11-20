@@ -73,13 +73,13 @@ describe('the dollar sign', () => {
   it('advancedGroups lists the NL form once, with the lines of both parts', () => {
     const own = advancedGroups(rNl).filter((g) => g.page === 'nl428');
     expect(own).toHaveLength(1);
-    expect(own[0]?.lines).toHaveLength(106);
+    expect(own[0]?.lines).toHaveLength(98);
   });
 
   it('advancedGroups lists the SK form once, with the lines of both parts', () => {
     const own = advancedGroups(rSk).filter((g) => g.page === 'sk428');
     expect(own).toHaveLength(1);
-    expect(own[0]?.lines).toHaveLength(49);
+    expect(own[0]?.lines).toHaveLength(47);
   });
 
   it('advancedGroups never repeats a title', () => {
@@ -122,5 +122,23 @@ describe('the dollar sign', () => {
     expect(groups.map((g) => g.name)).toEqual(['B title', 'A title']);
     expect(groups[0]?.form).toBe('x/b1');
     expect(groups[0]?.lines.map((l) => l.reference)).toEqual(['1', '3']);
+  });
+
+  it('advancedGroups lists an input both parts of a form read once', () => {
+    const line = (reference: string, amount: string, name = 'Other') => ({
+      reference,
+      name,
+      text: 'No value given',
+      amount,
+    });
+    const response: ComputeTakeHomeCalculationResponse = {
+      ...rNl,
+      trace: [
+        { form: 'x/a', name: 'T', lines: [line('10400', '0'), line('1', '5')] },
+        { form: 'x/b', name: 'T', lines: [line('10400', '0'), line('2', '5')] },
+      ],
+    };
+    const [group] = advancedGroups(response);
+    expect(group?.lines.map((l) => l.reference)).toEqual(['10400', '1', '2']);
   });
 });
