@@ -1,3 +1,6 @@
+import type { ComputeTakeHomeCalculationResponse } from '../api';
+import nlResponse from '../api/fixtures/compute-nl-2025-70000.json';
+import skResponse from '../api/fixtures/compute-sk-2025-70000.json';
 import { strings } from '../strings';
 import { compute70000 } from '../test/syntheticPages';
 import { advancedGroups, readUnit, responseUnit } from './fallback';
@@ -10,6 +13,10 @@ const rawCad = {
   spaced: false,
   as_percentage: false,
 };
+
+// Saved responses from the running service for $70,000 in 2025.
+const rNl = nlResponse as ComputeTakeHomeCalculationResponse;
+const rSk = skResponse as ComputeTakeHomeCalculationResponse;
 
 describe('the dollar sign', () => {
   it('readUnit shows the API CA$ unit as $, keeping everything else', () => {
@@ -61,5 +68,17 @@ describe('the dollar sign', () => {
     expect(page['ca/t2204']).toBe('t2204');
     expect(page['ca/schedule_8']).toBe('schedule-8');
     expect(page['ca-on/return']).toBeNull();
+  });
+
+  it('advancedGroups lists the NL form once, with the lines of its credits', () => {
+    const own = advancedGroups(rNl).filter((g) => g.page === 'nl428');
+    expect(own).toHaveLength(1);
+    expect(own[0]?.lines).toHaveLength(106);
+  });
+
+  it('advancedGroups lists the SK form once, with the lines of its credits', () => {
+    const own = advancedGroups(rSk).filter((g) => g.page === 'sk428');
+    expect(own).toHaveLength(1);
+    expect(own[0]?.lines).toHaveLength(49);
   });
 });
