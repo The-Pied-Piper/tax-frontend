@@ -46,8 +46,8 @@ export function responseUnit(response: { unit?: Unit | null }): Unit {
  * group sits where its first part appeared. It keeps the form key of its
  * first part and the first page any part has. Each part lists the inputs it
  * reads, so an input two parts of one form both read
- * would be listed twice: a line whose form reference, name and amount a
- * group already lists is left out.
+ * would be listed twice: a line a group already lists, with the same form
+ * reference, label, amount, detail and unit, is left out.
  */
 function mergeSameTitle(groups: AdvancedGroup[]): AdvancedGroup[] {
   const merged = new Map<string, AdvancedGroup>();
@@ -59,7 +59,9 @@ function mergeSameTitle(groups: AdvancedGroup[]): AdvancedGroup[] {
           (other) =>
             other.reference === line.reference &&
             other.label === line.label &&
-            other.amount === line.amount,
+            other.amount === line.amount &&
+            other.detail === line.detail &&
+            other.unit?.name === line.unit?.name,
         );
         if (!listed) first.lines.push(line);
       }

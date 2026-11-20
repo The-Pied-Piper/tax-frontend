@@ -141,4 +141,30 @@ describe('the dollar sign', () => {
     const [group] = advancedGroups(response);
     expect(group?.lines.map((l) => l.reference)).toEqual(['10400', '1', '2']);
   });
+
+  it('advancedGroups keeps a line that differs in amount, name or text', () => {
+    const line = (amount: string, name: string, text: string) => ({
+      reference: '5',
+      name,
+      text,
+      amount,
+    });
+    const response: ComputeTakeHomeCalculationResponse = {
+      ...rNl,
+      trace: [
+        { form: 'x/a', name: 'T', lines: [line('1', 'One', 'a')] },
+        {
+          form: 'x/b',
+          name: 'T',
+          lines: [
+            line('2', 'One', 'a'),
+            line('1', 'Two', 'a'),
+            line('1', 'One', 'b'),
+          ],
+        },
+      ],
+    };
+    const [group] = advancedGroups(response);
+    expect(group?.lines).toHaveLength(4);
+  });
 });
