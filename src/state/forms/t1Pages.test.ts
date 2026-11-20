@@ -15,8 +15,11 @@ const EXPECTED_SECTIONS: Record<string, string[]> = {
     'contribution',
     'on-return',
   ],
-  't1-income': ['total-income', 'deductions', 'net-income', 'taxable-income'],
-  't1-tax': [
+  t1: [
+    'total-income',
+    'deductions',
+    'net-income',
+    'taxable-income',
     'federal-tax',
     'credits',
     'after-credits',

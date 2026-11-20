@@ -5,6 +5,7 @@ import type { ComponentProps } from 'react';
 import { App as RealApp } from './App';
 import { AdapterRegistry, advancedGroups, COMING_SOON } from './adapters';
 import { responseUnit } from './adapters/fallback';
+import { shownForms } from './test/shownForms';
 import {
   ApiError,
   NetworkError,
@@ -762,7 +763,7 @@ describe('App advanced view', () => {
       screen.getByRole('group', { name: strings.advanced.toggle }),
     ).not.toHaveAttribute('open');
     await user.click(screen.getByText(strings.advanced.toggle));
-    for (const form of compute2025.trace) {
+    for (const form of shownForms(compute2025.trace)) {
       expect(screen.getByText(form.name)).toBeVisible();
     }
   });
@@ -776,7 +777,7 @@ describe('App advanced view', () => {
         lines: form.lines.filter((l) => (l.reference ?? '').trim() !== ''),
       }))
       .filter((form) => form.lines.length > 0);
-    for (const form of numbered) {
+    for (const form of shownForms(numbered)) {
       await user.click(screen.getByText(form.name));
     }
     const lines = within(

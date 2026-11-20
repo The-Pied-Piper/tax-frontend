@@ -61,14 +61,14 @@ describe('form page labels and copy', () => {
   });
 
   it('t1-income deductions names line 22215 and says 23300 is the total', () => {
-    const text = paragraphOf('t1-income', 'deductions');
+    const text = paragraphOf('t1', 'deductions');
     expect(text).toMatch(/22215/);
     expect(text).toMatch(/23300/);
     expect(text).toMatch(/total/i);
   });
 
   it('t1-income deductions label lists both 22215 and 23300', () => {
-    const { lines } = sectionOf('t1-income', 'deductions');
+    const { lines } = sectionOf('t1', 'deductions');
     expect(lines).toMatch(/22215/);
     expect(lines).toMatch(/23300/);
     expect(lines).toMatch(/^Lines? [A-Z\d]/);
@@ -85,7 +85,7 @@ describe('form page labels and copy', () => {
   });
 
   it('t1-tax after-credits says "basic federal tax"', () => {
-    const text = paragraphOf('t1-tax', 'after-credits');
+    const text = paragraphOf('t1', 'after-credits');
     expect(text).toMatch(/basic federal tax/i);
     expect(text).not.toMatch(/is your federal tax\.?\s*$/i);
   });
@@ -98,19 +98,14 @@ describe('form page labels and copy', () => {
     expect(text).not.toMatch(/bigger than the starting amount/i);
   });
 
-  describe.each([
-    'ab428',
-    'bc428',
-    'on428',
-    'schedule-8',
-    't1-income',
-    't1-tax',
-    't4',
-  ])('the %s page', (id) => {
-    it.each(copyRules)('holds no %s in any field', (_what, pattern) => {
-      expect(everyString(pageOf(id)).join('\n')).not.toMatch(pattern);
-    });
-  });
+  describe.each(['ab428', 'bc428', 'on428', 'schedule-8', 't1', 't4'])(
+    'the %s page',
+    (id) => {
+      it.each(copyRules)('holds no %s in any field', (_what, pattern) => {
+        expect(everyString(pageOf(id)).join('\n')).not.toMatch(pattern);
+      });
+    },
+  );
 });
 
 describe('ab428 copy', () => {

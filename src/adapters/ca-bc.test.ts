@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import type { ComputeTakeHomeCalculationResponse } from '../api';
 import fixture2025 from '../api/fixtures/compute-bc-2025-70000.json';
 import { strings } from '../strings';
+import { shownForms } from '../test/shownForms';
 import { cad, months } from '../test/units';
 import { adapters } from './index';
 import { caBcAdapter } from './ca-bc';
@@ -62,7 +63,7 @@ describe('British Columbia adapter', () => {
       }))
       .filter((f) => f.lines.length > 0);
     expect(result.advanced.map((g) => g.form)).toEqual(
-      numbered.map((f) => f.form),
+      shownForms(numbered).map((f) => f.form),
     );
     expect(result.advanced.flatMap((g) => g.lines)).toHaveLength(
       numbered.flatMap((f) => f.lines).length,

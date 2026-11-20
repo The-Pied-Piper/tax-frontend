@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import type { ComputeTakeHomeCalculationResponse } from '../api';
 import fixture from '../api/fixtures/compute-on-2025-70000.json';
 import { strings } from '../strings';
+import { shownForms } from '../test/shownForms';
 import { cad, months, percent } from '../test/units';
 import { advancedGroups } from './fallback';
 import { AdapterRegistry } from './registry';
@@ -117,7 +118,7 @@ describe('advancedGroups', () => {
   it('groups lines by form in API order and keeps amounts as text', () => {
     const groups = advancedGroups(response);
     expect(groups.map((g) => g.form)).toEqual(
-      (response.trace ?? []).map((f) => f.form),
+      shownForms(response.trace ?? []).map((f) => f.form),
     );
     expect(groups[0]?.lines[0]).toEqual({
       label: 'Line A',

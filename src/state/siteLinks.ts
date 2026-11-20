@@ -13,6 +13,16 @@ export const FORMS_SEGMENT = 'forms';
 /** The address of the open-source engine's code, which the methodology page and the star button link to. */
 export const ENGINE_REPO_URL = 'https://github.com/The-Pied-Piper/tax-engine';
 
+/**
+ * Pages that were published and have moved: the old slug and the slug it now
+ * points to. The build writes a small page at each old address that sends the
+ * reader (and search engines) to the new one; it is never in the sitemap.
+ */
+export const MOVED_PAGES: Readonly<Record<string, string>> = {
+  'forms/t1-income': 'forms/t1',
+  'forms/t1-tax': 'forms/t1',
+};
+
 /** The address of the calculator. */
 export const HOME_PATH = '/';
 

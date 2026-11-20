@@ -21,8 +21,7 @@ type Slug = (typeof FOOTER_PROVINCE_SLUGS)[number];
 
 const FEDERAL = [
   ['t4', 'T4 slip'],
-  ['t1-income', 'T1 return, steps 2 to 4'],
-  ['t1-tax', 'T1 return, steps 5 and 6'],
+  ['t1', 'T1 return'],
   ['schedule-8', 'Schedule 8: Canada Pension Plan'],
   ['t2204', 'Form T2204: EI overpayment'],
   ['schedule-6', 'Schedule 6: Canada Workers Benefit'],

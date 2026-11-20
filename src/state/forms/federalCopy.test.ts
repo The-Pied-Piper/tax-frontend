@@ -5,14 +5,7 @@ import {
   sectionOf as section,
 } from '../../test/formText';
 
-const FEDERAL_IDS = [
-  't4',
-  't1-income',
-  't1-tax',
-  'schedule-8',
-  't2204',
-  'schedule-6',
-];
+const FEDERAL_IDS = ['t4', 't1', 'schedule-8', 't2204', 'schedule-6'];
 
 const isFederal = (spec: ReturnType<typeof page>): boolean =>
   spec.federal === true;
@@ -80,7 +73,7 @@ describe('federal pages keep sentences to 40 words or fewer', () => {
 });
 
 describe('t1-tax copy', () => {
-  const spec = () => page('t1-tax');
+  const spec = () => page('t1');
 
   it('does not say total tax in the description or intro', () => {
     expect(spec().description).not.toMatch(/total tax/i);
@@ -97,42 +90,42 @@ describe('t1-tax copy', () => {
   });
 
   it('titles the provincial section Your provincial tax', () => {
-    expect(section('t1-tax', 'provincial').heading).toBe('Your provincial tax');
+    expect(section('t1', 'provincial').heading).toBe('Your provincial tax');
   });
 
   it('says each province charges its own tax on its own form', () => {
-    expect(section('t1-tax', 'provincial').paragraph).toMatch(
+    expect(section('t1', 'provincial').paragraph).toMatch(
       /each province charges its own tax on its own form/i,
     );
   });
 
   it("names Ontario's form as Form ON428 and line 42800 as the copy", () => {
-    const { paragraph } = section('t1-tax', 'provincial');
+    const { paragraph } = section('t1', 'provincial');
     expect(paragraph).toMatch(/Ontario's is Form ON428/);
     expect(paragraph).toMatch(/42800/);
   });
 
   it('gives the Ontario figure as a labelled example', () => {
-    expect(section('t1-tax', 'provincial').example).toBe(
+    expect(section('t1', 'provincial').example).toBe(
       'In Ontario the provincial tax is {ontario}.',
     );
   });
 
   it('says your federal tax and your provincial tax in the balance paragraph', () => {
-    expect(section('t1-tax', 'balance').paragraph).toContain(
+    expect(section('t1', 'balance').paragraph).toContain(
       'your federal tax and your provincial tax',
     );
   });
 
   it("opens the balance example with federal plus Ontario's provincial figure", () => {
-    expect(section('t1-tax', 'balance').example).toMatch(
+    expect(section('t1', 'balance').example).toMatch(
       /^\{federal\} plus Ontario's \{ontario\} is a total payable of \{total\}/,
     );
   });
 });
 
 describe('t1-income taxable-income copy', () => {
-  const { paragraph } = section('t1-income', 'taxable-income');
+  const { paragraph } = section('t1', 'taxable-income');
 
   it('says your federal tax and your provincial tax', () => {
     expect(paragraph).toContain('Your federal tax and your provincial tax');
@@ -177,7 +170,7 @@ describe('federal form page wording', () => {
   });
 
   it('t1-income total-income paragraph and example', () => {
-    const { paragraph, example } = section('t1-income', 'total-income');
+    const { paragraph, example } = section('t1', 'total-income');
     expect(paragraph).toBe(
       'Total income is all the income you report for the year. For someone with only a salary, that is your pay. Your pay from your job goes on one line. Other work income goes on another. The form adds them together.',
     );
@@ -187,25 +180,25 @@ describe('federal form page wording', () => {
   });
 
   it('t1-income taxable-income paragraph', () => {
-    expect(section('t1-income', 'taxable-income').paragraph).toBe(
+    expect(section('t1', 'taxable-income').paragraph).toBe(
       'Some people take off a few more amounts at this step. What is left is your taxable income, and it cannot be below zero. Your federal tax and your provincial tax are both worked out from it.',
     );
   });
 
   it('t1-tax federal-tax paragraph', () => {
-    expect(section('t1-tax', 'federal-tax').paragraph).toBe(
+    expect(section('t1', 'federal-tax').paragraph).toBe(
       "Federal tax is charged in slices of income, called brackets, each with its own rate. The form finds the top slice your income reaches. It adds up the tax on all the slices below that one, then charges the top slice's rate on the rest of your income.",
     );
   });
 
   it('t1-tax credits paragraph', () => {
-    expect(section('t1-tax', 'credits').paragraph).toBe(
+    expect(section('t1', 'credits').paragraph).toBe(
       'A credit lowers your tax bill. The form starts with a list of amounts: the basic personal amount that everyone gets (it shrinks at high incomes), the base part of your pension plan payments, your Employment Insurance (EI) payments, and the Canada employment amount. That last one is a set amount, or your job income if that is less. The form adds them up and takes {rate} of the total. That is your discount.',
     );
   });
 
   it('t1-tax balance paragraph', () => {
-    expect(section('t1-tax', 'balance').paragraph).toBe(
+    expect(section('t1', 'balance').paragraph).toBe(
       'Line 43500 mainly adds your federal tax and your provincial tax. That gives your total payable. The last step, line 167, takes away your total credits (line 48200) to show whether you owe money or get a refund. This page stops before that step. One of those credits is the tax your employer already took off your pay during the year (line 43700). We leave it out and count only the other credits.',
     );
   });

@@ -11,7 +11,7 @@ function longestSentence(text: string): number {
 }
 
 describe('t1-tax balance section copy', () => {
-  const balance = () => section('t1-tax', 'balance');
+  const balance = () => section('t1', 'balance');
 
   it('no longer calls the section "Your total tax"', () => {
     expect(balance().heading).not.toMatch(/^your total tax$/i);

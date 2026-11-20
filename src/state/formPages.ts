@@ -4,8 +4,7 @@ import { t4 } from './forms/t4';
 import { ab428 } from './forms/ab428';
 import { bc428 } from './forms/bc428';
 import { schedule8 } from './forms/schedule8';
-import { t1Income } from './forms/t1Income';
-import { t1Tax } from './forms/t1Tax';
+import { t1 } from './forms/t1';
 import { t2204 } from './forms/t2204';
 import { schedule6 } from './forms/schedule6';
 import { on428a } from './forms/on428a';
@@ -23,8 +22,7 @@ export const formPages: FormPageSpec[] = [
   ab428,
   bc428,
   schedule8,
-  t1Income,
-  t1Tax,
+  t1,
   t2204,
   schedule6,
   on428a,

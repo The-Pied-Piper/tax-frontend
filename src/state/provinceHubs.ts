@@ -33,16 +33,10 @@ const federalForms: HubForm[] = [
       'The yearly slip your employer gives you. It shows your pay and what was taken off.',
   },
   {
-    id: 't1-income',
-    name: 'T1 return, steps 2 to 4',
+    id: 't1',
+    name: 'T1 return',
     description:
-      'Adds up your income and finds the part of it that tax is charged on.',
-  },
-  {
-    id: 't1-tax',
-    name: 'T1 return, steps 5 and 6',
-    description:
-      'Works out your federal tax and what you end up owing or getting back.',
+      'Finds your taxable income, works out your federal tax and what you end up owing or getting back.',
   },
   {
     id: 'schedule-8',
