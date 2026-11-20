@@ -54,8 +54,10 @@ function mergeSameTitle(groups: AdvancedGroup[]): AdvancedGroup[] {
   for (const group of groups) {
     const first = merged.get(group.name);
     if (first) {
+      // Only lines of earlier parts count: a part may print the same line twice on purpose.
+      const earlier = [...first.lines];
       for (const line of group.lines) {
-        const listed = first.lines.some(
+        const listed = earlier.some(
           (other) =>
             other.reference === line.reference &&
             other.label === line.label &&
