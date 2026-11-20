@@ -23,6 +23,22 @@ export function groupThousands(amount: string): string {
   return `${sign}${whole.replace(/\B(?=(\d{3})+$)/g, ',')}${fraction}`;
 }
 
+// "70000" -> "70000.00", "1471.5" -> "1471.50". An amount that already has two
+// or more decimals, and text that is not a plain decimal, is returned as is:
+// nothing is rounded.
+export function withCents(amount: string): string {
+  const match = AMOUNT.exec(amount);
+  if (!match) return amount;
+  const [, sign = '', whole = '', fraction = ''] = match;
+  if (fraction.length >= 3) return amount;
+  return `${sign}${whole}.${fraction.slice(1).padEnd(2, '0')}`;
+}
+
+// True for the Canadian dollar unit: its amounts always show two decimals.
+export function isDollarUnit(unit: MoneyUnit): boolean {
+  return unit.singular === '$' && unit.plural === '$';
+}
+
 const ONE = /^1(\.0+)?$/;
 
 // "53,468.68" + $ -> "$53,468.68"; "12" + months -> "12 months". The minus

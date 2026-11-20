@@ -1,6 +1,11 @@
 import { useId } from 'react';
 import type { AdvancedGroup, AdvancedLine, Unit } from '../adapters';
-import { groupThousands, withUnit } from '../money/format';
+import {
+  groupThousands,
+  isDollarUnit,
+  withCents,
+  withUnit,
+} from '../money/format';
 import { formPageLink } from '../state/formLinks';
 import { strings } from '../strings';
 import { HelpTerm } from './HelpTerm';
@@ -92,6 +97,8 @@ function reference(line: AdvancedLine) {
 }
 
 function lineAmount(amount: string, unit: Unit | null) {
-  const grouped = groupThousands(amount);
+  // The API may send a whole-dollar figure as "70000"; dollars show cents.
+  const dollars = unit !== null && isDollarUnit(unit);
+  const grouped = groupThousands(dollars ? withCents(amount) : amount);
   return unit === null ? grouped : withUnit(grouped, unit);
 }

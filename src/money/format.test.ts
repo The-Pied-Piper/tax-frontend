@@ -5,6 +5,8 @@ import {
   displayRate,
   displayWholeMoney,
   groupThousands,
+  isDollarUnit,
+  withCents,
   withUnit,
 } from './format';
 
@@ -168,5 +170,28 @@ describe('displayWholeMoney', () => {
 
   it('shows an amount it cannot read as sent', () => {
     expect(displayWholeMoney('lots', 'annually', dollar)).toBe('lots');
+  });
+});
+
+describe('withCents', () => {
+  it.each([
+    ['70000', '70000.00'],
+    ['1471', '1471.00'],
+    ['1471.5', '1471.50'],
+    ['-1000', '-1000.00'],
+    ['0', '0.00'],
+    ['70000.00', '70000.00'],
+    ['0.125', '0.125'],
+    ['not money', 'not money'],
+  ])('writes %s as %s', (input, expected) => {
+    expect(withCents(input)).toBe(expected);
+  });
+});
+
+describe('isDollarUnit', () => {
+  it('is true for the dollar and false for months and percent', () => {
+    expect(isDollarUnit(cad)).toBe(true);
+    expect(isDollarUnit(months)).toBe(false);
+    expect(isDollarUnit(percent)).toBe(false);
   });
 });
