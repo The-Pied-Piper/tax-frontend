@@ -85,7 +85,7 @@ describe('Manitoba adapter', () => {
         lines: f.lines.filter((l) => (l.reference ?? '').trim() !== ''),
       }))
       .filter((f) => f.lines.length > 0);
-    // A province's main form and its credits share one page and one group.
+    // A province's main form and its credits share one title and one group.
     const names = result.advanced.map((g) => g.name);
     expect(new Set(names).size).toBe(names.length);
     expect(result.advanced.flatMap((g) => g.lines)).toHaveLength(

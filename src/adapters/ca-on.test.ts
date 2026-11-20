@@ -6,7 +6,6 @@ import fixture2026Small from '../api/fixtures/compute-on-2026-1500.json';
 import fixture2026 from '../api/fixtures/compute-on-2026-70000.json';
 import { sumAmounts } from '../money/sum';
 import { strings } from '../strings';
-import { shownForms } from '../test/shownForms';
 import { cad, months } from '../test/units';
 import { adapters } from './index';
 import { caOnAdapter } from './ca-on';
@@ -90,11 +89,15 @@ describe('Ontario adapter', () => {
     const numbered = (r2025.trace ?? [])
       .map((f) => ({
         form: f.form,
+        name: f.name,
         lines: f.lines.filter((l) => (l.reference ?? '').trim() !== ''),
       }))
       .filter((f) => f.lines.length > 0);
-    expect(result.advanced.map((g) => g.form)).toEqual(
-      shownForms(numbered).map((f) => f.form),
+    // Groups are sorted by title; a title is listed once.
+    expect(result.advanced.map((g) => g.name)).toEqual(
+      [...new Set(numbered.map((f) => f.name))].sort((a, b) =>
+        a.localeCompare(b, 'en'),
+      ),
     );
     expect(result.advanced.flatMap((g) => g.lines)).toHaveLength(
       numbered.flatMap((f) => f.lines).length,
