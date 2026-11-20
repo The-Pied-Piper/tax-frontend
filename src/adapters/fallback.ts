@@ -45,7 +45,7 @@ export function responseUnit(response: { unit?: Unit | null }): Unit {
  * listed once. Groups stay in the order the API returns them, and a joined
  * group sits where its first part appeared. It keeps the form key of its
  * first part and the first page any part has. Each part lists the inputs it
- * reads, so an input two parts both read (line 10400 on the T1's two parts)
+ * reads, so an input two parts of one form both read
  * would be listed twice: a line whose form reference, name and amount a
  * group already lists is left out.
  */
