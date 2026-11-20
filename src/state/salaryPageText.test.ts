@@ -237,4 +237,15 @@ describe('natural-search wording of the page text', () => {
     expect(y2027.description).toContain(' in 2027, ');
     expect(y2027.description).not.toContain('2026');
   });
+
+  it('uses the shorter title only when the full one is too long', () => {
+    const long = salaryPageText(
+      compute150000,
+      'Newfoundland and Labrador',
+      2026,
+    ).title;
+    expect(long).toBe('$150,000 After Tax in Newfoundland and Labrador (2026)');
+    const normal = salaryPageText(compute150000, 'Ontario', 2026).title;
+    expect(normal).toBe('$150,000 After Tax in Ontario (2026 Take-Home Pay)');
+  });
 });

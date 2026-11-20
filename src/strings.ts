@@ -109,6 +109,9 @@ export const strings = {
   pageText: {
     title: (salary: string, place: string, year: number) =>
       `${salary} After Tax in ${place} (${String(year)} Take-Home Pay)`,
+    // Used only when the title above would reach the length limit (a long place name).
+    shortTitle: (salary: string, place: string, year: number) =>
+      `${salary} After Tax in ${place} (${String(year)})`,
     description: (
       salary: string,
       place: string,

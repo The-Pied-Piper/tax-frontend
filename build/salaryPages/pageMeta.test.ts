@@ -3,6 +3,8 @@ import { COMING_SOON } from '../../src/adapters/coming-soon';
 import { readFileSync, readdirSync } from 'node:fs';
 import { join } from 'node:path';
 import { pageMeta } from './pageMeta';
+import { provinces } from './provinces';
+import { strings } from '../../src/strings';
 import { salaryPageText } from '../../src/state/salaryPageText';
 import {
   compute150000,
@@ -83,6 +85,22 @@ describe('pageMeta limits, for every page', () => {
       const { title, description } = pageMeta(data);
       expect(title.length).toBeLessThan(60);
       expect(description.length).toBeLessThan(160);
+    },
+  );
+});
+
+describe('pageMeta limits, for every province in the list, at its widest', () => {
+  const names = strings.siteNav.provinceNames as Record<string, string>;
+
+  it.each(provinces.map((p) => [p.slug, p] as const))(
+    'title under 60 and description under 160 characters for %s at $150,000',
+    (slug) => {
+      const place = names[slug] ?? '';
+      expect(place, slug).not.toBe('');
+      const { title, description } = salaryPageText(compute150000, place, 2026);
+      expect(title.length).toBeLessThan(60);
+      expect(description.length).toBeLessThan(160);
+      expect(title).toContain(place);
     },
   );
 });
