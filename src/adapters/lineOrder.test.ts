@@ -41,6 +41,7 @@ describe('line order', () => {
 
   it('puts a missing reference last', () => {
     expect(order([null, '2'])).toEqual(['2', null]);
+    expect(order([null, 'A', '2'])).toEqual(['2', 'A', null]);
     expect(compareReferences('', '1')).toBeGreaterThan(0);
   });
 });
