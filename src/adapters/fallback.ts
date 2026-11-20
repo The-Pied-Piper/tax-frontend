@@ -42,7 +42,7 @@ export function responseUnit(response: { unit?: Unit | null }): Unit {
 /**
  * Joins the groups of forms that share one page (a province's main form and
  * its credits worksheet) into one group, so the form is listed once. The
- * joined group keeps the place and form key of the first.
+ * joined group keeps the position, form key and page of the first.
  */
 function mergeSharedPages(groups: AdvancedGroup[]): AdvancedGroup[] {
   const merged: AdvancedGroup[] = [];

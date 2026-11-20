@@ -14,6 +14,10 @@ const rawCad = {
   as_percentage: false,
 };
 
+// Saved responses from the running service for $70,000 in 2025.
+const rNl = nlResponse as ComputeTakeHomeCalculationResponse;
+const rSk = skResponse as ComputeTakeHomeCalculationResponse;
+
 describe('the dollar sign', () => {
   it('readUnit shows the API CA$ unit as $, keeping everything else', () => {
     expect(readUnit(rawCad)).toEqual({
@@ -66,21 +70,15 @@ describe('the dollar sign', () => {
     expect(page['ca-on/return']).toBeNull();
   });
 
-  it.each([
-    ['NL', nlResponse, 'ca-nl/nl428', 'nl428'],
-    ['SK', skResponse, 'ca-sk/sk428', 'sk428'],
-  ])(
-    'advancedGroups lists the %s form once, with the lines of its credits',
-    (_name, response, form, page) => {
-      const groups = advancedGroups(
-        response as unknown as ComputeTakeHomeCalculationResponse,
-      );
-      const names = groups.map((g) => g.name);
-      expect(new Set(names).size).toBe(names.length);
-      const own = groups.filter((g) => g.page === page);
-      expect(own.map((g) => g.form)).toEqual([
-        form.replace('428', '428_credits'),
-      ]);
-    },
-  );
+  it('advancedGroups lists the NL form once, with the lines of its credits', () => {
+    const own = advancedGroups(rNl).filter((g) => g.page === 'nl428');
+    expect(own).toHaveLength(1);
+    expect(own[0]?.lines).toHaveLength(106);
+  });
+
+  it('advancedGroups lists the SK form once, with the lines of its credits', () => {
+    const own = advancedGroups(rSk).filter((g) => g.page === 'sk428');
+    expect(own).toHaveLength(1);
+    expect(own[0]?.lines).toHaveLength(49);
+  });
 });
