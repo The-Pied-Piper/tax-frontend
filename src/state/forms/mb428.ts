@@ -80,18 +80,9 @@ export const mb428: FormPageSpec = {
       example:
         'Your net income is {income}. That is under {threshold}, so you keep the full {basic}.',
       figures: {
-        full: sheet.result(
-          '$15,780',
-          'worksheet_mb428_basic_personal_amount_line_1',
-        ),
-        threshold: sheet.result(
-          '$200,000',
-          'worksheet_mb428_basic_personal_amount_line_3',
-        ),
-        range: sheet.result(
-          '$200,000',
-          'worksheet_mb428_basic_personal_amount_line_5',
-        ),
+        full: sheet.result('$15,780', 'worksheet_mb428_line_1'),
+        threshold: sheet.result('$200,000', 'worksheet_mb428_line_3'),
+        range: sheet.result('$200,000', 'worksheet_mb428_line_5'),
         income: sheet.result('$69,335', 'worksheet_mb428_line_2'),
         basic: sheet.result(
           '$15,780',

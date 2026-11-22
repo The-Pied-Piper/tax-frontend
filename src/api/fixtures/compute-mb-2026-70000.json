@@ -1338,7 +1338,7 @@
       "name": "Worksheet MB428",
       "lines": [
         {
-          "label": "worksheet_mb428_basic_personal_amount_line_1",
+          "label": "worksheet_mb428_line_1",
           "name": "Base amount",
           "reference": "1",
           "amount": "15780.00",
@@ -1353,7 +1353,7 @@
           "text": "Credit amount of 15780.00 (rounded to the nearest cent)."
         },
         {
-          "label": "worksheet_mb428_basic_personal_amount_line_3",
+          "label": "worksheet_mb428_line_3",
           "name": "Income threshold",
           "reference": "3",
           "amount": "200000.00",
@@ -1368,7 +1368,7 @@
           "text": "Credit amount of 200000.00 (rounded to the nearest cent)."
         },
         {
-          "label": "worksheet_mb428_basic_personal_amount_line_5",
+          "label": "worksheet_mb428_line_5",
           "name": "Income threshold",
           "reference": "5",
           "amount": "200000.00",
@@ -1383,7 +1383,7 @@
           "text": "Credit amount of 200000.00 (rounded to the nearest cent)."
         },
         {
-          "label": "worksheet_mb428_basic_personal_amount_line_7",
+          "label": "worksheet_mb428_line_7",
           "name": "Base amount",
           "reference": "7",
           "amount": "15780.00",
@@ -2475,7 +2475,7 @@
           "text": "50% of 66 (Form T691) (CA$0.00) gives CA$0.00 (rounded to the nearest cent)."
         },
         {
-          "label": "mb428_minimum_tax_carryover_line_63",
+          "label": "mb428_minimum_tax_carryover_amount_line_63",
           "name": "Amount from line 40427 of your return",
           "reference": "63 (line 40427)",
           "amount": "0",
@@ -2490,7 +2490,7 @@
           "text": "Left blank, taken as CA$0.00."
         },
         {
-          "label": "mb428_minimum_tax_carryover_credit_line_63",
+          "label": "mb428_minimum_tax_carryover_line_63",
           "name": "Manitoba minimum tax carryover",
           "reference": "63",
           "amount": "0.00",
