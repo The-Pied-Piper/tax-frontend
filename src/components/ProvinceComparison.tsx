@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { displayMoney, displayRate, displayWholeMoney } from '../money/format';
-import { PROVINCE_COMPARISON_SLOT_ID } from '../state/hubChartSlots';
+import { PROVINCE_COMPARISON_SLOT_ID } from '../state/hubSlots';
 import type { HubChartsData } from '../state/hubCharts';
 import {
   comparisonRows,

@@ -1,4 +1,11 @@
-import { parseHubChartsData, sweepSalaries } from './hubCharts';
+import {
+  CHART_COLUMN,
+  defaultIndex,
+  parseHubChartsData,
+  SALARY_AXIS,
+  sweepSalaries,
+  type SweepPoint,
+} from './hubCharts';
 
 const unit = {
   name: 'CAD',
@@ -145,5 +152,31 @@ describe('parseHubChartsData', () => {
     ],
   ])('refuses %s', (_name, text) => {
     expect(parseHubChartsData(text)).toBeNull();
+  });
+});
+
+const point = (salary: string): SweepPoint => [salary, '0', '0', '0', '0', '0'];
+
+describe('the card constants', () => {
+  it('starts the marker on the $70,000 point, or the first point when there is none', () => {
+    const points = sweepSalaries().map((salary) => point(`${salary}.00`));
+    expect(points[defaultIndex(points)]?.[0]).toBe('70000.00');
+    expect(defaultIndex([point('1000.00'), point('2000.00')])).toBe(0);
+  });
+
+  it('puts the salary axis ticks inside the axis, in order', () => {
+    expect(SALARY_AXIS.min).toBe('0');
+    expect(SALARY_AXIS.ticks[SALARY_AXIS.ticks.length - 1]).toBe(
+      SALARY_AXIS.max,
+    );
+  });
+
+  it('reads each chart from its own place of a point', () => {
+    expect(CHART_COLUMN).toEqual({
+      takeHome: 1,
+      incomeTax: 3,
+      averageRate: 4,
+      marginalRate: 5,
+    });
   });
 });

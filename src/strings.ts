@@ -22,6 +22,86 @@ export const strings = {
       'ca-nl': 'Newfoundland and Labrador',
     },
   },
+  hubCharts: {
+    heading: 'How your pay changes with salary',
+    intro: (chartCount: 'four' | 'five') =>
+      `Each chart has a point for every $1,000 of salary up to $250,000, and for every $5,000 above that. Move over a chart, or tap it, to read the figures. The marker follows on all ${chartCount} charts.`,
+    perYear: 'Per year',
+    perMonth: 'Per month',
+    hover: (salary: string, value: string) => `At a ${salary} salary: ${value}`,
+    perPeriod: (value: string, period: 'annually' | 'monthly') =>
+      `${value} ${period === 'monthly' ? 'a month' : 'a year'}`,
+    monthNote: 'Per month is the yearly figure divided by 12.',
+    readout: (salary: string) => `Salary ${salary} a year`,
+    showTable: 'Show the figures as a table',
+    hideTable: 'Hide the table',
+    headers: {
+      salary: 'Salary',
+      average: 'Average rate',
+      marginal: 'Marginal rate',
+      takeHome: 'Take-home',
+      incomeTax: 'Income tax',
+    },
+    salaryAxis: 'Salary before tax',
+    percentOfSalary: 'Percent of your salary',
+    percentOfExtra: 'Percent of each extra dollar',
+    dollarsYear: 'Dollars a year',
+    dollarsMonth: 'Dollars a month',
+    chartLabel: (title: string, from: string, to: string) =>
+      `Line chart: ${title} against salary, from ${from} to ${to}. The same figures are in the table below the charts.`,
+    note: "These are the calculator's own estimates for a single person whose only income is a salary. They are not tax advice.",
+    provisional: (year: number) =>
+      `The ${year.toString()} figures are provisional.`,
+    averageTitle: 'Average income tax rate',
+    averageText: (place: string) =>
+      `The share of your salary that goes to income tax, federal and ${place} together.`,
+    marginalTitle: 'Marginal income tax rate',
+    marginalText: (place: string) =>
+      `The income tax on your next dollar of salary, federal and ${place} together. Canada Pension Plan and Employment Insurance are not included, and neither are credits paid to you when you file. The rate steps up where a new tax bracket starts. In some provinces it also rises across a band of lower salaries, while a tax reduction shrinks to zero.`,
+    takeHomeTitle: 'Take-home pay',
+    takeHomeText:
+      'Your salary minus income tax, Canada Pension Plan and Employment Insurance. It is before any credits paid to you when you file.',
+    incomeTaxTitle: 'Income tax for the year',
+    incomeTaxText: (place: string) =>
+      `The federal and ${place} income tax you owe for the year, after the credits that lower your tax and before any credits paid to you.`,
+    // The province comparison on a hub; amounts come from money/format.
+    comparison: {
+      heading: 'Compare provinces at one salary',
+      intro:
+        "Pick a salary and see how the provinces compare. Every bar is the calculator's own estimate for a single person whose only income is a salary.",
+      toggleLabel: 'Compare by',
+      measures: {
+        takeHome: 'Take-home pay',
+        incomeTax: 'Income tax',
+        averageRate: 'Average income tax rate',
+      },
+      measureNotes: {
+        takeHome:
+          'Your salary minus income tax, pension plan payments and Employment Insurance, before any credits paid to you when you file.',
+        incomeTax:
+          'The federal and provincial income tax you owe for the year, before any credits paid to you.',
+        averageRate:
+          'Income tax divided by salary, before any credits paid to you.',
+      },
+      caption: (salary: string, year: number) =>
+        `Bars are for a ${salary} salary in ${String(year)}, from highest to lowest.`,
+      provisional: (year: number) =>
+        `The ${String(year)} figures are provisional.`,
+      salaryLabel: 'Salary a year',
+      salaryValueText: (salary: string) => `${salary} a year`,
+      hint: 'Drag the slider, or use the arrow keys, to pick a salary.',
+      stepNote:
+        'The slider moves in steps of $1,000 up to $250,000, and $5,000 above that.',
+      typedLabel: 'Or type a salary',
+      typedNote: 'A salary you type is shown at the nearest point we have.',
+      salaryError: (lowest: string, highest: string) =>
+        `Enter a salary from ${lowest} to ${highest}.`,
+      chartLabel: (measure: string, salary: string) =>
+        `Bar chart: ${measure} for a ${salary} salary, by province. The same figures are in the table below.`,
+      tableToggle: 'Show the figures as a table',
+      tableProvince: 'Province',
+    },
+  },
   formPage: {
     contents: 'On this page',
     permalink: (heading: string) => `Link to ${heading}`,
@@ -142,45 +222,6 @@ export const strings = {
       `${salary} salary, ${takeHome} take-home a year`,
     calculator: 'Back to the calculator',
     others: 'Other salaries',
-  },
-  // The charts on a province hub. Wording is the CRA-reviewed copy; amounts come from money/format.
-  hubCharts: {
-    comparison: {
-      heading: 'Compare provinces at one salary',
-      intro:
-        "Pick a salary and see how the provinces compare. Every bar is the calculator's own estimate for a single person whose only income is a salary.",
-      toggleLabel: 'Compare by',
-      measures: {
-        takeHome: 'Take-home pay',
-        incomeTax: 'Income tax',
-        averageRate: 'Average income tax rate',
-      },
-      measureNotes: {
-        takeHome:
-          'Your salary minus income tax, pension plan payments and Employment Insurance, before any credits paid to you when you file.',
-        incomeTax:
-          'The federal and provincial income tax you owe for the year, before any credits paid to you.',
-        averageRate:
-          'Income tax divided by salary, before any credits paid to you.',
-      },
-      caption: (salary: string, year: number) =>
-        `Bars are for a ${salary} salary in ${String(year)}, from highest to lowest.`,
-      provisional: (year: number) =>
-        `The ${String(year)} figures are provisional.`,
-      salaryLabel: 'Salary a year',
-      salaryValueText: (salary: string) => `${salary} a year`,
-      hint: 'Drag the slider, or use the arrow keys, to pick a salary.',
-      stepNote:
-        'The slider moves in steps of $1,000 up to $250,000, and $5,000 above that.',
-      typedLabel: 'Or type a salary',
-      typedNote: 'A salary you type is shown at the nearest point we have.',
-      salaryError: (lowest: string, highest: string) =>
-        `Enter a salary from ${lowest} to ${highest}.`,
-      chartLabel: (measure: string, salary: string) =>
-        `Bar chart: ${measure} for a ${salary} salary, by province. The same figures are in the table below.`,
-      tableToggle: 'Show the figures as a table',
-      tableProvince: 'Province',
-    },
   },
   learnMore: {
     label: 'Learn more about this estimate',

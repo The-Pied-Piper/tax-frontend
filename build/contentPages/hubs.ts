@@ -1,6 +1,6 @@
 import { dataBlock } from '../salaryPages/pageHtml';
+import { HUB_CHARTS_DATA_ID } from '../../src/state/hubSlots';
 import {
-  HUB_CHARTS_DATA_ID,
   parseHubChartsData,
   type ProvinceSweep,
 } from '../../src/state/hubCharts';
@@ -22,19 +22,19 @@ import type { Province } from '../salaryPages/provinces';
  * there are linked, and every hub counts as published. `hubOnly` holds the
  * slugs of provinces with a hub but no salary pages (the API does not serve
  * them yet); their hubs come after the listed provinces' and have no salary
- * section. `swept` holds the slugs of provinces with a sweep: only their hubs
- * carry the province comparison, and every one of them must have a hub, since
- * the comparison's bars link to hubs.
+ * section. `chartSlugs` holds the slugs of hubs that have a sweep: only those get
+ * the salary charts card and the province comparison, and every one of them must
+ * have a hub, since the comparison's bars link to hubs.
  */
 export function hubPages(
   built: BuiltProvince[],
   provinceList: Province[],
   published: ReadonlySet<string>,
   hubOnly: readonly string[],
-  swept: ReadonlySet<string>,
+  chartSlugs: ReadonlySet<string> = new Set(),
 ): ContentPageSpec[] {
   const slugs = [...provinceList.map((province) => province.slug), ...hubOnly];
-  for (const slug of swept) {
+  for (const slug of chartSlugs) {
     if (!slugs.includes(slug)) {
       throw new Error(`Hubs: ${slug} has a sweep but no hub`);
     }
@@ -67,7 +67,7 @@ export function hubPages(
       salaryLinks,
       everyPublished,
       otherHubs,
-      swept.has(slug),
+      chartSlugs.has(slug),
     );
   });
 }

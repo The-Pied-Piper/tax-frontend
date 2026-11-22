@@ -5,10 +5,10 @@ import {
   siteUrl,
   tmpDirs,
 } from '../../src/test/generatedSite';
-import { HUB_CHARTS_DATA_ID } from '../../src/state/hubCharts';
-import { PROVINCE_COMPARISON_SLOT_ID } from '../../src/state/hubChartSlots';
+import { HUB_CHARTS_DATA_ID } from '../../src/state/hubSlots';
+import { PROVINCE_COMPARISON_SLOT_ID } from '../../src/state/hubSlots';
 import { strings } from '../../src/strings';
-import { sampleHubCharts, sampleSweeps } from '../../src/test/hubChartsData';
+import { sampleHubCharts, sampleSweeps } from '../../src/test/comparisonData';
 import { provinces } from '../salaryPages/provinces';
 import { renderContentPage } from '../salaryPages/prerender';
 import { generateContentPages } from './generate';
@@ -33,7 +33,10 @@ async function writeHubs(swept: typeof sampleSweeps) {
     template: contentTemplate,
     pages: hubs,
     render: (spec) =>
-      renderContentPage(spec, swept.length === 0 ? null : { provinces: swept }),
+      renderContentPage(
+        spec,
+        swept.length === 0 ? undefined : { provinces: swept },
+      ),
     siteUrl,
     dataBlocks: hubChartBlocks(swept),
   });

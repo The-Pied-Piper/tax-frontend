@@ -337,7 +337,7 @@ describe('the province comparison', () => {
     ]);
   });
 
-  it('is left out when asked not to add it, and the rest of the page is the same', () => {
+  it('is left out with the charts card when asked not to add them, and the rest of the page is the same', () => {
     const without = make(false);
     expect(
       section(without, strings.hubCharts.comparison.heading),
@@ -345,7 +345,9 @@ describe('the province comparison', () => {
     const withIt = make(true);
     expect(
       withIt.sections.filter(
-        (s) => s.heading !== strings.hubCharts.comparison.heading,
+        (s) =>
+          s.heading !== strings.hubCharts.comparison.heading &&
+          s.heading !== strings.hubCharts.heading,
       ),
     ).toEqual(without.sections);
   });

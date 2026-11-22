@@ -1,3 +1,4 @@
+import { SalaryChartsCard } from './SalaryChartsCard';
 import { Breadcrumb } from './Breadcrumb';
 import styles from './ContentPage.module.css';
 import { FormSections } from './FormSections';
@@ -5,20 +6,31 @@ import { SiteFooter } from './SiteFooter';
 import { ThemeToggle } from './ThemeToggle';
 import { contentBreadcrumb } from '../state/breadcrumbs';
 import type { ContentBlock, ContentPageSpec } from '../state/contentPages';
-import { PROVINCE_COMPARISON_SLOT_ID } from '../state/hubChartSlots';
 import type { HubChartsData } from '../state/hubCharts';
+import {
+  HUB_CHARTS_SLOT_ID,
+  PROVINCE_COMPARISON_SLOT_ID,
+} from '../state/hubSlots';
 import { THEME_TOGGLE_SLOT_ID } from '../state/themeSlot';
 import { ProvinceComparison } from './ProvinceComparison';
 
-/** One block of a section: a paragraph, a list of forms, a group of links, a table or a hub's comparison. */
+/** One block of a section: a paragraph, a list of forms, a group of links, a table or a hub's charts or comparison. */
 function ContentBlockView({
   block,
   hubCharts,
 }: {
   block: ContentBlock;
-  hubCharts: HubChartsData | null;
+  hubCharts?: HubChartsData;
 }) {
   switch (block.kind) {
+    case 'salaryCharts':
+      return (
+        <div id={HUB_CHARTS_SLOT_ID} data-province={block.province}>
+          {hubCharts && (
+            <SalaryChartsCard data={hubCharts} province={block.province} />
+          )}
+        </div>
+      );
     case 'paragraph':
       return (
         <p>
@@ -109,8 +121,8 @@ export function ContentPage({
   trail,
   sections,
   form,
-  hubCharts = null,
-}: ContentPageSpec & { hubCharts?: HubChartsData | null }) {
+  hubCharts,
+}: ContentPageSpec & { hubCharts?: HubChartsData }) {
   return (
     <>
       <main>

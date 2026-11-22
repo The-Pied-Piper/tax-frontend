@@ -42,6 +42,24 @@ function hubOf(pages: ContentPageSpec[], slug: string): ContentPageSpec {
   return page;
 }
 
+describe('hubPages charts', () => {
+  it('gives the charts card only to a hub that has a sweep', () => {
+    const pages = hubPages(
+      [ontarioBuilt, albertaBuilt],
+      provinces,
+      new Set(),
+      [],
+      new Set(['ca-on']),
+    );
+    const has = (slug: string) =>
+      hubOf(pages, slug).sections.some((s) =>
+        s.blocks.some((b) => b.kind === 'salaryCharts'),
+      );
+    expect(has('ca-on')).toBe(true);
+    expect(has('ca-ab')).toBe(false);
+  });
+});
+
 describe('hubPages', () => {
   it('makes one hub per listed province, in list order, at the province slug', () => {
     const pages = hubPages(
@@ -227,7 +245,8 @@ describe('the province comparison on hubs', () => {
 
   it('comes right after how the take-home is worked out, before the forms', () => {
     const [page] = hubPages([], provinces, new Set(), [], new Set(['ca-on']));
-    expect(page?.sections.map((s) => s.heading).slice(0, 3)).toEqual([
+    expect(page?.sections.map((s) => s.heading).slice(0, 4)).toEqual([
+      strings.hubCharts.heading,
       'How your Ontario take-home is worked out',
       'Compare provinces at one salary',
       'The forms we follow',

@@ -1,6 +1,6 @@
 import { fireEvent, render, screen, within } from '@testing-library/react';
 import { strings } from '../strings';
-import { sampleHubCharts, sampleSweeps } from '../test/hubChartsData';
+import { sampleHubCharts, sampleSweeps } from '../test/comparisonData';
 import { ProvinceComparison } from './ProvinceComparison';
 
 const copy = strings.hubCharts.comparison;

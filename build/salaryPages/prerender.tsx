@@ -16,10 +16,10 @@ export function renderSiteFooter(): string {
   return renderToString(<SiteFooter />);
 }
 
-/** The page body of a pre-built content page: the real ContentPage, no network. A hub's comparison is drawn from `hubCharts`. */
+/** The page body of a pre-built content page: the real ContentPage, no network. A hub is given its chart data. */
 export function renderContentPage(
   spec: ContentPageSpec,
-  hubCharts: HubChartsData | null = null,
+  hubCharts?: HubChartsData,
 ): string {
   return renderToString(<ContentPage {...spec} hubCharts={hubCharts} />);
 }

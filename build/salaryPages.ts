@@ -37,7 +37,7 @@ type Prerender = {
   renderSiteFooter: () => string;
   renderContentPage: (
     spec: ContentPageSpec,
-    hubCharts?: HubChartsData | null,
+    hubCharts?: HubChartsData,
   ) => string;
 };
 
@@ -165,7 +165,6 @@ export function salaryPages(
           siteUrl,
         });
         const sweeps = provinceSweeps(figures.sweeps, built, list);
-        const chartsData = sweeps.length === 0 ? null : { provinces: sweeps };
         await rewriteHome(outDir, renderSiteFooter);
         const hubs = hubPages(
           built,
@@ -178,7 +177,11 @@ export function salaryPages(
           outDir,
           template: await readFile(contentFile, 'utf8'),
           pages: [...withSalaryLinks(contentPages, built), ...hubs],
-          render: (spec) => renderContentPage(spec, chartsData),
+          render: (spec) =>
+            renderContentPage(
+              spec,
+              sweeps.length > 0 ? { provinces: sweeps } : undefined,
+            ),
           siteUrl,
           dataBlocks: hubChartBlocks(sweeps),
         });

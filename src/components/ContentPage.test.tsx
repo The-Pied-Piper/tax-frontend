@@ -4,8 +4,8 @@ import { ContentPage } from './ContentPage';
 import { strings } from '../strings';
 import { THEME_STORAGE_KEY } from '../theme/theme';
 import { blocksSpec, plainSpec, sampleSpec } from '../test/contentPageData';
-import { sampleHubCharts } from '../test/hubChartsData';
-import { PROVINCE_COMPARISON_SLOT_ID } from '../state/hubChartSlots';
+import { sampleHubCharts } from '../test/comparisonData';
+import { PROVINCE_COMPARISON_SLOT_ID } from '../state/hubSlots';
 
 afterEach(() => {
   delete document.documentElement.dataset.theme;

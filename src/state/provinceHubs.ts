@@ -157,7 +157,8 @@ function listItem(form: HubForm, published: ReadonlySet<string>): ListItem {
  * The hub page of one province: how the take-home is worked out, the forms
  * used, a link to each salary page and the other hubs. `name` is the province's
  * name, `published` the slugs of the pages that exist (a form with no page is
- * listed without a link) and `otherHubs` the links to the other provinces.
+ * listed without a link), `otherHubs` the links to the other provinces and
+ * `withCharts` whether the hub has a sweep, which gets the salary charts card first.
  */
 export function hubPage(
   text: ProvinceHubText,
@@ -165,7 +166,7 @@ export function hubPage(
   salaryLinks: ContentLink[],
   published: ReadonlySet<string>,
   otherHubs: ContentLink[],
-  withComparison: boolean,
+  withCharts = false,
 ): ContentPageSpec {
   // A hub with no salary pages must not promise salary examples.
   const withSalaries = salaryLinks.length > 0;
@@ -197,6 +198,14 @@ export function hubPage(
       : `Everything this site uses to work out take-home pay in ${name}, in one place. Each form is explained in plain words.`,
     trail: [],
     sections: [
+      ...(withCharts
+        ? [
+            {
+              heading: strings.hubCharts.heading,
+              blocks: [{ kind: 'salaryCharts' as const, province: text.slug }],
+            },
+          ]
+        : []),
       {
         heading: `How your ${name} take-home is worked out`,
         blocks: [
@@ -205,7 +214,7 @@ export function hubPage(
           ),
         ],
       },
-      ...(!withComparison
+      ...(!withCharts
         ? []
         : [
             {

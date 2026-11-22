@@ -5,7 +5,7 @@ import {
   toDisplaySalary,
   withoutZeroCents,
 } from '../money/salaryInput';
-import { PROVINCE_COMPARISON_SLOT_ID } from '../state/hubChartSlots';
+import { PROVINCE_COMPARISON_SLOT_ID } from '../state/hubSlots';
 import { typedSalaryIndex } from '../state/provinceComparison';
 import { languageCode, strings } from '../strings';
 import styles from './SalarySlider.module.css';

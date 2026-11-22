@@ -1,5 +1,5 @@
 import { separatorsFor } from '../money/salaryInput';
-import { SAMPLE_SALARIES, sampleSweeps } from '../test/hubChartsData';
+import { SAMPLE_SALARIES, sampleSweeps } from '../test/comparisonData';
 import { sweepSalaries } from './hubCharts';
 import {
   comparisonRows,

@@ -3,9 +3,9 @@ import { dataBlock } from '../build/salaryPages/pageHtml';
 import { renderContentPage } from '../build/salaryPages/prerender';
 import { hubPages } from '../build/contentPages/hubs';
 import { provinces } from '../build/salaryPages/provinces';
-import { PROVINCE_COMPARISON_SLOT_ID } from './state/hubChartSlots';
-import { HUB_CHARTS_DATA_ID } from './state/hubCharts';
-import { sampleHubCharts, sampleSweeps } from './test/hubChartsData';
+import { PROVINCE_COMPARISON_SLOT_ID } from './state/hubSlots';
+import { HUB_CHARTS_DATA_ID } from './state/hubSlots';
+import { sampleHubCharts, sampleSweeps } from './test/comparisonData';
 
 // The content entry mounts the comparison into the slot of a pre-built hub.
 // What it mounts must equal what the build wrote there, so the page does not

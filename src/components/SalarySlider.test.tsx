@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { fireEvent, render, screen } from '@testing-library/react';
-import { SALARY_STEPS } from '../test/hubChartsData';
+import { SALARY_STEPS } from '../test/comparisonData';
 import { cad } from '../test/units';
 import { strings } from '../strings';
 import { SalarySlider } from './SalarySlider';
