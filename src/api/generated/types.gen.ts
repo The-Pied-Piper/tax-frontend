@@ -34,7 +34,7 @@ export type ComputeTakeHomeCalculationRequest = {
 export type ComputeTakeHomeCalculationResponse = {
   salary: string;
   /**
-   * Contributions and tax together.
+   * Contributions and income tax together. Income tax is the total payable, before the total credits are subtracted.
    */
   total_deductions: string;
   /**
