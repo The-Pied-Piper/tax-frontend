@@ -28,6 +28,9 @@ export const strings = {
       `Each chart has a point for every $1,000 of salary up to $250,000, and for every $5,000 above that. Move over a chart, or tap it, to read the figures. The marker follows on all ${chartCount} charts.`,
     perYear: 'Per year',
     perMonth: 'Per month',
+    hover: (salary: string, value: string) => `At a ${salary} salary: ${value}`,
+    perPeriod: (value: string, period: 'annually' | 'monthly') =>
+      `${value} ${period === 'monthly' ? 'a month' : 'a year'}`,
     monthNote: 'Per month is the yearly figure divided by 12.',
     readout: (salary: string) => `Salary ${salary} a year`,
     showTable: 'Show the figures as a table',

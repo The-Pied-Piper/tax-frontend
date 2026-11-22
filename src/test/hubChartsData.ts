@@ -1,5 +1,6 @@
+import sweeps from './hubChartsSweep.json';
 import { strings } from '../strings';
-import { sweepSalaries, type HubChartsData } from '../state/hubCharts';
+import type { HubChartsData, SweepPoint } from '../state/hubCharts';
 
 const unit = strings.fallbackUnit;
 const rateUnit = {
@@ -9,10 +10,12 @@ const rateUnit = {
   as_percentage: true,
 };
 
-/**
- * A made-up sweep with the real shape: a province per slug, a point for every
- * sweep salary. The figures are invented for tests of the card, not engine output.
- */
+// Real tax-engine figures (2026, a single person with a salary only) for Ontario
+// and Alberta, as the sweep writes them. Another slug gets Ontario's points.
+const ontario = sweeps['ca-on'] as SweepPoint[];
+const alberta = sweeps['ca-ab'] as SweepPoint[];
+
+/** A sweep with the real shape and real engine figures, a province per slug. */
 export function hubChartsData(
   slugs: string[] = ['ca-on'],
   provisional = true,
@@ -24,17 +27,7 @@ export function hubChartsData(
       provisional,
       unit,
       rateUnit,
-      points: sweepSalaries().map((salary, at) => {
-        const tax = (at * 10).toString();
-        return [
-          `${salary}.00`,
-          `${salary}.50`,
-          '0.00',
-          `${tax}.25`,
-          `0.${((at % 90) + 10).toString()}`,
-          '0.2',
-        ];
-      }),
+      points: slug === 'ca-ab' ? alberta : ontario,
     })),
   };
 }

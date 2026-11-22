@@ -1,8 +1,9 @@
 import { useMemo, useState } from 'react';
+import { ChartPeriodSwitch, type ChartPeriod } from './ChartPeriodSwitch';
 import { LineChart, type ChartPoint } from './LineChart';
 import styles from './SalaryChartsCard.module.css';
 import { displayMoney, displayRate, displayWholeMoney } from '../money/format';
-import { amountForPeriod, type PayPeriod } from '../money/payPeriod';
+import { amountForPeriod } from '../money/payPeriod';
 import {
   CHART_COLUMN,
   defaultIndex,
@@ -15,8 +16,6 @@ import { strings } from '../strings';
 
 type Props = { data: HubChartsData; province: FooterProvinceSlug };
 
-type Period = Extract<PayPeriod, 'annually' | 'monthly'>;
-
 // One chart of the card: its words, the column it reads and whether it is a rate.
 type ChartSpec = {
   id: string;
@@ -27,7 +26,7 @@ type ChartSpec = {
   yAxisLabel: string;
 };
 
-function chartSpecs(place: string, period: Period): ChartSpec[] {
+function chartSpecs(place: string, period: ChartPeriod): ChartSpec[] {
   const t = strings.hubCharts;
   const dollars = period === 'monthly' ? t.dollarsMonth : t.dollarsYear;
   return [
@@ -75,10 +74,10 @@ export function SalaryChartsCard({ data, province }: Props) {
 
 function Card({ sweep, place }: { sweep: ProvinceSweep; place: string }) {
   const t = strings.hubCharts;
-  const [period, setPeriod] = useState<Period>('annually');
-  const [active, setActive] = useState(defaultIndex());
-  const [tableOpen, setTableOpen] = useState(false);
+  const [period, setChartPeriod] = useState<ChartPeriod>('annually');
   const { unit, rateUnit, points } = sweep;
+  const [active, setActive] = useState(defaultIndex(points));
+  const [tableOpen, setTableOpen] = useState(false);
   const specs = chartSpecs(place, period);
   const first = points[0]?.[0] ?? '0';
   const last = points[points.length - 1]?.[0] ?? '0';
@@ -115,25 +114,7 @@ function Card({ sweep, place }: { sweep: ProvinceSweep; place: string }) {
     <div className={styles.card}>
       <p className={styles.intro}>{t.intro('four')}</p>
       <div className={styles.bar}>
-        <div className={styles.switch}>
-          {(
-            [
-              ['annually', t.perYear],
-              ['monthly', t.perMonth],
-            ] as const
-          ).map(([value, label]) => (
-            <button
-              key={value}
-              type="button"
-              aria-pressed={period === value}
-              onClick={() => {
-                setPeriod(value);
-              }}
-            >
-              {label}
-            </button>
-          ))}
-        </div>
+        <ChartPeriodSwitch value={period} onChange={setChartPeriod} />
         <p className={styles.readout} aria-live="polite">
           {t.readout(salaryAt)}
         </p>
@@ -154,15 +135,18 @@ function Card({ sweep, place }: { sweep: ProvinceSweep; place: string }) {
             xUnit={unit}
             yUnit={spec.rate ? rateUnit : unit}
             formatValue={(value) =>
-              spec.rate
-                ? displayRate(value, rateUnit)
-                : displayMoney(value, 'annually', unit)
+              t.hover(
+                salaryAt,
+                spec.rate
+                  ? displayRate(value, rateUnit)
+                  : t.perPeriod(displayMoney(value, 'annually', unit), period),
+              )
             }
             ariaLabel={t.chartLabel(spec.title, from, to)}
             activeIndex={active}
             // Escape clears the marker; it goes back to its first place.
             onActiveChange={(index) => {
-              setActive(index ?? defaultIndex());
+              setActive(index ?? defaultIndex(points));
             }}
           />
         ))}

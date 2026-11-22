@@ -2,8 +2,8 @@ import { StrictMode } from 'react';
 import { createRoot, hydrateRoot } from 'react-dom/client';
 import { SalaryChartsCard } from './components/SalaryChartsCard';
 import { ThemeToggle } from './components/ThemeToggle';
-import { HUB_CHARTS_DATA_ID, parseHubChartsData } from './state/hubCharts';
-import { HUB_CHARTS_SLOT_ID } from './state/hubSlots';
+import { parseHubChartsData } from './state/hubCharts';
+import { HUB_CHARTS_DATA_ID, HUB_CHARTS_SLOT_ID } from './state/hubSlots';
 import { FOOTER_PROVINCE_SLUGS } from './state/siteLinks';
 import { THEME_TOGGLE_SLOT_ID } from './state/themeSlot';
 import './styles/fonts.css';
@@ -13,6 +13,7 @@ import './styles/global.css';
 // HTML, so only their stylesheets are needed here.
 import './components/Breadcrumb.module.css';
 import './components/ContentPage.module.css';
+import './components/ChartPeriodSwitch.module.css';
 import './components/FormSections.module.css';
 import './components/LineChart.module.css';
 import './components/SalaryChartsCard.module.css';

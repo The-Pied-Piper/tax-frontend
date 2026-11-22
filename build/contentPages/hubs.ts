@@ -1,6 +1,6 @@
 import { dataBlock } from '../salaryPages/pageHtml';
+import { HUB_CHARTS_DATA_ID } from '../../src/state/hubSlots';
 import {
-  HUB_CHARTS_DATA_ID,
   parseHubChartsData,
   type ProvinceSweep,
 } from '../../src/state/hubCharts';

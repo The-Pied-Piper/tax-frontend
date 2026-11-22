@@ -2,9 +2,6 @@ import type { Unit } from '../adapters';
 import { readUnit } from '../adapters/fallback';
 import { isRecord } from './salaryPageData';
 
-/** The id of the data block on a province hub that holds every served province's salary sweep. */
-export const HUB_CHARTS_DATA_ID = 'hub-charts-data';
-
 /** The salaries of the sweep as text, lowest first: every $1,000 from $1,000 to $250,000, then every $5,000 to $500,000. The API takes no salary of 0. */
 export function sweepSalaries(): string[] {
   const salaries: string[] = [];
@@ -95,9 +92,12 @@ export function parseHubChartsData(text: string | null): HubChartsData | null {
 /** The salary the marker starts on. */
 export const DEFAULT_SALARY = '70000';
 
-/** The marker's first place: the index of `DEFAULT_SALARY` in the sweep. */
-export function defaultIndex(): number {
-  return Math.max(0, sweepSalaries().indexOf(DEFAULT_SALARY));
+/** The marker's first place: the index of the `DEFAULT_SALARY` point (salaries are quantized, so "70000.00"), or the first point. */
+export function defaultIndex(points: readonly SweepPoint[]): number {
+  return Math.max(
+    0,
+    points.findIndex((point) => point[0] === `${DEFAULT_SALARY}.00`),
+  );
 }
 
 /** The salary axis of every chart: the ends and the labelled round salaries, as text. */
