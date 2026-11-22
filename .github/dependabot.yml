@@ -10,8 +10,8 @@ updates:
       npm-development:
         dependency-type: development
 
-  # The tax-engine release the site's figures come from (build/localEngine). A bump changes
-  # the pre-built pages: it must move with the release of tax-service that serves the live calculator.
+  # The committed tax-engine pin in build/localEngine: it is for running the step by hand. Deploy
+  # builds follow the release tax-service pins (build/localEngine/resolve_pin.py), not this file.
   - package-ecosystem: pip
     directory: /build/localEngine
     schedule:
