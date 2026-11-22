@@ -1,3 +1,4 @@
+import type { HubChartsData } from '../src/state/hubCharts';
 import { mkdtemp, readFile, rm } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join, resolve } from 'node:path';
@@ -34,7 +35,10 @@ const CONTENT_TEMPLATE = 'content.html';
 type Prerender = {
   renderSalaryApp: (data: SalaryPageData) => string;
   renderSiteFooter: () => string;
-  renderContentPage: (spec: ContentPageSpec) => string;
+  renderContentPage: (
+    spec: ContentPageSpec,
+    hubCharts?: HubChartsData,
+  ) => string;
 };
 
 function isAppRenderer(value: unknown): value is Prerender['renderSalaryApp'] {
@@ -167,12 +171,17 @@ export function salaryPages(
           provinces,
           new Set(contentPages.map((page) => page.slug)),
           PROVINCES_WITHOUT_SALARY_PAGES,
+          new Set(sweeps.map((sweep) => sweep.slug)),
         );
         const content = await generateContentPages({
           outDir,
           template: await readFile(contentFile, 'utf8'),
           pages: [...withSalaryLinks(contentPages, built), ...hubs],
-          render: renderContentPage,
+          render: (spec) =>
+            renderContentPage(
+              spec,
+              sweeps.length > 0 ? { provinces: sweeps } : undefined,
+            ),
           siteUrl,
           dataBlocks: hubChartBlocks(sweeps),
         });

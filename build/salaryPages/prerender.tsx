@@ -2,6 +2,7 @@ import { renderToString } from 'react-dom/server';
 import { App } from '../../src/App';
 import { ContentPage } from '../../src/components/ContentPage';
 import { SiteFooter } from '../../src/components/SiteFooter';
+import type { HubChartsData } from '../../src/state/hubCharts';
 import type { ContentPageSpec } from '../../src/state/contentPages';
 import type { SalaryPageData } from '../../src/state/useTakeHome';
 
@@ -15,7 +16,10 @@ export function renderSiteFooter(): string {
   return renderToString(<SiteFooter />);
 }
 
-/** The page body of a pre-built content page: the real ContentPage, no network. */
-export function renderContentPage(spec: ContentPageSpec): string {
-  return renderToString(<ContentPage {...spec} />);
+/** The page body of a pre-built content page: the real ContentPage, no network. A hub is given its chart data. */
+export function renderContentPage(
+  spec: ContentPageSpec,
+  hubCharts?: HubChartsData,
+): string {
+  return renderToString(<ContentPage {...spec} hubCharts={hubCharts} />);
 }

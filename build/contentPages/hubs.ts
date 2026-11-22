@@ -1,6 +1,6 @@
 import { dataBlock } from '../salaryPages/pageHtml';
+import { HUB_CHARTS_DATA_ID } from '../../src/state/hubSlots';
 import {
-  HUB_CHARTS_DATA_ID,
   parseHubChartsData,
   type ProvinceSweep,
 } from '../../src/state/hubCharts';
@@ -22,13 +22,15 @@ import type { Province } from '../salaryPages/provinces';
  * there are linked, and every hub counts as published. `hubOnly` holds the
  * slugs of provinces with a hub but no salary pages (the API does not serve
  * them yet); their hubs come after the listed provinces' and have no salary
- * section.
+ * section. `chartSlugs` holds the slugs of hubs that have a sweep: only those get
+ * the salary charts card.
  */
 export function hubPages(
   built: BuiltProvince[],
   provinceList: Province[],
   published: ReadonlySet<string>,
   hubOnly: readonly string[],
+  chartSlugs: ReadonlySet<string> = new Set(),
 ): ContentPageSpec[] {
   const slugs = [...provinceList.map((province) => province.slug), ...hubOnly];
   const listed = slugs.map((slug) => {
@@ -53,7 +55,14 @@ export function hubPages(
         label: other.name,
         href: contentPath(other.slug),
       }));
-    return hubPage(text, name, salaryLinks, everyPublished, otherHubs);
+    return hubPage(
+      text,
+      name,
+      salaryLinks,
+      everyPublished,
+      otherHubs,
+      chartSlugs.has(slug),
+    );
   });
 }
 
