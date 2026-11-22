@@ -1,3 +1,4 @@
+import { SalaryChartsCard } from './SalaryChartsCard';
 import { Breadcrumb } from './Breadcrumb';
 import styles from './ContentPage.module.css';
 import { FormSections } from './FormSections';
@@ -5,11 +6,27 @@ import { SiteFooter } from './SiteFooter';
 import { ThemeToggle } from './ThemeToggle';
 import { contentBreadcrumb } from '../state/breadcrumbs';
 import type { ContentBlock, ContentPageSpec } from '../state/contentPages';
+import type { HubChartsData } from '../state/hubCharts';
+import { HUB_CHARTS_SLOT_ID } from '../state/hubSlots';
 import { THEME_TOGGLE_SLOT_ID } from '../state/themeSlot';
 
 /** One block of a section: a paragraph, a list of forms, a group of links or a table. */
-function ContentBlockView({ block }: { block: ContentBlock }) {
+function ContentBlockView({
+  block,
+  hubCharts,
+}: {
+  block: ContentBlock;
+  hubCharts?: HubChartsData;
+}) {
   switch (block.kind) {
+    case 'salaryCharts':
+      return (
+        <div id={HUB_CHARTS_SLOT_ID} data-province={block.province}>
+          {hubCharts && (
+            <SalaryChartsCard data={hubCharts} province={block.province} />
+          )}
+        </div>
+      );
     case 'paragraph':
       return (
         <p>
@@ -90,7 +107,8 @@ export function ContentPage({
   trail,
   sections,
   form,
-}: ContentPageSpec) {
+  hubCharts,
+}: ContentPageSpec & { hubCharts?: HubChartsData }) {
   return (
     <>
       <main>
@@ -109,7 +127,11 @@ export function ContentPage({
           <section key={at} className={styles.section}>
             <h2>{section.heading}</h2>
             {section.blocks.map((block, line) => (
-              <ContentBlockView key={line} block={block} />
+              <ContentBlockView
+                key={line}
+                block={block}
+                hubCharts={hubCharts}
+              />
             ))}
           </section>
         ))}

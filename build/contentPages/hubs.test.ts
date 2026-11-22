@@ -42,6 +42,24 @@ function hubOf(pages: ContentPageSpec[], slug: string): ContentPageSpec {
   return page;
 }
 
+describe('hubPages charts', () => {
+  it('gives the charts card only to a hub that has a sweep', () => {
+    const pages = hubPages(
+      [ontarioBuilt, albertaBuilt],
+      provinces,
+      new Set(),
+      [],
+      new Set(['ca-on']),
+    );
+    const has = (slug: string) =>
+      hubOf(pages, slug).sections.some((s) =>
+        s.blocks.some((b) => b.kind === 'salaryCharts'),
+      );
+    expect(has('ca-on')).toBe(true);
+    expect(has('ca-ab')).toBe(false);
+  });
+});
+
 describe('hubPages', () => {
   it('makes one hub per listed province, in list order, at the province slug', () => {
     const pages = hubPages(

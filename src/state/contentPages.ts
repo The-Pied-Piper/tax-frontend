@@ -1,6 +1,10 @@
 import { formContentPage, type FormBody } from './formPage';
 import { formPages } from './formPages';
-import { ENGINE_REPO_URL, METHODOLOGY_SLUG } from './siteLinks';
+import {
+  ENGINE_REPO_URL,
+  METHODOLOGY_SLUG,
+  type FooterProvinceSlug,
+} from './siteLinks';
 
 /** A link in a page: its words and where it goes. */
 export type ContentLink = { label: string; href: string };
@@ -24,7 +28,9 @@ export type ContentBlock =
       links: ContentLink[];
     }
   /** A table with a caption and column headings; every row has one cell per heading. */
-  | { kind: 'table'; caption: string; head: string[]; rows: string[][] };
+  | { kind: 'table'; caption: string; head: string[]; rows: string[][] }
+  /** The salary charts card of a province hub: a data reference only; the build and the page fill it from the hub's data block. */
+  | { kind: 'salaryCharts'; province: FooterProvinceSlug };
 
 /** A heading and the blocks under it. */
 export type ContentSection = { heading: string; blocks: ContentBlock[] };

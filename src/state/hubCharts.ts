@@ -91,3 +91,26 @@ export function parseHubChartsData(text: string | null): HubChartsData | null {
     return null;
   }
 }
+
+/** The salary the marker starts on. */
+export const DEFAULT_SALARY = '70000';
+
+/** The marker's first place: the index of `DEFAULT_SALARY` in the sweep. */
+export function defaultIndex(): number {
+  return Math.max(0, sweepSalaries().indexOf(DEFAULT_SALARY));
+}
+
+/** The salary axis of every chart: the ends and the labelled round salaries, as text. */
+export const SALARY_AXIS = {
+  min: '0',
+  max: '500000',
+  ticks: ['100000', '200000', '300000', '400000', '500000'],
+} as const;
+
+/** Which place of a `SweepPoint` each chart reads. */
+export const CHART_COLUMN = {
+  takeHome: 1,
+  incomeTax: 3,
+  averageRate: 4,
+  marginalRate: 5,
+} as const;
