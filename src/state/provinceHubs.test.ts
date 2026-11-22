@@ -5,6 +5,7 @@ import type {
   ContentLink,
   ContentPageSpec,
 } from './contentPages';
+import { paragraph } from './contentPages';
 import { copyRules, everyString } from '../test/copyRules';
 import { hubPage, provinceHubs } from './provinceHubs';
 import {
@@ -68,7 +69,7 @@ function build(
     label: strings.siteNav.provinceNames[s],
     href: contentPath(s),
   }));
-  return hubPage(textOf(slug), name, links, new Set(published), others);
+  return hubPage(textOf(slug), name, links, new Set(published), others, false);
 }
 
 function section(page: ContentPageSpec, heading: string) {
@@ -322,6 +323,34 @@ describe('a hub with no salary pages', () => {
   });
 });
 
+describe('the province comparison', () => {
+  const on = textOf('ca-on');
+  const others: ContentLink[] = [];
+  const make = (withComparison: boolean) =>
+    hubPage(on, 'Ontario', salaryLinks, new Set(), others, withComparison);
+
+  it('adds one section with the approved heading and intro, and the hub slug', () => {
+    const found = section(make(true), strings.hubCharts.comparison.heading);
+    expect(found?.blocks).toEqual([
+      paragraph(strings.hubCharts.comparison.intro),
+      { kind: 'provinceComparison', province: 'ca-on' },
+    ]);
+  });
+
+  it('is left out when asked not to add it, and the rest of the page is the same', () => {
+    const without = make(false);
+    expect(
+      section(without, strings.hubCharts.comparison.heading),
+    ).toBeUndefined();
+    const withIt = make(true);
+    expect(
+      withIt.sections.filter(
+        (s) => s.heading !== strings.hubCharts.comparison.heading,
+      ),
+    ).toEqual(without.sections);
+  });
+});
+
 describe('province names', () => {
   it('are not written into the hub text: the name is always the one given', () => {
     const page = hubPage(
@@ -330,6 +359,7 @@ describe('province names', () => {
       salaryLinks,
       new Set(),
       [],
+      false,
     );
     expect(page.heading).toBe('Zedland: forms and take-home examples');
     expect(page.lede).not.toContain('Ontario');
@@ -352,6 +382,7 @@ describe.each(FOOTER_PROVINCE_SLUGS)('the copy of the hub for %s', (slug) => {
         [{ label: '$30,000', href: `/${slug}/30000/` }],
         new Set(),
         [],
+        false,
       )
     : null;
 

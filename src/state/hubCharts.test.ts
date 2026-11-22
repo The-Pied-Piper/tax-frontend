@@ -41,6 +41,14 @@ describe('parseHubChartsData', () => {
     expect(parsed?.provinces[0]?.points).toEqual(sweep.points);
   });
 
+  it('reads provinces that share their salaries and their year', () => {
+    const other = { ...sweep, slug: 'ca-ab' };
+    expect(
+      parseHubChartsData(JSON.stringify({ provinces: [sweep, other] }))
+        ?.provinces,
+    ).toHaveLength(2);
+  });
+
   it.each([
     ['no text', null],
     ['blank text', '  '],
@@ -75,6 +83,25 @@ describe('parseHubChartsData', () => {
     [
       'a year as text',
       JSON.stringify({ provinces: [{ ...sweep, year: '2026' }] }),
+    ],
+    [
+      'provinces whose points are at different salaries',
+      JSON.stringify({
+        provinces: [
+          sweep,
+          {
+            ...sweep,
+            slug: 'ca-ab',
+            points: [['2000', '1000.00', '0.00', '0.00', '0.0000', '0.0505']],
+          },
+        ],
+      }),
+    ],
+    [
+      'provinces of different years',
+      JSON.stringify({
+        provinces: [sweep, { ...sweep, slug: 'ca-ab', year: 2025 }],
+      }),
     ],
   ])('refuses %s', (_name, text) => {
     expect(parseHubChartsData(text)).toBeNull();

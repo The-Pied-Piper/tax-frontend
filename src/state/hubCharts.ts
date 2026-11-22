@@ -69,12 +69,28 @@ function isProvinceSweep(value: unknown): boolean {
   );
 }
 
+/** The salaries of a province's points, in order. */
+function salariesOf(sweep: ProvinceSweep): string[] {
+  return sweep.points.map((point) => point[0]);
+}
+
 function isHubChartsData(value: unknown): value is HubChartsData {
-  return (
-    isRecord(value) &&
-    Array.isArray(value.provinces) &&
-    value.provinces.length > 0 &&
-    value.provinces.every(isProvinceSweep)
+  if (
+    !isRecord(value) ||
+    !Array.isArray(value.provinces) ||
+    value.provinces.length === 0 ||
+    !value.provinces.every(isProvinceSweep)
+  ) {
+    return false;
+  }
+  // The comparison reads every province at one position of the sweep, and
+  // states one year, so the provinces must share their salaries and their year.
+  const [first, ...rest] = value.provinces as ProvinceSweep[];
+  if (!first) return false;
+  const salaries = salariesOf(first).join(',');
+  return rest.every(
+    (sweep) =>
+      sweep.year === first.year && salariesOf(sweep).join(',') === salaries,
   );
 }
 

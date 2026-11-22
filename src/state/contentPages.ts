@@ -24,7 +24,9 @@ export type ContentBlock =
       links: ContentLink[];
     }
   /** A table with a caption and column headings; every row has one cell per heading. */
-  | { kind: 'table'; caption: string; head: string[]; rows: string[][] };
+  | { kind: 'table'; caption: string; head: string[]; rows: string[][] }
+  /** The province comparison of a hub: bars for every served province at one salary. It carries only the hub's slug; the page draws it from the hub's data block. */
+  | { kind: 'provinceComparison'; province: string };
 
 /** A heading and the blocks under it. */
 export type ContentSection = { heading: string; blocks: ContentBlock[] };

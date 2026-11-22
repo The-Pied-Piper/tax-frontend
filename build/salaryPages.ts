@@ -26,6 +26,7 @@ import {
 } from '../src/state/siteLinks';
 import { hubChartBlocks, hubPages } from './contentPages/hubs';
 import { withSalaryLinks } from './contentPages/forms';
+import type { HubChartsData } from '../src/state/hubCharts';
 import type { SalaryPageData } from '../src/state/useTakeHome';
 
 /** The built template of the content pages: it loads only the theme switch, and is removed from dist once they are written. */
@@ -34,7 +35,10 @@ const CONTENT_TEMPLATE = 'content.html';
 type Prerender = {
   renderSalaryApp: (data: SalaryPageData) => string;
   renderSiteFooter: () => string;
-  renderContentPage: (spec: ContentPageSpec) => string;
+  renderContentPage: (
+    spec: ContentPageSpec,
+    hubCharts?: HubChartsData | null,
+  ) => string;
 };
 
 function isAppRenderer(value: unknown): value is Prerender['renderSalaryApp'] {
@@ -161,18 +165,20 @@ export function salaryPages(
           siteUrl,
         });
         const sweeps = provinceSweeps(figures.sweeps, built, list);
+        const chartsData = sweeps.length === 0 ? null : { provinces: sweeps };
         await rewriteHome(outDir, renderSiteFooter);
         const hubs = hubPages(
           built,
           provinces,
           new Set(contentPages.map((page) => page.slug)),
           PROVINCES_WITHOUT_SALARY_PAGES,
+          new Set(sweeps.map((sweep) => sweep.slug)),
         );
         const content = await generateContentPages({
           outDir,
           template: await readFile(contentFile, 'utf8'),
           pages: [...withSalaryLinks(contentPages, built), ...hubs],
-          render: renderContentPage,
+          render: (spec) => renderContentPage(spec, chartsData),
           siteUrl,
           dataBlocks: hubChartBlocks(sweeps),
         });

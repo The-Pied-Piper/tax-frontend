@@ -5,10 +5,19 @@ import { SiteFooter } from './SiteFooter';
 import { ThemeToggle } from './ThemeToggle';
 import { contentBreadcrumb } from '../state/breadcrumbs';
 import type { ContentBlock, ContentPageSpec } from '../state/contentPages';
+import { PROVINCE_COMPARISON_SLOT_ID } from '../state/hubChartSlots';
+import type { HubChartsData } from '../state/hubCharts';
 import { THEME_TOGGLE_SLOT_ID } from '../state/themeSlot';
+import { ProvinceComparison } from './ProvinceComparison';
 
-/** One block of a section: a paragraph, a list of forms, a group of links or a table. */
-function ContentBlockView({ block }: { block: ContentBlock }) {
+/** One block of a section: a paragraph, a list of forms, a group of links, a table or a hub's comparison. */
+function ContentBlockView({
+  block,
+  hubCharts,
+}: {
+  block: ContentBlock;
+  hubCharts: HubChartsData | null;
+}) {
   switch (block.kind) {
     case 'paragraph':
       return (
@@ -80,17 +89,28 @@ function ContentBlockView({ block }: { block: ContentBlock }) {
           </table>
         </div>
       );
+    case 'provinceComparison':
+      // The slot the browser mounts the same component into; a hub with no
+      // sweep draws nothing.
+      return hubCharts?.provinces.some(
+        (sweep) => sweep.slug === block.province,
+      ) ? (
+        <div id={PROVINCE_COMPARISON_SLOT_ID} data-province={block.province}>
+          <ProvinceComparison data={hubCharts} province={block.province} />
+        </div>
+      ) : null;
   }
 }
 
-/** A reading page: heading, theme switch, breadcrumb, sections of blocks and the site footer. */
+/** A reading page: heading, theme switch, breadcrumb, sections of blocks and the site footer. A hub's charts data is what its comparison block draws from. */
 export function ContentPage({
   heading,
   lede,
   trail,
   sections,
   form,
-}: ContentPageSpec) {
+  hubCharts = null,
+}: ContentPageSpec & { hubCharts?: HubChartsData | null }) {
   return (
     <>
       <main>
@@ -109,7 +129,11 @@ export function ContentPage({
           <section key={at} className={styles.section}>
             <h2>{section.heading}</h2>
             {section.blocks.map((block, line) => (
-              <ContentBlockView key={line} block={block} />
+              <ContentBlockView
+                key={line}
+                block={block}
+                hubCharts={hubCharts}
+              />
             ))}
           </section>
         ))}

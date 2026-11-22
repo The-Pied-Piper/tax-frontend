@@ -165,6 +165,7 @@ export function hubPage(
   salaryLinks: ContentLink[],
   published: ReadonlySet<string>,
   otherHubs: ContentLink[],
+  withComparison: boolean,
 ): ContentPageSpec {
   // A hub with no salary pages must not promise salary examples.
   const withSalaries = salaryLinks.length > 0;
@@ -204,6 +205,17 @@ export function hubPage(
           ),
         ],
       },
+      ...(!withComparison
+        ? []
+        : [
+            {
+              heading: strings.hubCharts.comparison.heading,
+              blocks: [
+                paragraph(strings.hubCharts.comparison.intro),
+                { kind: 'provinceComparison' as const, province: text.slug },
+              ],
+            },
+          ]),
       {
         heading: 'The forms we follow',
         blocks: [

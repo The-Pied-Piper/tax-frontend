@@ -3,6 +3,7 @@ import { App } from '../../src/App';
 import { ContentPage } from '../../src/components/ContentPage';
 import { SiteFooter } from '../../src/components/SiteFooter';
 import type { ContentPageSpec } from '../../src/state/contentPages';
+import type { HubChartsData } from '../../src/state/hubCharts';
 import type { SalaryPageData } from '../../src/state/useTakeHome';
 
 /** The page body of a pre-built salary page: the real App, no network. */
@@ -15,7 +16,10 @@ export function renderSiteFooter(): string {
   return renderToString(<SiteFooter />);
 }
 
-/** The page body of a pre-built content page: the real ContentPage, no network. */
-export function renderContentPage(spec: ContentPageSpec): string {
-  return renderToString(<ContentPage {...spec} />);
+/** The page body of a pre-built content page: the real ContentPage, no network. A hub's comparison is drawn from `hubCharts`. */
+export function renderContentPage(
+  spec: ContentPageSpec,
+  hubCharts: HubChartsData | null = null,
+): string {
+  return renderToString(<ContentPage {...spec} hubCharts={hubCharts} />);
 }

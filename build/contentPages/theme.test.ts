@@ -17,7 +17,7 @@ const html = buildContentPageHtml(
 const page = new DOMParser().parseFromString(html, 'text/html');
 
 // Each hub page is built the same way, so it carries the same early script and slot.
-const hubs = hubPages([], provinces, new Set(), []).map((spec) =>
+const hubs = hubPages([], provinces, new Set(), [], new Set()).map((spec) =>
   new DOMParser().parseFromString(
     buildContentPageHtml(
       template,

@@ -1,4 +1,5 @@
 import {
+  compareAmounts,
   isBeyond,
   nearestIndex,
   niceAxis,
@@ -117,5 +118,24 @@ describe('niceAxis', () => {
       max: '1',
       ticks: ['0', '1'],
     });
+  });
+});
+
+describe('compareAmounts', () => {
+  it('compares exactly, whatever the number of decimals', () => {
+    expect(compareAmounts('70000.00', '70000')).toBe(0);
+    expect(compareAmounts('0.29650', '0.2965')).toBe(0);
+    expect(compareAmounts('0.2965', '0.29651')).toBe(-1);
+    expect(compareAmounts('10000', '9999.99')).toBe(1);
+  });
+
+  it('orders negative amounts below zero and below smaller negatives', () => {
+    expect(compareAmounts('-0.01', '0')).toBe(-1);
+    expect(compareAmounts('-2', '-1.5')).toBe(-1);
+    expect(compareAmounts('-0.00', '0')).toBe(0);
+  });
+
+  it('refuses text that is not an amount', () => {
+    expect(() => compareAmounts('abc', '1')).toThrow('Not a decimal amount');
   });
 });

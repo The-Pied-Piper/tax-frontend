@@ -22,15 +22,23 @@ import type { Province } from '../salaryPages/provinces';
  * there are linked, and every hub counts as published. `hubOnly` holds the
  * slugs of provinces with a hub but no salary pages (the API does not serve
  * them yet); their hubs come after the listed provinces' and have no salary
- * section.
+ * section. `swept` holds the slugs of provinces with a sweep: only their hubs
+ * carry the province comparison, and every one of them must have a hub, since
+ * the comparison's bars link to hubs.
  */
 export function hubPages(
   built: BuiltProvince[],
   provinceList: Province[],
   published: ReadonlySet<string>,
   hubOnly: readonly string[],
+  swept: ReadonlySet<string>,
 ): ContentPageSpec[] {
   const slugs = [...provinceList.map((province) => province.slug), ...hubOnly];
+  for (const slug of swept) {
+    if (!slugs.includes(slug)) {
+      throw new Error(`Hubs: ${slug} has a sweep but no hub`);
+    }
+  }
   const listed = slugs.map((slug) => {
     const text = provinceHubs.find((hub) => hub.slug === slug);
     if (!text) throw new Error(`Hubs: ${slug} has no hub text`);
@@ -53,7 +61,14 @@ export function hubPages(
         label: other.name,
         href: contentPath(other.slug),
       }));
-    return hubPage(text, name, salaryLinks, everyPublished, otherHubs);
+    return hubPage(
+      text,
+      name,
+      salaryLinks,
+      everyPublished,
+      otherHubs,
+      swept.has(slug),
+    );
   });
 }
 
