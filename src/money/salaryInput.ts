@@ -61,6 +61,12 @@ export function toDisplaySalary(plain: string, sep: Separators): string {
   return `${grouped}${fraction.replace('.', sep.decimal)}`;
 }
 
+// A salary written with cents as plain text -> the whole dollars when the cents are
+// zero: "70000.00" -> "70000". Anything else is returned as is.
+export function withoutZeroCents(salary: string): string {
+  return salary.replace(/\.00$/, '');
+}
+
 // Number of digits and decimal marks before the caret: what has to stay
 // before it when the text is rewritten with separators.
 export function significantBefore(

@@ -75,7 +75,13 @@ async function build(
   const hubs =
     options.withHubs === false
       ? []
-      : hubPages(built, provinces, base, PROVINCES_WITHOUT_SALARY_PAGES);
+      : hubPages(
+          built,
+          provinces,
+          base,
+          PROVINCES_WITHOUT_SALARY_PAGES,
+          new Set(),
+        );
   const { written: pageFiles } = await generateContentPages({
     outDir: dir,
     template,

@@ -1,4 +1,5 @@
 import {
+  withoutZeroCents,
   caretFor,
   separatorsFor,
   significantBefore,
@@ -85,5 +86,13 @@ describe('caret', () => {
   it('handles the start and an empty box', () => {
     expect(caretFor('70,000', 0, en)).toBe(0);
     expect(caretFor('', 0, en)).toBe(0);
+  });
+});
+
+describe('withoutZeroCents', () => {
+  it('drops zero cents and keeps any other cents', () => {
+    expect(withoutZeroCents('70000.00')).toBe('70000');
+    expect(withoutZeroCents('70000.50')).toBe('70000.50');
+    expect(withoutZeroCents('70000')).toBe('70000');
   });
 });

@@ -67,13 +67,14 @@ describe('hubPages', () => {
       provinces,
       new Set(),
       [],
+      new Set(),
     );
     expect(pages.map((p) => p.slug)).toEqual(provinces.map((p) => p.slug));
   });
 
   it('links each salary that was built, with the money label and the page address', () => {
     const page = hubOf(
-      hubPages([ontarioBuilt], provinces, new Set(), []),
+      hubPages([ontarioBuilt], provinces, new Set(), [], new Set()),
       'ca-on',
     );
     expect(gridOf(page)?.links).toEqual(
@@ -90,6 +91,7 @@ describe('hubPages', () => {
       provinces,
       new Set(),
       [],
+      new Set(),
     );
     const hrefs = pages.map((p) => gridOf(p)?.links.map((l) => l.href));
     expect(hrefs[0]).toEqual([
@@ -101,7 +103,7 @@ describe('hubPages', () => {
   });
 
   it('still makes the hub of a province the API did not return, with no salary section', () => {
-    const pages = hubPages([ontarioBuilt], provinces, new Set(), []);
+    const pages = hubPages([ontarioBuilt], provinces, new Set(), [], new Set());
     expect(pages).toHaveLength(provinces.length);
     const skipped = hubOf(pages, 'ca-ab');
     expect(gridOf(skipped)).toBeUndefined();
@@ -112,7 +114,7 @@ describe('hubPages', () => {
   });
 
   it('makes every hub with no salary section when nothing was built', () => {
-    const pages = hubPages([], provinces, new Set(), []);
+    const pages = hubPages([], provinces, new Set(), [], new Set());
     expect(pages).toHaveLength(provinces.length);
     for (const page of pages) expect(gridOf(page)).toBeUndefined();
   });
@@ -121,7 +123,13 @@ describe('hubPages', () => {
   const withoutNl = provinces.filter((p) => p.slug !== 'ca-nl');
 
   it('makes the hub of a hub-only province after the listed ones, with no salary section', () => {
-    const pages = hubPages([ontarioBuilt], withoutNl, new Set(), ['ca-nl']);
+    const pages = hubPages(
+      [ontarioBuilt],
+      withoutNl,
+      new Set(),
+      ['ca-nl'],
+      new Set(),
+    );
     expect(pages.map((p) => p.slug)).toEqual([
       ...withoutNl.map((p) => p.slug),
       'ca-nl',
@@ -136,7 +144,7 @@ describe('hubPages', () => {
   });
 
   it('links the hub-only province from every other hub, and links them back', () => {
-    const pages = hubPages([], withoutNl, new Set(), ['ca-nl']);
+    const pages = hubPages([], withoutNl, new Set(), ['ca-nl'], new Set());
     const hrefsOf = (page: ContentPageSpec) =>
       page.sections
         .flatMap((s) => s.blocks)
@@ -156,15 +164,15 @@ describe('hubPages', () => {
   });
 
   it('throws, naming the province, when a hub-only province has no hub text', () => {
-    expect(() => hubPages([], provinces, new Set(), ['ca-xx'])).toThrow(
-      'Hubs: ca-xx has no hub text',
-    );
+    expect(() =>
+      hubPages([], provinces, new Set(), ['ca-xx'], new Set()),
+    ).toThrow('Hubs: ca-xx has no hub text');
   });
 
   it('throws, naming the province, when a listed province has no hub text', () => {
-    expect(() => hubPages([], [...provinces, xland], new Set(), [])).toThrow(
-      'Hubs: ca-xx has no hub text',
-    );
+    expect(() =>
+      hubPages([], [...provinces, xland], new Set(), [], new Set()),
+    ).toThrow('Hubs: ca-xx has no hub text');
   });
 
   it('links a form only when its page is in the published set', () => {
@@ -173,6 +181,7 @@ describe('hubPages', () => {
       provinces,
       new Set([formSlug('on428')]),
       [],
+      new Set(),
     );
     const items = (page?.sections ?? [])
       .flatMap((s) => s.blocks)
@@ -184,7 +193,7 @@ describe('hubPages', () => {
   });
 
   it('counts the other hubs as published, so every hub links the others', () => {
-    const pages = hubPages([ontarioBuilt], provinces, new Set(), []);
+    const pages = hubPages([ontarioBuilt], provinces, new Set(), [], new Set());
     const row = pages[0]?.sections
       .flatMap((s) => s.blocks)
       .find((b): b is LinksBlock => b.kind === 'links' && b.layout === 'row');
@@ -204,8 +213,67 @@ describe('hubPages', () => {
       provinces,
       new Set(contentPages.map((p) => p.slug)),
       [],
+      new Set(),
     );
     expect(pages.map((p) => p.slug)).not.toContain('methodology');
+  });
+});
+
+describe('the province comparison on hubs', () => {
+  const comparisonOf = (page: ContentPageSpec) =>
+    page.sections.find(
+      (s) => s.heading === strings.hubCharts.comparison.heading,
+    );
+
+  it('goes on the hub of each swept province only, as a block with the hub slug', () => {
+    const pages = hubPages(
+      [],
+      provinces,
+      new Set(),
+      [],
+      new Set(['ca-on', 'ca-ab']),
+    );
+    expect(pages.filter((p) => comparisonOf(p)).map((p) => p.slug)).toEqual([
+      'ca-on',
+      'ca-ab',
+    ]);
+    expect(comparisonOf(hubOf(pages, 'ca-ab'))?.blocks).toEqual([
+      { kind: 'paragraph', content: [strings.hubCharts.comparison.intro] },
+      { kind: 'provinceComparison', province: 'ca-ab' },
+    ]);
+  });
+
+  it('comes right after how the take-home is worked out, before the forms', () => {
+    const [page] = hubPages([], provinces, new Set(), [], new Set(['ca-on']));
+    expect(page?.sections.map((s) => s.heading).slice(0, 4)).toEqual([
+      strings.hubCharts.heading,
+      'How your Ontario take-home is worked out',
+      'Compare provinces at one salary',
+      'The forms we follow',
+    ]);
+  });
+
+  it('is on no hub when nothing was swept', () => {
+    const pages = hubPages([], provinces, new Set(), [], new Set());
+    expect(pages.some((p) => comparisonOf(p))).toBe(false);
+  });
+
+  it('puts the comparison on a hub-only province that was swept', () => {
+    const withoutNl = provinces.filter((p) => p.slug !== 'ca-nl');
+    const pages = hubPages(
+      [],
+      withoutNl,
+      new Set(),
+      ['ca-nl'],
+      new Set(['ca-nl']),
+    );
+    expect(comparisonOf(hubOf(pages, 'ca-nl'))).toBeDefined();
+  });
+
+  it('fails when a swept province has no hub, since the bars link to hubs', () => {
+    expect(() =>
+      hubPages([], provinces, new Set(), [], new Set(['ca-xx'])),
+    ).toThrow('Hubs: ca-xx has a sweep but no hub');
   });
 });
 

@@ -1,4 +1,3 @@
-import type { HubChartsData } from '../src/state/hubCharts';
 import { mkdtemp, readFile, rm } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join, resolve } from 'node:path';
@@ -27,6 +26,7 @@ import {
 } from '../src/state/siteLinks';
 import { hubChartBlocks, hubPages } from './contentPages/hubs';
 import { withSalaryLinks } from './contentPages/forms';
+import type { HubChartsData } from '../src/state/hubCharts';
 import type { SalaryPageData } from '../src/state/useTakeHome';
 
 /** The built template of the content pages: it loads only the theme switch, and is removed from dist once they are written. */

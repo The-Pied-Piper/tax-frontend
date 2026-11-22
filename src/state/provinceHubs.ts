@@ -214,6 +214,17 @@ export function hubPage(
           ),
         ],
       },
+      ...(!withCharts
+        ? []
+        : [
+            {
+              heading: strings.hubCharts.comparison.heading,
+              blocks: [
+                paragraph(strings.hubCharts.comparison.intro),
+                { kind: 'provinceComparison' as const, province: text.slug },
+              ],
+            },
+          ]),
       {
         heading: 'The forms we follow',
         blocks: [

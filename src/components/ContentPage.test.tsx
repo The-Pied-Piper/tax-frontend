@@ -4,6 +4,8 @@ import { ContentPage } from './ContentPage';
 import { strings } from '../strings';
 import { THEME_STORAGE_KEY } from '../theme/theme';
 import { blocksSpec, plainSpec, sampleSpec } from '../test/contentPageData';
+import { sampleHubCharts } from '../test/comparisonData';
+import { PROVINCE_COMPARISON_SLOT_ID } from '../state/hubSlots';
 
 afterEach(() => {
   delete document.documentElement.dataset.theme;
@@ -187,6 +189,33 @@ describe('ContentPage blocks', () => {
         .getAllByRole('row')
         .map((r) => r.textContent),
     ).toEqual(['BandRate', 'First5%', 'Second10%']);
+  });
+
+  it('draws a province comparison in its slot when the hub has charts data', () => {
+    const { container } = render(
+      <ContentPage {...blocksSpec} hubCharts={sampleHubCharts} />,
+    );
+    const slot = container.querySelector(`#${PROVINCE_COMPARISON_SLOT_ID}`);
+    expect(slot).toHaveAttribute('data-province', 'ca-on');
+    expect(within(slot as HTMLElement).getAllByRole('listitem')).toHaveLength(
+      6,
+    );
+  });
+
+  it('draws nothing for a province comparison with no charts data, or none for its province', () => {
+    const { container, rerender } = render(<ContentPage {...blocksSpec} />);
+    expect(
+      container.querySelector(`#${PROVINCE_COMPARISON_SLOT_ID}`),
+    ).toBeNull();
+    rerender(
+      <ContentPage
+        {...blocksSpec}
+        hubCharts={{ provinces: sampleHubCharts.provinces.slice(1) }}
+      />,
+    );
+    expect(
+      container.querySelector(`#${PROVINCE_COMPARISON_SLOT_ID}`),
+    ).toBeNull();
   });
 
   it('writes the page on the server with the same blocks and no raw markup', () => {

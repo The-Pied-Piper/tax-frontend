@@ -64,6 +64,43 @@ export const strings = {
     incomeTaxTitle: 'Income tax for the year',
     incomeTaxText: (place: string) =>
       `The federal and ${place} income tax you owe for the year, after the credits that lower your tax and before any credits paid to you.`,
+    // The province comparison on a hub; amounts come from money/format.
+    comparison: {
+      heading: 'Compare provinces at one salary',
+      intro:
+        "Pick a salary and see how the provinces compare. Every bar is the calculator's own estimate for a single person whose only income is a salary.",
+      toggleLabel: 'Compare by',
+      measures: {
+        takeHome: 'Take-home pay',
+        incomeTax: 'Income tax',
+        averageRate: 'Average income tax rate',
+      },
+      measureNotes: {
+        takeHome:
+          'Your salary minus income tax, pension plan payments and Employment Insurance, before any credits paid to you when you file.',
+        incomeTax:
+          'The federal and provincial income tax you owe for the year, before any credits paid to you.',
+        averageRate:
+          'Income tax divided by salary, before any credits paid to you.',
+      },
+      caption: (salary: string, year: number) =>
+        `Bars are for a ${salary} salary in ${String(year)}, from highest to lowest.`,
+      provisional: (year: number) =>
+        `The ${String(year)} figures are provisional.`,
+      salaryLabel: 'Salary a year',
+      salaryValueText: (salary: string) => `${salary} a year`,
+      hint: 'Drag the slider, or use the arrow keys, to pick a salary.',
+      stepNote:
+        'The slider moves in steps of $1,000 up to $250,000, and $5,000 above that.',
+      typedLabel: 'Or type a salary',
+      typedNote: 'A salary you type is shown at the nearest point we have.',
+      salaryError: (lowest: string, highest: string) =>
+        `Enter a salary from ${lowest} to ${highest}.`,
+      chartLabel: (measure: string, salary: string) =>
+        `Bar chart: ${measure} for a ${salary} salary, by province. The same figures are in the table below.`,
+      tableToggle: 'Show the figures as a table',
+      tableProvince: 'Province',
+    },
   },
   formPage: {
     contents: 'On this page',

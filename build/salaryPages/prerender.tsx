@@ -2,8 +2,8 @@ import { renderToString } from 'react-dom/server';
 import { App } from '../../src/App';
 import { ContentPage } from '../../src/components/ContentPage';
 import { SiteFooter } from '../../src/components/SiteFooter';
-import type { HubChartsData } from '../../src/state/hubCharts';
 import type { ContentPageSpec } from '../../src/state/contentPages';
+import type { HubChartsData } from '../../src/state/hubCharts';
 import type { SalaryPageData } from '../../src/state/useTakeHome';
 
 /** The page body of a pre-built salary page: the real App, no network. */

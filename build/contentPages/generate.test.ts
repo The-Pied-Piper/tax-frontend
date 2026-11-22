@@ -259,6 +259,13 @@ describe('generateContentPages validation', () => {
       expect(files(dir)).toEqual([]);
     });
 
+    it('accepts a province comparison, a data reference only', async () => {
+      const { written } = await run(outDir(), [
+        withBlocks({ kind: 'provinceComparison', province: 'ca-on' }),
+      ]);
+      expect(written).toEqual(['plain-page/index.html']);
+    });
+
     it('accepts a link to the engine repository, the one address off the site', async () => {
       const dir = outDir();
       await run(dir, [

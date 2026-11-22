@@ -32,7 +32,9 @@ describe('a hub with a sweep', () => {
   it('writes the figures table and the marker into the static HTML', () => {
     const html = renderToString(<ContentPage {...spec} hubCharts={data} />);
     const doc = new DOMParser().parseFromString(html, 'text/html');
-    expect(doc.querySelectorAll('details tbody tr')).toHaveLength(300);
+    expect(
+      doc.querySelectorAll('#hub-charts-slot details tbody tr'),
+    ).toHaveLength(300);
     expect(doc.body.textContent).toContain(
       strings.hubCharts.readout('$70,000'),
     );

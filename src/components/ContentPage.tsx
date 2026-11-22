@@ -7,10 +7,14 @@ import { ThemeToggle } from './ThemeToggle';
 import { contentBreadcrumb } from '../state/breadcrumbs';
 import type { ContentBlock, ContentPageSpec } from '../state/contentPages';
 import type { HubChartsData } from '../state/hubCharts';
-import { HUB_CHARTS_SLOT_ID } from '../state/hubSlots';
+import {
+  HUB_CHARTS_SLOT_ID,
+  PROVINCE_COMPARISON_SLOT_ID,
+} from '../state/hubSlots';
 import { THEME_TOGGLE_SLOT_ID } from '../state/themeSlot';
+import { ProvinceComparison } from './ProvinceComparison';
 
-/** One block of a section: a paragraph, a list of forms, a group of links or a table. */
+/** One block of a section: a paragraph, a list of forms, a group of links, a table or a hub's charts or comparison. */
 function ContentBlockView({
   block,
   hubCharts,
@@ -97,10 +101,20 @@ function ContentBlockView({
           </table>
         </div>
       );
+    case 'provinceComparison':
+      // The slot the browser mounts the same component into; a hub with no
+      // sweep draws nothing.
+      return hubCharts?.provinces.some(
+        (sweep) => sweep.slug === block.province,
+      ) ? (
+        <div id={PROVINCE_COMPARISON_SLOT_ID} data-province={block.province}>
+          <ProvinceComparison data={hubCharts} province={block.province} />
+        </div>
+      ) : null;
   }
 }
 
-/** A reading page: heading, theme switch, breadcrumb, sections of blocks and the site footer. */
+/** A reading page: heading, theme switch, breadcrumb, sections of blocks and the site footer. A hub's charts data is what its comparison block draws from. */
 export function ContentPage({
   heading,
   lede,

@@ -118,6 +118,39 @@ export function pointerPosition(
   return positionText(BigInt(Math.round((offset / boxWidth) * viewWidth * 10)));
 }
 
+/** -1, 0 or 1: how amount `a` compares with amount `b`, judged exactly on the decimal text. */
+export function compareAmounts(a: string, b: string): -1 | 0 | 1 {
+  const {
+    units: [x = 0n, y = 0n],
+  } = parseAll([a, b]);
+  if (x === y) return 0;
+  return x < y ? -1 : 1;
+}
+
+/**
+ * Index of the amount nearest `target`, judged exactly on the decimal text (the
+ * earlier one on a tie).
+ */
+export function nearestAmountIndex(
+  amounts: readonly string[],
+  target: string,
+): number {
+  if (amounts.length === 0) throw new Error('No amounts to choose from');
+  const { units } = parseAll([target, ...amounts]);
+  const [goal = 0n, ...scaled] = units;
+  let best = 0;
+  let bestGap: bigint | null = null;
+  scaled.forEach((unit, index) => {
+    const diff = unit - goal;
+    const gap = diff < 0n ? -diff : diff;
+    if (bestGap === null || gap < bestGap) {
+      best = index;
+      bestGap = gap;
+    }
+  });
+  return best;
+}
+
 /** Index of the position nearest `target` (the earlier one on a tie). */
 export function nearestIndex(
   positions: readonly string[],

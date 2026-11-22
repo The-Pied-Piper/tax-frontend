@@ -23,7 +23,8 @@ import type { Province } from '../salaryPages/provinces';
  * slugs of provinces with a hub but no salary pages (the API does not serve
  * them yet); their hubs come after the listed provinces' and have no salary
  * section. `chartSlugs` holds the slugs of hubs that have a sweep: only those get
- * the salary charts card.
+ * the salary charts card and the province comparison, and every one of them must
+ * have a hub, since the comparison's bars link to hubs.
  */
 export function hubPages(
   built: BuiltProvince[],
@@ -33,6 +34,11 @@ export function hubPages(
   chartSlugs: ReadonlySet<string> = new Set(),
 ): ContentPageSpec[] {
   const slugs = [...provinceList.map((province) => province.slug), ...hubOnly];
+  for (const slug of chartSlugs) {
+    if (!slugs.includes(slug)) {
+      throw new Error(`Hubs: ${slug} has a sweep but no hub`);
+    }
+  }
   const listed = slugs.map((slug) => {
     const text = provinceHubs.find((hub) => hub.slug === slug);
     if (!text) throw new Error(`Hubs: ${slug} has no hub text`);

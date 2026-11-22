@@ -1,5 +1,6 @@
 import type { Unit } from '../adapters';
 import { readUnit } from '../adapters/fallback';
+import { compareAmounts } from '../money/scale';
 import { isRecord } from './salaryPageData';
 
 /** The salaries of the sweep as text, lowest first: every $1,000 from $1,000 to $250,000, then every $5,000 to $500,000. The API takes no salary of 0. */
@@ -39,15 +40,21 @@ export type ProvinceSweep = {
 /** What a hub's data block holds: the sweep of every province the build served. */
 export type HubChartsData = { provinces: ProvinceSweep[] };
 
-/** A figure as the API writes it: optional minus, digits, optional decimals. */
-const DECIMAL = /^-?\d+(\.\d+)?$/;
+/** A figure as the API writes it, and as money/scale reads it: optional minus, no leading zero, optional decimals, at most 30 characters. */
+const DECIMAL = /^-?(0|[1-9]\d*)(\.\d+)?$/;
+const MAX_FIGURE_LENGTH = 30;
+/** A slug as the site writes it. */
+const SLUG = /^[a-z0-9-]+$/;
 
 function isPoint(value: unknown): value is SweepPoint {
   return (
     Array.isArray(value) &&
     value.length === 6 &&
     value.every(
-      (part: unknown) => typeof part === 'string' && DECIMAL.test(part),
+      (part: unknown) =>
+        typeof part === 'string' &&
+        part.length <= MAX_FIGURE_LENGTH &&
+        DECIMAL.test(part),
     )
   );
 }
@@ -56,6 +63,7 @@ function isProvinceSweep(value: unknown): boolean {
   return (
     isRecord(value) &&
     typeof value.slug === 'string' &&
+    SLUG.test(value.slug) &&
     typeof value.year === 'number' &&
     typeof value.provisional === 'boolean' &&
     readUnit(value.unit) !== null &&
@@ -66,12 +74,45 @@ function isProvinceSweep(value: unknown): boolean {
   );
 }
 
+/** The salaries of a province's points, in order. */
+function salariesOf(sweep: ProvinceSweep): string[] {
+  return sweep.points.map((point) => point[0]);
+}
+
+/** True when the salaries of the points are above zero and rise. */
+function hasRisingSalaries(sweep: ProvinceSweep): boolean {
+  return salariesOf(sweep).every(
+    (salary, at, all) =>
+      compareAmounts(salary, at === 0 ? '0' : (all[at - 1] ?? '0')) > 0,
+  );
+}
+
+/**
+ * True when every province has the same salaries and year, and no slug is repeated. The comparison reads
+ * every province at one position of the sweep and states one year.
+ */
+function shareSalariesAndYear(provinces: ProvinceSweep[]): boolean {
+  const [first] = provinces;
+  if (!first) return false;
+  if (new Set(provinces.map((sweep) => sweep.slug)).size !== provinces.length) {
+    return false;
+  }
+  const salaries = salariesOf(first).join(',');
+  return provinces.every(
+    (sweep) =>
+      sweep.year === first.year && salariesOf(sweep).join(',') === salaries,
+  );
+}
+
 function isHubChartsData(value: unknown): value is HubChartsData {
   return (
     isRecord(value) &&
     Array.isArray(value.provinces) &&
     value.provinces.length > 0 &&
-    value.provinces.every(isProvinceSweep)
+    value.provinces.every(isProvinceSweep) &&
+    // isProvinceSweep has checked the shape of every entry.
+    shareSalariesAndYear(value.provinces as ProvinceSweep[]) &&
+    (value.provinces as ProvinceSweep[]).every(hasRisingSalaries)
   );
 }
 
