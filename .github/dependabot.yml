@@ -10,8 +10,9 @@ updates:
       npm-development:
         dependency-type: development
 
-  # The committed tax-engine pin in build/localEngine: it is for running the step by hand. Deploy
-  # builds follow the release tax-service pins (build/localEngine/resolve_pin.py), not this file.
+  # The committed pins in build/localEngine: tax-engine is for running the step by hand (deploy
+  # builds follow the release tax-service pins, build/localEngine/resolve_pin.py), but the PyYAML
+  # pin is the one deploy builds install, so a bump of it here changes them.
   - package-ecosystem: pip
     directory: /build/localEngine
     schedule:

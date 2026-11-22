@@ -79,6 +79,8 @@ def commit_of(mode: str) -> tuple[str, str]:
 
 
 def requirements_at(sha: str) -> str:
+    if not re.fullmatch(r"[0-9a-f]{40}", sha):
+        raise Failure(f"git gave {sha!r} where a commit sha was expected")
     with tempfile.TemporaryDirectory() as folder:
         git("init", "-q", folder)
         git("fetch", "-q", "--depth", "1", SERVICE_URL, sha, cwd=folder)
