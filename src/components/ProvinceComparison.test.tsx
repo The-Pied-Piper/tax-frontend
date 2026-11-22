@@ -1,12 +1,13 @@
 import { fireEvent, render, screen, within } from '@testing-library/react';
 import { strings } from '../strings';
+import type { FooterProvinceSlug } from '../state/siteLinks';
 import { sampleHubCharts, sampleSweeps } from '../test/comparisonData';
 import { ProvinceComparison } from './ProvinceComparison';
 
 const copy = strings.hubCharts.comparison;
 const names = strings.siteNav.provinceNames;
 
-function show(province = 'ca-on', data = sampleHubCharts) {
+function show(province: FooterProvinceSlug = 'ca-on', data = sampleHubCharts) {
   return render(<ProvinceComparison data={data} province={province} />);
 }
 
@@ -103,7 +104,9 @@ describe('the highlighted province and the links', () => {
   });
 
   it('draws nothing when the hub province has no sweep', () => {
-    const { container } = show('ca-xx');
+    const { container } = show('ca-nl', {
+      provinces: sampleSweeps.filter((sweep) => sweep.slug !== 'ca-nl'),
+    });
     expect(container).toBeEmptyDOMElement();
   });
 });

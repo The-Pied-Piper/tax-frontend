@@ -1,6 +1,10 @@
 import type { MoneyUnit } from '../money/format';
 import { toPlainSalary, type Separators } from '../money/salaryInput';
-import { compareAmounts, nearestIndex, scalePosition } from '../money/scale';
+import {
+  compareAmounts,
+  nearestAmountIndex,
+  scalePosition,
+} from '../money/scale';
 import type { ProvinceSweep } from './hubCharts';
 
 /** What the bars show. */
@@ -19,25 +23,12 @@ const COLUMN = { takeHome: 1, incomeTax: 3, averageRate: 4 } as const;
 /** The salary the comparison starts at. */
 export const DEFAULT_SALARY = '70000';
 
-// Salaries are laid on a long axis only to find the nearest one. Over a sweep
-// ending at $500,000, a position (kept to a tenth) is worth half a cent, so
-// two salaries a cent apart never share one and a tie is a true tie.
-const AXIS = 10000000;
-
-function position(salary: string, last: string): string {
-  return scalePosition(salary, '0', last, 0, AXIS);
-}
-
 /** The index of the point nearest `salary` (the lower one on a tie). */
 export function nearestSalaryIndex(
   salaries: readonly string[],
   salary: string,
 ): number {
-  const last = salaries[salaries.length - 1] ?? '1';
-  return nearestIndex(
-    salaries.map((point) => position(point, last)),
-    position(salary, last),
-  );
+  return nearestAmountIndex(salaries, salary);
 }
 
 /**

@@ -10,7 +10,7 @@ import {
   type ComparisonRow,
   type Measure,
 } from '../state/provinceComparison';
-import { contentPath } from '../state/siteLinks';
+import { contentPath, type FooterProvinceSlug } from '../state/siteLinks';
 import { strings } from '../strings';
 import styles from './ProvinceComparison.module.css';
 import { SalarySlider } from './SalarySlider';
@@ -33,7 +33,7 @@ type Props = {
   /** The sweep of every served province. */
   data: HubChartsData;
   /** The slug of the hub the page belongs to: its bar is highlighted and is not a link. */
-  province: string;
+  province: FooterProvinceSlug;
 };
 
 // Every served province as a bar at one salary, for the measure chosen. It has
