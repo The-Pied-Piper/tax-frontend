@@ -6,8 +6,8 @@ import {
   niceAxis,
   pointerPosition,
   scalePosition,
-  tickLabel,
 } from '../money/scale';
+import { displayTick, type MoneyUnit } from '../money/format';
 import styles from './LineChart.module.css';
 
 // A point's salary and one value per series, all the API's own text.
@@ -36,8 +36,9 @@ type Props = {
   xTicks: readonly string[];
   xAxisLabel: string;
   yAxisLabel: string;
-  /** Whether the values are dollars or fractions shown as percent. */
-  yKind: 'dollars' | 'percent';
+  /** The API's units for the salary axis and for the values (a percent for a rate). */
+  xUnit: MoneyUnit;
+  yUnit: MoneyUnit;
   /** A money/format formatter: the label beside the marker. */
   formatValue: (value: string) => string;
   /** The text for screen readers; the figures themselves are in the table. */
@@ -72,7 +73,8 @@ export function LineChart({
   xTicks,
   xAxisLabel,
   yAxisLabel,
-  yKind,
+  xUnit,
+  yUnit,
   formatValue,
   ariaLabel,
   activeIndex,
@@ -171,7 +173,7 @@ export function LineChart({
               dy="0.35em"
               textAnchor="end"
             >
-              {tickLabel(tick, yKind)}
+              {displayTick(tick, yUnit)}
             </text>
           </g>
         ))}
@@ -183,7 +185,7 @@ export function LineChart({
             y={PLOT_BOTTOM + 14}
             textAnchor="middle"
           >
-            {tickLabel(tick, 'dollars')}
+            {displayTick(tick, xUnit)}
           </text>
         ))}
         <text

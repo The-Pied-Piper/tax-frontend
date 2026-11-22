@@ -7,6 +7,7 @@ import {
   groupThousands,
   isDollarUnit,
   withCents,
+  displayTick,
   withUnit,
 } from './format';
 
@@ -193,5 +194,28 @@ describe('isDollarUnit', () => {
     expect(isDollarUnit(cad)).toBe(true);
     expect(isDollarUnit(months)).toBe(false);
     expect(isDollarUnit(percent)).toBe(false);
+  });
+});
+
+describe('displayTick', () => {
+  it('shortens whole hundreds from a thousand up and groups the rest', () => {
+    expect(displayTick('0', cad)).toBe('$0');
+    expect(displayTick('500', cad)).toBe('$500');
+    expect(displayTick('2500', cad)).toBe('$2.5k');
+    expect(displayTick('50000', cad)).toBe('$50k');
+    expect(displayTick('1050', cad)).toBe('$1,050');
+    expect(displayTick('-5000', cad)).toBe('-$5k');
+    expect(displayTick('500000', cad)).toBe('$500k');
+    expect(displayTick('1000000', cad)).toBe('$1,000k');
+  });
+
+  it('puts the unit where the unit says', () => {
+    expect(displayTick('50000', months)).toBe('50k months');
+  });
+
+  it('shows a rate as the unit says, nothing rounded', () => {
+    expect(displayTick('0.2', percent)).toBe('20%');
+    expect(displayTick('0', percent)).toBe('0%');
+    expect(displayTick('0.125', percent)).toBe('12.5%');
   });
 });

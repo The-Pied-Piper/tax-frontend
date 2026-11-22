@@ -37,7 +37,8 @@ function chart(
       xTicks={['100000', '500000']}
       xAxisLabel="Salary before tax"
       yAxisLabel="Dollars a year"
-      yKind="dollars"
+      xUnit={unit}
+      yUnit={unit}
       formatValue={formatValue}
       ariaLabel="Line chart: Income tax for the year against salary."
       activeIndex={null}
@@ -170,7 +171,14 @@ describe('LineChart', () => {
   it('draws rates as percent ticks', () => {
     render(
       chart({
-        yKind: 'percent',
+        yUnit: {
+          ...unit,
+          placement: 'after',
+          singular: '%',
+          plural: '%',
+          spaced: true,
+          as_percentage: true,
+        },
         series: [FIRST_SERIES],
         points: [
           { salary: '1000', values: ['0.05'] },
@@ -178,7 +186,7 @@ describe('LineChart', () => {
         ],
       }),
     );
-    expect(screen.getByText('50%')).toBeInTheDocument();
+    expect(screen.getByText('50 %')).toBeInTheDocument();
   });
 
   it('renders on the server with the whole chart in the HTML', () => {

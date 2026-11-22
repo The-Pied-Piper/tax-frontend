@@ -4,7 +4,6 @@ import {
   niceAxis,
   pointerPosition,
   scalePosition,
-  tickLabel,
 } from './scale';
 
 describe('scalePosition', () => {
@@ -118,23 +117,5 @@ describe('niceAxis', () => {
       max: '1',
       ticks: ['0', '1'],
     });
-  });
-});
-
-describe('tickLabel', () => {
-  it('shortens thousands and keeps the rest whole', () => {
-    expect(tickLabel('0', 'dollars')).toBe('$0');
-    expect(tickLabel('500', 'dollars')).toBe('$500');
-    expect(tickLabel('2500', 'dollars')).toBe('$2.5k');
-    expect(tickLabel('50000', 'dollars')).toBe('$50k');
-    expect(tickLabel('1050', 'dollars')).toBe('$1,050');
-    expect(tickLabel('-5000', 'dollars')).toBe('-$5k');
-    expect(tickLabel('500000', 'dollars')).toBe('$500k');
-  });
-
-  it('shows a fraction as a percent without rounding', () => {
-    expect(tickLabel('0.2', 'percent')).toBe('20%');
-    expect(tickLabel('0', 'percent')).toBe('0%');
-    expect(tickLabel('0.125', 'percent')).toBe('12.5%');
   });
 });

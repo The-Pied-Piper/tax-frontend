@@ -7,8 +7,6 @@
 // A position is a coordinate in the chart's own units (SVG user units), kept
 // to one decimal and written as text: "123.4".
 
-import { groupThousands } from './format';
-
 const DECIMAL = /^(-?)(0|[1-9]\d*)(?:\.(\d+))?$/;
 
 interface Scaled {
@@ -189,32 +187,4 @@ export function niceAxis(values: readonly string[]): Axis {
     ticks.push(unitsText(tick, digits));
   }
   return { min: unitsText(first, digits), max: unitsText(last, digits), ticks };
-}
-
-// Moves the decimal point `places` to the right, exactly.
-function shiftRight(text: string, places: number): string {
-  const { units, digits } = parse(text);
-  const kept = Math.max(0, digits - places);
-  return unitsText(units * 10n ** BigInt(Math.max(0, places - digits)), kept);
-}
-
-/**
- * Short label for an axis tick. 'dollars': "$500", "$2,500", "$50k", "$2.5k";
- * 'percent': a fraction shown times 100 ("0.2" -> "20%"). Tick values come
- * from niceAxis or are round figures the caller wrote, so the label is exact.
- */
-export function tickLabel(value: string, kind: 'dollars' | 'percent'): string {
-  if (kind === 'percent') return `${shiftRight(value, 2)}%`;
-  const { units, digits } = parse(value);
-  const negative = units < 0n;
-  const abs = negative ? -units : units;
-  const sign = negative ? '-' : '';
-  const scale = 10n ** BigInt(digits);
-  if (abs >= 1000n * scale && abs % (100n * scale) === 0n) {
-    const hundreds = abs / (100n * scale);
-    const rest = hundreds % 10n;
-    return `${sign}$${groupThousands((hundreds / 10n).toString())}${rest === 0n ? '' : `.${rest.toString()}`}k`;
-  }
-  const [whole = '0', fraction] = unitsText(abs, digits).split('.');
-  return `${sign}$${groupThousands(whole)}${fraction === undefined ? '' : `.${fraction}`}`;
 }
