@@ -134,7 +134,8 @@ export function displayTick(value: string, unit: MoneyUnit): string {
   }
   const hundreds = whole.slice(-3, -2);
   const body = `${match[1] ?? ''}${groupThousands(whole.slice(0, -3))}${hundreds === '0' ? '' : `.${hundreds}`}`;
-  const text = withUnit(body, unit);
+  // A shortened figure is never exactly 1 of the unit, so it takes the plural.
+  const text = withUnit(body, { ...unit, singular: unit.plural });
   return unit.placement === 'before'
     ? `${text}k`
     : text.replace(body, `${body}k`);

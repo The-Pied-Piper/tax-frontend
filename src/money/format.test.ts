@@ -211,6 +211,7 @@ describe('displayTick', () => {
 
   it('puts the unit where the unit says', () => {
     expect(displayTick('50000', months)).toBe('50k months');
+    expect(displayTick('1000', months)).toBe('1k months');
   });
 
   it('shows a rate as the unit says, nothing rounded', () => {
