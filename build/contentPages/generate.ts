@@ -26,6 +26,8 @@ export type ContentOptions = {
   render: (spec: ContentPageSpec) => string;
   /** The normalized site origin; null leaves canonical and og:url as the template has them. */
   siteUrl: string | null;
+  /** A data block for a page's React to read, by slug, put at the end of its body. */
+  dataBlocks?: ReadonlyMap<string, string>;
 };
 
 /** Why a block cannot be drawn, or null when it can. */
@@ -108,7 +110,7 @@ function check(pages: ContentPageSpec[]): void {
 export async function generateContentPages(
   options: ContentOptions,
 ): Promise<{ written: string[] }> {
-  const { outDir, template, pages, render, siteUrl } = options;
+  const { outDir, template, pages, render, siteUrl, dataBlocks } = options;
   check(pages);
   const built = pages.map((spec) => ({
     path: contentFile(spec.slug),
@@ -124,6 +126,7 @@ export async function generateContentPages(
             siteUrl,
             contentPath(spec.slug),
           ),
+      dataBlocks?.get(spec.slug) ?? null,
     ),
   }));
   for (const { path, html } of built) {

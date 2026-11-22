@@ -121,6 +121,11 @@ export function pageShell(
     : addressed.replace('</head>', () => `${headBlock}\n  </head>`);
 }
 
+/** The page with a data block (see `dataBlock`) at the end of its body. */
+export function withBodyBlock(html: string, block: string): string {
+  return html.replace('</body>', () => `${block}\n  </body>`);
+}
+
 /** The template with `#root` holding the rendered page, plus the data block for React. */
 export function buildPageHtml(
   template: string,
@@ -137,5 +142,5 @@ export function buildPageHtml(
     canonicalUrl,
     headBlock,
   );
-  return addressed.replace('</body>', () => `${block}\n  </body>`);
+  return withBodyBlock(addressed, block);
 }
