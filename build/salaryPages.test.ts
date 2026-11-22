@@ -177,7 +177,7 @@ describe('salaryPages closeBundle', () => {
     expect(generateCalls.list).toEqual([jurisdictions]);
   });
 
-  it("gives the sweep the engine file's sweeps, what was built and the API's list (#270)", async () => {
+  it("gives the sweep the engine file's sweeps, what was built and the API's list", async () => {
     sweepCalls.args.length = 0;
     await runCloseBundle(salaryPages(API, 'https://example.com'));
     expect(sweepCalls.args).toEqual([
