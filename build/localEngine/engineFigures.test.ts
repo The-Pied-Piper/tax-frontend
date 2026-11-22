@@ -45,14 +45,39 @@ describe("reading the Python step's file", () => {
     rmSync(dir, { recursive: true, force: true });
   });
 
-  function written(pages: Record<string, unknown>): string {
+  const sweepUnit = { ...saved.unit };
+  const sweepFile = {
+    sweep: [
+      {
+        salary: '1000.00',
+        total_deductions: '100.00',
+        income_tax: '40.00',
+        take_home: '900.00',
+        average_income_tax_rate: '0.0100',
+        marginal_income_tax_rate: '0.0505',
+      },
+    ],
+    sweep_units: {
+      unit: sweepUnit,
+      average_income_tax_rate: saved.average_income_tax_rate.unit,
+      marginal_income_tax_rate: saved.marginal_income_tax_rate.unit,
+    },
+  };
+
+  function written(
+    pages: Record<string, unknown>,
+    extra: Record<string, unknown> = sweepFile,
+  ): string {
     const file = join(
       dir,
       `figures-${Math.random().toString(36).slice(2)}.json`,
     );
     writeFileSync(
       file,
-      JSON.stringify({ engine: '0.4.1', provinces: { 'CA-ON': { pages } } }),
+      JSON.stringify({
+        engine: '0.4.1',
+        provinces: { 'CA-ON': { pages, ...extra } },
+      }),
     );
     return file;
   }
@@ -62,6 +87,27 @@ describe("reading the Python step's file", () => {
     const figures = readEngineFigures(written({ '70000': answer }));
     expect(figures.engine).toBe('0.4.1');
     expect(figures.answers['CA-ON']?.['70000']).toEqual(answer);
+  });
+
+  it('returns the sweep of each province with its units', () => {
+    const figures = readEngineFigures(written({ '70000': engineOf(saved) }));
+    expect(figures.sweeps['CA-ON']?.points).toEqual(sweepFile.sweep);
+    expect(figures.sweeps['CA-ON']?.units.unit).toEqual(sweepUnit);
+  });
+
+  it('fails when a province has no sweep, a point is not text, or the units are missing', () => {
+    const pages = { '70000': engineOf(saved) };
+    expect(() => readEngineFigures(written(pages, {}))).toThrow(
+      /CA-ON has no valid sweep/,
+    );
+    const bad = { ...sweepFile, sweep: [{ salary: 1000 }] };
+    expect(() => readEngineFigures(written(pages, bad))).toThrow(
+      /CA-ON has no valid sweep/,
+    );
+    const noUnits = { sweep: sweepFile.sweep };
+    expect(() => readEngineFigures(written(pages, noUnits))).toThrow(
+      /CA-ON has no sweep units/,
+    );
   });
 
   it('fails, naming the page, when an answer does not fit the spec', () => {

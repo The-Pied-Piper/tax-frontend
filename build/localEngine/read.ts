@@ -8,7 +8,70 @@ export type EngineFigures = {
   engine: string;
   /** The answers for the pre-built salary pages. */
   answers: EngineAnswers;
+  /** The hub-chart sweep of each province, by jurisdiction code. */
+  sweeps: Record<string, EngineSweep>;
 };
+
+/** One sweep point as the Python step writes it: the API's text figures. */
+export type EngineSweepPoint = {
+  salary: string;
+  total_deductions: string;
+  income_tax: string;
+  take_home: string;
+  average_income_tax_rate: string;
+  marginal_income_tax_rate: string;
+};
+
+/** The sweep of one province: its points, lowest salary first, and the units written once. */
+export type EngineSweep = {
+  points: EngineSweepPoint[];
+  units: {
+    unit: unknown;
+    average_income_tax_rate: unknown;
+    marginal_income_tax_rate: unknown;
+  };
+};
+
+const POINT_FIELDS = [
+  'salary',
+  'total_deductions',
+  'income_tax',
+  'take_home',
+  'average_income_tax_rate',
+  'marginal_income_tax_rate',
+] as const;
+
+function isSweepPoint(value: unknown): value is EngineSweepPoint {
+  return (
+    isRecord(value) && POINT_FIELDS.every((f) => typeof value[f] === 'string')
+  );
+}
+
+function readSweep(
+  code: string,
+  province: Record<string, unknown>,
+): EngineSweep {
+  const { sweep, sweep_units: units } = province;
+  if (!Array.isArray(sweep) || !sweep.every(isSweepPoint)) {
+    throw new Error(`Engine figures: ${code} has no valid sweep`);
+  }
+  if (
+    !isRecord(units) ||
+    !('unit' in units) ||
+    !('average_income_tax_rate' in units) ||
+    !('marginal_income_tax_rate' in units)
+  ) {
+    throw new Error(`Engine figures: ${code} has no sweep units`);
+  }
+  return {
+    points: sweep,
+    units: {
+      unit: units.unit,
+      average_income_tax_rate: units.average_income_tax_rate,
+      marginal_income_tax_rate: units.marginal_income_tax_rate,
+    },
+  };
+}
 
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === 'object' && value !== null && !Array.isArray(value);
@@ -40,6 +103,7 @@ export function readEngineFigures(
     );
   }
   const answers: EngineAnswers = {};
+  const sweeps: Record<string, EngineSweep> = {};
   for (const [code, province] of Object.entries(parsed.provinces)) {
     if (!isRecord(province) || !isRecord(province.pages)) {
       throw new Error(`Engine figures: ${code} has no pages`);
@@ -59,6 +123,7 @@ export function readEngineFigures(
       bySalary[salary] = answer as EngineAnswer;
     }
     answers[code] = bySalary;
+    sweeps[code] = readSweep(code, province);
   }
-  return { engine: parsed.engine, answers };
+  return { engine: parsed.engine, answers, sweeps };
 }
