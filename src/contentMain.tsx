@@ -57,7 +57,9 @@ if (chartsSlot && chartsData && chartsProvince) {
 // A province hub also has a slot for the province comparison, drawn from the same
 // data block. Hydrate it from that block too: no fetch, no storage.
 const comparisonSlot = document.getElementById(PROVINCE_COMPARISON_SLOT_ID);
-const comparisonProvince = comparisonSlot?.dataset.province;
+const comparisonProvince = FOOTER_PROVINCE_SLUGS.find(
+  (slug) => slug === comparisonSlot?.dataset.province,
+);
 if (comparisonSlot && chartsData && comparisonProvince) {
   hydrateRoot(
     comparisonSlot,

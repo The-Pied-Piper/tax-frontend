@@ -65,9 +65,7 @@ function blockProblem(block: ContentBlock): string | null {
         ? `has a table row that does not have ${block.head.length.toString()} cells`
         : null;
     case 'provinceComparison':
-      return isContentSlug(block.province)
-        ? null
-        : `has a comparison for ${block.province}, which is not a content page slug`;
+      return null;
   }
 }
 

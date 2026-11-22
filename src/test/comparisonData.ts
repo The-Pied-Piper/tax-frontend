@@ -1,4 +1,5 @@
-// Test data only: nothing in the build imports this file. A few points of the
+// Test data only: nothing in the build imports this file. The comparison needs all six
+// provinces, which hubChartsData.ts (two provinces, 300 points) does not have. A few points of the
 // hub charts sweep of each province, real tax-engine figures for 2026 (a single
 // person whose only income is a salary), laid out as a hub's data block holds them.
 import {

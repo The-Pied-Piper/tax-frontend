@@ -145,6 +145,10 @@ describe('parseHubChartsData', () => {
       JSON.stringify({ provinces: [{ ...sweep, slug: '/evil.com' }] }),
     ],
     [
+      'two provinces with the same slug',
+      JSON.stringify({ provinces: [sweep, sweep] }),
+    ],
+    [
       'provinces of different years',
       JSON.stringify({
         provinces: [sweep, { ...sweep, slug: 'ca-ab', year: 2025 }],

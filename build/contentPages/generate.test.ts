@@ -259,21 +259,11 @@ describe('generateContentPages validation', () => {
       expect(files(dir)).toEqual([]);
     });
 
-    it('accepts a province comparison for a content page slug', async () => {
+    it('accepts a province comparison, a data reference only', async () => {
       const { written } = await run(outDir(), [
         withBlocks({ kind: 'provinceComparison', province: 'ca-on' }),
       ]);
       expect(written).toEqual(['plain-page/index.html']);
-    });
-
-    it('rejects a province comparison whose province is not a content page slug', async () => {
-      const dir = outDir();
-      const bad = withBlocks({
-        kind: 'provinceComparison',
-        province: 'Not A Slug/',
-      });
-      await expect(run(dir, [bad])).rejects.toThrow(/plain-page.*Not A Slug/);
-      expect(files(dir)).toEqual([]);
     });
 
     it('accepts a link to the engine repository, the one address off the site', async () => {

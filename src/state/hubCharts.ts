@@ -88,12 +88,15 @@ function hasRisingSalaries(sweep: ProvinceSweep): boolean {
 }
 
 /**
- * True when every province has the same salaries and year. The comparison reads
+ * True when every province has the same salaries and year, and no slug is repeated. The comparison reads
  * every province at one position of the sweep and states one year.
  */
 function shareSalariesAndYear(provinces: ProvinceSweep[]): boolean {
   const [first] = provinces;
   if (!first) return false;
+  if (new Set(provinces.map((sweep) => sweep.slug)).size !== provinces.length) {
+    return false;
+  }
   const salaries = salariesOf(first).join(',');
   return provinces.every(
     (sweep) =>
