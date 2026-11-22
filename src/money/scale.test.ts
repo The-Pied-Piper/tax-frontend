@@ -31,6 +31,17 @@ describe('scalePosition', () => {
     expect(scalePosition('0.2965', '0', '0.5', 206, 10)).toBe('89.8');
   });
 
+  it('rounds a tie up on a rising and a falling axis alike', () => {
+    expect(scalePosition('0.05', '0', '1', 0, 10)).toBe('0.5');
+    expect(scalePosition('0.05', '0', '1', 10, 0)).toBe('9.5');
+    expect(scalePosition('0.005', '0', '1', 10, 0)).toBe('10.0');
+    expect(scalePosition('0.995', '0', '1', 10, 0)).toBe('0.1');
+  });
+
+  it('refuses a number far longer than any amount', () => {
+    expect(() => scalePosition('1'.repeat(40), '0', '5', 0, 10)).toThrow();
+  });
+
   it('handles values below zero', () => {
     expect(scalePosition('-500', '-1000', '1000', 100, 0)).toBe('75.0');
   });
@@ -89,6 +100,16 @@ describe('niceAxis', () => {
     expect(axis.min).toBe('-10000');
     expect(axis.max).toBe('40000');
     expect(axis.ticks[0]).toBe('-10000');
+  });
+
+  it('keeps a range that straddles zero within five steps', () => {
+    const axis = niceAxis(['-150', '350']);
+    expect(axis.ticks.length).toBeLessThanOrEqual(6);
+    expect(axis).toEqual({
+      min: '-200',
+      max: '400',
+      ticks: ['-200', '0', '200', '400'],
+    });
   });
 
   it('gives a flat chart of zeros an axis of its own', () => {

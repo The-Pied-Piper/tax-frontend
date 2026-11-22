@@ -56,6 +56,7 @@ const BOTTOM = 44;
 const PLOT_RIGHT = WIDTH - RIGHT;
 const PLOT_BOTTOM = HEIGHT - BOTTOM;
 // The marker's figure moves to the left of the dot past 60% of the width.
+const LABEL_TOP = scalePosition('22', '0', '1', 0, 1);
 const LABEL_FLIPS_AFTER = scalePosition('3', '0', '5', 0, WIDTH);
 
 // One chart of the hub card: a figure with the title, the words, the lines and
@@ -105,6 +106,11 @@ export function LineChart({
   const active =
     activeIndex !== null && activeIndex in points ? activeIndex : undefined;
   const activeX = active === undefined ? undefined : xs[active];
+  // The figure sits above its dot but never above the top of the plot.
+  const dotY = y(
+    (active === undefined ? undefined : points[active]?.values[0]) ?? '0',
+  );
+  const markerY = isBeyond(LABEL_TOP, dotY) ? LABEL_TOP : dotY;
 
   const choose = (event: PointerEvent<SVGRectElement>) => {
     const box = svgRef.current?.getBoundingClientRect();
@@ -116,7 +122,7 @@ export function LineChart({
   const onKeyDown = (event: KeyboardEvent<SVGSVGElement>) => {
     const last = points.length - 1;
     if (last < 0) return;
-    const current = activeIndex;
+    const current = activeIndex === null ? null : Math.min(activeIndex, last);
     let next: number | null | undefined;
     if (event.key === 'ArrowRight') {
       next = current === null ? 0 : Math.min(last, current + 1);
@@ -232,11 +238,18 @@ export function LineChart({
                 />
               );
             })}
-            <MarkerLabel
+            <text
+              className={styles.markerLabel}
               x={activeX}
-              y={y(points[active]?.values[0] ?? '0')}
-              text={formatValue(points[active]?.values[0] ?? '0')}
-            />
+              y={markerY}
+              dx={isBeyond(activeX, LABEL_FLIPS_AFTER) ? -9 : 9}
+              dy="-0.6em"
+              textAnchor={
+                isBeyond(activeX, LABEL_FLIPS_AFTER) ? 'end' : 'start'
+              }
+            >
+              {formatValue(points[active]?.values[0] ?? '0')}
+            </text>
           </g>
         )}
         <rect
@@ -264,22 +277,5 @@ export function LineChart({
         </ul>
       )}
     </figure>
-  );
-}
-
-// The marker's figure sits beside the dot, flipping left near the right edge.
-function MarkerLabel({ x, y, text }: { x: string; y: string; text: string }) {
-  const flip = isBeyond(x, LABEL_FLIPS_AFTER);
-  return (
-    <text
-      className={styles.markerLabel}
-      x={x}
-      y={y}
-      dx={flip ? -9 : 9}
-      dy="-0.6em"
-      textAnchor={flip ? 'end' : 'start'}
-    >
-      {text}
-    </text>
   );
 }

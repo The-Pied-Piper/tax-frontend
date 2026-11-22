@@ -7,6 +7,8 @@
 // A position is a coordinate in the chart's own units (SVG user units), kept
 // to one decimal and written as text: "123.4".
 
+import { groupThousands } from './format';
+
 const DECIMAL = /^(-?)(0|[1-9]\d*)(?:\.(\d+))?$/;
 
 interface Scaled {
@@ -15,8 +17,11 @@ interface Scaled {
   readonly digits: number;
 }
 
+// No real amount is longer; the cap keeps a malformed string cheap to refuse.
+const MAX_LENGTH = 30;
+
 function parse(text: string): Scaled {
-  const match = DECIMAL.exec(text);
+  const match = text.length <= MAX_LENGTH ? DECIMAL.exec(text) : null;
   if (!match) throw new Error(`Not a decimal amount: "${text}"`);
   const [, sign, whole = '0', fraction = ''] = match;
   const units = BigInt(`${whole}${fraction}`);
@@ -36,13 +41,13 @@ function parseAll(texts: readonly string[]): {
   };
 }
 
-// Division rounded half away from zero.
+// Division rounded half up: a tie goes to the larger value, whatever the sign.
 function divideHalfUp(numerator: bigint, denominator: bigint): bigint {
-  const negative = numerator < 0n !== denominator < 0n;
-  const n = numerator < 0n ? -numerator : numerator;
+  const n = denominator < 0n ? -numerator : numerator;
   const d = denominator < 0n ? -denominator : denominator;
-  const rounded = (n * 2n + d) / (d * 2n);
-  return negative ? -rounded : rounded;
+  const twice = 2n * n + d;
+  const quotient = twice / (2n * d);
+  return twice < 0n && twice % (2n * d) !== 0n ? quotient - 1n : quotient;
 }
 
 // Scaled integer back to text, trailing zeros of the fraction dropped.
@@ -149,15 +154,22 @@ export interface Axis {
 
 const MAX_INTERVALS = 5n;
 
-// The smallest 1, 2 or 5 times a power of ten that covers `range` in at most
-// MAX_INTERVALS steps.
-function roundStep(range: bigint): bigint {
+// The smallest 1, 2 or 5 times a power of ten whose steps, aligned to
+// multiples of the step, cover low..high in at most MAX_INTERVALS steps.
+function roundStep(low: bigint, high: bigint): bigint {
   for (let power = 1n; ; power *= 10n) {
     for (const factor of [1n, 2n, 5n]) {
       const step = power * factor;
-      if ((range + step - 1n) / step <= MAX_INTERVALS) return step;
+      const first = floorDiv(low, step);
+      const last = -floorDiv(-high, step);
+      if (last - first <= MAX_INTERVALS) return step;
     }
   }
+}
+
+function floorDiv(n: bigint, d: bigint): bigint {
+  const q = n / d;
+  return n % d !== 0n && n < 0n ? q - 1n : q;
 }
 
 /**
@@ -169,19 +181,14 @@ export function niceAxis(values: readonly string[]): Axis {
   const low = units.reduce((a, b) => (b < a ? b : a));
   const high = units.reduce((a, b) => (b > a ? b : a));
   if (high === low) return { min: '0', max: '1', ticks: ['0', '1'] };
-  const range = high - low;
-  const step = roundStep(range);
-  const first = (low < 0n ? -((-low + step - 1n) / step) : low / step) * step;
-  const last = ((high + step - 1n) / step) * step;
+  const step = roundStep(low, high);
+  const first = floorDiv(low, step) * step;
+  const last = -floorDiv(-high, step) * step;
   const ticks: string[] = [];
   for (let tick = first; tick <= last; tick += step) {
     ticks.push(unitsText(tick, digits));
   }
   return { min: unitsText(first, digits), max: unitsText(last, digits), ticks };
-}
-
-function group(whole: string): string {
-  return whole.replace(/\B(?=(\d{3})+$)/g, ',');
 }
 
 // Moves the decimal point `places` to the right, exactly.
@@ -206,8 +213,8 @@ export function tickLabel(value: string, kind: 'dollars' | 'percent'): string {
   if (abs >= 1000n * scale && abs % (100n * scale) === 0n) {
     const hundreds = abs / (100n * scale);
     const rest = hundreds % 10n;
-    return `${sign}$${group((hundreds / 10n).toString())}${rest === 0n ? '' : `.${rest.toString()}`}k`;
+    return `${sign}$${groupThousands((hundreds / 10n).toString())}${rest === 0n ? '' : `.${rest.toString()}`}k`;
   }
   const [whole = '0', fraction] = unitsText(abs, digits).split('.');
-  return `${sign}$${group(whole)}${fraction === undefined ? '' : `.${fraction}`}`;
+  return `${sign}$${groupThousands(whole)}${fraction === undefined ? '' : `.${fraction}`}`;
 }

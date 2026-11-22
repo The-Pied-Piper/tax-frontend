@@ -95,6 +95,24 @@ describe('LineChart', () => {
     expect(screen.getByText('$16,531.32')).toBeInTheDocument();
   });
 
+  it('keeps the marker figure inside the chart at the top of the axis', () => {
+    const { container } = render(
+      chart({
+        activeIndex: 1,
+        series: [FIRST_SERIES],
+        points: [
+          { salary: '1000', values: ['0'] },
+          { salary: '500000', values: ['200000'] },
+        ],
+      }),
+    );
+    const label = [...container.querySelectorAll('text')].find(
+      (t) => t.textContent === '$200,000.00',
+    );
+    // The dot is at y = 10.0; the figure is held down to 22.0.
+    expect(label?.getAttribute('y')).toBe('22.0');
+  });
+
   it('ignores an active index that is not a point', () => {
     const { container } = render(chart({ activeIndex: 9 }));
     expect(container.querySelector('circle')).toBeNull();
@@ -134,6 +152,9 @@ describe('LineChart', () => {
     expect(onActiveChange).toHaveBeenLastCalledWith(2);
     fireEvent.keyDown(svg(), { key: 'Home' });
     expect(onActiveChange).toHaveBeenLastCalledWith(0);
+    rerender(chart({ onActiveChange, activeIndex: 500 }));
+    fireEvent.keyDown(svg(), { key: 'ArrowLeft' });
+    expect(onActiveChange).toHaveBeenLastCalledWith(1);
     rerender(chart({ onActiveChange, activeIndex: 1 }));
     fireEvent.keyDown(svg(), { key: 'ArrowRight' });
     expect(onActiveChange).toHaveBeenLastCalledWith(2);
