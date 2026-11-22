@@ -1,8 +1,7 @@
 import { existsSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import {
-  apiBaseUrl,
-  fakeFetch,
+  engineOptions,
   listedIn,
   siteUrl as site,
   template,
@@ -35,8 +34,7 @@ async function build() {
   const published = new Set(contentPages.map((page) => page.slug));
   const { written: salaryFiles, built } = await generateSalaryPages({
     published,
-    fetch: fakeFetch(withAlberta),
-    baseUrl: apiBaseUrl,
+    ...engineOptions(provinces, withAlberta),
     // Only the provinces the fake API lists: a site-URL build fails on any other.
     provinces: listedIn(provinces, withAlberta),
     outDir: dir,

@@ -7,10 +7,11 @@ name: Release publish
 # file as it is on main (job_workflow_ref), only a v tag, and only the GitHub environment
 # prod-deploy, which needs the owner's approval.
 #
-# build: runs npm on the released commit with no cloud credentials at all (no id-token, no
+# build: runs tax-engine (pinned in build/localEngine) and npm on the released commit with no cloud credentials at all (no id-token, no
 # environment) and hands the finished site (dist/) to deploy as a workflow artifact. The
-# prod API must be up before a release is published: the build calls it once per page, and if
-# it fails nothing is published.
+# prod API must be up before a release is published: the build calls it once, for the list of
+# jurisdictions it serves (every figure comes from the local engine), and if it fails nothing is
+# published.
 # deploy: waits in prod-deploy for approval, never runs npm, uploads the artifact in the dev
 # order and, after the stale assets are deleted, refreshes the whole CDN. Until the prod site
 # exists (tax-infra creates the bucket, distribution and role) the variables below are unset
@@ -28,7 +29,7 @@ jobs:
     permissions:
       contents: read
     env:
-      # The prod API and the public address, set at build time (see DEVELOPMENT.md, "API client").
+      # The prod API (asked only which jurisdictions it serves) and the public address, set at build time (see DEVELOPMENT.md, "API client").
       VITE_API_BASE_URL: https://api.aftertaxlens.com/api/v1
       VITE_SITE_URL: https://aftertaxlens.com
     steps:
@@ -61,8 +62,23 @@ jobs:
         with:
           node-version-file: .nvmrc
 
+      # The site's figures come from tax-engine run here, not from an API: one Python step,
+      # hash-pinned requirements (build/localEngine/requirements.txt), no network use after the
+      # install. The Node build reads the file it writes.
+      - uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0
+        with:
+          python-version: '3.12'
+
+      - name: Compute the site's figures with tax-engine
+        run: |
+          set -euo pipefail
+          python -m pip install --require-hashes --no-deps --only-binary :all: -r build/localEngine/requirements.txt
+          python -I build/localEngine/engine_figures.py build/salaryPages/provinces.json "$RUNNER_TEMP/engine-figures.json"
+
       - run: npm ci --ignore-scripts
       - run: npm run build
+        env:
+          ENGINE_FIGURES_FILE: ${{ runner.temp }}/engine-figures.json
 
       # Nothing is published unless the build produced a page and the sitemap.
       - name: Check the build

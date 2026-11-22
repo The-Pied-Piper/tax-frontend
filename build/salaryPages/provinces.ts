@@ -1,5 +1,7 @@
+import config from './provinces.json';
+
 /** The tax year of every pre-built page: the one build setting. Change it each January. */
-export const TAX_YEAR = 2026;
+export const TAX_YEAR = config.year;
 
 export type Province = {
   /** The API's jurisdiction code. */
@@ -12,57 +14,11 @@ export type Province = {
   step: number;
 };
 
-/** One entry per province. A province the API does not return fails a build with a site URL and is skipped without one. */
-export const provinces: Province[] = [
-  {
-    code: 'CA-ON',
-    slug: 'ca-on',
-    year: TAX_YEAR,
-    from: 30000,
-    to: 150000,
-    step: 5000,
-  },
-  {
-    code: 'CA-AB',
-    slug: 'ca-ab',
-    year: TAX_YEAR,
-    from: 30000,
-    to: 150000,
-    step: 5000,
-  },
-  {
-    code: 'CA-BC',
-    slug: 'ca-bc',
-    year: TAX_YEAR,
-    from: 30000,
-    to: 150000,
-    step: 5000,
-  },
-  {
-    code: 'CA-MB',
-    slug: 'ca-mb',
-    year: TAX_YEAR,
-    from: 30000,
-    to: 150000,
-    step: 5000,
-  },
-  {
-    code: 'CA-SK',
-    slug: 'ca-sk',
-    year: TAX_YEAR,
-    from: 30000,
-    to: 150000,
-    step: 5000,
-  },
-  {
-    code: 'CA-NL',
-    slug: 'ca-nl',
-    year: TAX_YEAR,
-    from: 30000,
-    to: 150000,
-    step: 5000,
-  },
-];
+/** One entry per province (build/salaryPages/provinces.json, which the Python step reads too, with the hub-chart salary steps). A province the API does not return fails a build with a site URL and is skipped without one. */
+export const provinces: Province[] = config.provinces.map((p) => ({
+  ...p,
+  year: TAX_YEAR,
+}));
 
 export function salaries(province: Province): number[] {
   const { code, from, to, step } = province;

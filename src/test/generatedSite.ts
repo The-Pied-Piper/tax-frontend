@@ -3,10 +3,17 @@
 import { mkdtempSync, readFileSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
-import type { ComputeTakeHomeCalculationResponse } from '../api';
+import type {
+  ComputeTakeHomeCalculationResponse,
+  ListJurisdictionsResponse,
+} from '../api';
 import fixture70000 from '../api/fixtures/compute-on-2026-70000.json';
 import jurisdictions from '../api/fixtures/jurisdictions.json';
-import type { Province } from '../../build/salaryPages/provinces';
+import { salaries, type Province } from '../../build/salaryPages/provinces';
+import type {
+  EngineAnswer,
+  EngineAnswers,
+} from '../../build/salaryPages/generate';
 
 export const apiBaseUrl = 'https://api.test/api/v1';
 export const siteUrl = 'https://aftertaxlens.com';
@@ -62,27 +69,61 @@ export function listedIn(
   );
 }
 
-function urlOf(input: Parameters<typeof fetch>[0]): string {
-  return typeof input === 'string'
-    ? input
-    : input instanceof URL
-      ? input.href
-      : input.url;
+/** What the engine answers for a saved API response: everything but `provisional`, which is the service's policy. */
+export function engineOf(
+  response: ComputeTakeHomeCalculationResponse,
+): EngineAnswer {
+  return {
+    salary: response.salary,
+    total_deductions: response.total_deductions,
+    income_tax: response.income_tax,
+    take_home: response.take_home,
+    unit: response.unit,
+    average_income_tax_rate: response.average_income_tax_rate,
+    marginal_income_tax_rate: response.marginal_income_tax_rate,
+    trace: response.trace,
+  };
 }
 
-/** A stand-in tax-service: the saved list of places, and the $70,000 answer for every request. */
-export function fakeFetch(list: unknown = jurisdictions): typeof fetch {
-  return (input) => {
-    const url = urlOf(input);
-    if (url === `${apiBaseUrl}/jurisdictions`) {
-      return Promise.resolve(Response.json(list));
-    }
-    if (url === `${apiBaseUrl}/take-home-calculations:compute`) {
-      return Promise.resolve(
-        Response.json(fixture70000 as ComputeTakeHomeCalculationResponse),
-      );
-    }
-    return Promise.reject(new Error(`unexpected request ${url}`));
+const engineAnswer70000 = engineOf(
+  fixture70000 as ComputeTakeHomeCalculationResponse,
+);
+
+/**
+ * What the local engine would answer: the $70,000 answer for every salary of every
+ * province, or what `answerFor` makes of the province and the salary.
+ */
+export function engineAnswers(
+  provinces: Province[],
+  answerFor: (province: Province, salary: string) => EngineAnswer = () =>
+    engineAnswer70000,
+): EngineAnswers {
+  const answers: EngineAnswers = {};
+  for (const province of provinces) {
+    // Entries may share a code (one salary each), so their answers are merged.
+    answers[province.code] = {
+      ...answers[province.code],
+      ...Object.fromEntries(
+        salaries(province).map((n) => [
+          n.toString(),
+          answerFor(province, n.toString()),
+        ]),
+      ),
+    };
+  }
+  return answers;
+}
+
+/** The engine's answers for the provinces, with the API's list of places beside them: what generating pages takes in. */
+export function engineOptions(
+  provinces: Province[],
+  list: unknown = jurisdictions,
+  answerFor?: (province: Province, salary: string) => EngineAnswer,
+) {
+  return {
+    answers: engineAnswers(provinces, answerFor),
+    list: list as ListJurisdictionsResponse,
+    baseUrl: apiBaseUrl,
   };
 }
 

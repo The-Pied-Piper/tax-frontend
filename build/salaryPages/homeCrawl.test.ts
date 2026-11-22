@@ -2,8 +2,7 @@ import { publishedSlugs } from '../../src/test/pageLinks';
 import { existsSync, readFileSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import {
-  apiBaseUrl,
-  fakeFetch,
+  engineOptions,
   listedIn,
   siteUrl as site,
   template,
@@ -62,8 +61,7 @@ async function build(
         : undefined;
   const { written: salaryFiles, built } = await generateSalaryPages({
     published: publishedSlugs,
-    fetch: fakeFetch(list),
-    baseUrl: apiBaseUrl,
+    ...engineOptions(listedIn(provinces, list), list),
     // Only the provinces the fake API lists: a site-URL build fails on any
     // other. The hubs below still take every province. With no province
     // returned the build is the no-site-URL one, which skips them instead.

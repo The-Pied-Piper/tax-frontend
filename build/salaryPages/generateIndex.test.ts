@@ -4,8 +4,7 @@ import { join } from 'node:path';
 import compute70000 from '../../src/api/fixtures/compute-on-2026-70000.json';
 import { readUnit } from '../../src/adapters/fallback';
 import {
-  apiBaseUrl,
-  fakeFetch,
+  engineOptions,
   template,
   tmpDirs,
   withAlberta,
@@ -23,8 +22,10 @@ const outDir = tmpDirs('salary-built');
 function run(dir: string, options: { all?: boolean; list?: unknown } = {}) {
   return generateSalaryPages({
     published: publishedSlugs,
-    fetch: fakeFetch(options.list ?? (options.all ? withXland : undefined)),
-    baseUrl: apiBaseUrl,
+    ...engineOptions(
+      options.all ? [...provinces, xland] : provinces,
+      options.list ?? (options.all ? withXland : undefined),
+    ),
     provinces: options.all ? [...provinces, xland] : provinces,
     outDir: dir,
     template,
@@ -71,8 +72,7 @@ describe('generateSalaryPages: built', () => {
   it('has no entry for a listed province the API does not return', async () => {
     const result = await generateSalaryPages({
       published: publishedSlugs,
-      fetch: fakeFetch(),
-      baseUrl: apiBaseUrl,
+      ...engineOptions([...provinces.filter((p) => p.code === 'CA-ON'), xland]),
       provinces: [...provinces.filter((p) => p.code === 'CA-ON'), xland],
       outDir: outDir(),
       template,
@@ -86,8 +86,7 @@ describe('generateSalaryPages: built', () => {
   it('has no entries when no listed province is returned', async () => {
     const result = await generateSalaryPages({
       published: publishedSlugs,
-      fetch: fakeFetch({ jurisdictions: [] }),
-      baseUrl: apiBaseUrl,
+      ...engineOptions(provinces, { jurisdictions: [] }),
       provinces,
       outDir: outDir(),
       template,

@@ -24,6 +24,27 @@ jobs:
         run: npm run api:check
       - run: npm run check
       - run: npm run build
+  engine-figures:
+    # The Python step that the deploy builds run: it must install from the pinned, hashed
+    # requirements, run, and write answers that fit api/openapi.yml for every page.
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 22
+          cache: npm
+      - uses: actions/setup-python@v7
+        with:
+          python-version: '3.12'
+      - run: npm ci
+      - run: |
+          python -m pip install --require-hashes --no-deps --only-binary=:all: -r build/localEngine/requirements.txt
+      - run: python -I build/localEngine/engine_figures.py build/salaryPages/provinces.json "$RUNNER_TEMP/engine-figures.json"
+      - name: Check the written figures
+        env:
+          ENGINE_FIGURES_FILE: ${{ runner.temp }}/engine-figures.json
+        run: npx vitest run build/localEngine/engineFigures.test.ts
   spec-drift:
     # The committed spec must equal the one tax-service publishes on main.
     # tax-service is public, so no token is needed and the check runs on

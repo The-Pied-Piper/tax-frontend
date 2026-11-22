@@ -6,7 +6,9 @@ import { build, type Plugin } from 'vite';
 import react from '@vitejs/plugin-react';
 import { normalizeSiteUrl } from './seo';
 import { formPageIdDefine } from './formPageIds';
+import { createApiClient, type ListJurisdictionsResponse } from '../src/api';
 import { generateSalaryPages } from './salaryPages/generate';
+import { readEngineFigures } from './localEngine/read';
 import { generateContentPages } from './contentPages/generate';
 import { generateNotFoundPage } from './contentPages/notFound';
 import { generateMovedPages } from './contentPages/moved';
@@ -90,17 +92,33 @@ async function loadRenderer(tempDir: string): Promise<Prerender> {
   );
 }
 
+/** Asks the API which jurisdictions it serves: the one call the build makes to it. */
+async function listJurisdictions(
+  baseUrl: string,
+): Promise<ListJurisdictionsResponse> {
+  try {
+    return await createApiClient({ baseUrl, fetch }).listJurisdictions();
+  } catch (error) {
+    throw new Error(`Salary pages: GET ${baseUrl}/jurisdictions failed`, {
+      cause: error,
+    });
+  }
+}
+
 /**
  * Writes dist/<slug>/<salary>/index.html for every listed province and step.
  * With the site address set it also lists them in dist/sitemap.xml, each with a
  * last-modified date kept in dist/page-hashes.json, and gives each its own
  * canonical address. The content pages in src/state/contentPages.ts and the
- * province hub pages are written the same way, after them. Only when the API address is set (deploy builds); local
- * builds and CI write no salary pages.
+ * province hub pages are written the same way, after them. Every figure on them comes from the
+ * file the Python step wrote from the local tax-engine (`engineFile`, see build/localEngine); the API
+ * is asked one thing only, which jurisdictions it serves. Only when an engine file is given (deploy
+ * builds); local builds and CI write no salary pages.
  */
 export function salaryPages(
   apiBaseUrl: string | undefined,
   siteUrlValue?: string,
+  engineFile?: string,
 ): Plugin {
   const siteUrl = normalizeSiteUrl(siteUrlValue);
   const baseUrl = (apiBaseUrl ?? '').trim().replace(/\/+$/, '');
@@ -112,18 +130,27 @@ export function salaryPages(
     async handler() {
       const outDir = resolve('dist');
       const contentFile = join(outDir, CONTENT_TEMPLATE);
-      if (baseUrl === '') {
+      if (engineFile === undefined || engineFile.trim() === '') {
         // No pages to write; the content template is not part of the site.
         await rm(contentFile, { force: true });
         return;
       }
+      if (baseUrl === '') {
+        throw new Error(
+          'Salary pages: an engine file is given but VITE_API_BASE_URL is not set; the build asks the API which jurisdictions it serves.',
+        );
+      }
+      const figures = readEngineFigures(engineFile);
+      console.log(`Salary pages: figures from tax-engine ${figures.engine}`);
+      const list = await listJurisdictions(baseUrl);
       const tempDir = await mkdtemp(join(tmpdir(), 'salary-pages-ssr-'));
       try {
         const { renderSalaryApp, renderSiteFooter, renderContentPage } =
           await loadRenderer(tempDir);
         const template = await readFile(join(outDir, 'index.html'), 'utf8');
         const { written, skipped, built } = await generateSalaryPages({
-          fetch,
+          answers: figures.answers,
+          list,
           baseUrl,
           provinces,
           outDir,
@@ -131,8 +158,6 @@ export function salaryPages(
           template,
           render: renderSalaryApp,
           siteUrl,
-          // The API allows 10 requests a second for everyone together, so the build takes 5.
-          pace: {},
         });
         await rewriteHome(outDir, renderSiteFooter);
         const hubs = hubPages(
