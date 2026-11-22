@@ -33,7 +33,47 @@ vi.mock('vite', () => ({
 
 const generateCalls = vi.hoisted(() => ({
   published: [] as unknown[],
-  pace: [] as unknown[],
+  api: [] as unknown[],
+  order: [] as string[],
+  sweepArgs: [] as unknown[],
+}));
+
+const apiOptions = vi.hoisted(() => ({ made: [] as unknown[] }));
+
+vi.mock('./salaryPages/buildApi', async (importOriginal) => {
+  const actual =
+    await importOriginal<typeof import('./salaryPages/buildApi')>();
+  return {
+    ...actual,
+    createBuildApi: (options: Parameters<typeof actual.createBuildApi>[0]) => {
+      apiOptions.made.push(options);
+      return actual.createBuildApi(options);
+    },
+  };
+});
+
+vi.mock('./salaryPages/sweep', () => ({
+  sweepProvinces: (args: unknown): Promise<unknown[]> => {
+    generateCalls.order.push('sweep');
+    generateCalls.sweepArgs.push(args);
+    const unit = {
+      name: 'CAD',
+      placement: 'before',
+      singular: '$',
+      plural: '$',
+      spaced: false,
+    };
+    return Promise.resolve([
+      {
+        slug: 'ca-on',
+        year: 2026,
+        provisional: false,
+        unit,
+        rateUnit: unit,
+        points: [['1000', '1000.00', '0.00', '0.0000', '0.0505']],
+      },
+    ]);
+  },
 }));
 
 vi.mock('./salaryPages/generate', async () => {
@@ -43,18 +83,19 @@ vi.mock('./salaryPages/generate', async () => {
     generateSalaryPages: async ({
       outDir,
       published,
-      pace,
+      api,
     }: {
       outDir: string;
       published: unknown;
-      pace?: unknown;
+      api?: unknown;
     }): Promise<{
       written: string[];
       skipped: string[];
       built: never[];
     }> => {
       generateCalls.published.push(published);
-      generateCalls.pace.push(pace);
+      generateCalls.api.push(api);
+      generateCalls.order.push('pages');
       const written = ['ca-on/30000/index.html', 'ca-on/35000/index.html'];
       for (const file of written) {
         await makeDir(joinPath(outDir, file, '..'), { recursive: true });
@@ -119,19 +160,46 @@ describe('salaryPages closeBundle', () => {
     expect((published as Set<string>).has('forms/on428')).toBe(true);
   });
 
-  it('paces the real build to 5 API requests a second (#243)', async () => {
-    generateCalls.pace.length = 0;
+  it('paces the real build to 5 API requests a second, in one queue for the pages and the sweep (#243)', async () => {
+    apiOptions.made.length = 0;
+    generateCalls.api.length = 0;
+    generateCalls.sweepArgs.length = 0;
     await runCloseBundle(
       salaryPages('https://api.example.com/api/v1', 'https://example.com'),
     );
-    const [pace] = generateCalls.pace as [
-      { minGapMs?: number; sleep?: unknown; now?: unknown } | undefined,
+    expect(apiOptions.made).toHaveLength(1);
+    const [options] = apiOptions.made as [
+      { pace?: { minGapMs?: number; sleep?: unknown; now?: unknown } },
     ];
+    const pace = options.pace;
     expect(pace).toBeDefined();
     // Defaults: a real timer and the real clock, and a gap of 200 ms (5 a second) or unset.
     expect(pace?.minGapMs ?? 200).toBe(200);
     expect(pace?.sleep).toBeUndefined();
     expect(pace?.now).toBeUndefined();
+    // The pages and the sweep get that one client.
+    const [pagesApi] = generateCalls.api;
+    const [sweepArgs] = generateCalls.sweepArgs as [{ api: unknown }];
+    expect(pagesApi).toBeDefined();
+    expect(sweepArgs.api).toBe(pagesApi);
+  });
+
+  it('sweeps after the salary pages, then writes the sweep into each swept province hub only (#270)', async () => {
+    generateCalls.order.length = 0;
+    await runCloseBundle(
+      salaryPages('https://api.example.com/api/v1', 'https://example.com'),
+    );
+    expect(generateCalls.order).toEqual(['pages', 'sweep']);
+    const hub = await readFile(
+      join(root, 'dist', 'ca-on', 'index.html'),
+      'utf8',
+    );
+    expect(hub).toContain('id="hub-charts-data"');
+    const other = await readFile(
+      join(root, 'dist', 'ca-ab', 'index.html'),
+      'utf8',
+    );
+    expect(other).not.toContain('hub-charts-data');
   });
 
   it('dates every page in the sitemap and keeps the dates in page-hashes.json', async () => {

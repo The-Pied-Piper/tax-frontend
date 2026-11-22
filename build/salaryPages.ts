@@ -21,7 +21,9 @@ import {
   MOVED_PAGES,
   PROVINCES_WITHOUT_SALARY_PAGES,
 } from '../src/state/siteLinks';
-import { hubPages } from './contentPages/hubs';
+import { hubChartBlocks, hubPages } from './contentPages/hubs';
+import { createBuildApi } from './salaryPages/buildApi';
+import { sweepProvinces } from './salaryPages/sweep';
 import { withSalaryLinks } from './contentPages/forms';
 import type { SalaryPageData } from '../src/state/useTakeHome';
 
@@ -122,17 +124,23 @@ export function salaryPages(
         const { renderSalaryApp, renderSiteFooter, renderContentPage } =
           await loadRenderer(tempDir);
         const template = await readFile(join(outDir, 'index.html'), 'utf8');
+        // The API allows 10 requests a second for everyone together, so the build takes 5:
+        // one paced queue for the salary pages and then the sweep, never side by side.
+        const api = createBuildApi({ fetch, baseUrl, pace: {} });
         const { written, skipped, built } = await generateSalaryPages({
           fetch,
           baseUrl,
+          api,
           provinces,
           outDir,
           published: new Set(contentPages.map((p) => p.slug)),
           template,
           render: renderSalaryApp,
           siteUrl,
-          // The API allows 10 requests a second for everyone together, so the build takes 5.
-          pace: {},
+        });
+        const sweeps = await sweepProvinces({
+          api,
+          provinces: built.map((b) => b.province),
         });
         await rewriteHome(outDir, renderSiteFooter);
         const hubs = hubPages(
@@ -147,6 +155,7 @@ export function salaryPages(
           pages: [...withSalaryLinks(contentPages, built), ...hubs],
           render: renderContentPage,
           siteUrl,
+          dataBlocks: hubChartBlocks(sweeps),
         });
         const notFound = await generateNotFoundPage({
           outDir,
