@@ -38,8 +38,10 @@ jobs:
         with:
           python-version: '3.12'
       - run: npm ci
+      # The same resolver as the dev deploy: CI tests the engine release dev will build with.
       - run: |
-          python -m pip install --require-hashes --no-deps --only-binary=:all: -r build/localEngine/requirements.txt
+          python -I build/localEngine/resolve_pin.py main build/localEngine/requirements.txt "$RUNNER_TEMP/engine-requirements.txt"
+          python -m pip install --require-hashes --no-deps --only-binary=:all: -r "$RUNNER_TEMP/engine-requirements.txt"
       - run: python -I build/localEngine/engine_figures.py build/salaryPages/provinces.json "$RUNNER_TEMP/engine-figures.json"
       - name: Check the written figures
         env:

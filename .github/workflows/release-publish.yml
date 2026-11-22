@@ -63,8 +63,9 @@ jobs:
           node-version-file: .nvmrc
 
       # The site's figures come from tax-engine run here, not from an API: one Python step,
-      # hash-pinned requirements (build/localEngine/requirements.txt), no network use after the
-      # install. The Node build reads the file it writes.
+      # the tax-engine release tax-service itself pins (build/localEngine/resolve_pin.py reads it
+      # by commit sha; any failure fails this build, there is no fallback), hashes from PyPI, no
+      # network use after the install. The Node build reads the file it writes.
       - uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0
         with:
           python-version: '3.12'
@@ -72,7 +73,8 @@ jobs:
       - name: Compute the site's figures with tax-engine
         run: |
           set -euo pipefail
-          python -m pip install --require-hashes --no-deps --only-binary :all: -r build/localEngine/requirements.txt
+          python -I build/localEngine/resolve_pin.py release build/localEngine/requirements.txt "$RUNNER_TEMP/engine-requirements.txt"
+          python -m pip install --require-hashes --no-deps --only-binary=:all: -r "$RUNNER_TEMP/engine-requirements.txt"
           python -I build/localEngine/engine_figures.py build/salaryPages/provinces.json "$RUNNER_TEMP/engine-figures.json"
 
       - run: npm ci --ignore-scripts
