@@ -38,6 +38,10 @@ export type ComputeTakeHomeCalculationResponse = {
    */
   total_deductions: string;
   /**
+   * The income tax part of total_deductions on its own, federal and provincial together, as the total payable before the total credits are subtracted. Contributions are not in it.
+   */
+  income_tax: string;
+  /**
    * Salary minus total deductions.
    */
   take_home: string;
