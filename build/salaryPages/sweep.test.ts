@@ -3,9 +3,9 @@ import jurisdictions from '../../src/api/fixtures/jurisdictions.json';
 import fixture70000 from '../../src/api/fixtures/compute-on-2026-70000.json';
 import type { ComputeTakeHomeCalculationResponse } from '../../src/api';
 import { sweepSalaries } from '../../src/state/hubCharts';
-import { provinces, sweepSteps } from '../salaryPages/provinces';
-import type { BuiltProvince } from '../salaryPages/generate';
-import type { EngineSweep } from './read';
+import { provinces, sweepSteps } from './provinces';
+import type { BuiltProvince } from './generate';
+import type { EngineSweep } from '../localEngine/read';
 import { provinceSweeps } from './sweep';
 
 const saved = fixture70000 as ComputeTakeHomeCalculationResponse;
@@ -122,7 +122,7 @@ describe.runIf(process.env.ENGINE_FIGURES_FILE)(
   'the sweep in the file the Python step wrote',
   () => {
     it('holds the sweep salaries for every listed province and fits the hub block cap', async () => {
-      const { readEngineFigures } = await import('./read');
+      const { readEngineFigures } = await import('../localEngine/read');
       const { hubChartBlocks } = await import('../contentPages/hubs');
       const figures = readEngineFigures(process.env.ENGINE_FIGURES_FILE ?? '');
       const everyone = {

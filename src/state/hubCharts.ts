@@ -41,11 +41,16 @@ export type ProvinceSweep = {
 /** What a hub's data block holds: the sweep of every province the build served. */
 export type HubChartsData = { provinces: ProvinceSweep[] };
 
+/** A figure as the API writes it: optional minus, digits, optional decimals. */
+const DECIMAL = /^-?\d+(\.\d+)?$/;
+
 function isPoint(value: unknown): value is SweepPoint {
   return (
     Array.isArray(value) &&
     value.length === 5 &&
-    value.every((part: unknown) => typeof part === 'string')
+    value.every(
+      (part: unknown) => typeof part === 'string' && DECIMAL.test(part),
+    )
   );
 }
 

@@ -1,8 +1,8 @@
 import type { ListJurisdictionsResponse } from '../../src/api';
 import { readUnit } from '../../src/adapters/fallback';
 import { sweepSalaries, type ProvinceSweep } from '../../src/state/hubCharts';
-import type { BuiltProvince } from '../salaryPages/generate';
-import type { EngineSweep } from './read';
+import { provisionalOf, type BuiltProvince } from './generate';
+import type { EngineSweep } from '../localEngine/read';
 
 /**
  * The hub-chart sweep of every province the salary build served, from the figures the
@@ -21,9 +21,7 @@ export function provinceSweeps(
     if (!sweep) {
       throw new Error(`Salary sweep: no figures for ${province.code}`);
     }
-    const provisional = list.jurisdictions
-      .find((j) => j.code === province.code)
-      ?.years.find((y) => y.year === province.year)?.provisional;
+    const provisional = provisionalOf(list, province);
     if (provisional === undefined) {
       throw new Error(
         `Salary sweep: the API does not list ${province.code} for ${province.year.toString()}`,

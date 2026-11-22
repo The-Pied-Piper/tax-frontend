@@ -9,7 +9,7 @@ import { formPageIdDefine } from './formPageIds';
 import { createApiClient, type ListJurisdictionsResponse } from '../src/api';
 import { generateSalaryPages } from './salaryPages/generate';
 import { readEngineFigures } from './localEngine/read';
-import { provinceSweeps } from './localEngine/sweep';
+import { provinceSweeps } from './salaryPages/sweep';
 import { generateContentPages } from './contentPages/generate';
 import { generateNotFoundPage } from './contentPages/notFound';
 import { generateMovedPages } from './contentPages/moved';

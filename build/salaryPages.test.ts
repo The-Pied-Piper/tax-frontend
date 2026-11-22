@@ -88,7 +88,7 @@ vi.mock('./localEngine/read', () => ({
 
 const sweepCalls = vi.hoisted(() => ({ args: [] as unknown[][] }));
 
-vi.mock('./localEngine/sweep', () => ({
+vi.mock('./salaryPages/sweep', () => ({
   provinceSweeps: (...args: unknown[]): unknown[] => {
     sweepCalls.args.push(args);
     const unit = {
@@ -185,7 +185,7 @@ describe('salaryPages closeBundle', () => {
     ]);
   });
 
-  it('writes the sweep into the hub of each swept province only (#270)', async () => {
+  it('writes the sweep into the hub of each swept province only', async () => {
     await runCloseBundle(salaryPages(API, 'https://example.com'));
     const hub = await readFile(
       join(root, 'dist', 'ca-on', 'index.html'),

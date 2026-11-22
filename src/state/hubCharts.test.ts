@@ -61,6 +61,12 @@ describe('parseHubChartsData', () => {
         provinces: [{ ...sweep, points: [['1', '2', '3', '4']] }],
       }),
     ],
+    [
+      'a figure that is not a decimal',
+      JSON.stringify({
+        provinces: [{ ...sweep, points: [['1000', '<b>', '0', '0', '0']] }],
+      }),
+    ],
     ['no unit', JSON.stringify({ provinces: [{ ...sweep, unit: null }] })],
     [
       'a year as text',
