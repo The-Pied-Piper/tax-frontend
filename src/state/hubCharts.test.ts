@@ -46,6 +46,7 @@ describe('parseHubChartsData', () => {
     ['blank text', '  '],
     ['text that is not JSON', '{'],
     ['no provinces', '{}'],
+    ['an empty list of provinces', JSON.stringify({ provinces: [] })],
     [
       'a province with no points',
       JSON.stringify({ provinces: [{ ...sweep, points: [] }] }),

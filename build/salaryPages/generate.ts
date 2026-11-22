@@ -8,9 +8,10 @@ import { dollarSign, responseUnit } from '../../src/adapters/fallback';
 import { displayWholeMoney } from '../../src/money/format';
 import { salaryBreadcrumb } from '../../src/state/breadcrumbs';
 import { breadcrumbJsonLd } from '../breadcrumbJsonLd';
-import { languageCode, strings } from '../../src/strings';
+import { strings } from '../../src/strings';
 import type { Unit } from '../../src/adapters';
 import type { SalaryPageData } from '../../src/state/useTakeHome';
+import { parseSalaryPageData } from '../../src/state/salaryPageData';
 import { pagePath, pageUrl } from './address';
 import { buildPageHtml } from './pageHtml';
 import { pageMeta } from './pageMeta';
@@ -18,13 +19,18 @@ import { DESCRIPTION_LIMIT, TITLE_LIMIT } from './limits';
 import { salaryLinks } from './links';
 import { provinceLinks } from '../../src/state/salaryPageLinks';
 import { salaries, type Province } from './provinces';
-import type { PaceOptions } from './pacedFetch';
-import {
-  createBuildApi,
-  reason,
-  type BuildApi,
-  type RetryOptions,
-} from './buildApi';
+
+/**
+ * The engine's answer for one salary: the API's response without `provisional`, which is the
+ * service's policy and not the engine's, so the build adds it from the list of jurisdictions.
+ */
+export type EngineAnswer = Omit<
+  ComputeTakeHomeCalculationResponse,
+  'provisional'
+>;
+
+/** The engine's answers by jurisdiction code, then by the salary as written in the page address. */
+export type EngineAnswers = Record<string, Record<string, EngineAnswer>>;
 
 /** What was built for one province: its salary steps, lowest first, and the unit of its answers. */
 export type BuiltProvince = {
@@ -34,7 +40,11 @@ export type BuiltProvince = {
 };
 
 export type GenerateOptions = {
-  fetch: typeof fetch;
+  /** What the local engine answered for every page salary (build/localEngine). */
+  answers: EngineAnswers;
+  /** The API's list of jurisdictions: who is served, their display names and which years are provisional. */
+  list: ListJurisdictionsResponse;
+  /** The API address, named in the message when a listed province is not served. */
   baseUrl: string;
   provinces: Province[];
   outDir: string;
@@ -47,15 +57,9 @@ export type GenerateOptions = {
   /**
    * The normalized site origin; null leaves canonical and og:url as the template has them.
    * When set (a prod-shaped build), a listed province the API does not return fails the
-   * build before anything is fetched or written; without it such a province is skipped.
+   * build before anything is written; without it such a province is skipped.
    */
   siteUrl?: string | null;
-  /** How a 429 is retried; see `createBuildApi`. Ignored when `api` is given. */
-  retry?: RetryOptions;
-  /** Spacing of the calls; see `createBuildApi`. Ignored when `api` is given. */
-  pace?: PaceOptions;
-  /** The build's one API client; made from `fetch`, `retry` and `pace` when absent. */
-  api?: BuildApi;
 };
 
 export type GenerateResult = {
@@ -67,29 +71,12 @@ export type GenerateResult = {
   built: BuiltProvince[];
 };
 
-/** Writes one finished page per listed province and salary step. Retries a 429 from the API, then fails on the first API problem. */
+/** Writes one finished page per listed province and salary step, from the engine's answers. Fails on the first answer that is missing. */
 export async function generateSalaryPages(
   options: GenerateOptions,
 ): Promise<GenerateResult> {
-  const { baseUrl, provinces, outDir, template, render } = options;
-  const { client, attempts } =
-    options.api ??
-    createBuildApi({
-      fetch: options.fetch,
-      baseUrl,
-      retry: options.retry,
-      pace: options.pace,
-    });
-
-  let list: ListJurisdictionsResponse;
-  try {
-    list = await client.listJurisdictions();
-  } catch (error) {
-    throw new Error(
-      `Salary pages: GET ${baseUrl}/jurisdictions failed: ${reason(error, attempts)}`,
-      { cause: error },
-    );
-  }
+  const { baseUrl, provinces, outDir, template, render, list, answers } =
+    options;
 
   const placeNames = strings.siteNav.provinceNames as Record<
     string,
@@ -121,31 +108,27 @@ export async function generateSalaryPages(
       continue;
     }
     const steps = salaries(province).map((salary) => salary.toString());
+    const provisional = list.jurisdictions
+      .find((j) => j.code === province.code)
+      ?.years.find((y) => y.year === province.year)?.provisional;
+    if (provisional === undefined) {
+      throw new Error(
+        `Salary pages: ${province.code} ${province.year.toString()} is not listed by the API at ${baseUrl}`,
+      );
+    }
     const responses: ComputeTakeHomeCalculationResponse[] = [];
     for (const salary of steps) {
       const page = `${province.slug}/${salary}`;
-      try {
-        const answer = await client.computeTakeHomeCalculation({
-          jurisdiction_code: province.code,
-          year: province.year,
-          salary,
-          language_code: languageCode,
-          include_trace: true,
-        });
-        // The page and its data block carry "$", never the API's "CA$".
-        responses.push(
-          JSON.parse(
-            dollarSign(JSON.stringify(answer)),
-          ) as ComputeTakeHomeCalculationResponse,
-        );
-      } catch (error) {
-        throw new Error(
-          `Salary pages: ${page} failed: ${reason(error, attempts)}`,
-          {
-            cause: error,
-          },
-        );
+      const answer = answers[province.code]?.[salary];
+      if (!answer) {
+        throw new Error(`Salary pages: ${page} has no engine answer`);
       }
+      // The page and its data block carry "$", never the engine's "CA$".
+      responses.push(
+        JSON.parse(
+          dollarSign(JSON.stringify({ ...answer, provisional })),
+        ) as ComputeTakeHomeCalculationResponse,
+      );
     }
     fetched.push({ province, steps, responses });
   }
@@ -188,6 +171,12 @@ export async function generateSalaryPages(
         salary,
         links,
       };
+      // The same guard the page applies to its data block when it loads.
+      if (parseSalaryPageData(JSON.stringify(data)) === null) {
+        throw new Error(
+          `Salary pages: ${page} data does not fit the page's guard`,
+        );
+      }
       const meta = pageMeta(data);
       if (meta.title.length >= TITLE_LIMIT) {
         throw new Error(

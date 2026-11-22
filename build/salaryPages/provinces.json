@@ -1,0 +1,54 @@
+{
+  "year": 2026,
+  "provinces": [
+    {
+      "code": "CA-ON",
+      "slug": "ca-on",
+      "from": 30000,
+      "to": 150000,
+      "step": 5000
+    },
+    {
+      "code": "CA-AB",
+      "slug": "ca-ab",
+      "from": 30000,
+      "to": 150000,
+      "step": 5000
+    },
+    {
+      "code": "CA-BC",
+      "slug": "ca-bc",
+      "from": 30000,
+      "to": 150000,
+      "step": 5000
+    },
+    {
+      "code": "CA-MB",
+      "slug": "ca-mb",
+      "from": 30000,
+      "to": 150000,
+      "step": 5000
+    },
+    {
+      "code": "CA-SK",
+      "slug": "ca-sk",
+      "from": 30000,
+      "to": 150000,
+      "step": 5000
+    },
+    {
+      "code": "CA-NL",
+      "slug": "ca-nl",
+      "from": 30000,
+      "to": 150000,
+      "step": 5000
+    }
+  ],
+  "sweep": {
+    "first": 1000,
+    "fineStep": 1000,
+    "fineTo": 250000,
+    "coarseStep": 5000,
+    "to": 500000
+  }
+}

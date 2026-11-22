@@ -1,6 +1,7 @@
 import { dataBlock } from '../salaryPages/pageHtml';
 import {
   HUB_CHARTS_DATA_ID,
+  parseHubChartsData,
   type ProvinceSweep,
 } from '../../src/state/hubCharts';
 import { displayWholeMoney } from '../../src/money/format';
@@ -62,14 +63,19 @@ export const MAX_HUB_CHARTS_CHARS = 200000;
 /**
  * The data block of each hub that has a sweep, by hub slug: every province's sweep in
  * one block (the comparison needs them all). A province with no sweep gets no block.
- * Fails when a block would pass `MAX_HUB_CHARTS_CHARS`.
+ * Fails when the data does not pass `parseHubChartsData` or a block would pass `MAX_HUB_CHARTS_CHARS`.
  */
 export function hubChartBlocks(
   sweeps: readonly ProvinceSweep[],
 ): Map<string, string> {
   const blocks = new Map<string, string>();
   if (sweeps.length === 0) return blocks;
-  const block = dataBlock(HUB_CHARTS_DATA_ID, { provinces: sweeps });
+  const data = { provinces: sweeps };
+  // What the page will read must pass the page's own guard, or the charts would silently vanish.
+  if (parseHubChartsData(JSON.stringify(data)) === null) {
+    throw new Error('Hubs: the chart data does not pass the data guard');
+  }
+  const block = dataBlock(HUB_CHARTS_DATA_ID, data);
   if (block.length > MAX_HUB_CHARTS_CHARS) {
     throw new Error(
       `Hubs: the chart data block is ${block.length.toString()} characters, limit ${MAX_HUB_CHARTS_CHARS.toString()}`,

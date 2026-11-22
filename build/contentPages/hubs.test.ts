@@ -227,6 +227,11 @@ describe('hubChartBlocks', () => {
     expect(hubChartBlocks([]).size).toBe(0);
   });
 
+  it('fails when the data would not pass the data guard', () => {
+    const bad = { ...sweepOf('ca-on'), points: [] };
+    expect(() => hubChartBlocks([bad])).toThrow('does not pass the data guard');
+  });
+
   it('keeps six full provinces under the size cap', () => {
     const six = provinces.map((p) => sweepOf(p.slug));
     const block = hubChartBlocks(six).get('ca-on') ?? '';

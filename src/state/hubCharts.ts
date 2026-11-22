@@ -67,6 +67,7 @@ function isHubChartsData(value: unknown): value is HubChartsData {
   return (
     isRecord(value) &&
     Array.isArray(value.provinces) &&
+    value.provinces.length > 0 &&
     value.provinces.every(isProvinceSweep)
   );
 }

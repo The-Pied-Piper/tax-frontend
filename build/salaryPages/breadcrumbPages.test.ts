@@ -6,8 +6,7 @@ import { METHODOLOGY_SLUG } from '../../src/state/siteLinks';
 import { notFoundPage } from '../../src/state/notFoundPage';
 import { publishedSlugs } from '../../src/test/pageLinks';
 import {
-  apiBaseUrl,
-  fakeFetch,
+  engineOptions,
   listedIn,
   siteUrl as site,
   contentTemplate,
@@ -55,8 +54,7 @@ async function build(siteUrl: string | null): Promise<string> {
   writeFileSync(join(dir, 'index.html'), template);
   const { built } = await generateSalaryPages({
     published: publishedSlugs,
-    fetch: fakeFetch(),
-    baseUrl: apiBaseUrl,
+    ...engineOptions(provinces),
     provinces: listedIn(provinces),
     outDir: dir,
     template,
