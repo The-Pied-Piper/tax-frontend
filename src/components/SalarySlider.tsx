@@ -1,6 +1,10 @@
 import { useMemo, useState } from 'react';
 import { displayWholeMoney, type MoneyUnit } from '../money/format';
-import { separatorsFor, toDisplaySalary } from '../money/salaryInput';
+import {
+  separatorsFor,
+  toDisplaySalary,
+  withoutZeroCents,
+} from '../money/salaryInput';
 import { PROVINCE_COMPARISON_SLOT_ID } from '../state/hubChartSlots';
 import { typedSalaryIndex } from '../state/provinceComparison';
 import { languageCode, strings } from '../strings';
@@ -84,7 +88,7 @@ export function SalarySlider({ salaries, index, unit, onChange }: Props) {
             inputMode="decimal"
             autoComplete="off"
             value={
-              draft ?? toDisplaySalary(chosen.replace(/\.00$/, ''), separators)
+              draft ?? toDisplaySalary(withoutZeroCents(chosen), separators)
             }
             aria-invalid={refused}
             aria-describedby={refused ? `${HINT_ID} ${ERROR_ID}` : HINT_ID}

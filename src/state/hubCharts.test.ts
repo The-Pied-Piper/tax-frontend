@@ -98,6 +98,46 @@ describe('parseHubChartsData', () => {
       }),
     ],
     [
+      'a figure with a leading zero',
+      JSON.stringify({
+        provinces: [
+          { ...sweep, points: [['1000', '01000.00', '0', '0', '0', '0']] },
+        ],
+      }),
+    ],
+    [
+      'a figure longer than money/scale reads',
+      JSON.stringify({
+        provinces: [
+          { ...sweep, points: [['1000', '1'.repeat(31), '0', '0', '0', '0']] },
+        ],
+      }),
+    ],
+    [
+      'salaries that do not rise',
+      JSON.stringify({
+        provinces: [
+          {
+            ...sweep,
+            points: [
+              ['2000', '1', '0', '0', '0', '0'],
+              ['1000', '1', '0', '0', '0', '0'],
+            ],
+          },
+        ],
+      }),
+    ],
+    [
+      'a salary of zero',
+      JSON.stringify({
+        provinces: [{ ...sweep, points: [['0', '1', '0', '0', '0', '0']] }],
+      }),
+    ],
+    [
+      'a slug that is not a slug',
+      JSON.stringify({ provinces: [{ ...sweep, slug: '/evil.com' }] }),
+    ],
+    [
       'provinces of different years',
       JSON.stringify({
         provinces: [sweep, { ...sweep, slug: 'ca-ab', year: 2025 }],

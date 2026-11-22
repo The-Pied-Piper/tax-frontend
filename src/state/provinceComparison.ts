@@ -49,7 +49,8 @@ export function typedSalaryIndex(
   salaries: readonly string[],
   separators: Separators,
 ): number | null {
-  const plain = toPlainSalary(typed, separators);
+  // Leading zeros mean nothing in a typed salary; the amounts of money/scale have none.
+  const plain = toPlainSalary(typed, separators).replace(/^0+(?=\d)/, '');
   const first = salaries[0];
   const last = salaries[salaries.length - 1];
   if (

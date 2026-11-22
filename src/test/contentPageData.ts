@@ -116,6 +116,10 @@ export const blocksSpec: ContentPageSpec = {
         },
       ],
     },
+    {
+      heading: 'A comparison',
+      blocks: [{ kind: 'provinceComparison', province: 'ca-on' }],
+    },
   ],
 };
 

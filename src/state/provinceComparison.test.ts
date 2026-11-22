@@ -69,6 +69,13 @@ describe('typedSalaryIndex', () => {
     expect(index('500000')).toBe('500000.00');
   });
 
+  it('reads a salary typed with leading zeros as the salary without them', () => {
+    expect(index('070000')).toBe('70000.00');
+    expect(index('00070000')).toBe('70000.00');
+    expect(index('0070 000,50', french)).toBe('70000.00');
+    expect(index('000')).toBeNull();
+  });
+
   it('refuses a salary outside the sweep', () => {
     expect(index('999.99')).toBeNull();
     expect(index('0')).toBeNull();
