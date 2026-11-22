@@ -9,7 +9,7 @@ calculator says (when the two pin the same tax-engine release):
   * app/adapters/outbound/tax_engine/engine.py  FIGURES, AVERAGE_RATES, MARGINAL_RATES, the unit and
     trace mapping, and the rule that all figures share one unit;
   * app/domain/take_home.py  TakeHomeResult.of: total = sum of the figures in the order of the
-    service's deduction items, quantized to cents; take_home = salary minus that total, quantized;
+    service's deduction items, quantized to cents; income_tax = the income tax figure alone, quantized; take_home = salary minus that total, quantized;
   * app/adapters/inbound/take_home_calculations_adapter.py  the response shape (strings everywhere,
     a form's name falls back to its identifier).
 
@@ -119,9 +119,13 @@ class Figures:
             return {"amount": str(value), "unit": _unit(rate_unit)}
 
         total = sum(amounts, Decimal(0))
+        # The income tax part on its own (the service's TakeHomeResult.income_tax): the total
+        # payable before the credits, contributions not in it.
+        income_tax = amounts[list(FIGURES).index("income_tax")]
         answer = {
             "salary": str(Decimal(salary).quantize(CENTS)),
             "total_deductions": str(total.quantize(CENTS)),
+            "income_tax": str(income_tax.quantize(CENTS)),
             "take_home": str((Decimal(salary) - total).quantize(CENTS)),
             "unit": _unit(unit),
             "average_income_tax_rate": rate("average_income_tax_rate"),
@@ -186,6 +190,7 @@ def main(provinces_file: str, output_file: str) -> None:
                 {
                     "salary": answer["salary"],
                     "total_deductions": answer["total_deductions"],
+                    "income_tax": answer["income_tax"],
                     "take_home": answer["take_home"],
                     "average_income_tax_rate": answer["average_income_tax_rate"]["amount"],
                     "marginal_income_tax_rate": answer["marginal_income_tax_rate"]["amount"],

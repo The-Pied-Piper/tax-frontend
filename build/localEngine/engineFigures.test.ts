@@ -105,6 +105,8 @@ describe.runIf(process.env.ENGINE_FIGURES_FILE)(
       const expected = engineOf(saved as ComputeTakeHomeCalculationResponse);
       expect(answer?.total_deductions).toBe(expected.total_deductions);
       expect(answer?.take_home).toBe(expected.take_home);
+      // The income tax part alone (tax-service's `income_tax`): in cents, and part of the total.
+      expect(answer?.income_tax).toMatch(/^\d+\.\d{2}$/);
       expect(answer?.unit).toEqual(expected.unit);
       expect(answer?.average_income_tax_rate).toEqual(
         expected.average_income_tax_rate,
