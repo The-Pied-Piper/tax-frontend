@@ -72,7 +72,7 @@ jobs:
       - name: Compute the site's figures with tax-engine
         run: |
           set -euo pipefail
-          python -m pip install --require-hashes --no-deps -r build/localEngine/requirements.txt
+          python -m pip install --require-hashes --no-deps --only-binary :all: -r build/localEngine/requirements.txt
           python -I build/localEngine/engine_figures.py build/salaryPages/provinces.json "$RUNNER_TEMP/engine-figures.json"
 
       - run: npm ci --ignore-scripts

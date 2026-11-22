@@ -4,7 +4,8 @@ import { provinces, salaries } from '../salaryPages/provinces';
 import { engineOf } from '../../src/test/generatedSite';
 import compute70000 from '../../src/api/fixtures/compute-on-2026-70000.json';
 import type { ComputeTakeHomeCalculationResponse } from '../../src/api';
-import { mkdtempSync, rmSync, writeFileSync } from 'node:fs';
+import computeAlberta from '../../src/api/fixtures/compute-ab-2026-70000.json';
+import { mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 
@@ -91,6 +92,45 @@ describe.runIf(process.env.ENGINE_FIGURES_FILE)(
           expect(answer?.salary).toBe(`${salary.toString()}.00`);
           expect(answer?.trace?.length).toBeGreaterThan(0);
         }
+      }
+    });
+
+    // The figures that matter, pinned to the service's own saved answers for $70,000
+    // (the fixtures at other salaries predate the line 43500 basis).
+    it.each([
+      ['CA-ON', compute70000],
+      ['CA-AB', computeAlberta],
+    ])('gives %s the same figures as the service at $70,000', (code, saved) => {
+      const answer = readEngineFigures(file).answers[code]?.['70000'];
+      const expected = engineOf(saved as ComputeTakeHomeCalculationResponse);
+      expect(answer?.total_deductions).toBe(expected.total_deductions);
+      expect(answer?.take_home).toBe(expected.take_home);
+      expect(answer?.unit).toEqual(expected.unit);
+      expect(answer?.average_income_tax_rate).toEqual(
+        expected.average_income_tax_rate,
+      );
+      expect(answer?.marginal_income_tax_rate).toEqual(
+        expected.marginal_income_tax_rate,
+      );
+    });
+
+    it('holds the 300 hub-chart points of every province, $1,000 to $500,000', () => {
+      const raw = JSON.parse(readFileSync(file, 'utf8')) as {
+        provinces: Record<
+          string,
+          { sweep: { salary: string }[]; sweep_units: unknown }
+        >;
+      };
+      for (const province of provinces) {
+        const { sweep, sweep_units } = raw.provinces[province.code] ?? {
+          sweep: [],
+          sweep_units: undefined,
+        };
+        expect(sweep, province.code).toHaveLength(300);
+        expect(sweep[0]?.salary).toBe('1000.00');
+        expect(sweep[249]?.salary).toBe('250000.00');
+        expect(sweep[299]?.salary).toBe('500000.00');
+        expect(sweep_units).toBeDefined();
       }
     });
   },
