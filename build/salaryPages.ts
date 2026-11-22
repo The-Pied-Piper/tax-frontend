@@ -9,6 +9,7 @@ import { formPageIdDefine } from './formPageIds';
 import { createApiClient, type ListJurisdictionsResponse } from '../src/api';
 import { generateSalaryPages } from './salaryPages/generate';
 import { readEngineFigures } from './localEngine/read';
+import { provinceSweeps } from './salaryPages/sweep';
 import { generateContentPages } from './contentPages/generate';
 import { generateNotFoundPage } from './contentPages/notFound';
 import { generateMovedPages } from './contentPages/moved';
@@ -23,7 +24,7 @@ import {
   MOVED_PAGES,
   PROVINCES_WITHOUT_SALARY_PAGES,
 } from '../src/state/siteLinks';
-import { hubPages } from './contentPages/hubs';
+import { hubChartBlocks, hubPages } from './contentPages/hubs';
 import { withSalaryLinks } from './contentPages/forms';
 import type { SalaryPageData } from '../src/state/useTakeHome';
 
@@ -159,6 +160,7 @@ export function salaryPages(
           render: renderSalaryApp,
           siteUrl,
         });
+        const sweeps = provinceSweeps(figures.sweeps, built, list);
         await rewriteHome(outDir, renderSiteFooter);
         const hubs = hubPages(
           built,
@@ -172,6 +174,7 @@ export function salaryPages(
           pages: [...withSalaryLinks(contentPages, built), ...hubs],
           render: renderContentPage,
           siteUrl,
+          dataBlocks: hubChartBlocks(sweeps),
         });
         const notFound = await generateNotFoundPage({
           outDir,

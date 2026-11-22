@@ -29,7 +29,11 @@ function render(spec: ContentPageSpec): string {
 function run(
   dir: string,
   pages: ContentPageSpec[],
-  options: { siteUrl?: string | null; render?: typeof render } = {},
+  options: {
+    siteUrl?: string | null;
+    render?: typeof render;
+    dataBlocks?: ReadonlyMap<string, string>;
+  } = {},
 ) {
   // Wrapped so a throw at once and a rejection look the same to the tests.
   return Promise.resolve().then(() =>
@@ -39,6 +43,7 @@ function run(
       pages,
       render: options.render ?? render,
       siteUrl: options.siteUrl === undefined ? site : options.siteUrl,
+      dataBlocks: options.dataBlocks,
     }),
   );
 }
@@ -292,5 +297,25 @@ describe('generateContentPages validation', () => {
       }
       expect(files(dir)).toEqual([]);
     });
+  });
+});
+
+describe('generateContentPages data blocks', () => {
+  it("puts a page's data block at the end of its body and no other page's", async () => {
+    const dir = outDir();
+    const block = '<script type="application/json" id="x">{"a":1}</script>';
+    await run(dir, [plainSpec, parentSpec], {
+      dataBlocks: new Map([[plainSpec.slug, block]]),
+    });
+    const withBlock = readFileSync(
+      join(dir, `${plainSpec.slug}/index.html`),
+      'utf8',
+    );
+    expect(withBlock).toContain(`${block}\n  </body>`);
+    const without = readFileSync(
+      join(dir, `${parentSpec.slug}/index.html`),
+      'utf8',
+    );
+    expect(without).not.toContain('id="x"');
   });
 });

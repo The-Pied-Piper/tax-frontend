@@ -82,7 +82,34 @@ vi.mock('./localEngine/read', () => ({
   readEngineFigures: vi.fn((file: string) => ({
     engine: '0.0.0',
     answers: { file },
+    sweeps: { file },
   })),
+}));
+
+const sweepCalls = vi.hoisted(() => ({ args: [] as unknown[][] }));
+
+vi.mock('./salaryPages/sweep', () => ({
+  provinceSweeps: (...args: unknown[]): unknown[] => {
+    sweepCalls.args.push(args);
+    const unit = {
+      name: 'CAD',
+      placement: 'before',
+      singular: '$',
+      plural: '$',
+      spaced: false,
+      as_percentage: false,
+    };
+    return [
+      {
+        slug: 'ca-on',
+        year: 2026,
+        provisional: false,
+        unit,
+        rateUnit: { ...unit, as_percentage: true },
+        points: [['1000.00', '1000.00', '0.00', '0.00', '0.0000', '0.0505']],
+      },
+    ];
+  },
 }));
 
 vi.mock('./salaryPages/home', () => ({
@@ -148,6 +175,28 @@ describe('salaryPages closeBundle', () => {
     await runCloseBundle(salaryPages(API, 'https://example.com'));
     expect(generateCalls.answers).toEqual([{ file: ENGINE_FILE }]);
     expect(generateCalls.list).toEqual([jurisdictions]);
+  });
+
+  it("gives the sweep the engine file's sweeps, what was built and the API's list", async () => {
+    sweepCalls.args.length = 0;
+    await runCloseBundle(salaryPages(API, 'https://example.com'));
+    expect(sweepCalls.args).toEqual([
+      [{ file: ENGINE_FILE }, [], jurisdictions],
+    ]);
+  });
+
+  it('writes the sweep into the hub of each swept province only', async () => {
+    await runCloseBundle(salaryPages(API, 'https://example.com'));
+    const hub = await readFile(
+      join(root, 'dist', 'ca-on', 'index.html'),
+      'utf8',
+    );
+    expect(hub).toContain('id="hub-charts-data"');
+    const other = await readFile(
+      join(root, 'dist', 'ca-ab', 'index.html'),
+      'utf8',
+    );
+    expect(other).not.toContain('hub-charts-data');
   });
 
   it('makes one call to the API, the list of places, and computes nothing there', async () => {

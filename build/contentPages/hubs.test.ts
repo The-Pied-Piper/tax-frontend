@@ -11,7 +11,11 @@ import { xland } from '../../src/test/generatedSite';
 import { compute70000 } from '../../src/test/syntheticPages';
 import { pagePath } from '../salaryPages/address';
 import { provinces } from '../salaryPages/provinces';
-import { hubPages } from './hubs';
+import {
+  parseHubChartsData,
+  type ProvinceSweep,
+} from '../../src/state/hubCharts';
+import { hubChartBlocks, hubPages, MAX_HUB_CHARTS_CHARS } from './hubs';
 
 // Builds the hub pages from what the salary build wrote.
 const unit = readUnit(compute70000.unit) ?? strings.fallbackUnit;
@@ -184,5 +188,59 @@ describe('hubPages', () => {
       [],
     );
     expect(pages.map((p) => p.slug)).not.toContain('methodology');
+  });
+});
+
+describe('hubChartBlocks', () => {
+  const sweepUnit = readUnit(compute70000.unit) ?? strings.fallbackUnit;
+  const sweepOf = (slug: string, points = 300): ProvinceSweep => ({
+    slug,
+    year: 2026,
+    provisional: false,
+    unit: sweepUnit,
+    rateUnit: sweepUnit,
+    points: Array.from({ length: points }, (_, i) => [
+      String((i + 1) * 1000),
+      '12345.67',
+      '2345.67',
+      '1234.56',
+      '0.1234',
+      '0.2965',
+    ]),
+  });
+
+  it('gives each swept province a hub block holding every province', () => {
+    const sweeps = [sweepOf('ca-on'), sweepOf('ca-ab')];
+    const blocks = hubChartBlocks(sweeps);
+    expect([...blocks.keys()]).toEqual(['ca-on', 'ca-ab']);
+    const block = blocks.get('ca-on') ?? '';
+    expect(block).toMatch(
+      /^<script type="application\/json" id="hub-charts-data">/,
+    );
+    const text = /^<script[^>]*>(.*)<\/script>$/s.exec(block)?.[1] ?? '';
+    expect(parseHubChartsData(text)?.provinces.map((p) => p.slug)).toEqual([
+      'ca-on',
+      'ca-ab',
+    ]);
+  });
+
+  it('writes no block when nothing was swept', () => {
+    expect(hubChartBlocks([]).size).toBe(0);
+  });
+
+  it('fails when the data would not pass the data guard', () => {
+    const bad = { ...sweepOf('ca-on'), points: [] };
+    expect(() => hubChartBlocks([bad])).toThrow('does not pass the data guard');
+  });
+
+  it('keeps six full provinces under the size cap', () => {
+    const six = provinces.map((p) => sweepOf(p.slug));
+    const block = hubChartBlocks(six).get('ca-on') ?? '';
+    expect(block.length).toBeLessThan(MAX_HUB_CHARTS_CHARS);
+  });
+
+  it('fails when the block would pass the cap', () => {
+    const big = provinces.map((p) => sweepOf(p.slug, 3000));
+    expect(() => hubChartBlocks(big)).toThrow('Hubs: the chart data block is');
   });
 });

@@ -32,6 +32,16 @@ export type EngineAnswer = Omit<
 /** The engine's answers by jurisdiction code, then by the salary as written in the page address. */
 export type EngineAnswers = Record<string, Record<string, EngineAnswer>>;
 
+/** Whether the API lists the province's year as provisional; undefined when it does not list it. */
+export function provisionalOf(
+  list: ListJurisdictionsResponse,
+  province: Province,
+): boolean | undefined {
+  return list.jurisdictions
+    .find((j) => j.code === province.code)
+    ?.years.find((y) => y.year === province.year)?.provisional;
+}
+
 /** What was built for one province: its salary steps, lowest first, and the unit of its answers. */
 export type BuiltProvince = {
   province: Province;
@@ -108,9 +118,7 @@ export async function generateSalaryPages(
       continue;
     }
     const steps = salaries(province).map((salary) => salary.toString());
-    const provisional = list.jurisdictions
-      .find((j) => j.code === province.code)
-      ?.years.find((y) => y.year === province.year)?.provisional;
+    const provisional = provisionalOf(list, province);
     if (provisional === undefined) {
       throw new Error(
         `Salary pages: ${province.code} ${province.year.toString()} is not listed by the API at ${baseUrl}`,
