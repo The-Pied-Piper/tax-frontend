@@ -2,9 +2,18 @@ import { mkdir, mkdtemp, readFile, rm, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import type { Plugin } from 'vite';
+import jurisdictions from '../src/api/fixtures/jurisdictions.json';
 import { contentTemplate, template } from '../src/test/generatedSite';
 import { contentPages } from '../src/state/contentPages';
-import { salaryPages } from './salaryPages';
+import { salaryPages as salaryPagesPlugin } from './salaryPages';
+
+const API = 'https://api.example.com/api/v1';
+const ENGINE_FILE = 'engine-figures.json';
+
+/** The plugin with an engine file, as a deploy build has it. */
+function salaryPages(api: string | undefined, site?: string) {
+  return salaryPagesPlugin(api, site, ENGINE_FILE);
+}
 
 // Vitest can only import a module built at run time from inside the project,
 // so the temp folders live under node_modules (never committed), and the plugin
@@ -33,7 +42,8 @@ vi.mock('vite', () => ({
 
 const generateCalls = vi.hoisted(() => ({
   published: [] as unknown[],
-  pace: [] as unknown[],
+  answers: [] as unknown[],
+  list: [] as unknown[],
 }));
 
 vi.mock('./salaryPages/generate', async () => {
@@ -43,18 +53,21 @@ vi.mock('./salaryPages/generate', async () => {
     generateSalaryPages: async ({
       outDir,
       published,
-      pace,
+      answers,
+      list,
     }: {
       outDir: string;
       published: unknown;
-      pace?: unknown;
+      answers: unknown;
+      list: unknown;
     }): Promise<{
       written: string[];
       skipped: string[];
       built: never[];
     }> => {
       generateCalls.published.push(published);
-      generateCalls.pace.push(pace);
+      generateCalls.answers.push(answers);
+      generateCalls.list.push(list);
       const written = ['ca-on/30000/index.html', 'ca-on/35000/index.html'];
       for (const file of written) {
         await makeDir(joinPath(outDir, file, '..'), { recursive: true });
@@ -64,6 +77,13 @@ vi.mock('./salaryPages/generate', async () => {
     },
   };
 });
+
+vi.mock('./localEngine/read', () => ({
+  readEngineFigures: vi.fn((file: string) => ({
+    engine: '0.0.0',
+    answers: { file },
+  })),
+}));
 
 vi.mock('./salaryPages/home', () => ({
   rewriteHome: vi.fn((): Promise<void> => Promise.resolve()),
@@ -78,8 +98,8 @@ async function runCloseBundle(plugin: Plugin): Promise<void> {
 }
 
 describe('salaryPages plugin', () => {
-  it('runs after the bundle is written when the API address is set', () => {
-    const plugin = salaryPages('https://api.example.com/api/v1');
+  it('runs after the bundle is written', () => {
+    const plugin = salaryPages(API);
     expect(plugin.name).toBe('salary-pages');
     expect(plugin.closeBundle).toBeDefined();
   });
@@ -87,6 +107,7 @@ describe('salaryPages plugin', () => {
 
 describe('salaryPages closeBundle', () => {
   let root: string;
+  let fetchMock: ReturnType<typeof vi.fn>;
 
   beforeEach(async () => {
     root = await mkdtemp(join(tmpdir(), 'salary-pages-test-'));
@@ -96,10 +117,14 @@ describe('salaryPages closeBundle', () => {
     vi.spyOn(process, 'cwd').mockReturnValue(root);
     vi.spyOn(console, 'log').mockImplementation(() => undefined);
     vi.spyOn(console, 'warn').mockImplementation(() => undefined);
-    vi.stubGlobal(
-      'fetch',
-      vi.fn(() => Promise.resolve(new Response('not found', { status: 404 }))),
+    fetchMock = vi.fn((input: string) =>
+      Promise.resolve(
+        input.endsWith('/jurisdictions')
+          ? Response.json(jurisdictions)
+          : new Response('not found', { status: 404 }),
+      ),
     );
+    vi.stubGlobal('fetch', fetchMock);
   });
 
   afterEach(async () => {
@@ -110,34 +135,37 @@ describe('salaryPages closeBundle', () => {
 
   it('hands the generator the slugs of every content page, so salary pages link only to pages that exist (#150)', async () => {
     generateCalls.published.length = 0;
-    await runCloseBundle(
-      salaryPages('https://api.example.com/api/v1', 'https://example.com'),
-    );
+    await runCloseBundle(salaryPages(API, 'https://example.com'));
     const [published] = generateCalls.published;
     expect(published).toEqual(new Set(contentPages.map((page) => page.slug)));
     expect((published as Set<string>).has('methodology')).toBe(true);
     expect((published as Set<string>).has('forms/on428')).toBe(true);
   });
 
-  it('paces the real build to 5 API requests a second (#243)', async () => {
-    generateCalls.pace.length = 0;
-    await runCloseBundle(
-      salaryPages('https://api.example.com/api/v1', 'https://example.com'),
+  it("gives the generator the engine file's answers and the API's one list of places", async () => {
+    generateCalls.answers.length = 0;
+    generateCalls.list.length = 0;
+    await runCloseBundle(salaryPages(API, 'https://example.com'));
+    expect(generateCalls.answers).toEqual([{ file: ENGINE_FILE }]);
+    expect(generateCalls.list).toEqual([jurisdictions]);
+  });
+
+  it('makes one call to the API, the list of places, and computes nothing there', async () => {
+    await runCloseBundle(salaryPages(API, 'https://example.com'));
+    const apiCalls = fetchMock.mock.calls
+      .map(([input]) => String(input))
+      .filter((url) => url.startsWith(API));
+    expect(apiCalls).toEqual([`${API}/jurisdictions`]);
+  });
+
+  it('fails when there is an engine file but no API address to ask for the places', async () => {
+    await expect(runCloseBundle(salaryPages(undefined))).rejects.toThrow(
+      /VITE_API_BASE_URL/,
     );
-    const [pace] = generateCalls.pace as [
-      { minGapMs?: number; sleep?: unknown; now?: unknown } | undefined,
-    ];
-    expect(pace).toBeDefined();
-    // Defaults: a real timer and the real clock, and a gap of 200 ms (5 a second) or unset.
-    expect(pace?.minGapMs ?? 200).toBe(200);
-    expect(pace?.sleep).toBeUndefined();
-    expect(pace?.now).toBeUndefined();
   });
 
   it('dates every page in the sitemap and keeps the dates in page-hashes.json', async () => {
-    await runCloseBundle(
-      salaryPages('https://api.example.com/api/v1', 'https://example.com'),
-    );
+    await runCloseBundle(salaryPages(API, 'https://example.com'));
 
     const hashes = JSON.parse(
       await readFile(join(root, 'dist', 'page-hashes.json'), 'utf8'),
@@ -179,9 +207,7 @@ describe('salaryPages closeBundle', () => {
   });
 
   it('writes a page at each old T1 address that points at the merged page, and keeps them out of the sitemap', async () => {
-    await runCloseBundle(
-      salaryPages('https://api.example.com/api/v1', 'https://example.com'),
-    );
+    await runCloseBundle(salaryPages(API, 'https://example.com'));
     for (const old of ['t1-income', 't1-tax']) {
       const html = await readFile(
         join(root, 'dist', 'forms', old, 'index.html'),
@@ -197,7 +223,7 @@ describe('salaryPages closeBundle', () => {
   });
 
   it('writes no page list and no sitemap without a site address', async () => {
-    await runCloseBundle(salaryPages('https://api.example.com/api/v1'));
+    await runCloseBundle(salaryPages(API));
 
     await expect(
       readFile(join(root, 'dist', 'page-hashes.json'), 'utf8'),
@@ -207,9 +233,9 @@ describe('salaryPages closeBundle', () => {
     ).rejects.toThrow();
   });
 
-  it('writes no pages without an explicit API address (local builds and CI)', async () => {
-    for (const address of [undefined, '', '  ']) {
-      await runCloseBundle(salaryPages(address));
+  it('writes no pages without an engine file (local builds and CI)', async () => {
+    for (const file of [undefined, '', '  ']) {
+      await runCloseBundle(salaryPagesPlugin(API, undefined, file));
     }
 
     await expect(
@@ -221,7 +247,7 @@ describe('salaryPages closeBundle', () => {
   });
 
   it('writes the content pages from the content template, which loads no calculator', async () => {
-    await runCloseBundle(salaryPages('https://api.example.com/api/v1'));
+    await runCloseBundle(salaryPages(API));
 
     const page = await readFile(
       join(root, 'dist', 'methodology', 'index.html'),
@@ -231,14 +257,14 @@ describe('salaryPages closeBundle', () => {
     expect(page).not.toContain('/src/main.tsx');
   });
 
-  it('leaves no content template in dist, with or without an API address', async () => {
-    await runCloseBundle(salaryPages('https://api.example.com/api/v1'));
+  it('leaves no content template in dist, with or without an engine file', async () => {
+    await runCloseBundle(salaryPages(API));
     await expect(
       readFile(join(root, 'dist', 'content.html'), 'utf8'),
     ).rejects.toThrow();
 
     await writeFile(join(root, 'dist', 'content.html'), contentTemplate);
-    await runCloseBundle(salaryPages(undefined));
+    await runCloseBundle(salaryPagesPlugin(undefined));
     await expect(
       readFile(join(root, 'dist', 'content.html'), 'utf8'),
     ).rejects.toThrow();

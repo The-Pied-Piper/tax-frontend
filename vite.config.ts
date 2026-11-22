@@ -17,7 +17,11 @@ export default defineConfig(({ mode }) => {
       react(),
       keepCssModules(),
       seo(env.VITE_SITE_URL),
-      salaryPages(env.VITE_API_BASE_URL, env.VITE_SITE_URL),
+      salaryPages(
+        env.VITE_API_BASE_URL,
+        env.VITE_SITE_URL,
+        process.env.ENGINE_FIGURES_FILE,
+      ),
     ],
     define: formPageIdDefine(),
     // Two pages: the calculator (index.html) and the template of the pre-built

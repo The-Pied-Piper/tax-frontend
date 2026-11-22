@@ -3,51 +3,41 @@ import { mkdtempSync, readFileSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import type { ComputeTakeHomeCalculationResponse } from '../../src/api';
-import jurisdictions from '../../src/api/fixtures/jurisdictions.json';
 import { caOnAdapter } from '../../src/adapters/ca-on';
 import { strings } from '../../src/strings';
 import { compute70000 } from '../../src/test/syntheticPages';
-import { template } from '../../src/test/generatedSite';
+import {
+  engineOf,
+  engineOptions,
+  template,
+} from '../../src/test/generatedSite';
 import { generateSalaryPages } from './generate';
 import { renderSalaryApp } from './prerender';
+import type { Province } from './provinces';
 
 // The advanced view's groups and lines are in the written page, folded in a
 // real <details>, never in a CSS-hidden panel.
-const baseUrl = 'https://api.test/api/v1';
 const answer: ComputeTakeHomeCalculationResponse = compute70000;
 
-const fakeFetch: typeof fetch = (input) => {
-  const url =
-    typeof input === 'string'
-      ? input
-      : input instanceof URL
-        ? input.href
-        : input.url;
-  return Promise.resolve(
-    url === `${baseUrl}/jurisdictions`
-      ? Response.json(jurisdictions)
-      : Response.json(answer),
-  );
-};
-
+const oneOntario: Province[] = [
+  {
+    code: 'CA-ON',
+    slug: 'ca-on',
+    year: 2026,
+    from: 70000,
+    to: 70000,
+    step: 1,
+  },
+];
+const engineAnswer = engineOf(answer);
 const outDir = mkdtempSync(join(tmpdir(), 'salary-advanced-'));
 let html = '';
 let page: Document;
 beforeAll(async () => {
   await generateSalaryPages({
     published: publishedSlugs,
-    fetch: fakeFetch,
-    baseUrl,
-    provinces: [
-      {
-        code: 'CA-ON',
-        slug: 'ca-on',
-        year: 2026,
-        from: 70000,
-        to: 70000,
-        step: 1,
-      },
-    ],
+    ...engineOptions(oneOntario, undefined, () => engineAnswer),
+    provinces: oneOntario,
     outDir,
     template,
     render: renderSalaryApp,

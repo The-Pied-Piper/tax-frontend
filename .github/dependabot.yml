@@ -10,6 +10,13 @@ updates:
       npm-development:
         dependency-type: development
 
+  # The tax-engine release the site's figures come from (build/localEngine). A bump changes
+  # the pre-built pages: it must move with the release of tax-service that serves the live calculator.
+  - package-ecosystem: pip
+    directory: /build/localEngine
+    schedule:
+      interval: monthly
+
   - package-ecosystem: github-actions
     directory: /
     schedule:

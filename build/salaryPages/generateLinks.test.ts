@@ -8,8 +8,8 @@ import { join } from 'node:path';
 import { parseSalaryPageData } from '../../src/state/salaryPageData';
 import type { SalaryPageData } from '../../src/state/useTakeHome';
 import {
-  apiBaseUrl,
-  fakeFetch,
+  engineOf,
+  engineOptions,
   listedIn,
   siteUrl,
   template,
@@ -18,7 +18,7 @@ import {
   xland,
 } from '../../src/test/generatedSite';
 import { syntheticOntarioPages } from '../../src/test/syntheticPages';
-import { generateSalaryPages } from './generate';
+import { generateSalaryPages, type EngineAnswer } from './generate';
 import { provinces } from './provinces';
 
 // What the generator alone adds to a page: the links in its data block, and
@@ -40,8 +40,10 @@ function run(
     { jurisdictions: { code: string }[] } | undefined;
   return generateSalaryPages({
     published: options.published ?? publishedSlugs,
-    fetch: fakeFetch(options.list),
-    baseUrl: apiBaseUrl,
+    ...engineOptions(
+      options.siteUrl ? listedIn(all, listOf) : all,
+      options.list,
+    ),
     // With a site URL the build fails on a listed province the fake API does not
     // return, so such a build passes only the provinces the fake API lists.
     provinces: options.siteUrl ? listedIn(all, listOf) : all,
@@ -92,8 +94,7 @@ describe('generateSalaryPages links', () => {
     const seen: SalaryPageData[] = [];
     await generateSalaryPages({
       published: publishedSlugs,
-      fetch: fakeFetch(),
-      baseUrl: apiBaseUrl,
+      ...engineOptions(provinces),
       provinces,
       outDir: dir,
       template,
@@ -208,8 +209,7 @@ describe('generateSalaryPages hub and learn-more links (#150)', () => {
     const seen: SalaryPageData[] = [];
     await generateSalaryPages({
       published: publishedSlugs,
-      fetch: fakeFetch(),
-      baseUrl: apiBaseUrl,
+      ...engineOptions(provinces),
       provinces,
       outDir: dir,
       template,
@@ -245,34 +245,23 @@ describe('generateSalaryPages canonical address', () => {
   });
 });
 
-/** Like fakeFetch, but each request gets a take_home of its own, from the salary asked for. */
-const synthetic: Record<string, unknown> = Object.fromEntries(
-  syntheticOntarioPages().map((page) => [page.salary, page.response]),
+/** Each salary gets an answer of its own, with a take_home that tells the pages apart. */
+const synthetic: Record<string, EngineAnswer> = Object.fromEntries(
+  syntheticOntarioPages().map((page) => [page.salary, engineOf(page.response)]),
 );
 
-function perSalaryFetch(): typeof fetch {
-  const base = fakeFetch();
-  return (input, init) => {
-    const url =
-      typeof input === 'string'
-        ? input
-        : input instanceof URL
-          ? input.href
-          : input.url;
-    if (url.endsWith(':compute') && typeof init?.body === 'string') {
-      const { salary } = JSON.parse(init.body) as { salary: string };
-      return Promise.resolve(Response.json(synthetic[salary]));
-    }
-    return base(input, init);
-  };
-}
+const perSalary = () =>
+  engineOptions(provinces, undefined, (_province, salary) => {
+    const answer = synthetic[salary];
+    if (!answer) throw new Error(`no synthetic answer for ${salary}`);
+    return answer;
+  });
 
 async function buildPerSalary() {
   const dir = outDir();
   const result = await generateSalaryPages({
     published: publishedSlugs,
-    fetch: perSalaryFetch(),
-    baseUrl: apiBaseUrl,
+    ...perSalary(),
     provinces,
     outDir: dir,
     template,
@@ -364,8 +353,7 @@ describe('generateSalaryPages link take-home figures (#184)', () => {
     const seen: SalaryPageData[] = [];
     await generateSalaryPages({
       published: publishedSlugs,
-      fetch: perSalaryFetch(),
-      baseUrl: apiBaseUrl,
+      ...perSalary(),
       provinces,
       outDir: dir,
       template,

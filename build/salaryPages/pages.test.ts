@@ -2,7 +2,7 @@ import { publishedSlugs } from '../../src/test/pageLinks';
 import { mkdtempSync, readFileSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
-import jurisdictions from '../../src/api/fixtures/jurisdictions.json';
+import { engineOf, engineOptions } from '../../src/test/generatedSite';
 import { generateSalaryPages } from './generate';
 import { pageMeta } from './pageMeta';
 import { renderSalaryApp } from './prerender';
@@ -15,29 +15,7 @@ import {
 
 // Whole build: 25 Ontario pages from a fake API whose answer differs per salary
 // (SYNTHETIC responses, see syntheticPages.ts), rendered by the real App.
-const baseUrl = 'https://api.test/api/v1';
 const template = readFileSync('index.html', 'utf8');
-
-const fakeFetch: typeof fetch = (input, init) => {
-  const url =
-    typeof input === 'string'
-      ? input
-      : input instanceof URL
-        ? input.href
-        : input.url;
-  if (url === `${baseUrl}/jurisdictions`) {
-    return Promise.resolve(Response.json(jurisdictions));
-  }
-  const body = JSON.parse(
-    typeof init?.body === 'string' ? init.body : '{}',
-  ) as {
-    salary: string;
-  };
-  const n = salaries.find((s) => s.toString() === body.salary);
-  if (n === undefined)
-    return Promise.reject(new Error(`salary ${body.salary}`));
-  return Promise.resolve(Response.json(syntheticResponse(n)));
-};
 
 const salaries = Array.from({ length: 25 }, (_, i) => 30000 + i * 5000);
 const outDir = mkdtempSync(join(tmpdir(), 'salary-meta-'));
@@ -46,8 +24,11 @@ const pages = new Map<number, Document>();
 beforeAll(async () => {
   await generateSalaryPages({
     published: publishedSlugs,
-    fetch: fakeFetch,
-    baseUrl,
+    ...engineOptions(provinces, undefined, (_province, salary) => {
+      const n = salaries.find((s) => s.toString() === salary);
+      if (n === undefined) throw new Error(`salary ${salary}`);
+      return engineOf(syntheticResponse(n));
+    }),
     provinces,
     outDir,
     template,

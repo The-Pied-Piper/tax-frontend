@@ -1,18 +1,17 @@
 import { mkdir, writeFile } from 'node:fs/promises';
 import { dirname, join } from 'node:path';
-import {
-  ApiError,
-  createApiClient,
-  type ComputeTakeHomeCalculationResponse,
-  type ListJurisdictionsResponse,
+import type {
+  ComputeTakeHomeCalculationResponse,
+  ListJurisdictionsResponse,
 } from '../../src/api';
 import { dollarSign, responseUnit } from '../../src/adapters/fallback';
 import { displayWholeMoney } from '../../src/money/format';
 import { salaryBreadcrumb } from '../../src/state/breadcrumbs';
 import { breadcrumbJsonLd } from '../breadcrumbJsonLd';
-import { languageCode, strings } from '../../src/strings';
+import { strings } from '../../src/strings';
 import type { Unit } from '../../src/adapters';
 import type { SalaryPageData } from '../../src/state/useTakeHome';
+import { parseSalaryPageData } from '../../src/state/salaryPageData';
 import { pagePath, pageUrl } from './address';
 import { buildPageHtml } from './pageHtml';
 import { pageMeta } from './pageMeta';
@@ -20,25 +19,18 @@ import { DESCRIPTION_LIMIT, TITLE_LIMIT } from './limits';
 import { salaryLinks } from './links';
 import { provinceLinks } from '../../src/state/salaryPageLinks';
 import { salaries, type Province } from './provinces';
-import { pacedFetch, type PaceOptions } from './pacedFetch';
-import {
-  DEFAULT_ATTEMPTS,
-  DEFAULT_TRY_TIMEOUT_MS,
-  MAX_WAIT_MS,
-  retryingFetch,
-  timer,
-} from './retryFetch';
 
-/** The most time, in milliseconds, all the waits for 429s in one build may add up to. */
-const DEFAULT_MAX_TOTAL_WAIT_MS = 600000;
+/**
+ * The engine's answer for one salary: the API's response without `provisional`, which is the
+ * service's policy and not the engine's, so the build adds it from the list of jurisdictions.
+ */
+export type EngineAnswer = Omit<
+  ComputeTakeHomeCalculationResponse,
+  'provisional'
+>;
 
-/** The waits for 429s have used up the build's budget. */
-class WaitBudgetError extends Error {
-  constructor() {
-    super('the API kept answering 429 and the wait budget was spent');
-    this.name = 'WaitBudgetError';
-  }
-}
+/** The engine's answers by jurisdiction code, then by the salary as written in the page address. */
+export type EngineAnswers = Record<string, Record<string, EngineAnswer>>;
 
 /** What was built for one province: its salary steps, lowest first, and the unit of its answers. */
 export type BuiltProvince = {
@@ -48,7 +40,11 @@ export type BuiltProvince = {
 };
 
 export type GenerateOptions = {
-  fetch: typeof fetch;
+  /** What the local engine answered for every page salary (build/localEngine). */
+  answers: EngineAnswers;
+  /** The API's list of jurisdictions: who is served, their display names and which years are provisional. */
+  list: ListJurisdictionsResponse;
+  /** The API address, named in the message when a listed province is not served. */
   baseUrl: string;
   provinces: Province[];
   outDir: string;
@@ -61,26 +57,9 @@ export type GenerateOptions = {
   /**
    * The normalized site origin; null leaves canonical and og:url as the template has them.
    * When set (a prod-shaped build), a listed province the API does not return fails the
-   * build before anything is fetched or written; without it such a province is skipped.
+   * build before anything is written; without it such a province is skipped.
    */
   siteUrl?: string | null;
-  /**
-   * How a 429 from the API is retried: `attempts` tries in all per call (default 6, at
-   * least 1), the `sleep` between them (a real timer by default; tests pass an instant
-   * one) and `maxTotalWaitMs`, the most all the waits of the whole build may add up to
-   * (default 10 minutes); a wait that would pass it fails the build instead.
-   */
-  retry?: {
-    attempts?: number;
-    sleep?: (ms: number) => Promise<void>;
-    maxTotalWaitMs?: number;
-  };
-  /**
-   * Spaces the API calls: each starts at least `minGapMs` (default 200, so 5 a second)
-   * after the previous one, with `sleep` and `now` as the clock (real ones by default;
-   * tests pass fakes). The retries of a 429 are spaced too. Absent, calls are not paced.
-   */
-  pace?: PaceOptions;
 };
 
 export type GenerateResult = {
@@ -92,58 +71,12 @@ export type GenerateResult = {
   built: BuiltProvince[];
 };
 
-function reason(error: unknown, attempts: number): string {
-  if (error instanceof ApiError) {
-    const status = `status ${error.status.toString()}`;
-    if (error.status !== 429) return status;
-    return `${status} after ${attempts.toString()} ${attempts === 1 ? 'try' : 'tries'}`;
-  }
-  // The client wraps what the fetch throws, so the budget error is its cause.
-  if (error instanceof Error && error.cause instanceof WaitBudgetError) {
-    return error.cause.message;
-  }
-  return error instanceof Error ? error.message : 'unknown error';
-}
-
-/** Writes one finished page per listed province and salary step. Retries a 429 from the API, then fails on the first API problem. */
+/** Writes one finished page per listed province and salary step, from the engine's answers. Fails on the first answer that is missing. */
 export async function generateSalaryPages(
   options: GenerateOptions,
 ): Promise<GenerateResult> {
-  const { baseUrl, provinces, outDir, template, render } = options;
-  const attempts = Math.max(1, options.retry?.attempts ?? DEFAULT_ATTEMPTS);
-  const sleepFor = options.retry?.sleep ?? timer;
-  const maxTotalWaitMs =
-    options.retry?.maxTotalWaitMs ?? DEFAULT_MAX_TOTAL_WAIT_MS;
-  let waited = 0;
-  // One running total for the whole build, so a long throttle fails it rather than stall it.
-  const budgetedSleep = (ms: number) => {
-    if (waited + ms > maxTotalWaitMs)
-      return Promise.reject(new WaitBudgetError());
-    waited += ms;
-    return sleepFor(ms);
-  };
-  const client = createApiClient({
-    baseUrl,
-    // Pacing sits under the retries, so a retried call is spaced like any other.
-    fetch: retryingFetch(
-      options.pace ? pacedFetch(options.fetch, options.pace) : options.fetch,
-      { attempts, sleep: budgetedSleep },
-    ),
-    // The client's one timer spans every try and wait of a call, so it must outlast them
-    // all (each try has its own timer inside retryingFetch); the 1 s is slack.
-    timeoutMs:
-      attempts * DEFAULT_TRY_TIMEOUT_MS + (attempts - 1) * MAX_WAIT_MS + 1000,
-  });
-
-  let list: ListJurisdictionsResponse;
-  try {
-    list = await client.listJurisdictions();
-  } catch (error) {
-    throw new Error(
-      `Salary pages: GET ${baseUrl}/jurisdictions failed: ${reason(error, attempts)}`,
-      { cause: error },
-    );
-  }
+  const { baseUrl, provinces, outDir, template, render, list, answers } =
+    options;
 
   const placeNames = strings.siteNav.provinceNames as Record<
     string,
@@ -175,31 +108,27 @@ export async function generateSalaryPages(
       continue;
     }
     const steps = salaries(province).map((salary) => salary.toString());
+    const provisional = list.jurisdictions
+      .find((j) => j.code === province.code)
+      ?.years.find((y) => y.year === province.year)?.provisional;
+    if (provisional === undefined) {
+      throw new Error(
+        `Salary pages: ${province.code} ${province.year.toString()} is not listed by the API at ${baseUrl}`,
+      );
+    }
     const responses: ComputeTakeHomeCalculationResponse[] = [];
     for (const salary of steps) {
       const page = `${province.slug}/${salary}`;
-      try {
-        const answer = await client.computeTakeHomeCalculation({
-          jurisdiction_code: province.code,
-          year: province.year,
-          salary,
-          language_code: languageCode,
-          include_trace: true,
-        });
-        // The page and its data block carry "$", never the API's "CA$".
-        responses.push(
-          JSON.parse(
-            dollarSign(JSON.stringify(answer)),
-          ) as ComputeTakeHomeCalculationResponse,
-        );
-      } catch (error) {
-        throw new Error(
-          `Salary pages: ${page} failed: ${reason(error, attempts)}`,
-          {
-            cause: error,
-          },
-        );
+      const answer = answers[province.code]?.[salary];
+      if (!answer) {
+        throw new Error(`Salary pages: ${page} has no engine answer`);
       }
+      // The page and its data block carry "$", never the engine's "CA$".
+      responses.push(
+        JSON.parse(
+          dollarSign(JSON.stringify({ ...answer, provisional })),
+        ) as ComputeTakeHomeCalculationResponse,
+      );
     }
     fetched.push({ province, steps, responses });
   }
@@ -242,6 +171,12 @@ export async function generateSalaryPages(
         salary,
         links,
       };
+      // The same guard the page applies to its data block when it loads.
+      if (parseSalaryPageData(JSON.stringify(data)) === null) {
+        throw new Error(
+          `Salary pages: ${page} data does not fit the page's guard`,
+        );
+      }
       const meta = pageMeta(data);
       if (meta.title.length >= TITLE_LIMIT) {
         throw new Error(

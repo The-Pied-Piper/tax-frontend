@@ -4,14 +4,17 @@ import { mkdtempSync, readFileSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import type { ComputeTakeHomeCalculationResponse } from '../../src/api';
-import jurisdictions from '../../src/api/fixtures/jurisdictions.json';
 import { strings } from '../../src/strings';
 import {
   compute150000,
   compute30000,
   compute70000,
 } from '../../src/test/syntheticPages';
-import { template } from '../../src/test/generatedSite';
+import {
+  engineOf,
+  engineOptions,
+  template,
+} from '../../src/test/generatedSite';
 import {
   parseSalaryPageData,
   SALARY_PAGE_DATA_ID,
@@ -24,7 +27,6 @@ import type { Province } from './provinces';
 // The fake API answers by the salary in the request body, with the saved
 // engine responses. One list entry per salary (from = to), so exactly the
 // three saved salaries are built.
-const baseUrl = 'https://api.test/api/v1';
 
 const answers = new Map<string, ComputeTakeHomeCalculationResponse>([
   ['30000', compute30000],
@@ -62,33 +64,18 @@ const entries: Province[] = expected.map(({ salary, n }) => ({
   step: 1,
 }));
 
-const answerBySalary: typeof fetch = (input, init) => {
-  const url =
-    typeof input === 'string'
-      ? input
-      : input instanceof URL
-        ? input.href
-        : input.url;
-  if (url === `${baseUrl}/jurisdictions`) {
-    return Promise.resolve(Response.json(jurisdictions));
-  }
-  const body = JSON.parse(
-    typeof init?.body === 'string' ? init.body : '{}',
-  ) as {
-    salary?: string;
-  };
-  const answer = answers.get(body.salary ?? '');
-  return answer
-    ? Promise.resolve(Response.json(answer))
-    : Promise.reject(new Error(`no saved answer for ${String(body.salary)}`));
-};
+const answerBySalary = engineOptions(entries, undefined, (province) => {
+  const salary = province.from.toString();
+  const answer = answers.get(salary);
+  if (!answer) throw new Error(`no saved answer for ${salary}`);
+  return engineOf(answer);
+});
 
 const outDir = mkdtempSync(join(tmpdir(), 'salary-figures-'));
 beforeAll(async () => {
   await generateSalaryPages({
     published: publishedSlugs,
-    fetch: answerBySalary,
-    baseUrl,
+    ...answerBySalary,
     provinces: entries,
     outDir,
     template,

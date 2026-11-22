@@ -7,8 +7,7 @@ const withoutForms: ReadonlySet<string> = new Set(
 import { existsSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import {
-  apiBaseUrl,
-  fakeFetch,
+  engineOptions,
   listedIn,
   siteUrl as site,
   template,
@@ -49,8 +48,7 @@ async function build(options: { list?: 'xland' | 'alberta' } = {}) {
         : undefined;
   const { written } = await generateSalaryPages({
     published: withoutForms,
-    fetch: fakeFetch(list),
-    baseUrl: apiBaseUrl,
+    ...engineOptions([...provinces, xland], list),
     // Only the provinces the fake API lists: a site-URL build fails on any other.
     provinces: listedIn(
       options.list === 'xland' ? [...provinces, xland] : provinces,
