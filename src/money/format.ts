@@ -119,3 +119,24 @@ export function displayRate(amount: string, unit: MoneyUnit): string {
   const shifted = timesHundred(amount);
   return shifted === null ? amount : withUnit(shifted, unit);
 }
+
+// Short label for an axis tick, from a round value the chart chose. A rate
+// shows as the unit says (a percent when as_percentage). Money is grouped, and
+// a whole number of hundreds from 1,000 up is shortened with a k: "$50k",
+// "$2.5k". The unit's own text goes on as in withUnit; only digits are moved,
+// never rounded. Anything not a plain decimal is returned as is.
+export function displayTick(value: string, unit: MoneyUnit): string {
+  if (unit.as_percentage === true) return displayRate(value, unit);
+  const match = /^(-?)(\d+)(?:\.0+)?$/.exec(value);
+  const whole = match?.[2] ?? '';
+  if (whole.length < 4 || !whole.endsWith('00') || match === null) {
+    return withUnit(groupThousands(value), unit);
+  }
+  const hundreds = whole.slice(-3, -2);
+  const body = `${match[1] ?? ''}${groupThousands(whole.slice(0, -3))}${hundreds === '0' ? '' : `.${hundreds}`}`;
+  // A shortened figure is never exactly 1 of the unit, so it takes the plural.
+  const text = withUnit(body, { ...unit, singular: unit.plural });
+  return unit.placement === 'before'
+    ? `${text}k`
+    : text.replace(body, `${body}k`);
+}
