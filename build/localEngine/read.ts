@@ -16,6 +16,7 @@ export type EngineFigures = {
 export type EngineSweepPoint = {
   salary: string;
   total_deductions: string;
+  income_tax: string;
   take_home: string;
   average_income_tax_rate: string;
   marginal_income_tax_rate: string;
@@ -34,6 +35,7 @@ export type EngineSweep = {
 const POINT_FIELDS = [
   'salary',
   'total_deductions',
+  'income_tax',
   'take_home',
   'average_income_tax_rate',
   'marginal_income_tax_rate',

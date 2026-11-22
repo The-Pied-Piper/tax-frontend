@@ -38,7 +38,8 @@ jobs:
         with:
           python-version: '3.12'
       - run: npm ci
-      - run: python -m pip install --require-hashes --no-deps -r build/localEngine/requirements.txt
+      - run: |
+          python -m pip install --require-hashes --no-deps --only-binary=:all: -r build/localEngine/requirements.txt
       - run: python -I build/localEngine/engine_figures.py build/salaryPages/provinces.json "$RUNNER_TEMP/engine-figures.json"
       - name: Check the written figures
         env:

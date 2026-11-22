@@ -57,6 +57,7 @@ export function provinceSweeps(
         point.salary,
         point.take_home,
         point.total_deductions,
+        point.income_tax,
         point.average_income_tax_rate,
         point.marginal_income_tax_rate,
       ]),

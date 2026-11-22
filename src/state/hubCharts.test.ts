@@ -13,7 +13,7 @@ const sweep = {
   provisional: true,
   unit,
   rateUnit: { ...unit, as_percentage: true },
-  points: [['1000', '1000.00', '0.00', '0.0000', '0.0505']],
+  points: [['1000', '1000.00', '0.00', '0.00', '0.0000', '0.0505']],
 };
 
 describe('sweepSalaries', () => {
@@ -53,18 +53,22 @@ describe('parseHubChartsData', () => {
     ],
     [
       'a point of numbers',
-      JSON.stringify({ provinces: [{ ...sweep, points: [[1, 2, 3, 4, 5]] }] }),
+      JSON.stringify({
+        provinces: [{ ...sweep, points: [[1, 2, 3, 4, 5, 6]] }],
+      }),
     ],
     [
       'a point with four figures',
       JSON.stringify({
-        provinces: [{ ...sweep, points: [['1', '2', '3', '4']] }],
+        provinces: [{ ...sweep, points: [['1', '2', '3', '4', '5']] }],
       }),
     ],
     [
       'a figure that is not a decimal',
       JSON.stringify({
-        provinces: [{ ...sweep, points: [['1000', '<b>', '0', '0', '0']] }],
+        provinces: [
+          { ...sweep, points: [['1000', '<b>', '0', '0', '0', '0']] },
+        ],
       }),
     ],
     ['no unit', JSON.stringify({ provinces: [{ ...sweep, unit: null }] })],

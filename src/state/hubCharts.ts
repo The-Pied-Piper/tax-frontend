@@ -15,13 +15,14 @@ export function sweepSalaries(): string[] {
 
 /**
  * One point of a sweep, all text exactly as the API sent it: salary, take-home,
- * total deductions, average rate, marginal rate. Income tax in dollars joins
- * once the API has a field for it.
+ * total deductions, income tax (the total payable, before credits paid to you),
+ * average rate, marginal rate. Credits paid to you join when the engine has them.
  */
 export type SweepPoint = [
   salary: string,
   takeHome: string,
   totalDeductions: string,
+  incomeTax: string,
   averageRate: string,
   marginalRate: string,
 ];
@@ -47,7 +48,7 @@ const DECIMAL = /^-?\d+(\.\d+)?$/;
 function isPoint(value: unknown): value is SweepPoint {
   return (
     Array.isArray(value) &&
-    value.length === 5 &&
+    value.length === 6 &&
     value.every(
       (part: unknown) => typeof part === 'string' && DECIMAL.test(part),
     )

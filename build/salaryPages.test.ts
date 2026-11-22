@@ -106,7 +106,7 @@ vi.mock('./salaryPages/sweep', () => ({
         provisional: false,
         unit,
         rateUnit: { ...unit, as_percentage: true },
-        points: [['1000.00', '1000.00', '0.00', '0.0000', '0.0505']],
+        points: [['1000.00', '1000.00', '0.00', '0.00', '0.0000', '0.0505']],
       },
     ];
   },
@@ -205,6 +205,15 @@ describe('salaryPages closeBundle', () => {
       .map(([input]) => String(input))
       .filter((url) => url.startsWith(API));
     expect(apiCalls).toEqual([`${API}/jurisdictions`]);
+  });
+
+  it('fails, naming the call, when the list of places cannot be fetched', async () => {
+    fetchMock.mockImplementation(() => {
+      throw new Error('offline');
+    });
+    await expect(
+      runCloseBundle(salaryPages(API, 'https://example.com')),
+    ).rejects.toThrow(`GET ${API}/jurisdictions failed`);
   });
 
   it('fails when there is an engine file but no API address to ask for the places', async () => {

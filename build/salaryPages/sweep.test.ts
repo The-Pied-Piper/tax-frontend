@@ -3,7 +3,8 @@ import jurisdictions from '../../src/api/fixtures/jurisdictions.json';
 import fixture70000 from '../../src/api/fixtures/compute-on-2026-70000.json';
 import type { ComputeTakeHomeCalculationResponse } from '../../src/api';
 import { sweepSalaries } from '../../src/state/hubCharts';
-import { provinces, sweepSteps } from './provinces';
+import { provinces } from './provinces';
+import config from './provinces.json';
 import type { BuiltProvince } from './generate';
 import type { EngineSweep } from '../localEngine/read';
 import { provinceSweeps } from './sweep';
@@ -20,6 +21,7 @@ function sweepOf(): EngineSweep {
     points: sweepSalaries().map((salary) => ({
       salary: `${salary}.00`,
       total_deductions: `d${salary}`,
+      income_tax: `i${salary}`,
       take_home: `t${salary}`,
       average_income_tax_rate: '0.1000',
       marginal_income_tax_rate: '0.2000',
@@ -34,7 +36,7 @@ function sweepOf(): EngineSweep {
 
 describe('the sweep steps of the Python step and of the charts', () => {
   it('are the same salaries: the one setting in provinces.json gives sweepSalaries()', () => {
-    const { first, fineStep, fineTo, coarseStep, to } = sweepSteps;
+    const { first, fineStep, fineTo, coarseStep, to } = config.sweep;
     const steps: string[] = [];
     for (let n = first; n <= fineTo; n += fineStep) steps.push(n.toString());
     for (let n = fineTo + coarseStep; n <= to; n += coarseStep)
@@ -62,6 +64,7 @@ describe('provinceSweeps', () => {
       '1000.00',
       't1000',
       'd1000',
+      'i1000',
       '0.1000',
       '0.2000',
     ]);
