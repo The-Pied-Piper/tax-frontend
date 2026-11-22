@@ -133,6 +133,7 @@ describe('advancedGroups', () => {
     const groups = advancedGroups({
       salary: '1.00',
       total_deductions: '0.00',
+      income_tax: '0.00',
       average_income_tax_rate: { amount: '0.1642', unit: percent },
       marginal_income_tax_rate: { amount: '0.2965', unit: percent },
       take_home: '1.00',
@@ -205,6 +206,7 @@ describe('advancedGroups', () => {
       advancedGroups({
         salary: '1.00',
         total_deductions: '0.00',
+        income_tax: '0.00',
         average_income_tax_rate: { amount: '0.1642', unit: percent },
         marginal_income_tax_rate: { amount: '0.2965', unit: percent },
         take_home: '1.00',
