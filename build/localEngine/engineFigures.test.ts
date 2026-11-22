@@ -9,7 +9,12 @@ import { mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 
-const saved = compute70000 as ComputeTakeHomeCalculationResponse;
+// The saved fixtures predate the `income_tax` field of the response (tax-service #83), which the
+// spec now requires; the shape tests add it so they test the rest of the answer.
+const saved = {
+  ...(compute70000 as ComputeTakeHomeCalculationResponse),
+  income_tax: '11133.93',
+};
 
 describe('the OpenAPI check', () => {
   const check = responseChecker();

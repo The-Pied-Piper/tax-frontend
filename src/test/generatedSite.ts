@@ -76,6 +76,7 @@ export function engineOf(
   return {
     salary: response.salary,
     total_deductions: response.total_deductions,
+    income_tax: response.income_tax,
     take_home: response.take_home,
     unit: response.unit,
     average_income_tax_rate: response.average_income_tax_rate,
