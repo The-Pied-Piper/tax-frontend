@@ -142,7 +142,7 @@ describe('parseHubChartsData', () => {
       }),
     ],
     [
-      'a figure longer than money/scale reads',
+      'a figure longer than money/ reads',
       JSON.stringify({
         provinces: [
           { ...sweep, points: [['1000', '1'.repeat(31), '0', '0', '0', '0']] },

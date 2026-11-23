@@ -357,6 +357,7 @@ describe('the province comparison', () => {
         blocks: blocks.filter(
           (block) =>
             block.kind !== 'salaryChart' &&
+            block.kind !== 'chartNotes' &&
             block.kind !== 'subheading' &&
             JSON.stringify(block) !==
               JSON.stringify(paragraph(strings.hubCharts.charts.takeHome.text)),
@@ -371,10 +372,11 @@ describe('the province comparison', () => {
     expect(how?.id).toBe('take-home');
     expect(how?.card).toBe(true);
     const t = strings.hubCharts.charts;
-    expect(how?.blocks.slice(-3)).toEqual([
+    expect(how?.blocks.slice(-4)).toEqual([
       { kind: 'subheading', text: t.takeHome.title },
       paragraph(t.takeHome.text),
       { kind: 'salaryChart', province: 'ca-on', chart: 'takeHome' },
+      { kind: 'chartNotes', province: 'ca-on', chart: 'takeHome' },
     ]);
     expect(
       (['averageRate', 'marginalRate', 'yearTotal'] as const).map(
@@ -392,6 +394,7 @@ describe('the province comparison', () => {
         [
           paragraph(t.averageRate.text),
           { kind: 'salaryChart', province: 'ca-on', chart: 'averageRate' },
+          { kind: 'chartNotes', province: 'ca-on', chart: 'averageRate' },
         ],
       ],
       [
@@ -399,6 +402,7 @@ describe('the province comparison', () => {
         [
           paragraph(t.marginalRate.text),
           { kind: 'salaryChart', province: 'ca-on', chart: 'marginalRate' },
+          { kind: 'chartNotes', province: 'ca-on', chart: 'marginalRate' },
         ],
       ],
       [
@@ -406,6 +410,7 @@ describe('the province comparison', () => {
         [
           paragraph(t.yearTotal.text),
           { kind: 'salaryChart', province: 'ca-on', chart: 'yearTotal' },
+          { kind: 'chartNotes', province: 'ca-on', chart: 'yearTotal' },
         ],
       ],
     ]);

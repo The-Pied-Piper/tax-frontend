@@ -280,6 +280,17 @@ describe('generateContentPages validation', () => {
       expect(written).toEqual(['plain-page/index.html']);
     });
 
+    it('accepts chart notes, a data reference only', async () => {
+      const { written } = await run(outDir(), [
+        withBlocks({
+          kind: 'chartNotes',
+          province: 'ca-on',
+          chart: 'marginalRate',
+        }),
+      ]);
+      expect(written).toEqual(['plain-page/index.html']);
+    });
+
     it('accepts a link to the engine repository, the one address off the site', async () => {
       const dir = outDir();
       await run(dir, [

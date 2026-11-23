@@ -75,7 +75,11 @@ function chartSection(
     heading: title,
     id: CHART_SECTION_IDS[chart],
     card: true,
-    blocks: [paragraph(text), { kind: 'salaryChart', province, chart }],
+    blocks: [
+      paragraph(text),
+      { kind: 'salaryChart', province, chart },
+      { kind: 'chartNotes', province, chart },
+    ],
   };
 }
 
@@ -241,6 +245,11 @@ export function hubPage(
                 paragraph(strings.hubCharts.charts.takeHome.text),
                 {
                   kind: 'salaryChart' as const,
+                  province: text.slug,
+                  chart: 'takeHome' as const,
+                },
+                {
+                  kind: 'chartNotes' as const,
                   province: text.slug,
                   chart: 'takeHome' as const,
                 },

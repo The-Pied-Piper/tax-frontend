@@ -5,6 +5,7 @@ import { strings } from '../strings';
 import { THEME_STORAGE_KEY } from '../theme/theme';
 import { blocksSpec, plainSpec, sampleSpec } from '../test/contentPageData';
 import { sampleHubCharts } from '../test/comparisonData';
+import { fullHubCharts } from '../test/hubNotesData';
 import { PROVINCE_COMPARISON_SLOT_ID } from '../state/hubSlots';
 
 afterEach(() => {
@@ -273,5 +274,50 @@ describe('ContentPage blocks', () => {
     const { container } = render(<ContentPage {...spec} />);
     expect(container.querySelector('b')).toBeNull();
     expect(screen.getByText('a <b>bold</b> b')).toBeInTheDocument();
+  });
+});
+
+describe('ContentPage chart notes', () => {
+  const spec = {
+    ...plainSpec,
+    sections: [
+      {
+        heading: 'Average tax rate',
+        blocks: [
+          {
+            kind: 'chartNotes' as const,
+            province: 'ca-on' as const,
+            chart: 'averageRate' as const,
+          },
+        ],
+      },
+    ],
+  };
+
+  it('writes the province text of a chart as a list, figures filled from the hub data', () => {
+    const { container } = render(
+      <ContentPage {...spec} hubCharts={fullHubCharts(['ca-on'])} />,
+    );
+    const list = container.querySelector('ul[data-chart-notes="averageRate"]');
+    expect(list).not.toBeNull();
+    expect(list?.textContent).toContain('lowest, -12.73%, at $9,000');
+    expect(list?.textContent).not.toMatch(/[{}]/);
+  });
+
+  it('draws nothing when the hub has no sweep or the sweep is not the full one', () => {
+    const none = render(<ContentPage {...spec} />);
+    expect(none.container.querySelector('[data-chart-notes]')).toBeNull();
+    none.unmount();
+    const partial = render(
+      <ContentPage {...spec} hubCharts={sampleHubCharts} />,
+    );
+    expect(partial.container.querySelector('[data-chart-notes]')).toBeNull();
+  });
+
+  it('writes the same markup on the server', () => {
+    const html = renderToString(
+      <ContentPage {...spec} hubCharts={fullHubCharts(['ca-on'])} />,
+    );
+    expect(html).toContain('data-chart-notes="averageRate"');
   });
 });

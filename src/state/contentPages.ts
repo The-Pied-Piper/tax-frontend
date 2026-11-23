@@ -34,6 +34,8 @@ export type ContentBlock =
   | { kind: 'table'; caption: string; head: string[]; rows: string[][] }
   /** One salary chart of a province hub: a data reference only; the build and the page fill it from the hub's data block. */
   | { kind: 'salaryChart'; province: FooterProvinceSlug; chart: HubChartId }
+  /** What one of a hub's charts shows for its province: bullets the page writes from the hub's data block, so no figure is typed here. Draws nothing when the hub has no sweep or no text for the chart. */
+  | { kind: 'chartNotes'; province: FooterProvinceSlug; chart: HubChartId }
   /** The province comparison of a hub: bars for every served province at one salary. It carries only the hub's slug; the page draws it from the hub's data block. */
   | { kind: 'provinceComparison'; province: FooterProvinceSlug };
 

@@ -71,7 +71,7 @@ export type ProvinceSweep = {
 /** What a hub's data block holds: the sweep of every province the build served. */
 export type HubChartsData = { provinces: ProvinceSweep[] };
 
-/** A figure as the API writes it, and as money/scale reads it: optional minus, no leading zero, optional decimals, at most 30 characters. */
+/** A figure as the API writes it, and as money/ reads it: optional minus, no leading zero, optional decimals, at most 30 characters. */
 const DECIMAL = /^-?(0|[1-9]\d*)(\.\d+)?$/;
 const MAX_FIGURE_LENGTH = 30;
 /** A slug as the site writes it. */
@@ -189,12 +189,23 @@ export const HUB_CHART_IDS = [
 
 export type HubChartId = (typeof HUB_CHART_IDS)[number];
 
+/** The place of each figure in a `SweepPoint`. */
+export const SWEEP_COLUMN = {
+  takeHome: 1,
+  deductions: 2,
+  tax: 3,
+  taxAverage: 4,
+  marginal: 5,
+  total: 6,
+  average: 7,
+} as const;
+
 /** Which place of a `SweepPoint` each chart reads. */
 export const CHART_COLUMN: Record<HubChartId, number> = {
-  takeHome: 1,
-  averageRate: 7,
-  marginalRate: 5,
-  yearTotal: 6,
+  takeHome: SWEEP_COLUMN.takeHome,
+  averageRate: SWEEP_COLUMN.average,
+  marginalRate: SWEEP_COLUMN.marginal,
+  yearTotal: SWEEP_COLUMN.total,
 };
 
 /** True for the two charts that draw a rate; the others draw money and follow Per year / Per month. */

@@ -142,6 +142,14 @@ export function displayRate(amount: string, unit: MoneyUnit): string {
   return shifted === null ? amount : withUnit(shifted, unit);
 }
 
+// A rate written as cents on the dollar: "0.0857" -> "8.57 cents", "0.01" -> "1 cent".
+// Only digits are moved, never rounded; text that is not a plain decimal is returned as is.
+export function displayCents(amount: string): string {
+  const shifted = timesHundred(amount);
+  if (shifted === null) return amount;
+  return `${shifted} ${shifted === '1' ? 'cent' : 'cents'}`;
+}
+
 // A rate shown to one decimal, rounded half away from zero: "0.2316" -> "23.2%",
 // "-0.2537" -> "-25.4%". Like displayRate for a unit that is not a percentage,
 // and for text it cannot read.
