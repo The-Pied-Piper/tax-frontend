@@ -154,7 +154,7 @@ describe('generateContentPages validation', () => {
     ).rejects.toThrow(/plain-page/);
   });
 
-  it('rejects a title of 60 characters or more', async () => {
+  it('rejects a title of 64 characters or more', async () => {
     const dir = await fails([
       { ...plainSpec, title: 'x'.repeat(CONTENT_TITLE_LIMIT) },
     ]);
