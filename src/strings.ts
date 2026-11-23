@@ -25,18 +25,15 @@ export const strings = {
   hubCharts: {
     perYear: 'Per year',
     perMonth: 'Per month',
-    hover: (salary: string, value: string) => `At a ${salary} salary: ${value}`,
-    perPeriod: (value: string, period: 'annually' | 'monthly') =>
-      `${value} ${period === 'monthly' ? 'a month' : 'a year'}`,
-    monthNote: 'Per month is the yearly figure divided by 12.',
+    // The label beside the marker, as the approved mockup draws it: "$70,000: 23.2%".
+    hover: (salary: string, value: string) => `${salary}: ${value}`,
     // Read aloud when the marker moves; not shown.
     readout: (salary: string) => `Salary ${salary} a year`,
     showTable: 'Show the figures as a table',
     hideTable: 'Hide the table',
     salaryHeader: 'Salary',
     salaryAxis: 'Salary before tax',
-    percentOfSalary: 'Percent of your salary',
-    percentOfExtra: 'Percent of each extra dollar',
+    percent: 'Percent',
     dollarsYear: 'Dollars a year',
     dollarsMonth: 'Dollars a month',
     chartLabel: (title: string, from: string, to: string) =>
@@ -44,9 +41,13 @@ export const strings = {
     note: "These are the calculator's own estimates for a single person whose only income is a salary. They are not tax advice.",
     provisional: (year: number) =>
       `The ${year.toString()} figures are provisional.`,
-    // One entry per chart: its title (the section heading, except for take-home, whose section already exists), its one line, and its table column.
+    // One entry per chart: its title (the section heading, or for take-home a sub-heading in the existing section), its one line, and its table column.
     charts: {
-      takeHome: { title: 'Take-home pay', header: 'Take-home' },
+      takeHome: {
+        title: 'Take-home pay',
+        text: 'Your salary minus income tax, Canada Pension Plan and Employment Insurance. It is before any credits paid to you when you file.',
+        header: 'Take-home',
+      },
       averageRate: {
         title: 'Average tax rate',
         text: 'Of your whole salary, the share that goes to income tax, Canada Pension Plan and Employment Insurance, less benefits paid to you when you file. It is below zero where those benefits are bigger than what you pay.',

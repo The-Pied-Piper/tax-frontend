@@ -1,4 +1,4 @@
-import { amountForPeriod, type PayPeriod } from './payPeriod';
+import { amountForPeriod, toCents, type PayPeriod } from './payPeriod';
 
 // Display formatting for money text. Pure string work: the amount is never
 // turned into a number, so no digit can be lost to float rounding.
@@ -98,6 +98,25 @@ export function displayWholeMoney(
   }
 }
 
+// Like displayMoney, but rounded to whole dollars (half away from zero) and with
+// no cents: "$53,786" for "53786.25". For the short label beside a chart's
+// marker, where cents are noise. The table keeps the exact figure.
+export function displayRoundedMoney(
+  yearly: string,
+  period: PayPeriod,
+  unit: MoneyUnit,
+): string {
+  try {
+    const cents = toCents(amountForPeriod(yearly, period));
+    const abs = cents < 0n ? -cents : cents;
+    const whole = (abs + 50n) / 100n;
+    const signed = `${cents < 0n && whole !== 0n ? '-' : ''}${whole.toString()}`;
+    return withUnit(groupThousands(signed), unit);
+  } catch {
+    return yearly;
+  }
+}
+
 // Moves the decimal point two places right in the text, so no digit is lost
 // and nothing is rounded: "0.2965" -> "29.65", "0.1" -> "10", "-0.2537" ->
 // "-25.37" (a rate below zero, where a benefit is bigger than the tax). Text
@@ -121,6 +140,21 @@ export function displayRate(amount: string, unit: MoneyUnit): string {
     return withUnit(groupThousands(amount), unit);
   const shifted = timesHundred(amount);
   return shifted === null ? amount : withUnit(shifted, unit);
+}
+
+// A rate shown to one decimal, rounded half away from zero: "0.2316" -> "23.2%",
+// "-0.2537" -> "-25.4%". Like displayRate for a unit that is not a percentage,
+// and for text it cannot read.
+export function displayRateOneDecimal(amount: string, unit: MoneyUnit): string {
+  const match = /^(-?)(0|[1-9]\d*)(?:\.(\d+))?$/.exec(amount);
+  if (unit.as_percentage !== true || !match) return displayRate(amount, unit);
+  const [, minus = '', whole = '', fraction = ''] = match;
+  // A fraction is a percent times 100, so tenths of a percent are the fraction times 1000.
+  const scale = 10n ** BigInt(fraction.length);
+  const tenths =
+    (BigInt(`${whole}${fraction}`) * 1000n * 2n + scale) / (scale * 2n);
+  const text = `${(tenths / 10n).toString()}.${(tenths % 10n).toString()}`;
+  return withUnit(minus !== '' && tenths !== 0n ? `-${text}` : text, unit);
 }
 
 // Short label for an axis tick, from a round value the chart chose. A rate

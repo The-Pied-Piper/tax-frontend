@@ -351,10 +351,16 @@ describe('the province comparison', () => {
     const withIt = make(true);
     const rest = withIt.sections
       .filter((s) => !chartHeadings.includes(s.heading))
-      // The take-home section keeps its words and gains its permalink and its chart.
+      // The take-home section keeps its words and gains its permalink, its chart and the chart's heading and line.
       .map(({ heading, blocks }) => ({
         heading,
-        blocks: blocks.filter((block) => block.kind !== 'salaryChart'),
+        blocks: blocks.filter(
+          (block) =>
+            block.kind !== 'salaryChart' &&
+            block.kind !== 'subheading' &&
+            JSON.stringify(block) !==
+              JSON.stringify(paragraph(strings.hubCharts.charts.takeHome.text)),
+        ),
       }));
     expect(rest).toEqual(without.sections);
   });
