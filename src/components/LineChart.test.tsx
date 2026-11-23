@@ -65,7 +65,7 @@ describe('LineChart', () => {
         series: [FIRST_SERIES],
       }),
     );
-    // Ticks -50k, 0, 50k, 100k, 150k: the zero line stays, with its neighbours' neighbours.
+    // Ticks -50k, 0, 50k, 100k, 150k: the zero line stays, and every other label from it.
     const hidden = [...container.querySelectorAll('text')]
       .filter((node) => /desktopOnly/.test(node.getAttribute('class') ?? ''))
       .map((node) => node.textContent);

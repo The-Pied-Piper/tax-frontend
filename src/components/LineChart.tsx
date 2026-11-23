@@ -224,7 +224,7 @@ export function LineChart({
           {xAxisLabel}
         </text>
         <text
-          className={[styles.tick, styles.title].join(' ')}
+          className={[styles.tick, styles.title, styles.yTitle].join(' ')}
           transform={`translate(11 ${String((TOP + PLOT_BOTTOM) / 2)}) rotate(-90)`}
           textAnchor="middle"
         >
