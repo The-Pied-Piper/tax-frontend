@@ -135,12 +135,13 @@ describe('SalaryChart', () => {
 
   it('draws every figure of a table in the one basis: the year total is income tax, CPP and EI less credits paid', () => {
     hub();
-    // At $3,000 Ontario pays $48.90 of EI and no income tax, and the Canada workers benefit is paid on filing.
+    // At $3,000 Ontario pays $48.90 of EI and no income tax. The year total takes off the Canada workers
+    // benefit paid on filing; the average and marginal rates do not count it.
     const rowAt = (chart: HubChartId) =>
       section(chart).getByRole('row', { name: /^\$3,000/, hidden: true });
     expect(rowAt('yearTotal')).toHaveTextContent('$48.90');
     expect(rowAt('averageRate')).toHaveTextContent('1.63%');
-    expect(rowAt('marginalRate')).toHaveTextContent('-25.37%');
+    expect(rowAt('marginalRate')).toHaveTextContent('1.63%');
   });
 
   it('moves the marker of every chart, and the announcement, with the keyboard in one', () => {

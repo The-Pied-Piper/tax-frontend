@@ -24,6 +24,8 @@ export type ProvinceHubText = {
   slug: FooterProvinceSlug;
   /** The forms of the province itself. */
   own: HubForm[];
+  /** True when a tax reduction in the province shrinks to zero as salary rises, which bends the marginal rate. Alberta and Saskatchewan have none. */
+  taxReduction: boolean;
 };
 
 /** The federal forms every hub lists, in the order shown. */
@@ -68,15 +70,21 @@ const CHART_SECTION_IDS = {
 /** A chart's section: its heading, its one line and the chart. The province's own text (#288) goes after the chart block. */
 function chartSection(
   chart: Exclude<HubChartId, 'takeHome'>,
-  province: FooterProvinceSlug,
+  text: ProvinceHubText,
+  name: string,
 ): ContentSection {
-  const { title, text } = strings.hubCharts.charts[chart];
+  const words = strings.hubCharts.charts[chart];
+  const province = text.slug;
+  const oneLine =
+    chart === 'marginalRate' && text.taxReduction
+      ? `${words.text} ${strings.hubCharts.marginalReduction}`
+      : words.text.replace('{place}', name);
   return {
-    heading: title,
+    heading: words.title,
     id: CHART_SECTION_IDS[chart],
     card: true,
     blocks: [
-      paragraph(text),
+      paragraph(oneLine),
       { kind: 'salaryChart', province, chart },
       { kind: 'chartNotes', province, chart },
     ],
@@ -87,6 +95,7 @@ function chartSection(
 export const provinceHubs: ProvinceHubText[] = [
   {
     slug: 'ca-on',
+    taxReduction: true,
     own: [
       {
         id: 'on428',
@@ -102,6 +111,7 @@ export const provinceHubs: ProvinceHubText[] = [
   },
   {
     slug: 'ca-ab',
+    taxReduction: false,
     own: [
       {
         id: 'ab428',
@@ -112,6 +122,7 @@ export const provinceHubs: ProvinceHubText[] = [
   },
   {
     slug: 'ca-bc',
+    taxReduction: true,
     own: [
       {
         id: 'bc428',
@@ -128,6 +139,7 @@ export const provinceHubs: ProvinceHubText[] = [
   },
   {
     slug: 'ca-mb',
+    taxReduction: true,
     own: [
       {
         id: 'mb428',
@@ -150,6 +162,7 @@ export const provinceHubs: ProvinceHubText[] = [
   },
   {
     slug: 'ca-sk',
+    taxReduction: false,
     own: [
       {
         id: 'sk428',
@@ -160,6 +173,7 @@ export const provinceHubs: ProvinceHubText[] = [
   },
   {
     slug: 'ca-nl',
+    taxReduction: true,
     own: [
       {
         id: 'nl428',
@@ -255,9 +269,9 @@ export function hubPage(
       },
       ...(withCharts
         ? [
-            chartSection('averageRate', text.slug),
-            chartSection('marginalRate', text.slug),
-            chartSection('yearTotal', text.slug),
+            chartSection('averageRate', text, name),
+            chartSection('marginalRate', text, name),
+            chartSection('yearTotal', text, name),
           ]
         : []),
       ...(!withCharts

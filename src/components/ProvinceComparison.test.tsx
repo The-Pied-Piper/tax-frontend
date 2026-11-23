@@ -143,12 +143,12 @@ describe('the measure toggle', () => {
     show();
     fireEvent.click(measure(copy.measures.averageRate));
     expect(barTexts()).toEqual([
-      `${names['ca-nl']}18.88%`,
-      `${names['ca-mb']}18.6%`,
-      `${names['ca-sk']}17.5%`,
-      `${names['ca-on']}15.91%`,
-      `${names['ca-ab']}15.45%`,
-      `${names['ca-bc']}15.1%`,
+      `${names['ca-nl']}26.14%`,
+      `${names['ca-mb']}25.86%`,
+      `${names['ca-sk']}24.76%`,
+      `${names['ca-on']}23.16%`,
+      `${names['ca-ab']}22.7%`,
+      `${names['ca-bc']}22.36%`,
     ]);
     expect(screen.getByText(copy.measureNotes.averageRate)).toBeInTheDocument();
   });
@@ -267,7 +267,7 @@ describe('the table of the figures', () => {
         name: copy.measures.averageRate,
       }),
     ).toBeInTheDocument();
-    expect(within(table).getByText('15.91%')).toBeInTheDocument();
+    expect(within(table).getByText('23.16%')).toBeInTheDocument();
   });
 });
 

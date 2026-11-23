@@ -295,8 +295,9 @@ describe('hubChartBlocks', () => {
       '0.1234',
       '0.2965',
       '1234.56',
-      '0.1234',
     ]),
+    edges: [],
+    facts: {},
   });
 
   it('gives each swept province a hub block holding every province', () => {

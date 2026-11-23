@@ -133,12 +133,12 @@ describe('comparisonRows', () => {
   it('puts the highest average rate first, in the rate unit', () => {
     const rows = comparisonRows(sampleSweeps, at70000, 'averageRate');
     expect(rows.map((row) => [row.slug, row.value])).toEqual([
-      ['ca-nl', '0.1888'],
-      ['ca-mb', '0.1860'],
-      ['ca-sk', '0.1750'],
-      ['ca-on', '0.1591'],
-      ['ca-ab', '0.1545'],
-      ['ca-bc', '0.1510'],
+      ['ca-nl', '0.2614'],
+      ['ca-mb', '0.2586'],
+      ['ca-sk', '0.2476'],
+      ['ca-on', '0.2316'],
+      ['ca-ab', '0.2270'],
+      ['ca-bc', '0.2236'],
     ]);
     expect(rows.every((row) => row.unit.as_percentage === true)).toBe(true);
     const money = comparisonRows(sampleSweeps, at70000, 'takeHome');
@@ -170,16 +170,7 @@ describe('comparisonRows', () => {
     const negative = {
       ...on,
       points: [
-        [
-          '1000.00',
-          '1000.00',
-          '0.00',
-          '-50.00',
-          '0.0000',
-          '0.0505',
-          '0.00',
-          '0.0000',
-        ],
+        ['1000.00', '1000.00', '0.00', '-50.00', '0.0000', '0.0505', '0.00'],
       ] as typeof on.points,
     };
     const mixed = comparisonRows(
@@ -188,16 +179,7 @@ describe('comparisonRows', () => {
         {
           ...ab,
           points: [
-            [
-              '1000.00',
-              '1000.00',
-              '0.00',
-              '20.00',
-              '0.02',
-              '0.05',
-              '0.00',
-              '0.0000',
-            ],
+            ['1000.00', '1000.00', '0.00', '20.00', '0.02', '0.05', '0.00'],
           ],
         },
       ],

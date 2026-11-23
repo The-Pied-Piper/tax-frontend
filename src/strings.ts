@@ -39,6 +39,9 @@ export const strings = {
     chartLabel: (title: string, from: string, to: string) =>
       `Line chart: ${title} against salary, from ${from} to ${to}. The same figures are in the table below the chart.`,
     note: 'These are estimates for a single person whose only income is a salary.',
+    // Added to the marginal rate's line on a hub whose province has a tax reduction that shrinks to zero (not Alberta or Saskatchewan).
+    marginalReduction:
+      'In some provinces it also rises across a band of lower salaries, while a tax reduction shrinks to zero.',
     // One entry per chart: its title (the section heading, or for take-home a sub-heading in the existing section), its one line, and its table column.
     charts: {
       takeHome: {
@@ -48,12 +51,13 @@ export const strings = {
       },
       averageRate: {
         title: 'Average tax rate',
-        text: 'Of your whole salary, the share that goes to income tax, Canada Pension Plan and Employment Insurance, less benefits paid to you when you file. It is below zero where those benefits are bigger than what you pay.',
+        // {place} is the province's name.
+        text: 'The share of your salary that goes to income tax, Canada Pension Plan and Employment Insurance together. Federal and {place} income tax both count.',
         header: 'Average rate',
       },
       marginalRate: {
         title: 'Marginal tax rate',
-        text: 'Of each extra dollar of salary, how much goes to income tax, Canada Pension Plan and Employment Insurance, plus how much you lose in benefits paid when you file. The rate steps up where a new tax bracket starts. It also rises across a band of lower salaries, while the Canada workers benefit shrinks, and in some provinces while a tax reduction shrinks.',
+        text: 'Out of your next dollar of salary, the share that goes to income tax, Canada Pension Plan and Employment Insurance. The rate steps up where a new tax bracket starts.',
         header: 'Marginal rate',
       },
       yearTotal: {
@@ -71,7 +75,7 @@ export const strings = {
       measures: {
         takeHome: 'Take-home pay',
         incomeTax: 'Income tax',
-        averageRate: 'Average income tax rate',
+        averageRate: 'Average tax rate',
       },
       // Shorter wording for the toggle on narrow phones only, where the full label does not fit one line.
       measuresPhone: {
@@ -81,11 +85,11 @@ export const strings = {
       },
       measureNotes: {
         takeHome:
-          'Your salary minus income tax, pension plan payments and Employment Insurance, before any credits paid to you when you file.',
+          'Your salary minus income tax, Canada Pension Plan payments and Employment Insurance. Tax cuts such as the Ontario LIFT Credit count.',
         incomeTax:
-          'The federal and provincial income tax you owe for the year, before any credits paid to you.',
+          'The federal and provincial income tax you owe for the year, after the credits that lower it.',
         averageRate:
-          'Income tax divided by salary, before any credits paid to you.',
+          'Income tax, Canada Pension Plan payments and Employment Insurance, added together, divided by your salary.',
       },
       caption: (salary: string, year: number) =>
         `Bars are for a ${salary} salary in ${String(year)}, from highest to lowest.`,

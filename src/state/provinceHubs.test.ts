@@ -400,7 +400,7 @@ describe('the province comparison', () => {
       [
         'average-rate',
         [
-          paragraph(t.averageRate.text),
+          paragraph(t.averageRate.text.replace('{place}', 'Ontario')),
           { kind: 'salaryChart', province: 'ca-on', chart: 'averageRate' },
           { kind: 'chartNotes', province: 'ca-on', chart: 'averageRate' },
         ],
@@ -408,7 +408,9 @@ describe('the province comparison', () => {
       [
         'marginal-rate',
         [
-          paragraph(t.marginalRate.text),
+          paragraph(
+            `${t.marginalRate.text} ${strings.hubCharts.marginalReduction}`,
+          ),
           { kind: 'salaryChart', province: 'ca-on', chart: 'marginalRate' },
           { kind: 'chartNotes', province: 'ca-on', chart: 'marginalRate' },
         ],
@@ -488,5 +490,41 @@ describe('the copy rules', () => {
     samples.forEach((text, at) => {
       expect(text).toMatch(copyRules[at]?.[1] ?? /^$/);
     });
+  });
+});
+
+describe('the one-line text of the rate charts', () => {
+  const marginalLine = (slug: string): string | undefined => {
+    const text = provinceHubs.find((hub) => hub.slug === slug);
+    if (!text) throw new Error(`no hub for ${slug}`);
+    const page = hubPage(text, slug, [], new Set(), [], true);
+    const found = page.sections.find(
+      (entry) => entry.heading === strings.hubCharts.charts.marginalRate.title,
+    );
+    const [first] = found?.blocks ?? [];
+    return first?.kind === 'paragraph'
+      ? JSON.stringify(first.content)
+      : undefined;
+  };
+
+  it('adds the sentence about a tax reduction only where one shrinks to zero, so not for Alberta or Saskatchewan', () => {
+    for (const slug of ['ca-on', 'ca-bc', 'ca-mb', 'ca-nl']) {
+      expect(marginalLine(slug), slug).toContain('a tax reduction shrinks');
+    }
+    for (const slug of ['ca-ab', 'ca-sk']) {
+      expect(marginalLine(slug), slug).not.toContain('a tax reduction');
+    }
+  });
+
+  it('names the province in the average rate line', () => {
+    const text = provinceHubs.find((hub) => hub.slug === 'ca-bc');
+    if (!text) throw new Error('no hub for ca-bc');
+    const page = hubPage(text, 'British Columbia', [], new Set(), [], true);
+    const found = page.sections.find(
+      (entry) => entry.heading === strings.hubCharts.charts.averageRate.title,
+    );
+    expect(JSON.stringify(found?.blocks[0])).toContain(
+      'Federal and British Columbia income tax both count.',
+    );
   });
 });

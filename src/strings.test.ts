@@ -40,7 +40,7 @@ describe('the province comparison copy', () => {
     expect(copy.measures).toEqual({
       takeHome: 'Take-home pay',
       incomeTax: 'Income tax',
-      averageRate: 'Average income tax rate',
+      averageRate: 'Average tax rate',
     });
     expect(copy.measuresPhone).toEqual({
       takeHome: 'Take-home pay',
@@ -49,11 +49,11 @@ describe('the province comparison copy', () => {
     });
     expect(copy.measureNotes).toEqual({
       takeHome:
-        'Your salary minus income tax, pension plan payments and Employment Insurance, before any credits paid to you when you file.',
+        'Your salary minus income tax, Canada Pension Plan payments and Employment Insurance. Tax cuts such as the Ontario LIFT Credit count.',
       incomeTax:
-        'The federal and provincial income tax you owe for the year, before any credits paid to you.',
+        'The federal and provincial income tax you owe for the year, after the credits that lower it.',
       averageRate:
-        'Income tax divided by salary, before any credits paid to you.',
+        'Income tax, Canada Pension Plan payments and Employment Insurance, added together, divided by your salary.',
     });
     expect(copy.caption('$70,000', 2026)).toBe(
       'Bars are for a $70,000 salary in 2026, from highest to lowest.',

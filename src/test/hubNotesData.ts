@@ -1,6 +1,12 @@
 import sweeps from './hubNotesSweep.json';
 import { cad, percent } from './units';
-import type { HubChartsData, SweepPoint } from '../state/hubCharts';
+import type { HubChartsData, SweepEdge, SweepPoint } from '../state/hubCharts';
+
+type Saved = {
+  points: SweepPoint[];
+  edges: SweepEdge[];
+  facts: Record<string, string>;
+};
 
 /**
  * The full sweep (all 307 salaries) of the six provinces, one engine run in the form the build
@@ -11,18 +17,20 @@ import type { HubChartsData, SweepPoint } from '../state/hubCharts';
 export function fullHubCharts(
   slugs: string[] = Object.keys(sweeps),
 ): HubChartsData {
-  const byProvince = sweeps as unknown as Record<string, SweepPoint[]>;
+  const byProvince = sweeps as unknown as Record<string, Saved>;
   return {
     provinces: slugs.map((slug) => {
-      const points = byProvince[slug];
-      if (!points) throw new Error(`No full sweep for ${slug}`);
+      const saved = byProvince[slug];
+      if (!saved) throw new Error(`No full sweep for ${slug}`);
       return {
         slug,
         year: 2026,
         provisional: true,
         unit: cad,
         rateUnit: percent,
-        points,
+        points: saved.points,
+        edges: saved.edges,
+        facts: saved.facts,
       };
     }),
   };

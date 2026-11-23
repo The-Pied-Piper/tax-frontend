@@ -18,15 +18,18 @@ export type EngineSweepPoint = {
   total_deductions: string;
   income_tax: string;
   take_home: string;
-  average_income_tax_rate: string;
-  net_total: string;
-  net_average_rate: string;
-  net_marginal_rate: string;
+  average_rate: string;
+  marginal_rate: string;
+  year_total: string;
 };
 
 /** The sweep of one province: its points, lowest salary first, and the units written once. */
 export type EngineSweep = {
   points: EngineSweepPoint[];
+  /** Where the marginal rate changes: [the sweep salary below, the salary it first moves, the salary it has settled, the rate there]. */
+  edges: string[][];
+  /** Engine parameters and band figures the notes quote, by name, as text. */
+  facts: Record<string, string>;
   units: {
     unit: unknown;
     average_income_tax_rate: unknown;
@@ -38,10 +41,9 @@ const POINT_FIELDS = [
   'total_deductions',
   'income_tax',
   'take_home',
-  'average_income_tax_rate',
-  'net_total',
-  'net_average_rate',
-  'net_marginal_rate',
+  'average_rate',
+  'marginal_rate',
+  'year_total',
 ] as const;
 
 function isSweepPoint(value: unknown): value is EngineSweepPoint {
@@ -54,7 +56,7 @@ function readSweep(
   code: string,
   province: Record<string, unknown>,
 ): EngineSweep {
-  const { sweep, sweep_units: units } = province;
+  const { sweep, sweep_units: units, edges, facts } = province;
   if (!Array.isArray(sweep) || !sweep.every(isSweepPoint)) {
     throw new Error(`Engine figures: ${code} has no valid sweep`);
   }
@@ -65,8 +67,27 @@ function readSweep(
   ) {
     throw new Error(`Engine figures: ${code} has no sweep units`);
   }
+  if (
+    !Array.isArray(edges) ||
+    !edges.every(
+      (edge) =>
+        Array.isArray(edge) &&
+        edge.length === 4 &&
+        edge.every((part) => typeof part === 'string'),
+    )
+  ) {
+    throw new Error(`Engine figures: ${code} has no valid edges`);
+  }
+  if (
+    !isRecord(facts) ||
+    !Object.values(facts).every((fact) => typeof fact === 'string')
+  ) {
+    throw new Error(`Engine figures: ${code} has no valid facts`);
+  }
   return {
     points: sweep,
+    edges: edges as string[][],
+    facts: facts as Record<string, string>,
     units: {
       unit: units.unit,
       average_income_tax_rate: units.average_income_tax_rate,

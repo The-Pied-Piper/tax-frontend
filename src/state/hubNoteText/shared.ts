@@ -13,42 +13,65 @@ export function note(text: string, pool: Record<string, string>): Note {
 
 /** What differs between provinces in the wording every province shares. */
 export type SharedFigures = {
-  /** Where the line of take-home pay turns straight (the top rate has begun). */
+  /** A sweep salary just below where the line turns straight (the top rate has begun). The engine's own figure is read from the data. */
   flatFrom: string;
-  /** The Canada workers benefit: what it builds up by a dollar, the salary it starts above, its most, and where it has built up fully. */
-  cwbRate: string;
-  cwbStart: string;
-  cwbMax: string;
-  cwbTo: string;
-  /** The levels the average rate passes that the sweep reaches, as fractions: "0.10". */
-  levels: string[];
 };
 
-const POOL = {
-  cpeStop: 's:85000:cpe',
+/**
+ * The figures several bullets share, as specs (see `hubNotes.ts`). A change of the marginal rate is named by a
+ * salary near it (`e:` is where the new rate has taken hold, `o:` where the rate first moves); the figure shown
+ * is the engine's.
+ */
+export const POOL = {
+  // Employment Insurance as the Employment Insurance form sets it: nothing up to $2,000, then a dollar of
+  // premium for every dollar earned, until the full premium applies.
+  eiFloor: 'd:2000',
+  eiEnd: 'f:ei_band_end',
+  eiTop: 'f:ei_band_top',
+  zero: 'r:marginal@1000',
+  all: 'r:marginal@2020',
+  eiCents: 't:ei_rate',
+  eiAvgFrom: 'e:2020',
+  eiAvg: 'r:average@2040',
+  // Where federal income tax starts, and the rates either side of it.
+  fedStart: 'e:19000',
+  low: 'r:marginal@12000',
+  fed: 'r:marginal@20000',
+  // The Canada Pension Plan and Employment Insurance together.
+  cpeCents: 'c:marginal@12000',
   cpeMax: 'm:cpe@85000',
-  eiStop: 'd:69000',
-  cppStop: 'e:74600:marginal',
+  eiStop: 'f:ei_stop',
+  cppStop: 'e:74000',
+  cpeStop: 'e:84000',
   top: 'd:500000',
+  topRate: 'r:marginal@300000',
   keepTop: 'k:marginal@300000',
   keepAll: 'q:takeHome@500000',
-  avgTop: 'r:average@500000',
-  topRate: 'r:marginal@300000',
-  half: 'h:average',
-  eiRefund: 'm:cpe@2000',
+  perTen: 'u:marginal@300000',
   total70: 'm:total@70000',
   total100: 'm:total@100000',
   total500: 'm:total@500000',
-  perTen: 'u:marginal@300000',
-  eiBack: 'r:average@2040',
+  avg10: 'r:average@10000',
+  avg20: 'r:average@20000',
+  avg30: 'r:average@30000',
+  avg50: 'r:average@50000',
+  avg70: 'r:average@70000',
+  avg100: 'r:average@100000',
+  avgTop: 'r:average@500000',
+  // The federal 20.5% bracket, and the rates once Employment Insurance and the Canada Pension Plan stop.
+  fedBracket: 'e:59000',
+  fedBracketRate: 'p:federal_second_rate',
+  afterEi: 'r:marginal@69000',
+  afterCpp: 'r:marginal@75000',
+  afterCpe: 'r:marginal@85000',
 } as const;
 
 /** The bullets of the "take-home pay" chart, the same wording in every province. */
 export function takeHomeNotes(f: SharedFigures): Note[] {
-  const pool = { ...POOL, flatFrom: `e:${f.flatFrom}:marginal` };
+  const pool = { ...POOL, flatFrom: `e:${f.flatFrom}` };
   return [
     note(
-      'Canada Pension Plan and Employment Insurance together stop growing at {cpeStop}, at most {cpeMax} a year. Employment Insurance stops growing at about {eiStop}, and the Canada Pension Plan at about {cpeStop}. Above that, each extra dollar loses only income tax.',
+      'Canada Pension Plan and Employment Insurance together stop growing at {cpeStop}, at most {cpeMax} a year. Employment Insurance stops growing at about {eiStop}, and the Canada Pension Plan at about {cppStop}. Above that, each extra dollar loses only income tax.',
       pool,
     ),
     note(
@@ -58,115 +81,73 @@ export function takeHomeNotes(f: SharedFigures): Note[] {
   ];
 }
 
-/** The low-salary bullets of the "average tax rate" chart, by kind of province. */
-export const averageLow = {
-  // Ontario, Saskatchewan, Newfoundland and Labrador.
-  standard: (start: string): Note[] => [
+/** The bullets of the "average tax rate" chart. `second` is the bullet about where income tax starts, which Manitoba words for itself; `extra` follows the shared ones. */
+export function averageRateNotes(
+  second: Note[] = [
     note(
-      'Up to $2,000 the average is 0%. Employment Insurance is taken from your pay and refunded when you file, so the net is nothing. Just above $2,000 you lose that refund and the average is about {eiBack}.',
+      'Up to about {fedStart} you pay no income tax, only Canada Pension Plan and Employment Insurance. The average is {avg10} at $10,000 and {avg20} at $20,000.',
       POOL,
     ),
-    note(
-      'From about {start} the Canada workers benefit, which is paid when you file, is bigger than what you pay, so the average is below zero. It is lowest, {lowest}, at {lowAt}, and turns positive at {positive}.',
-      {
-        ...POOL,
-        start: `e:${start}:average`,
-        lowest: 'v:average',
-        lowAt: 'w:average',
-        positive: 'z:average',
-      },
-    ),
   ],
-  alberta: (start: string): Note[] => [
-    note(
-      'Up to $2,000 the average is 0%, for the same Employment Insurance reason.',
-      POOL,
-    ),
-    note(
-      'From about {start} the Canada workers benefit is bigger than what you pay, so the average is below zero. It is lowest, about {lowest}, at {lowAt}, and turns positive at about {positive}.',
-      {
-        ...POOL,
-        start: `e:${start}:average`,
-        lowest: 'v:average',
-        lowAt: 'w:average',
-        positive: 'z:average',
-      },
-    ),
-  ],
-  // British Columbia and Manitoba: a provincial credit is paid from the first dollar.
-  credit: (name: string, ending = '.', about = 'about '): Note[] => [
-    note(
-      `Your ${name} is paid from the first dollar, so the average is below zero at every salary up to about {positive}. It is lowest, ${about}{lowest}, at {lowAt}${ending}`,
-      {
-        ...POOL,
-        lowest: 'v:average',
-        lowAt: 'w:average',
-        positive: 'z:average',
-      },
-    ),
-  ],
-};
-
-/** The bullets of the "average tax rate" chart: the province's low-salary bullets, then the wording every province shares. */
-export function averageRateNotes(f: SharedFigures, low: Note[]): Note[] {
-  const pool: Record<string, string> = { ...POOL };
-  const passes = f.levels.map((level) => {
-    const name = `p${level.slice(2)}`;
-    pool[name] = `x:average:${level}`;
-    return `${level.slice(2)}% at {${name}}`;
-  });
-  const list =
-    passes.length > 1
-      ? `${passes.slice(0, -1).join(', ')} and ${passes[passes.length - 1] ?? ''}`
-      : (passes[0] ?? '');
+  extra: Note[] = [],
+): Note[] {
   return [
-    ...low,
-    note(`The average passes ${list}.`, pool),
     note(
-      'It climbs more slowly than the marginal rate, because each higher rate applies only to the dollars above its bracket. At {top} the average is {avgTop}, while the top marginal rate is {topRate}. It reaches half of its {top} value at {half}.',
-      pool,
+      'Up to {eiFloor} the average is {zero}. Employment Insurance starts just above {eiFloor} and counts for more as your salary rises, until the full rate applies by about {eiEnd}. The average is about {eiAvg} from about {eiAvgFrom}.',
+      POOL,
+    ),
+    ...second,
+    note(
+      'After that the average climbs: {avg30} at $30,000, {avg50} at $50,000, {avg70} at $70,000 and {avg100} at $100,000.',
+      POOL,
+    ),
+    note(
+      'It climbs more slowly than the marginal rate, because each higher rate applies only to the dollars above its bracket. At {top} the average is {avgTop}, while the top marginal rate is {topRate}.',
+      POOL,
+    ),
+    ...extra,
+  ];
+}
+
+/**
+ * The first bullets of the "marginal tax rate" chart: Employment Insurance up to and just above $2,000, the
+ * rate where only the pension plan and insurance apply, and where they stop. `between` is the bullet about
+ * the rate from $4,000 to where income tax starts, which Manitoba words for itself.
+ */
+export function marginalLowNotes(
+  between: Note[] = [
+    note(
+      'From $4,000 to about {fedStart} the rate is {low}: Canada Pension Plan and Employment Insurance, with no income tax yet. It is {fed} from {fedStart}, when federal income tax starts.',
+      POOL,
+    ),
+  ],
+): Note[] {
+  return [
+    note(
+      'Up to {eiFloor} the rate is {zero}. From {eiFloor} to about {eiEnd} the rate is {all}, because the Employment Insurance counted rises by $1 for every $1 of salary, until it reaches the full {eiTop}. After that it takes {eiCents} of each extra dollar.',
+      POOL,
+    ),
+    ...between,
+    note(
+      'Canada Pension Plan and Employment Insurance take about {cpeCents} of each dollar. Employment Insurance stops at about {eiStop}, and the main Canada Pension Plan amount at {cppStop}. A second Canada Pension Plan tier takes {tier} of each dollar from {cppStop} to {cpeStop}, so the rate falls less at {cppStop} than at {cpeStop}.',
+      { ...POOL, tier: 'l:4 cents' },
     ),
   ];
 }
 
-/** The first three bullets of the "marginal tax rate" chart; `credit` provinces drop the first clause about the Employment Insurance refund below $2,000. */
-export function marginalLowNotes(
-  f: SharedFigures,
-  credit = false,
-  takes = 'l:7.6 cents',
-): Note[] {
-  const pool: Record<string, string> = {
-    ...POOL,
-    cwbTo: `e:${f.cwbTo}:marginal`,
-    cwbRate: `l:${f.cwbRate}`,
-    cwbStart: `d:${f.cwbStart}`,
-    cwbMax: `d:${f.cwbMax}`,
-    cwbFrom: 'e:3000:marginal',
-    takes,
-  };
-  return [
-    note(
-      credit
-        ? 'Employment Insurance is refunded when you file if you earn $2,000 or less. Earn a dollar more and you lose that refund, about {eiRefund} in all, so the rate spikes just past $2,000.'
-        : 'Up to $2,000 the rate is 0%: Employment Insurance is refunded when you file. Earn a dollar more and you lose that refund, about {eiRefund} in all, so the rate spikes just past $2,000.',
-      pool,
-    ),
-    note(
-      'Then, from {cwbFrom} to about {cwbTo}, the rate is below zero. The Canada workers benefit is paid when you file. For a low salary it builds up by {cwbRate} for every dollar earned above {cwbStart}, to at most about {cwbMax}. Counting that benefit, each extra dollar of salary leaves you with more than a dollar, so the rate is below zero.',
-      pool,
-    ),
-    note(
-      'Canada Pension Plan and Employment Insurance take about {takes} of each dollar. The rate steps down where they stop: Employment Insurance at about {eiStop}, the main Canada Pension Plan amount at {cppStop} and its second tier at {cpeStop}.',
-      pool,
-    ),
-  ];
+/** The last bullet of the "marginal tax rate" chart: the line turns straight. */
+export function straightLineNote(f: SharedFigures): Note {
+  return note(
+    'From {flatFrom} of salary the line is straight: the rate stops rising, and every extra dollar loses the top rate, {topRate}.',
+    { ...POOL, flatFrom: `e:${f.flatFrom}` },
+  );
 }
 
 /** The bullets of the "tax and contributions for the year" chart, the same wording in every province. */
 export function yearTotalNotes(f: SharedFigures): Note[] {
   const pool: Record<string, string> = {
     ...POOL,
-    flatFrom: `e:${f.flatFrom}:marginal`,
+    flatFrom: `e:${f.flatFrom}`,
   };
   return [
     note(
