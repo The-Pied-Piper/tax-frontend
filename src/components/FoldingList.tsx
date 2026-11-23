@@ -16,39 +16,39 @@ function folds(items: readonly FoldingItem[]): boolean {
   return total > FOLD_ABOVE_CHARACTERS && items.length > FOLD_SHOWN_ITEMS + 1;
 }
 
-/**
- * A bullet or plain list that keeps a long page short (#294). A list over
- * `FOLD_ABOVE_CHARACTERS` of text shows its first `FOLD_SHOWN_ITEMS` items and
- * puts the rest behind a "See more" link that opens them in place (a native
- * details element, so the pre-built page works without script). Shorter lists
- * are drawn whole. `listClassName` styles every list drawn; `chart` marks the first one.
- */
 type Props = {
   items: readonly FoldingItem[];
   listClassName: string | undefined;
   /** An extra class on the list behind the link, for a list whose first item is styled differently. */
   foldedClassName?: string;
-  /** The chart whose notes these are: written on the first list as `data-chart-notes`. */
-  chart?: string;
+  /** Data attributes for the first list. */
+  data?: Record<`data-${string}`, string>;
 };
 
+/**
+ * A bullet or plain list that keeps a long page short (#294). A list over
+ * `FOLD_ABOVE_CHARACTERS` of text shows its first `FOLD_SHOWN_ITEMS` items and
+ * puts the rest behind a "See more" link that opens them in place (a native
+ * details element, so the pre-built page works without script). Shorter lists
+ * are drawn whole. `listClassName` styles every list drawn; `data` goes on the first one.
+ */
 export function FoldingList({
   items,
   listClassName,
   foldedClassName,
-  chart,
+  data,
 }: Props) {
   const li = (item: FoldingItem) => <li key={item.key}>{item.content}</li>;
   if (!folds(items)) {
     return (
-      <ul className={listClassName} data-chart-notes={chart}>
+      <ul className={listClassName} {...data}>
         {items.map(li)}
       </ul>
     );
   }
   return (
     <>
-      <ul className={listClassName} data-chart-notes={chart}>
+      <ul className={listClassName} {...data}>
         {items.slice(0, FOLD_SHOWN_ITEMS).map(li)}
       </ul>
       <details className={styles.fold}>

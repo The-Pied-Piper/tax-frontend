@@ -1,11 +1,11 @@
 import { cleanup, render, screen } from '@testing-library/react';
 import { renderToString } from 'react-dom/server';
 import { FoldingList, type FoldingItem } from './FoldingList';
+import { strings } from '../strings';
 
 /** The limits the list folds at: over 1,000 characters, the first 3 items stay. */
 const FOLD_ABOVE_CHARACTERS = 1000;
 const FOLD_SHOWN_ITEMS = 3;
-import { strings } from '../strings';
 
 /** `count` items that share `total` characters between them. */
 function items(count: number, total: number): FoldingItem[] {

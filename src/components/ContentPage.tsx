@@ -49,7 +49,7 @@ function ContentBlockView({
       return notes.length === 0 ? null : (
         <FoldingList
           listClassName={styles.notes}
-          chart={block.chart}
+          data={{ 'data-chart-notes': block.chart }}
           items={notes.map((words) => ({
             key: words,
             length: words.length,
