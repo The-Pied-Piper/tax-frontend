@@ -1,6 +1,6 @@
 import { separatorsFor } from '../money/salaryInput';
 import { SAMPLE_SALARIES, sampleSweeps } from '../test/comparisonData';
-import { sweepSalaries } from './hubCharts';
+import { regularSalaries } from './hubCharts';
 import {
   comparisonRows,
   DEFAULT_SALARY,
@@ -12,7 +12,7 @@ import {
 const english = separatorsFor('en');
 const french = separatorsFor('fr');
 // The full sweep, as the build writes it: salaries are quantized amounts.
-const full = sweepSalaries().map((salary) => `${salary}.00`);
+const full = regularSalaries().map((salary) => `${salary}.00`);
 
 describe('the measures', () => {
   it('are take-home pay, income tax and the average rate, in that order', () => {
@@ -170,7 +170,16 @@ describe('comparisonRows', () => {
     const negative = {
       ...on,
       points: [
-        ['1000.00', '1000.00', '0.00', '-50.00', '0.0000', '0.0505'],
+        [
+          '1000.00',
+          '1000.00',
+          '0.00',
+          '-50.00',
+          '0.0000',
+          '0.0505',
+          '0.00',
+          '0.0000',
+        ],
       ] as typeof on.points,
     };
     const mixed = comparisonRows(
@@ -178,7 +187,18 @@ describe('comparisonRows', () => {
         negative,
         {
           ...ab,
-          points: [['1000.00', '1000.00', '0.00', '20.00', '0.02', '0.05']],
+          points: [
+            [
+              '1000.00',
+              '1000.00',
+              '0.00',
+              '20.00',
+              '0.02',
+              '0.05',
+              '0.00',
+              '0.0000',
+            ],
+          ],
         },
       ],
       0,

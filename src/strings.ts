@@ -23,47 +23,46 @@ export const strings = {
     },
   },
   hubCharts: {
-    heading: 'How your pay changes with salary',
-    intro: (chartCount: 'four' | 'five') =>
-      `Each chart has a point for every $1,000 of salary up to $250,000, and for every $5,000 above that. Move over a chart, or tap it, to read the figures. The marker follows on all ${chartCount} charts.`,
     perYear: 'Per year',
     perMonth: 'Per month',
     hover: (salary: string, value: string) => `At a ${salary} salary: ${value}`,
     perPeriod: (value: string, period: 'annually' | 'monthly') =>
       `${value} ${period === 'monthly' ? 'a month' : 'a year'}`,
     monthNote: 'Per month is the yearly figure divided by 12.',
+    // Read aloud when the marker moves; not shown.
     readout: (salary: string) => `Salary ${salary} a year`,
     showTable: 'Show the figures as a table',
     hideTable: 'Hide the table',
-    headers: {
-      salary: 'Salary',
-      average: 'Average rate',
-      marginal: 'Marginal rate',
-      takeHome: 'Take-home',
-      incomeTax: 'Income tax',
-    },
+    salaryHeader: 'Salary',
     salaryAxis: 'Salary before tax',
     percentOfSalary: 'Percent of your salary',
     percentOfExtra: 'Percent of each extra dollar',
     dollarsYear: 'Dollars a year',
     dollarsMonth: 'Dollars a month',
     chartLabel: (title: string, from: string, to: string) =>
-      `Line chart: ${title} against salary, from ${from} to ${to}. The same figures are in the table below the charts.`,
+      `Line chart: ${title} against salary, from ${from} to ${to}. The same figures are in the table below the chart.`,
     note: "These are the calculator's own estimates for a single person whose only income is a salary. They are not tax advice.",
     provisional: (year: number) =>
       `The ${year.toString()} figures are provisional.`,
-    averageTitle: 'Average income tax rate',
-    averageText: (place: string) =>
-      `The share of your salary that goes to income tax, federal and ${place} together.`,
-    marginalTitle: 'Marginal income tax rate',
-    marginalText: (place: string) =>
-      `The income tax on your next dollar of salary, federal and ${place} together. Canada Pension Plan and Employment Insurance are not included, and neither are credits paid to you when you file. The rate steps up where a new tax bracket starts. In some provinces it also rises across a band of lower salaries, while a tax reduction shrinks to zero.`,
-    takeHomeTitle: 'Take-home pay',
-    takeHomeText:
-      'Your salary minus income tax, Canada Pension Plan and Employment Insurance. It is before any credits paid to you when you file.',
-    incomeTaxTitle: 'Income tax for the year',
-    incomeTaxText: (place: string) =>
-      `The federal and ${place} income tax you owe for the year, after the credits that lower your tax and before any credits paid to you.`,
+    // One entry per chart: its title (the section heading, except for take-home, whose section already exists), its one line, and its table column.
+    charts: {
+      takeHome: { title: 'Take-home pay', header: 'Take-home' },
+      averageRate: {
+        title: 'Average tax rate',
+        text: 'Of your whole salary, the share that goes to income tax, Canada Pension Plan and Employment Insurance, less benefits paid to you when you file. It is below zero where those benefits are bigger than what you pay.',
+        header: 'Average rate',
+      },
+      marginalRate: {
+        title: 'Marginal tax rate',
+        text: 'Of each extra dollar of salary, how much goes to income tax, Canada Pension Plan and Employment Insurance, plus how much you lose in benefits paid when you file. The rate steps up where a new tax bracket starts. It also rises across a band of lower salaries, while the Canada workers benefit shrinks, and in some provinces while a tax reduction shrinks.',
+        header: 'Marginal rate',
+      },
+      yearTotal: {
+        title: 'Tax and contributions for the year',
+        text: 'Income tax, Canada Pension Plan and Employment Insurance for the year, less benefits paid to you when you file. Below zero means money comes back to you.',
+        header: 'Tax and contributions',
+      },
+    },
     // The province comparison on a hub; amounts come from money/format.
     comparison: {
       heading: 'Compare provinces at one salary',

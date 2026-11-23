@@ -24,8 +24,6 @@ export interface ChartSeries {
 }
 
 type Props = {
-  title: string;
-  description: string;
   /** Sorted by salary. */
   points: readonly ChartPoint[];
   /** One or two lines; values[i] of each point belongs to series[i]. */
@@ -60,12 +58,10 @@ const PLOT_BOTTOM = HEIGHT - BOTTOM;
 const LABEL_TOP = scalePosition('22', '0', '1', 0, 1);
 const LABEL_FLIPS_AFTER = scalePosition('3', '0', '5', 0, WIDTH);
 
-// One chart of the hub card: a figure with the title, the words, the lines and
+// One chart of a hub: a figure with the lines and
 // the shared marker. Controlled and presentational: no fetch, no storage, no
 // arithmetic of its own; positions come from money/scale.
 export function LineChart({
-  title,
-  description,
   points,
   series,
   xMin,
@@ -146,8 +142,6 @@ export function LineChart({
 
   return (
     <figure className={styles.chart}>
-      <h3 className={styles.title}>{title}</h3>
-      <p className={styles.description}>{description}</p>
       <svg
         ref={svgRef}
         className={styles.svg}

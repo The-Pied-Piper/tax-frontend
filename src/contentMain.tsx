@@ -1,12 +1,12 @@
 import { StrictMode } from 'react';
 import { createRoot, hydrateRoot } from 'react-dom/client';
 import { ProvinceComparison } from './components/ProvinceComparison';
-import { SalaryChartsCard } from './components/SalaryChartsCard';
+import { SalaryChart } from './components/SalaryChart';
 import { ThemeToggle } from './components/ThemeToggle';
-import { parseHubChartsData } from './state/hubCharts';
+import { HUB_CHART_IDS, parseHubChartsData } from './state/hubCharts';
 import {
   HUB_CHARTS_DATA_ID,
-  HUB_CHARTS_SLOT_ID,
+  HUB_CHART_SLOT_IDS,
   PROVINCE_COMPARISON_SLOT_ID,
 } from './state/hubSlots';
 import { FOOTER_PROVINCE_SLUGS } from './state/siteLinks';
@@ -21,7 +21,7 @@ import './components/ContentPage.module.css';
 import './components/ChartPeriodSwitch.module.css';
 import './components/FormSections.module.css';
 import './components/LineChart.module.css';
-import './components/SalaryChartsCard.module.css';
+import './components/SalaryChart.module.css';
 import './components/SiteFooter.module.css';
 
 // A pre-built content page has a slot for the Light/Dark switch: mount the
@@ -35,23 +35,25 @@ if (toggleSlot) {
   );
 }
 
-// A province hub has a slot for the salary charts card, drawn in the page's HTML
-// from the figures in its data block. Hydrate the same card from that block: no
-// fetch, no storage.
-const chartsSlot = document.getElementById(HUB_CHARTS_SLOT_ID);
+// A province hub has a slot for each salary chart, drawn in the page's HTML from the
+// figures in its data block. Hydrate the same charts from that block: no fetch, no
+// storage. The charts share their marker and period through state/hubChartView.
 const chartsData = parseHubChartsData(
   document.getElementById(HUB_CHARTS_DATA_ID)?.textContent ?? null,
 );
-const chartsProvince = FOOTER_PROVINCE_SLUGS.find(
-  (slug) => slug === chartsSlot?.dataset.province,
-);
-if (chartsSlot && chartsData && chartsProvince) {
-  hydrateRoot(
-    chartsSlot,
-    <StrictMode>
-      <SalaryChartsCard data={chartsData} province={chartsProvince} />
-    </StrictMode>,
+for (const chart of HUB_CHART_IDS) {
+  const slot = document.getElementById(HUB_CHART_SLOT_IDS[chart]);
+  const province = FOOTER_PROVINCE_SLUGS.find(
+    (slug) => slug === slot?.dataset.province,
   );
+  if (slot && chartsData && province) {
+    hydrateRoot(
+      slot,
+      <StrictMode>
+        <SalaryChart data={chartsData} province={province} chart={chart} />
+      </StrictMode>,
+    );
+  }
 }
 
 // A province hub also has a slot for the province comparison, drawn from the same

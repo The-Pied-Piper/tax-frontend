@@ -3,8 +3,10 @@ import {
   type ContentBlock,
   type ContentLink,
   type ContentPageSpec,
+  type ContentSection,
   type ListItem,
 } from './contentPages';
+import type { HubChartId } from './hubCharts';
 import {
   contentPath,
   formSlug,
@@ -54,6 +56,27 @@ const federalForms: HubForm[] = [
     description: 'A payment for people whose pay from work is low.',
   },
 ];
+
+/** The permalinks of the hub's chart sections. */
+const CHART_SECTION_IDS = {
+  takeHome: 'take-home',
+  averageRate: 'average-rate',
+  marginalRate: 'marginal-rate',
+  yearTotal: 'tax-and-contributions',
+} as const;
+
+/** A chart's section: its heading, its one line and the chart. The province's own text (#288) goes after the chart block. */
+function chartSection(
+  chart: Exclude<HubChartId, 'takeHome'>,
+  province: FooterProvinceSlug,
+): ContentSection {
+  const { title, text } = strings.hubCharts.charts[chart];
+  return {
+    heading: title,
+    id: CHART_SECTION_IDS[chart],
+    blocks: [paragraph(text), { kind: 'salaryChart', province, chart }],
+  };
+}
 
 /** The hub text of each province the footer lists. Adding a province is one entry here. */
 export const provinceHubs: ProvinceHubText[] = [
@@ -158,7 +181,8 @@ function listItem(form: HubForm, published: ReadonlySet<string>): ListItem {
  * used, a link to each salary page and the other hubs. `name` is the province's
  * name, `published` the slugs of the pages that exist (a form with no page is
  * listed without a link), `otherHubs` the links to the other provinces and
- * `withCharts` whether the hub has a sweep, which gets the salary charts card first.
+ * `withCharts` whether the hub has a sweep: its take-home chart then sits in the
+ * section that explains the take-home, and three more sections follow, one for each chart.
  */
 export function hubPage(
   text: ProvinceHubText,
@@ -198,22 +222,31 @@ export function hubPage(
       : `Everything this site uses to work out take-home pay in ${name}, in one place. Each form is explained in plain words.`,
     trail: [],
     sections: [
-      ...(withCharts
-        ? [
-            {
-              heading: strings.hubCharts.heading,
-              blocks: [{ kind: 'salaryCharts' as const, province: text.slug }],
-            },
-          ]
-        : []),
       {
         heading: `How your ${name} take-home is worked out`,
+        ...(withCharts ? { id: CHART_SECTION_IDS.takeHome } : {}),
         blocks: [
           paragraph(
             `Take-home pay is your salary minus three things. The first is income tax, which comes in two parts: federal tax and ${name} tax. The second is your Canada Pension Plan payments, which build up your future pension. The third is Employment Insurance, or EI, which can pay you if you lose your job. The forms below are where each of those is worked out.`,
           ),
+          ...(withCharts
+            ? [
+                {
+                  kind: 'salaryChart' as const,
+                  province: text.slug,
+                  chart: 'takeHome' as const,
+                },
+              ]
+            : []),
         ],
       },
+      ...(withCharts
+        ? [
+            chartSection('averageRate', text.slug),
+            chartSection('marginalRate', text.slug),
+            chartSection('yearTotal', text.slug),
+          ]
+        : []),
       ...(!withCharts
         ? []
         : [

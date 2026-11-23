@@ -1,3 +1,4 @@
+import type { HubChartId } from './hubCharts';
 import { formContentPage, type FormBody } from './formPage';
 import { formPages } from './formPages';
 import {
@@ -29,13 +30,17 @@ export type ContentBlock =
     }
   /** A table with a caption and column headings; every row has one cell per heading. */
   | { kind: 'table'; caption: string; head: string[]; rows: string[][] }
-  /** The salary charts card of a province hub: a data reference only; the build and the page fill it from the hub's data block. */
-  | { kind: 'salaryCharts'; province: FooterProvinceSlug }
+  /** One salary chart of a province hub: a data reference only; the build and the page fill it from the hub's data block. */
+  | { kind: 'salaryChart'; province: FooterProvinceSlug; chart: HubChartId }
   /** The province comparison of a hub: bars for every served province at one salary. It carries only the hub's slug; the page draws it from the hub's data block. */
   | { kind: 'provinceComparison'; province: FooterProvinceSlug };
 
-/** A heading and the blocks under it. */
-export type ContentSection = { heading: string; blocks: ContentBlock[] };
+/** A heading and the blocks under it. With an `id` the section has a permalink, such as `#average-rate`. */
+export type ContentSection = {
+  heading: string;
+  id?: string;
+  blocks: ContentBlock[];
+};
 
 /** A paragraph block from words and links. */
 export function paragraph(...content: Inline[]): ContentBlock {

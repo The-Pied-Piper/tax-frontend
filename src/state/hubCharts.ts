@@ -3,18 +3,47 @@ import { readUnit } from '../adapters/fallback';
 import { compareAmounts } from '../money/scale';
 import { isRecord } from './salaryPageData';
 
-/** The salaries of the sweep as text, lowest first: every $1,000 from $1,000 to $250,000, then every $5,000 to $500,000. The API takes no salary of 0. */
-export function sweepSalaries(): string[] {
+/** The regular salaries of the sweep as text, lowest first: every $1,000 from $1,000 to $250,000, then every $5,000 to $500,000. The API takes no salary of 0. The province comparison's slider has a step for each. */
+export function regularSalaries(): string[] {
   const salaries: string[] = [];
   for (let n = 1000; n <= 250000; n += 1000) salaries.push(n.toString());
   for (let n = 255000; n <= 500000; n += 5000) salaries.push(n.toString());
   return salaries;
 }
 
+/** Salaries added to the sweep so the lines show what a regular step would miss: the $2,000 Employment Insurance band and the Ontario health premium steps near $201,000. */
+const EXTRA_SALARIES = [
+  '1990',
+  '2020',
+  '2040',
+  '201100',
+  '201200',
+  '201700',
+  '201800',
+];
+
+/** Every salary of the sweep as text, lowest first: the regular ones and the extra ones. */
+export function sweepSalaries(): string[] {
+  return [...regularSalaries(), ...EXTRA_SALARIES].sort(compareAmounts);
+}
+
+/** The indexes of the points at a regular salary, in order. */
+export function regularIndexes(points: readonly SweepPoint[]): number[] {
+  const regular = new Set(regularSalaries().map((salary) => `${salary}.00`));
+  const indexes: number[] = [];
+  points.forEach((point, at) => {
+    if (regular.has(point[0])) indexes.push(at);
+  });
+  return indexes;
+}
+
 /**
- * One point of a sweep, all text exactly as the API sent it: salary, take-home,
- * total deductions, income tax (the total payable, before credits paid to you),
- * average rate, marginal rate. Credits paid to you join when the engine has them.
+ * One point of a sweep, all text as the engine wrote it: salary, take-home,
+ * total deductions, income tax (the total payable, before credits paid to you) and its
+ * average rate (the comparison's figures), then the figures the charts draw on one
+ * basis, income tax plus Canada Pension Plan and Employment Insurance less the credits paid
+ * to you when you file: the marginal rate (the change in that total per extra dollar),
+ * the total for the year and its average rate.
  */
 export type SweepPoint = [
   salary: string,
@@ -23,6 +52,8 @@ export type SweepPoint = [
   incomeTax: string,
   averageRate: string,
   marginalRate: string,
+  yearTotal: string,
+  yearAverageRate: string,
 ];
 
 /** The sweep of one province. */
@@ -49,7 +80,7 @@ const SLUG = /^[a-z0-9-]+$/;
 function isPoint(value: unknown): value is SweepPoint {
   return (
     Array.isArray(value) &&
-    value.length === 6 &&
+    value.length === 8 &&
     value.every(
       (part: unknown) =>
         typeof part === 'string' &&
@@ -148,10 +179,25 @@ export const SALARY_AXIS = {
   ticks: ['100000', '200000', '300000', '400000', '500000'],
 } as const;
 
+/** The four charts of a hub, in the order of its sections. */
+export const HUB_CHART_IDS = [
+  'takeHome',
+  'averageRate',
+  'marginalRate',
+  'yearTotal',
+] as const;
+
+export type HubChartId = (typeof HUB_CHART_IDS)[number];
+
 /** Which place of a `SweepPoint` each chart reads. */
-export const CHART_COLUMN = {
+export const CHART_COLUMN: Record<HubChartId, number> = {
   takeHome: 1,
-  incomeTax: 3,
-  averageRate: 4,
+  averageRate: 7,
   marginalRate: 5,
-} as const;
+  yearTotal: 6,
+};
+
+/** True for the two charts that draw a rate; the others draw money and follow Per year / Per month. */
+export function isRateChart(chart: HubChartId): boolean {
+  return chart === 'averageRate' || chart === 'marginalRate';
+}

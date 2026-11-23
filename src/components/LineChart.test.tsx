@@ -28,8 +28,6 @@ function chart(
 ) {
   return (
     <LineChart
-      title="Income tax for the year"
-      description="The tax you owe."
       points={POINTS}
       series={SERIES}
       xMin="0"
@@ -56,12 +54,8 @@ const hitRect = (container: HTMLElement) => {
 const svg = () => screen.getByRole('img');
 
 describe('LineChart', () => {
-  it('shows the title, the words, the axis labels and the legend', () => {
+  it('shows the axis labels and the legend', () => {
     render(chart());
-    expect(
-      screen.getByRole('heading', { name: 'Income tax for the year' }),
-    ).toBeInTheDocument();
-    expect(screen.getByText('The tax you owe.')).toBeInTheDocument();
     expect(screen.getByText('Salary before tax')).toBeInTheDocument();
     expect(screen.getByText('Dollars a year')).toBeInTheDocument();
     expect(screen.getByText('After credits')).toBeInTheDocument();

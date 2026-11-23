@@ -129,6 +129,13 @@ describe('displayRate', () => {
     ['0', '0%'],
     ['1', '100%'],
     ['0.123456', '12.3456%'],
+    // Below zero: a benefit paid on filing is bigger than the tax.
+    ['-0.2537', '-25.37%'],
+    ['-0.25', '-25%'],
+    ['-1.5', '-150%'],
+    ['-0.0001', '-0.01%'],
+    ['-0.0000', '0%'],
+    ['-0', '0%'],
   ])('shows %s as %s', (amount, shown) => {
     expect(displayRate(amount, pct)).toBe(shown);
   });

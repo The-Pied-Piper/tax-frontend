@@ -1,4 +1,4 @@
-import { SalaryChartsCard } from './SalaryChartsCard';
+import { SalaryChart } from './SalaryChart';
 import { Breadcrumb } from './Breadcrumb';
 import styles from './ContentPage.module.css';
 import { FormSections } from './FormSections';
@@ -8,9 +8,10 @@ import { contentBreadcrumb } from '../state/breadcrumbs';
 import type { ContentBlock, ContentPageSpec } from '../state/contentPages';
 import type { HubChartsData } from '../state/hubCharts';
 import {
-  HUB_CHARTS_SLOT_ID,
+  HUB_CHART_SLOT_IDS,
   PROVINCE_COMPARISON_SLOT_ID,
 } from '../state/hubSlots';
+import { strings } from '../strings';
 import { THEME_TOGGLE_SLOT_ID } from '../state/themeSlot';
 import { ProvinceComparison } from './ProvinceComparison';
 
@@ -23,11 +24,18 @@ function ContentBlockView({
   hubCharts?: HubChartsData;
 }) {
   switch (block.kind) {
-    case 'salaryCharts':
+    case 'salaryChart':
       return (
-        <div id={HUB_CHARTS_SLOT_ID} data-province={block.province}>
+        <div
+          id={HUB_CHART_SLOT_IDS[block.chart]}
+          data-province={block.province}
+        >
           {hubCharts && (
-            <SalaryChartsCard data={hubCharts} province={block.province} />
+            <SalaryChart
+              data={hubCharts}
+              province={block.province}
+              chart={block.chart}
+            />
           )}
         </div>
       );
@@ -138,8 +146,21 @@ export function ContentPage({
         <Breadcrumb {...contentBreadcrumb({ heading, trail })} />
         {form && <FormSections {...form} />}
         {sections.map((section, at) => (
-          <section key={at} className={styles.section}>
-            <h2>{section.heading}</h2>
+          <section key={at} id={section.id} className={styles.section}>
+            {section.id ? (
+              <div className={styles.headingRow}>
+                <h2>{section.heading}</h2>
+                <a
+                  className={styles.permalink}
+                  href={`#${section.id}`}
+                  aria-label={strings.formPage.permalink(section.heading)}
+                >
+                  #
+                </a>
+              </div>
+            ) : (
+              <h2>{section.heading}</h2>
+            )}
             {section.blocks.map((block, line) => (
               <ContentBlockView
                 key={line}

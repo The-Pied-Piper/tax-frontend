@@ -99,16 +99,19 @@ export function displayWholeMoney(
 }
 
 // Moves the decimal point two places right in the text, so no digit is lost
-// and nothing is rounded: "0.2965" -> "29.65", "0.1" -> "10". Text that is not
-// a plain non-negative decimal is returned as is.
+// and nothing is rounded: "0.2965" -> "29.65", "0.1" -> "10", "-0.2537" ->
+// "-25.37" (a rate below zero, where a benefit is bigger than the tax). Text
+// that is not a plain decimal is returned as is.
 function timesHundred(amount: string): string | null {
-  const match = /^(0|[1-9]\d*)(?:\.(\d+))?$/.exec(amount);
+  const match = /^(-?)(0|[1-9]\d*)(?:\.(\d+))?$/.exec(amount);
   if (!match) return null;
-  const [, whole = '', fraction = ''] = match;
+  const [, minus = '', whole = '', fraction = ''] = match;
   const padded = fraction.padEnd(2, '0');
   const digits = `${whole}${padded.slice(0, 2)}`.replace(/^0+(?=\d)/, '');
   const rest = padded.slice(2).replace(/0+$/, '');
-  return rest === '' ? digits : `${digits}.${rest}`;
+  const shifted = rest === '' ? digits : `${digits}.${rest}`;
+  // A rate of exactly zero has no sign, whatever it was written with.
+  return minus !== '' && /[1-9]/.test(shifted) ? `-${shifted}` : shifted;
 }
 
 // A rate with its unit, ready to show; the same for every pay period. A unit

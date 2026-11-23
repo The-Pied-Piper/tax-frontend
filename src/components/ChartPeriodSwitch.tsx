@@ -1,9 +1,6 @@
-import type { PayPeriod } from '../money/payPeriod';
+import type { ChartPeriod } from '../state/hubChartView';
 import { strings } from '../strings';
 import styles from './ChartPeriodSwitch.module.css';
-
-/** The two periods the hub charts show: the yearly figure, or it divided by 12. */
-export type ChartPeriod = Extract<PayPeriod, 'annually' | 'monthly'>;
 
 type Props = {
   value: ChartPeriod;
