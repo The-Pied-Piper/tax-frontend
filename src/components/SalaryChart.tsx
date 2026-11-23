@@ -121,15 +121,7 @@ function Chart({ sweep, chart }: { sweep: ProvinceSweep; chart: HubChartId }) {
           {t.readout(salaryAt)}
         </p>
       )}
-      <p className={styles.note}>
-        {t.note}
-        {sweep.provisional && (
-          <span className={styles.provisional}>
-            {' '}
-            {t.provisional(sweep.year)}
-          </span>
-        )}
-      </p>
+      <p className={styles.note}>{t.note}</p>
       <details
         className={styles.details}
         open={tableOpen}

@@ -38,9 +38,7 @@ export const strings = {
     dollarsMonth: 'Dollars a month',
     chartLabel: (title: string, from: string, to: string) =>
       `Line chart: ${title} against salary, from ${from} to ${to}. The same figures are in the table below the chart.`,
-    note: "These are the calculator's own estimates for a single person whose only income is a salary. They are not tax advice.",
-    provisional: (year: number) =>
-      `The ${year.toString()} figures are provisional.`,
+    note: 'These are estimates for a single person whose only income is a salary.',
     // One entry per chart: its title (the section heading, or for take-home a sub-heading in the existing section), its one line, and its table column.
     charts: {
       takeHome: {
