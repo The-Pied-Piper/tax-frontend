@@ -123,6 +123,39 @@ describe('ContentPage theme switch', () => {
   });
 });
 
+describe('ContentPage sub-heading and card', () => {
+  const spec = {
+    ...plainSpec,
+    sections: [
+      {
+        heading: 'Framed part',
+        card: true as const,
+        blocks: [{ kind: 'subheading' as const, text: 'Chart title' }],
+      },
+      { heading: 'Plain part', blocks: [] },
+    ],
+  };
+
+  it('renders a sub-heading block as an h3', () => {
+    render(<ContentPage {...spec} />);
+    expect(
+      screen.getByRole('heading', { level: 3, name: 'Chart title' }),
+    ).toBeInTheDocument();
+  });
+
+  it('draws only a section marked as a card with the card class', () => {
+    render(<ContentPage {...spec} />);
+    const framed = screen
+      .getByRole('heading', { level: 2, name: 'Framed part' })
+      .closest('section');
+    const plain = screen
+      .getByRole('heading', { level: 2, name: 'Plain part' })
+      .closest('section');
+    expect(framed?.className).toMatch(/card/);
+    expect(plain?.className).not.toMatch(/card/);
+  });
+});
+
 describe('ContentPage blocks', () => {
   it('renders a paragraph with a link inside the words', () => {
     render(<ContentPage {...blocksSpec} />);

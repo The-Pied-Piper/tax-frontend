@@ -57,6 +57,8 @@ function blockProblem(block: ContentBlock): string | null {
         if (problem) return problem;
       }
       return null;
+    case 'subheading':
+      return block.text === '' ? 'has an empty sub-heading' : null;
     case 'salaryChart':
     case 'chartNotes':
       return null;

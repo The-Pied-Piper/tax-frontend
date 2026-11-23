@@ -4,6 +4,8 @@ import {
   displayCents,
   displayMoney,
   displayRate,
+  displayRateOneDecimal,
+  displayRoundedMoney,
   displayWholeMoney,
   groupThousands,
   isDollarUnit,
@@ -147,6 +149,49 @@ describe('displayRate', () => {
   });
   it('shows text it cannot read as sent', () => {
     expect(displayRate('abc', pct)).toBe('abc');
+  });
+});
+
+describe('displayRateOneDecimal', () => {
+  const pct = { ...percent, as_percentage: true };
+  it.each([
+    ['0.2316', '23.2%'],
+    ['0.2315', '23.2%'],
+    ['0.2314', '23.1%'],
+    ['0', '0.0%'],
+    ['1', '100.0%'],
+    ['-0.2537', '-25.4%'],
+    ['-0.0001', '0.0%'],
+    ['-0.0004', '0.0%'],
+    ['-0.0005', '-0.1%'],
+    ['0.5353', '53.5%'],
+    ['0.7327', '73.3%'],
+  ])('shows %s as %s', (amount, shown) => {
+    expect(displayRateOneDecimal(amount, pct)).toBe(shown);
+  });
+  it('shows a unit that is not a percentage, and unreadable text, as displayRate does', () => {
+    expect(
+      displayRateOneDecimal('16.42', { ...percent, as_percentage: false }),
+    ).toBe('16.42%');
+    expect(displayRateOneDecimal('abc', pct)).toBe('abc');
+  });
+});
+
+describe('displayRoundedMoney', () => {
+  const dollar: Unit = { ...cad, singular: '$', plural: '$' };
+  it.each([
+    ['53786.25', 'annually', '$53,786'],
+    ['53786.50', 'annually', '$53,787'],
+    ['0.00', 'annually', '$0'],
+    ['-812.05', 'annually', '-$812'],
+    ['-0.40', 'annually', '$0'],
+    ['53786.25', 'monthly', '$4,482'],
+    ['-812.05', 'monthly', '-$68'],
+  ] as const)('shows %s %s as %s', (amount, period, shown) => {
+    expect(displayRoundedMoney(amount, period, dollar)).toBe(shown);
+  });
+  it('shows text it cannot read as sent', () => {
+    expect(displayRoundedMoney('abc', 'annually', dollar)).toBe('abc');
   });
 });
 
