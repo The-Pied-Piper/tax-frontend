@@ -32,7 +32,8 @@ function chart(
       series={SERIES}
       xMin="0"
       xMax="500000"
-      xTicks={['100000', '500000']}
+      xTicks={['100000', '300000', '500000']}
+      xTicksPhone={['400000', '500000']}
       xAxisLabel="Salary before tax"
       yAxisLabel="Dollars a year"
       xUnit={unit}
@@ -54,6 +55,19 @@ const hitRect = (container: HTMLElement) => {
 const svg = () => screen.getByRole('img');
 
 describe('LineChart', () => {
+  it('marks which salary labels are for desktop only and which for phones only', () => {
+    render(chart());
+    // A class name carries the CSS module's hashed name; match on its stem.
+    const classes = (text: string) =>
+      screen.getByText(text).getAttribute('class') ?? '';
+    expect(classes('$300k')).toMatch(/desktopOnly/);
+    expect(classes('$400k')).toMatch(/phoneOnly/);
+    // On both: no visibility class; the phone's last label ends at the edge.
+    expect(classes('$500k')).not.toMatch(/desktopOnly|phoneOnly/);
+    expect(classes('$500k')).toMatch(/phoneEnd/);
+    expect(classes('$400k')).not.toMatch(/phoneEnd/);
+  });
+
   it('shows the axis labels and the legend', () => {
     render(chart());
     expect(screen.getByText('Salary before tax')).toBeInTheDocument();

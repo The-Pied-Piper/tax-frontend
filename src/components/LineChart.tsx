@@ -32,6 +32,8 @@ type Props = {
   xMin: string;
   xMax: string;
   xTicks: readonly string[];
+  /** The round salaries labelled on a phone instead of xTicks; the last one ends the axis. */
+  xTicksPhone: readonly string[];
   xAxisLabel: string;
   yAxisLabel: string;
   /** The API's units for the salary axis and for the values (a percent for a rate). */
@@ -46,6 +48,8 @@ type Props = {
   onActiveChange: (index: number | null) => void;
 };
 
+// A phone shows at most this many labels up the side (the rest are hidden by CSS).
+const PHONE_MAX_Y_LABELS = 4;
 const WIDTH = 420;
 const HEIGHT = 250;
 const LEFT = 56;
@@ -67,6 +71,7 @@ export function LineChart({
   xMin,
   xMax,
   xTicks,
+  xTicksPhone,
   xAxisLabel,
   yAxisLabel,
   xUnit,
@@ -101,6 +106,8 @@ export function LineChart({
   }, [points, series, xMin, xMax]);
 
   const { axis, xs, y } = geometry;
+  // On a phone, an axis with more than four labels shows every other one.
+  const phoneHidesY = axis.ticks.length > PHONE_MAX_Y_LABELS;
   const active =
     activeIndex !== null && activeIndex in points ? activeIndex : undefined;
   const activeX = active === undefined ? undefined : xs[active];
@@ -151,7 +158,7 @@ export function LineChart({
         tabIndex={0}
         onKeyDown={onKeyDown}
       >
-        {axis.ticks.map((tick) => (
+        {axis.ticks.map((tick, at) => (
           <g key={`y${tick}`}>
             <line
               className={styles.grid}
@@ -161,7 +168,11 @@ export function LineChart({
               y2={y(tick)}
             />
             <text
-              className={styles.tick}
+              className={
+                phoneHidesY && at % 2 === 1
+                  ? [styles.tick, styles.desktopOnly].join(' ')
+                  : styles.tick
+              }
               x={LEFT - 6}
               y={y(tick)}
               dy="0.35em"
@@ -171,17 +182,34 @@ export function LineChart({
             </text>
           </g>
         ))}
-        {xTicks.map((tick) => (
-          <text
-            key={`x${tick}`}
-            className={styles.tick}
-            x={geometry.x(tick)}
-            y={PLOT_BOTTOM + 14}
-            textAnchor="middle"
-          >
-            {displayTick(tick, xUnit)}
-          </text>
-        ))}
+        {[...new Set([...xTicks, ...xTicksPhone])].map((tick) => {
+          const onDesktop = xTicks.includes(tick);
+          const onPhone = xTicksPhone.includes(tick);
+          const visibility = onDesktop
+            ? onPhone
+              ? undefined
+              : styles.desktopOnly
+            : styles.phoneOnly;
+          // The axis's last label ends at the edge on a phone, so it is not cut off.
+          const ends = tick === xTicksPhone[xTicksPhone.length - 1];
+          return (
+            <text
+              key={`x${tick}`}
+              className={[
+                styles.tick,
+                visibility,
+                ends ? styles.phoneEnd : undefined,
+              ]
+                .filter((name) => name !== undefined)
+                .join(' ')}
+              x={geometry.x(tick)}
+              y={PLOT_BOTTOM + 14}
+              textAnchor="middle"
+            >
+              {displayTick(tick, xUnit)}
+            </text>
+          );
+        })}
         <text
           className={styles.tick}
           x={(LEFT + PLOT_RIGHT) / 2}
