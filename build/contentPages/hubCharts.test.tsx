@@ -73,14 +73,16 @@ describe('a hub with a sweep', () => {
     expect(doc.querySelectorAll('[id^="hub-chart-"] svg')).toHaveLength(4);
   });
 
-  it("writes each chart's figures table and the marker into the static HTML", () => {
+  it("writes each chart's marker into the static HTML and no figures table", () => {
     const html = renderToString(<ContentPage {...spec} hubCharts={data} />);
     const doc = new DOMParser().parseFromString(html, 'text/html');
     for (const chart of HUB_CHART_IDS) {
       expect(
-        doc.querySelectorAll(`#${HUB_CHART_SLOT_IDS[chart]} details tbody tr`),
+        doc.querySelectorAll(
+          `#${HUB_CHART_SLOT_IDS[chart]} details, #${HUB_CHART_SLOT_IDS[chart]} table`,
+        ),
         chart,
-      ).toHaveLength(307);
+      ).toHaveLength(0);
     }
     expect(doc.body.textContent).toContain(
       strings.hubCharts.readout('$70,000'),
