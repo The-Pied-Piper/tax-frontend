@@ -12,7 +12,7 @@ The average passes 10% at $32,000, 20% at $57,000, 30% at $182,000 and 40% at $4
 It climbs more slowly than the marginal rate, because each higher rate applies only to the dollars above its bracket. At $500,000 the average is 40.35%, while the top marginal rate is 47%. It reaches half of its $500,000 value at $59,000.
 
 marginalRate
-Up to $2,000 the rate is 0%: Employment Insurance is refunded when you file. Earn a dollar more and you lose that refund, about $33 in all, so the rate spikes just past $2,000. From $3,000 to about $11,100 the rate is below zero, because the Canada workers benefit adds 21 cents for each extra dollar.
+Up to $2,000 the rate is 0%: Employment Insurance is refunded when you file. Earn a dollar more and you lose that refund, about $33 in all, so the rate spikes just past $2,000.
 Then, from $3,000 to about $11,100, the rate is below zero. The Canada workers benefit is paid when you file. For a low salary it builds up by 21 cents for every dollar earned above $2,760, to at most about $1,785. Counting that benefit, each extra dollar of salary leaves you with more than a dollar, so the rate is below zero.
 Canada Pension Plan and Employment Insurance take about 7.6 cents of each dollar. The rate steps down where they stop: Employment Insurance at about $69,000, the main Canada Pension Plan amount at $74,600 and its second tier at $85,000.
 From about $11,100 to $19,100 the rate is 7.58%: only Canada Pension Plan and Employment Insurance. It is 20.52% from $19,200, when federal tax starts, and about 27.91% from $24,500, when Alberta’s 8% tax starts.
@@ -35,7 +35,7 @@ The average passes 10% at $32,000, 20% at $58,000, 30% at $173,000 and 40% at $3
 It climbs more slowly than the marginal rate, because each higher rate applies only to the dollars above its bracket. At $500,000 the average is 43.91%, while the top marginal rate is 53.5%. It reaches half of its $500,000 value at $68,000.
 
 marginalRate
-Employment Insurance is refunded when you file if you earn $2,000 or less. Earn a dollar more and you lose that refund, about $33 in all, so the rate spikes just past $2,000. From $3,000 to about $9,000 the rate is below zero, because the Canada workers benefit adds 27 cents for each extra dollar.
+Employment Insurance is refunded when you file if you earn $2,000 or less. Earn a dollar more and you lose that refund, about $33 in all, so the rate spikes just past $2,000.
 Then, from $3,000 to about $9,000, the rate is below zero. The Canada workers benefit is paid when you file. For a low salary it builds up by 27 cents for every dollar earned above $3,000, to at most about $1,700. Counting that benefit, each extra dollar of salary leaves you with more than a dollar, so the rate is below zero.
 Canada Pension Plan and Employment Insurance take about 7.6 cents of each dollar. The rate steps down where they stop: Employment Insurance at about $69,000, the main Canada Pension Plan amount at $74,600 and its second tier at $85,000.
 From about $9,100 to $19,100 the rate is 7.58% to 9.56%: Canada Pension Plan and Employment Insurance, plus 2 cents more for every dollar from $15,200 to $18,800, because the BC sales tax credit, which is paid when you file, shrinks by 2 cents for every dollar above $15,000. It is 20.52% from $19,200, when federal tax starts.
@@ -58,7 +58,7 @@ The average passes 10% at $29,000, 20% at $42,000, 30% at $119,000 and 40% at $3
 It climbs more slowly than the marginal rate, because each higher rate applies only to the dollars above its bracket. At $500,000 the average is 44.43%, while the top marginal rate is 51.26%. It reaches half of its $500,000 value at $52,000.
 
 marginalRate
-Employment Insurance is refunded when you file if you earn $2,000 or less. Earn a dollar more and you lose that refund, about $33 in all, so the rate spikes just past $2,000. From $3,000 to about $9,000 the rate is below zero, because the Canada workers benefit adds 27 cents for each extra dollar.
+Employment Insurance is refunded when you file if you earn $2,000 or less. Earn a dollar more and you lose that refund, about $33 in all, so the rate spikes just past $2,000.
 Then, from $3,000 to about $9,000, the rate is below zero. The Canada workers benefit is paid when you file. For a low salary it builds up by 27 cents for every dollar earned above $3,000, to at most about $1,700. Counting that benefit, each extra dollar of salary leaves you with more than a dollar, so the rate is below zero.
 Canada Pension Plan and Employment Insurance take about 8.57 cents of each dollar. The rate steps down where they stop: Employment Insurance at about $69,000, the main Canada Pension Plan amount at $74,600 and its second tier at $85,000.
 Manitoba’s own tax starts before the federal tax does. From $17,500 the rate is 19.51%: Manitoba tax, Canada Pension Plan and Employment Insurance, and 1 cent more for every dollar, because the Manitoba personal tax credit, which is paid when you file, shrinks by 1 cent for every dollar of income. It is 31.46% from $19,200, once federal tax joins in.
@@ -83,7 +83,7 @@ The average passes 10% at $30,000, 20% at $45,000, 30% at $110,000 and 40% at $2
 It climbs more slowly than the marginal rate, because each higher rate applies only to the dollars above its bracket. At $500,000 the average is 45.88%, while the top marginal rate is 53.8%. It reaches half of its $500,000 value at $57,000.
 
 marginalRate
-Up to $2,000 the rate is 0%: Employment Insurance is refunded when you file. Earn a dollar more and you lose that refund, about $33 in all, so the rate spikes just past $2,000. From $3,000 to about $9,000 the rate is below zero, because the Canada workers benefit adds 27 cents for each extra dollar.
+Up to $2,000 the rate is 0%: Employment Insurance is refunded when you file. Earn a dollar more and you lose that refund, about $33 in all, so the rate spikes just past $2,000.
 Then, from $3,000 to about $9,000, the rate is below zero. The Canada workers benefit is paid when you file. For a low salary it builds up by 27 cents for every dollar earned above $3,000, to at most about $1,700. Counting that benefit, each extra dollar of salary leaves you with more than a dollar, so the rate is below zero.
 Canada Pension Plan and Employment Insurance take about 7.6 cents of each dollar. The rate steps down where they stop: Employment Insurance at about $69,000, the main Canada Pension Plan amount at $74,600 and its second tier at $85,000.
 From about $9,100 to $19,100 the rate is 7.58%: only Canada Pension Plan and Employment Insurance. It stays 20.52% (federal tax only) until $25,000, because Newfoundland and Labrador’s low-income tax reduction removes the provincial tax at low incomes.
@@ -107,7 +107,7 @@ The average passes 10% at $33,000, 20% at $53,000, 30% at $145,000 and 40% at $3
 It climbs more slowly than the marginal rate, because each higher rate applies only to the dollars above its bracket. At $500,000 the average is 45.38%, while the top marginal rate is 53.53%. It reaches half of its $500,000 value at $68,000.
 
 marginalRate
-Up to $2,000 the rate is 0%: Employment Insurance is refunded when you file. Earn a dollar more and you lose that refund, about $33 in all, so the rate spikes just past $2,000. From $3,000 to about $9,000 the rate is below zero, because the Canada workers benefit adds 27 cents for each extra dollar.
+Up to $2,000 the rate is 0%: Employment Insurance is refunded when you file. Earn a dollar more and you lose that refund, about $33 in all, so the rate spikes just past $2,000.
 Then, from $3,000 to about $9,000, the rate is below zero. The Canada workers benefit is paid when you file. For a low salary it builds up by 27 cents for every dollar earned above $3,000, to at most about $1,700. Counting that benefit, each extra dollar of salary leaves you with more than a dollar, so the rate is below zero.
 Canada Pension Plan and Employment Insurance take about 7.6 cents of each dollar. The rate steps down where they stop: Employment Insurance at about $69,000, the main Canada Pension Plan amount at $74,600 and its second tier at $85,000.
 From about $9,100 to $19,100 the rate is 7.58%: no income tax yet, only Canada Pension Plan and Employment Insurance. It is 20.52% from $19,200, when federal income tax starts.
@@ -134,7 +134,7 @@ The average passes 10% at $31,000, 20% at $48,000, 30% at $139,000 and 40% at $4
 It climbs more slowly than the marginal rate, because each higher rate applies only to the dollars above its bracket. At $500,000 the average is 41.39%, while the top marginal rate is 47.5%. It reaches half of its $500,000 value at $51,000.
 
 marginalRate
-Up to $2,000 the rate is 0%: Employment Insurance is refunded when you file. Earn a dollar more and you lose that refund, about $33 in all, so the rate spikes just past $2,000. From $3,000 to about $9,000 the rate is below zero, because the Canada workers benefit adds 27 cents for each extra dollar.
+Up to $2,000 the rate is 0%: Employment Insurance is refunded when you file. Earn a dollar more and you lose that refund, about $33 in all, so the rate spikes just past $2,000.
 Then, from $3,000 to about $9,000, the rate is below zero. The Canada workers benefit is paid when you file. For a low salary it builds up by 27 cents for every dollar earned above $3,000, to at most about $1,700. Counting that benefit, each extra dollar of salary leaves you with more than a dollar, so the rate is below zero.
 Canada Pension Plan and Employment Insurance take about 7.6 cents of each dollar. The rate steps down where they stop: Employment Insurance at about $69,000, the main Canada Pension Plan amount at $74,600 and its second tier at $85,000.
 From about $9,100 to $19,100 the rate is 7.58%: only Canada Pension Plan and Employment Insurance. It is 20.52% from $19,200, when federal tax starts, and 30.22% from $21,900, when Saskatchewan’s tax starts.

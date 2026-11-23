@@ -147,8 +147,8 @@ export function marginalLowNotes(
   return [
     note(
       credit
-        ? 'Employment Insurance is refunded when you file if you earn $2,000 or less. Earn a dollar more and you lose that refund, about {eiRefund} in all, so the rate spikes just past $2,000. From $3,000 to about {cwbTo} the rate is below zero, because the Canada workers benefit adds {cwbRate} for each extra dollar.'
-        : 'Up to $2,000 the rate is 0%: Employment Insurance is refunded when you file. Earn a dollar more and you lose that refund, about {eiRefund} in all, so the rate spikes just past $2,000. From $3,000 to about {cwbTo} the rate is below zero, because the Canada workers benefit adds {cwbRate} for each extra dollar.',
+        ? 'Employment Insurance is refunded when you file if you earn $2,000 or less. Earn a dollar more and you lose that refund, about {eiRefund} in all, so the rate spikes just past $2,000.'
+        : 'Up to $2,000 the rate is 0%: Employment Insurance is refunded when you file. Earn a dollar more and you lose that refund, about {eiRefund} in all, so the rate spikes just past $2,000.',
       pool,
     ),
     note(
