@@ -166,6 +166,7 @@
 .permalink {
   font-size: 15px;
   text-decoration: none;
+  opacity: 0.6;
 }
 
 /* A section drawn as a card (the hub's chart sections), its margin kept. */
@@ -176,13 +177,10 @@
   padding: 18px;
 }
 
+/* The sentence-case heading of a chart inside a card; the list's uppercase label (.subheading) is a different look. */
 .chartHeading {
   margin: 16px 0 4px;
   font-size: 15px;
   font-weight: 600;
   color: var(--fg);
-}
-
-.permalink {
-  opacity: 0.6;
 }
