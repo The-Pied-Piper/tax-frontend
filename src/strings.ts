@@ -75,6 +75,10 @@ export const strings = {
         incomeTax: 'Income tax',
         averageRate: 'Average income tax rate',
       },
+      // Shorter wording for the toggle on narrow phones only, where the full label does not fit one line.
+      measuresPhone: {
+        averageRate: 'Average tax rate',
+      },
       measureNotes: {
         takeHome:
           'Your salary minus income tax, pension plan payments and Employment Insurance, before any credits paid to you when you file.',

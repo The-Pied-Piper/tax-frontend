@@ -80,8 +80,10 @@ describe('ProvinceComparison at the start', () => {
     expect(
       within(group)
         .getAllByRole('radio')
-        .map((radio) => radio.parentElement?.textContent),
-    ).toEqual(['Take-home pay', 'Income tax', 'Average income tax rate']);
+        .map((radio) => radio.getAttribute('value')),
+    ).toEqual(['takeHome', 'incomeTax', 'averageRate']);
+    // Screen readers get the full wording; the phone wording is visual only.
+    expect(measure('Average income tax rate')).toBeInTheDocument();
   });
 });
 

@@ -86,7 +86,16 @@ export function ProvinceComparison({ data, province }: Props) {
                   setMeasure(option);
                 }}
               />
-              {copy.measures[option]}
+              {option === 'averageRate' ? (
+                <>
+                  <span className={styles.full}>{copy.measures[option]}</span>
+                  <span className={styles.phone} aria-hidden="true">
+                    {copy.measuresPhone[option]}
+                  </span>
+                </>
+              ) : (
+                copy.measures[option]
+              )}
             </label>
           ))}
         </div>

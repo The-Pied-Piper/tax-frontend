@@ -5,9 +5,9 @@
 
 .bar {
   display: flex;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: 12px;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 8px;
   margin: 0 0 14px;
 }
 
@@ -16,10 +16,9 @@
   color: var(--muted);
 }
 
-/* The same segmented control as the pay-period switch. */
+/* The same segmented control as the pay-period switch, spanning the width in three equal parts on one line. */
 .group {
-  display: inline-flex;
-  flex-wrap: wrap;
+  display: flex;
   border: 1px solid var(--edge);
   border-radius: var(--radius-control);
   overflow: hidden;
@@ -28,11 +27,24 @@
 
 .option {
   position: relative;
+  flex: 1 1 0;
+  min-width: 0;
+  box-sizing: border-box;
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  white-space: nowrap;
   font-size: 13px;
   font-weight: 500;
   color: var(--muted);
-  padding: 6px 12px;
+  padding: 0 4px;
   cursor: pointer;
+}
+
+.phone {
+  display: none;
 }
 
 .option + .option {
@@ -192,6 +204,14 @@
   }
 
   .option {
-    padding: 6px 9px;
+    font-size: 12px;
+  }
+
+  .full {
+    display: none;
+  }
+
+  .phone {
+    display: inline;
   }
 }
