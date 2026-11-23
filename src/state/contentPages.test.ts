@@ -1,4 +1,7 @@
-import { DESCRIPTION_LIMIT, TITLE_LIMIT } from '../../build/salaryPages/limits';
+import {
+  CONTENT_TITLE_LIMIT,
+  DESCRIPTION_LIMIT,
+} from '../../build/salaryPages/limits';
 import { copyRules, everyString } from '../test/copyRules';
 import { longestSentence } from '../test/formText';
 import { contentPages, paragraph } from './contentPages';
@@ -20,7 +23,9 @@ describe('contentPages', () => {
     for (const page of contentPages) {
       expect(isContentSlug(page.slug), page.slug).toBe(true);
       expect(page.title.length, `${page.slug} title`).toBeGreaterThan(0);
-      expect(page.title.length, `${page.slug} title`).toBeLessThan(TITLE_LIMIT);
+      expect(page.title.length, `${page.slug} title`).toBeLessThan(
+        CONTENT_TITLE_LIMIT,
+      );
       expect(
         page.description.length,
         `${page.slug} description`,

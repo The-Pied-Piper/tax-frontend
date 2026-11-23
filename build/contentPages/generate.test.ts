@@ -16,7 +16,7 @@ import type {
   ContentBlock,
   ContentPageSpec,
 } from '../../src/state/contentPages';
-import { DESCRIPTION_LIMIT, TITLE_LIMIT } from '../salaryPages/limits';
+import { CONTENT_TITLE_LIMIT, DESCRIPTION_LIMIT } from '../salaryPages/limits';
 import { generateContentPages } from './generate';
 
 const outDir = tmpDirs('content-pages');
@@ -155,13 +155,15 @@ describe('generateContentPages validation', () => {
   });
 
   it('rejects a title of 60 characters or more', async () => {
-    const dir = await fails([{ ...plainSpec, title: 'x'.repeat(TITLE_LIMIT) }]);
+    const dir = await fails([
+      { ...plainSpec, title: 'x'.repeat(CONTENT_TITLE_LIMIT) },
+    ]);
     expect(files(dir)).toEqual([]);
   });
 
   it('accepts a title one character under the limit', async () => {
     const { written } = await run(outDir(), [
-      { ...plainSpec, title: 'x'.repeat(TITLE_LIMIT - 1) },
+      { ...plainSpec, title: 'x'.repeat(CONTENT_TITLE_LIMIT - 1) },
     ]);
     expect(written).toHaveLength(1);
   });
@@ -193,7 +195,7 @@ describe('generateContentPages validation', () => {
   it('writes no file at all when one entry of several is invalid', async () => {
     const dir = await fails([
       plainSpec,
-      { ...parentSpec, title: 'x'.repeat(TITLE_LIMIT) },
+      { ...parentSpec, title: 'x'.repeat(CONTENT_TITLE_LIMIT) },
     ]);
     expect(files(dir)).toEqual([]);
   });

@@ -1,4 +1,5 @@
 import { fireEvent, render, screen, within } from '@testing-library/react';
+import { MEASURES } from '../state/provinceComparison';
 import { strings } from '../strings';
 import type { FooterProvinceSlug } from '../state/siteLinks';
 import { sampleHubCharts, sampleSweeps } from '../test/comparisonData';
@@ -80,8 +81,14 @@ describe('ProvinceComparison at the start', () => {
     expect(
       within(group)
         .getAllByRole('radio')
-        .map((radio) => radio.parentElement?.textContent),
-    ).toEqual(['Take-home pay', 'Income tax', 'Average income tax rate']);
+        .map((radio) => radio.getAttribute('value')),
+    ).toEqual(['takeHome', 'incomeTax', 'averageRate']);
+    // Screen readers get the full wording; the phone wording is visual only and hidden from them.
+    for (const option of MEASURES) {
+      const label = measure(copy.measures[option]).parentElement;
+      const hidden = label?.querySelector('[aria-hidden="true"]');
+      expect(hidden?.textContent).toBe(copy.measuresPhone[option]);
+    }
   });
 });
 

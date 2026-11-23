@@ -14,7 +14,7 @@ import { isSitePath } from '../../src/state/salaryPageData';
 import { contentBreadcrumb } from '../../src/state/breadcrumbs';
 import { breadcrumbJsonLd } from '../breadcrumbJsonLd';
 import { isSalaryPageSlug } from '../salaryPages/address';
-import { DESCRIPTION_LIMIT, TITLE_LIMIT } from '../salaryPages/limits';
+import { CONTENT_TITLE_LIMIT, DESCRIPTION_LIMIT } from '../salaryPages/limits';
 import { buildContentPageHtml } from './html';
 
 export type ContentOptions = {
@@ -89,9 +89,9 @@ function check(pages: ContentPageSpec[]): void {
     seen.add(slug);
   }
   for (const page of pages) {
-    if (page.title.length >= TITLE_LIMIT) {
+    if (page.title.length >= CONTENT_TITLE_LIMIT) {
       throw new Error(
-        `Content pages: ${page.slug} title is ${page.title.length.toString()} characters, limit ${(TITLE_LIMIT - 1).toString()}`,
+        `Content pages: ${page.slug} title is ${page.title.length.toString()} characters, limit ${(CONTENT_TITLE_LIMIT - 1).toString()}`,
       );
     }
     if (page.description.length >= DESCRIPTION_LIMIT) {
