@@ -56,7 +56,7 @@ export function paragraph(...content: Inline[]): ContentBlock {
 export type ContentPageSpec = {
   /** Where the page lives: `ca-on`, `methodology`, `forms/bc428`. */
   slug: string;
-  /** The browser tab title and share title; under 60 characters. */
+  /** The browser tab title and share title; under 64 characters. */
   title: string;
   /** The search and share description; under 160 characters. */
   description: string;
