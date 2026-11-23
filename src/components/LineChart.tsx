@@ -32,6 +32,8 @@ type Props = {
   xMin: string;
   xMax: string;
   xTicks: readonly string[];
+  /** The round salaries labelled on a phone instead of xTicks; the last one ends the axis. */
+  xTicksPhone: readonly string[];
   xAxisLabel: string;
   yAxisLabel: string;
   /** The API's units for the salary axis and for the values (a percent for a rate). */
@@ -46,6 +48,8 @@ type Props = {
   onActiveChange: (index: number | null) => void;
 };
 
+// Beyond this many labels up the side, a phone hides every other one (in CSS).
+const PHONE_MAX_Y_LABELS = 4;
 const WIDTH = 420;
 const HEIGHT = 250;
 const LEFT = 56;
@@ -67,6 +71,7 @@ export function LineChart({
   xMin,
   xMax,
   xTicks,
+  xTicksPhone,
   xAxisLabel,
   yAxisLabel,
   xUnit,
@@ -101,6 +106,13 @@ export function LineChart({
   }, [points, series, xMin, xMax]);
 
   const { axis, xs, y } = geometry;
+  // On a phone, an axis with more than four labels shows every other one.
+  const phoneHidesY = axis.ticks.length > PHONE_MAX_Y_LABELS;
+  // The one that stays is the zero line's, so the labels shown are zero and every other tick from it.
+  const zeroAt = Math.max(
+    0,
+    axis.ticks.findIndex((tick) => /^-?0(\.0+)?$/.test(tick)),
+  );
   const active =
     activeIndex !== null && activeIndex in points ? activeIndex : undefined;
   const activeX = active === undefined ? undefined : xs[active];
@@ -151,7 +163,7 @@ export function LineChart({
         tabIndex={0}
         onKeyDown={onKeyDown}
       >
-        {axis.ticks.map((tick) => (
+        {axis.ticks.map((tick, at) => (
           <g key={`y${tick}`}>
             <line
               className={styles.grid}
@@ -161,7 +173,11 @@ export function LineChart({
               y2={y(tick)}
             />
             <text
-              className={styles.tick}
+              className={
+                phoneHidesY && (at - zeroAt) % 2 !== 0
+                  ? [styles.tick, styles.desktopOnly].join(' ')
+                  : styles.tick
+              }
               x={LEFT - 6}
               y={y(tick)}
               dy="0.35em"
@@ -171,19 +187,33 @@ export function LineChart({
             </text>
           </g>
         ))}
-        {xTicks.map((tick) => (
-          <text
-            key={`x${tick}`}
-            className={styles.tick}
-            x={geometry.x(tick)}
-            y={PLOT_BOTTOM + 14}
-            textAnchor="middle"
-          >
-            {displayTick(tick, xUnit)}
-          </text>
-        ))}
+        {[...new Set([...xTicks, ...xTicksPhone])].map((tick) => {
+          const onDesktop = xTicks.includes(tick);
+          const onPhone = xTicksPhone.includes(tick);
+          const labelClasses = onDesktop
+            ? onPhone
+              ? [styles.tick]
+              : [styles.tick, styles.desktopOnly]
+            : [styles.tick, styles.phoneOnly];
+          // The last label is right-aligned on a phone so it stays inside the drawing's edge.
+          const ends = tick === xTicksPhone[xTicksPhone.length - 1];
+          return (
+            <text
+              key={`x${tick}`}
+              className={(ends
+                ? [...labelClasses, styles.phoneEnd]
+                : labelClasses
+              ).join(' ')}
+              x={geometry.x(tick)}
+              y={PLOT_BOTTOM + 14}
+              textAnchor="middle"
+            >
+              {displayTick(tick, xUnit)}
+            </text>
+          );
+        })}
         <text
-          className={styles.tick}
+          className={[styles.tick, styles.title].join(' ')}
           x={(LEFT + PLOT_RIGHT) / 2}
           y={HEIGHT - 4}
           textAnchor="middle"
@@ -191,7 +221,7 @@ export function LineChart({
           {xAxisLabel}
         </text>
         <text
-          className={styles.tick}
+          className={[styles.tick, styles.title, styles.yTitle].join(' ')}
           transform={`translate(11 ${String((TOP + PLOT_BOTTOM) / 2)}) rotate(-90)`}
           textAnchor="middle"
         >

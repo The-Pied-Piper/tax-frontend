@@ -93,6 +93,7 @@ function Chart({ sweep, chart }: { sweep: ProvinceSweep; chart: HubChartId }) {
         xMin={SALARY_AXIS.min}
         xMax={SALARY_AXIS.max}
         xTicks={SALARY_AXIS.ticks}
+        xTicksPhone={SALARY_AXIS.phoneTicks}
         xAxisLabel={t.salaryAxis}
         yAxisLabel={yAxisLabel(
           chart,

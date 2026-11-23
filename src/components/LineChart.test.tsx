@@ -32,7 +32,8 @@ function chart(
       series={SERIES}
       xMin="0"
       xMax="500000"
-      xTicks={['100000', '500000']}
+      xTicks={['100000', '300000', '500000']}
+      xTicksPhone={['400000', '500000']}
       xAxisLabel="Salary before tax"
       yAxisLabel="Dollars a year"
       xUnit={unit}
@@ -54,6 +55,55 @@ const hitRect = (container: HTMLElement) => {
 const svg = () => screen.getByRole('img');
 
 describe('LineChart', () => {
+  it('on a phone hides every other label up the side beyond four, keeping the zero line labelled', () => {
+    const { container } = render(
+      chart({
+        points: [
+          { salary: '1000', values: ['-40000'] },
+          { salary: '500000', values: ['140000'] },
+        ],
+        series: [FIRST_SERIES],
+      }),
+    );
+    // Ticks -50k, 0, 50k, 100k, 150k: the zero line stays, and every other label from it.
+    const hidden = [...container.querySelectorAll('text')]
+      .filter((node) => /desktopOnly/.test(node.getAttribute('class') ?? ''))
+      .map((node) => node.textContent);
+    expect(hidden).toEqual(expect.arrayContaining(['-$50k', '$50k', '$150k']));
+    expect(hidden).not.toContain('$0');
+  });
+
+  it('keeps every label up the side when there are four or fewer', () => {
+    const { container } = render(
+      chart({
+        points: [
+          { salary: '1000', values: ['0'] },
+          { salary: '500000', values: ['300000'] },
+        ],
+        series: [FIRST_SERIES],
+      }),
+    );
+    expect(
+      container.querySelectorAll('text[class*="desktopOnly"]'),
+    ).toHaveLength(
+      // The two salary labels only desktop shows: $100k and $300k.
+      2,
+    );
+  });
+
+  it('marks which salary labels are for desktop only and which for phones only', () => {
+    render(chart());
+    // A class name carries the CSS module's hashed name; match on its stem.
+    const classes = (text: string) =>
+      screen.getByText(text).getAttribute('class') ?? '';
+    expect(classes('$300k')).toMatch(/desktopOnly/);
+    expect(classes('$400k')).toMatch(/phoneOnly/);
+    // On both: no visibility class; the phone's last label ends at the edge.
+    expect(classes('$500k')).not.toMatch(/desktopOnly|phoneOnly/);
+    expect(classes('$500k')).toMatch(/phoneEnd/);
+    expect(classes('$400k')).not.toMatch(/phoneEnd/);
+  });
+
   it('shows the axis labels and the legend', () => {
     render(chart());
     expect(screen.getByText('Salary before tax')).toBeInTheDocument();
