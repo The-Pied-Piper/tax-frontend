@@ -177,6 +177,8 @@ export const SALARY_AXIS = {
   min: '0',
   max: '500000',
   ticks: ['100000', '200000', '300000', '400000', '500000'],
+  /** The labels a phone shows instead. */
+  phoneTicks: ['250000', '500000'],
 } as const;
 
 /** The four charts of a hub, in the order of its sections. */

@@ -97,3 +97,37 @@
 .swatchDashed {
   border-top: 2px dashed var(--faint);
 }
+
+/* Phones: the drawing is scaled down to the screen, so axis text is larger in
+   drawing units and fewer labels are shown. Above 480px nothing changes. */
+.phoneOnly {
+  display: none;
+}
+
+@media (max-width: 480px) {
+  .tick {
+    font-size: 12px;
+  }
+
+  /* The axis titles keep their size; the one up the side sits a little
+     further out, clear of the larger figures beside it. */
+  .title {
+    font-size: 11px;
+  }
+
+  .yTitle {
+    translate: -3px 0;
+  }
+
+  .desktopOnly {
+    display: none;
+  }
+
+  .phoneOnly {
+    display: inline;
+  }
+
+  .phoneEnd {
+    text-anchor: end;
+  }
+}
