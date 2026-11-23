@@ -71,7 +71,7 @@ export type ProvinceSweep = {
 /** What a hub's data block holds: the sweep of every province the build served. */
 export type HubChartsData = { provinces: ProvinceSweep[] };
 
-/** A figure as the API writes it, and as money/scale reads it: optional minus, no leading zero, optional decimals, at most 30 characters. */
+/** A figure as the API writes it, and as money/ reads it: optional minus, no leading zero, optional decimals, at most 30 characters. */
 const DECIMAL = /^-?(0|[1-9]\d*)(\.\d+)?$/;
 const MAX_FIGURE_LENGTH = 30;
 /** A slug as the site writes it. */
