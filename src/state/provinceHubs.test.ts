@@ -354,7 +354,10 @@ describe('the province comparison', () => {
       // The take-home section keeps its words and gains its permalink and its chart.
       .map(({ heading, blocks }) => ({
         heading,
-        blocks: blocks.filter((block) => block.kind !== 'salaryChart'),
+        blocks: blocks.filter(
+          (block) =>
+            block.kind !== 'salaryChart' && block.kind !== 'chartNotes',
+        ),
       }));
     expect(rest).toEqual(without.sections);
   });
@@ -363,11 +366,10 @@ describe('the province comparison', () => {
     const page = make(true);
     const how = section(page, 'How your Ontario take-home is worked out');
     expect(how?.id).toBe('take-home');
-    expect(how?.blocks.at(-1)).toEqual({
-      kind: 'salaryChart',
-      province: 'ca-on',
-      chart: 'takeHome',
-    });
+    expect(how?.blocks.slice(-2)).toEqual([
+      { kind: 'salaryChart', province: 'ca-on', chart: 'takeHome' },
+      { kind: 'chartNotes', province: 'ca-on', chart: 'takeHome' },
+    ]);
     const t = strings.hubCharts.charts;
     expect(
       (['averageRate', 'marginalRate', 'yearTotal'] as const).map((chart) => {
@@ -380,6 +382,7 @@ describe('the province comparison', () => {
         [
           paragraph(t.averageRate.text),
           { kind: 'salaryChart', province: 'ca-on', chart: 'averageRate' },
+          { kind: 'chartNotes', province: 'ca-on', chart: 'averageRate' },
         ],
       ],
       [
@@ -387,6 +390,7 @@ describe('the province comparison', () => {
         [
           paragraph(t.marginalRate.text),
           { kind: 'salaryChart', province: 'ca-on', chart: 'marginalRate' },
+          { kind: 'chartNotes', province: 'ca-on', chart: 'marginalRate' },
         ],
       ],
       [
@@ -394,6 +398,7 @@ describe('the province comparison', () => {
         [
           paragraph(t.yearTotal.text),
           { kind: 'salaryChart', province: 'ca-on', chart: 'yearTotal' },
+          { kind: 'chartNotes', province: 'ca-on', chart: 'yearTotal' },
         ],
       ],
     ]);

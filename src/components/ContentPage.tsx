@@ -11,6 +11,7 @@ import {
   HUB_CHART_SLOT_IDS,
   PROVINCE_COMPARISON_SLOT_ID,
 } from '../state/hubSlots';
+import { chartNotes } from '../state/hubNotes';
 import { strings } from '../strings';
 import { THEME_TOGGLE_SLOT_ID } from '../state/themeSlot';
 import { ProvinceComparison } from './ProvinceComparison';
@@ -39,6 +40,19 @@ function ContentBlockView({
           )}
         </div>
       );
+    case 'chartNotes': {
+      const sweep = hubCharts?.provinces.find(
+        (entry) => entry.slug === block.province,
+      );
+      const notes = sweep ? chartNotes(block.province, block.chart, sweep) : [];
+      return notes.length === 0 ? null : (
+        <ul className={styles.notes} data-chart-notes={block.chart}>
+          {notes.map((words) => (
+            <li key={words}>{words}</li>
+          ))}
+        </ul>
+      );
+    }
     case 'paragraph':
       return (
         <p>

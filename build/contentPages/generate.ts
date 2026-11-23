@@ -58,6 +58,7 @@ function blockProblem(block: ContentBlock): string | null {
       }
       return null;
     case 'salaryChart':
+    case 'chartNotes':
       return null;
     case 'table':
       if (block.rows.length === 0) return 'has a table with no rows';
