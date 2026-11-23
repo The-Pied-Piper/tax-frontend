@@ -63,11 +63,7 @@ describe('SalaryChart', () => {
         chart="yearTotal"
       />,
     );
-    expect(
-      screen.getByText(
-        'These are estimates for a single person whose only income is a salary.',
-      ),
-    ).toBeInTheDocument();
+    expect(screen.getByText(t.note)).toBeInTheDocument();
   });
 
   it('has the Per year / Per month switch on the two money charts only', () => {
