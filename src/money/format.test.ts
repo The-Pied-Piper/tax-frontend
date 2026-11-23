@@ -1,6 +1,7 @@
 import type { Unit } from '../api';
 import { cad, months, percent } from '../test/units';
 import {
+  displayCents,
   displayMoney,
   displayRate,
   displayWholeMoney,
@@ -225,5 +226,14 @@ describe('displayTick', () => {
     expect(displayTick('0.2', percent)).toBe('20%');
     expect(displayTick('0', percent)).toBe('0%');
     expect(displayTick('0.125', percent)).toBe('12.5%');
+  });
+});
+
+describe('displayCents', () => {
+  it('writes a rate as cents on the dollar, moving digits only', () => {
+    expect(displayCents('0.0857')).toBe('8.57 cents');
+    expect(displayCents('0.01')).toBe('1 cent');
+    expect(displayCents('-0.1942')).toBe('-19.42 cents');
+    expect(displayCents('n/a')).toBe('n/a');
   });
 });

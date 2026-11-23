@@ -1,13 +1,13 @@
 import type { MoneyUnit } from '../money/format';
-import { displayRate, displayWholeMoney } from '../money/format';
+import { displayCents, displayRate, displayWholeMoney } from '../money/format';
 import {
-  compareAmounts,
   halfOf,
   ratioText,
   roundToWhole,
   subtractAmounts,
   timesTenThousand,
-} from '../money/scale';
+} from '../money/amounts';
+import { compareAmounts } from '../money/scale';
 import {
   SWEEP_COLUMN,
   sweepSalaries,
@@ -17,6 +17,7 @@ import {
 } from './hubCharts';
 import { hubNoteText } from './hubNoteText';
 import type { Note } from './hubNoteTypes';
+import type { FooterProvinceSlug } from './siteLinks';
 
 /**
  * The text under each hub chart (#288): what the chart shows for this province. The wording is
@@ -218,7 +219,7 @@ export function figureText(
         return displayWholeMoney(timesTenThousand(value), 'annually', unit);
       }
       if (spec.kind === 'c') {
-        return `${displayRate(value, rateUnit).replace(/\s*%$/, '')} cents`;
+        return displayCents(value);
       }
       if (spec.kind === 'k') {
         return displayRate(subtractAmounts('1', value), rateUnit);
@@ -306,7 +307,7 @@ function isFullSweep(sweep: ProvinceSweep): boolean {
 
 /** The bullets under one chart of a province hub, or none when the province has no text for it or the sweep is not the full one. */
 export function chartNotes(
-  province: string,
+  province: FooterProvinceSlug,
   chart: HubChartId,
   sweep: ProvinceSweep,
 ): string[] {

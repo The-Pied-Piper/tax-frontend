@@ -7,56 +7,7 @@
 // A position is a coordinate in the chart's own units (SVG user units), kept
 // to one decimal and written as text: "123.4".
 
-const DECIMAL = /^(-?)(0|[1-9]\d*)(?:\.(\d+))?$/;
-
-interface Scaled {
-  readonly units: bigint;
-  /** Number of decimal digits `units` is scaled by. */
-  readonly digits: number;
-}
-
-// No real amount is longer; the cap keeps a malformed string cheap to refuse.
-const MAX_LENGTH = 30;
-
-function parse(text: string): Scaled {
-  const match = text.length <= MAX_LENGTH ? DECIMAL.exec(text) : null;
-  if (!match) throw new Error(`Not a decimal amount: "${text}"`);
-  const [, sign, whole = '0', fraction = ''] = match;
-  const units = BigInt(`${whole}${fraction}`);
-  return { units: sign === '-' ? -units : units, digits: fraction.length };
-}
-
-// Parses several amounts onto one common scale.
-function parseAll(texts: readonly string[]): {
-  units: bigint[];
-  digits: number;
-} {
-  const parsed = texts.map(parse);
-  const digits = parsed.reduce((most, p) => Math.max(most, p.digits), 0);
-  return {
-    units: parsed.map((p) => p.units * 10n ** BigInt(digits - p.digits)),
-    digits,
-  };
-}
-
-// Division rounded half up: a tie goes to the larger value, whatever the sign.
-function divideHalfUp(numerator: bigint, denominator: bigint): bigint {
-  const n = denominator < 0n ? -numerator : numerator;
-  const d = denominator < 0n ? -denominator : denominator;
-  const twice = 2n * n + d;
-  const quotient = twice / (2n * d);
-  return twice < 0n && twice % (2n * d) !== 0n ? quotient - 1n : quotient;
-}
-
-// Scaled integer back to text, trailing zeros of the fraction dropped.
-function unitsText(units: bigint, digits: number): string {
-  const negative = units < 0n;
-  const abs = (negative ? -units : units).toString().padStart(digits + 1, '0');
-  const whole = abs.slice(0, abs.length - digits);
-  const fraction = abs.slice(abs.length - digits).replace(/0+$/, '');
-  const sign = negative && (whole !== '0' || fraction !== '') ? '-' : '';
-  return `${sign}${whole}${fraction === '' ? '' : `.${fraction}`}`;
-}
+import { divideHalfUp, parseAll, unitsText } from './decimal';
 
 // A position always shows its one decimal: "123.0".
 function positionText(tenths: bigint): string {
@@ -125,52 +76,6 @@ export function compareAmounts(a: string, b: string): -1 | 0 | 1 {
   } = parseAll([a, b]);
   if (x === y) return 0;
   return x < y ? -1 : 1;
-}
-
-/** `a` minus `b`, exact, as text with trailing zeros of the fraction dropped. */
-export function subtractAmounts(a: string, b: string): string {
-  const {
-    units: [x = 0n, y = 0n],
-    digits,
-  } = parseAll([a, b]);
-  return unitsText(x - y, digits);
-}
-
-/** The whole-dollar amount nearest `amount`, a half going up, as text: "11133.97" gives "11134". Never shown with cents. */
-export function roundToWhole(amount: string): string {
-  const {
-    units: [x = 0n],
-    digits,
-  } = parseAll([amount]);
-  const scale = 10n ** BigInt(digits);
-  return unitsText(divideHalfUp(x, scale), 0);
-}
-
-/** Half of `amount`, exact. */
-export function halfOf(amount: string): string {
-  const {
-    units: [x = 0n],
-    digits,
-  } = parseAll([amount]);
-  return unitsText(x * 5n, digits + 1);
-}
-
-/** `amount` times 10,000, exact: a rate of "0.5353" gives "5353". */
-export function timesTenThousand(amount: string): string {
-  const {
-    units: [x = 0n],
-    digits,
-  } = parseAll([amount]);
-  return unitsText(x * 10000n, digits);
-}
-
-/** `numerator` over `denominator` as a fraction written to four decimals, half up: 273077.60 over 500000 gives "0.5462". The denominator must be above zero. */
-export function ratioText(numerator: string, denominator: string): string {
-  const {
-    units: [x = 0n, y = 0n],
-  } = parseAll([numerator, denominator]);
-  if (y <= 0n) throw new Error('The denominator must be above zero');
-  return unitsText(divideHalfUp(x * 10000n, y), 4);
 }
 
 /**

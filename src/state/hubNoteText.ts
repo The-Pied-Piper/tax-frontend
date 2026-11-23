@@ -1,3 +1,4 @@
+import type { FooterProvinceSlug } from './siteLinks';
 import type { ProvinceNotes } from './hubNoteTypes';
 import { alberta } from './hubNoteText/ca-ab';
 import { britishColumbia } from './hubNoteText/ca-bc';
@@ -7,7 +8,7 @@ import { ontario } from './hubNoteText/ca-on';
 import { saskatchewan } from './hubNoteText/ca-sk';
 
 /** The text under each hub chart, by province slug. A province with none shows no notes. */
-export const hubNoteText: Record<string, ProvinceNotes | undefined> = {
+export const hubNoteText: Partial<Record<FooterProvinceSlug, ProvinceNotes>> = {
   'ca-on': ontario,
   'ca-ab': alberta,
   'ca-bc': britishColumbia,

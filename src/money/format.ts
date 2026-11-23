@@ -123,6 +123,14 @@ export function displayRate(amount: string, unit: MoneyUnit): string {
   return shifted === null ? amount : withUnit(shifted, unit);
 }
 
+// A rate written as cents on the dollar: "0.0857" -> "8.57 cents", "0.01" -> "1 cent".
+// Only digits are moved, never rounded; text that is not a plain decimal is returned as is.
+export function displayCents(amount: string): string {
+  const shifted = timesHundred(amount);
+  if (shifted === null) return amount;
+  return `${shifted} ${shifted === '1' ? 'cent' : 'cents'}`;
+}
+
 // Short label for an axis tick, from a round value the chart chose. A rate
 // shows as the unit says (a percent when as_percentage). Money is grouped, and
 // a whole number of hundreds from 1,000 up is shortened with a k: "$50k",
