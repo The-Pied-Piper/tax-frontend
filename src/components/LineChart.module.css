@@ -106,7 +106,14 @@
 
 @media (max-width: 480px) {
   .tick {
-    font-size: 13px;
+    font-size: 12px;
+  }
+
+  /* The axis titles keep their size and sit a little further out, clear of
+     the larger figures beside them. */
+  .title {
+    font-size: 11px;
+    translate: -3px 0;
   }
 
   .desktopOnly {

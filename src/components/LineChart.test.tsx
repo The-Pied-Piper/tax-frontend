@@ -55,6 +55,42 @@ const hitRect = (container: HTMLElement) => {
 const svg = () => screen.getByRole('img');
 
 describe('LineChart', () => {
+  it('on a phone hides every other label up the side beyond four, keeping the zero line labelled', () => {
+    const { container } = render(
+      chart({
+        points: [
+          { salary: '1000', values: ['-40000'] },
+          { salary: '500000', values: ['140000'] },
+        ],
+        series: [FIRST_SERIES],
+      }),
+    );
+    // Ticks -50k, 0, 50k, 100k, 150k: the zero line stays, with its neighbours' neighbours.
+    const hidden = [...container.querySelectorAll('text')]
+      .filter((node) => /desktopOnly/.test(node.getAttribute('class') ?? ''))
+      .map((node) => node.textContent);
+    expect(hidden).toEqual(expect.arrayContaining(['-$50k', '$50k', '$150k']));
+    expect(hidden).not.toContain('$0');
+  });
+
+  it('keeps every label up the side when there are four or fewer', () => {
+    const { container } = render(
+      chart({
+        points: [
+          { salary: '1000', values: ['0'] },
+          { salary: '500000', values: ['300000'] },
+        ],
+        series: [FIRST_SERIES],
+      }),
+    );
+    expect(
+      container.querySelectorAll('text[class*="desktopOnly"]'),
+    ).toHaveLength(
+      // The two salary labels only desktop shows: $100k and $300k.
+      2,
+    );
+  });
+
   it('marks which salary labels are for desktop only and which for phones only', () => {
     render(chart());
     // A class name carries the CSS module's hashed name; match on its stem.

@@ -48,7 +48,7 @@ type Props = {
   onActiveChange: (index: number | null) => void;
 };
 
-// A phone shows at most this many labels up the side (the rest are hidden by CSS).
+// Beyond this many labels up the side, a phone hides every other one (in CSS).
 const PHONE_MAX_Y_LABELS = 4;
 const WIDTH = 420;
 const HEIGHT = 250;
@@ -108,6 +108,11 @@ export function LineChart({
   const { axis, xs, y } = geometry;
   // On a phone, an axis with more than four labels shows every other one.
   const phoneHidesY = axis.ticks.length > PHONE_MAX_Y_LABELS;
+  // The one that stays is the zero line's, so the labels shown are zero and every other tick from it.
+  const zeroAt = Math.max(
+    0,
+    axis.ticks.findIndex((tick) => /^-?0(\.0+)?$/.test(tick)),
+  );
   const active =
     activeIndex !== null && activeIndex in points ? activeIndex : undefined;
   const activeX = active === undefined ? undefined : xs[active];
@@ -169,7 +174,7 @@ export function LineChart({
             />
             <text
               className={
-                phoneHidesY && at % 2 === 1
+                phoneHidesY && (at - zeroAt) % 2 !== 0
                   ? [styles.tick, styles.desktopOnly].join(' ')
                   : styles.tick
               }
@@ -190,7 +195,7 @@ export function LineChart({
               ? undefined
               : styles.desktopOnly
             : styles.phoneOnly;
-          // The axis's last label ends at the edge on a phone, so it is not cut off.
+          // The last label is right-aligned on a phone so it stays inside the drawing's edge.
           const ends = tick === xTicksPhone[xTicksPhone.length - 1];
           return (
             <text
@@ -211,7 +216,7 @@ export function LineChart({
           );
         })}
         <text
-          className={styles.tick}
+          className={[styles.tick, styles.title].join(' ')}
           x={(LEFT + PLOT_RIGHT) / 2}
           y={HEIGHT - 4}
           textAnchor="middle"
@@ -219,7 +224,7 @@ export function LineChart({
           {xAxisLabel}
         </text>
         <text
-          className={styles.tick}
+          className={[styles.tick, styles.title].join(' ')}
           transform={`translate(11 ${String((TOP + PLOT_BOTTOM) / 2)}) rotate(-90)`}
           textAnchor="middle"
         >
