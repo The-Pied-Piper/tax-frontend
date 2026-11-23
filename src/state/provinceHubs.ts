@@ -74,6 +74,7 @@ function chartSection(
   return {
     heading: title,
     id: CHART_SECTION_IDS[chart],
+    card: true,
     blocks: [paragraph(text), { kind: 'salaryChart', province, chart }],
   };
 }
@@ -224,13 +225,20 @@ export function hubPage(
     sections: [
       {
         heading: `How your ${name} take-home is worked out`,
-        ...(withCharts ? { id: CHART_SECTION_IDS.takeHome } : {}),
+        ...(withCharts
+          ? { id: CHART_SECTION_IDS.takeHome, card: true as const }
+          : {}),
         blocks: [
           paragraph(
             `Take-home pay is your salary minus three things. The first is income tax, which comes in two parts: federal tax and ${name} tax. The second is your Canada Pension Plan payments, which build up your future pension. The third is Employment Insurance, or EI, which can pay you if you lose your job. The forms below are where each of those is worked out.`,
           ),
           ...(withCharts
             ? [
+                {
+                  kind: 'subheading' as const,
+                  text: strings.hubCharts.charts.takeHome.title,
+                },
+                paragraph(strings.hubCharts.charts.takeHome.text),
                 {
                   kind: 'salaryChart' as const,
                   province: text.slug,

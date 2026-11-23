@@ -39,6 +39,8 @@ function ContentBlockView({
           )}
         </div>
       );
+    case 'subheading':
+      return <h3 className={styles.chartHeading}>{block.text}</h3>;
     case 'paragraph':
       return (
         <p>
@@ -122,6 +124,8 @@ function ContentBlockView({
   }
 }
 
+const cardSection = [styles.section, styles.card].join(' ');
+
 /** A reading page: heading, theme switch, breadcrumb, sections of blocks and the site footer. A hub's charts data is what its comparison block draws from. */
 export function ContentPage({
   heading,
@@ -146,7 +150,11 @@ export function ContentPage({
         <Breadcrumb {...contentBreadcrumb({ heading, trail })} />
         {form && <FormSections {...form} />}
         {sections.map((section, at) => (
-          <section key={at} id={section.id} className={styles.section}>
+          <section
+            key={at}
+            id={section.id}
+            className={section.card ? cardSection : styles.section}
+          >
             {section.id ? (
               <div className={styles.headingRow}>
                 <h2>{section.heading}</h2>

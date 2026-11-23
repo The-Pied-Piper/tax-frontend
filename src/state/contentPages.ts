@@ -19,6 +19,8 @@ export type ListItem = { label: string; href?: string; description: string };
 /** One piece of a section, shown in order. */
 export type ContentBlock =
   | { kind: 'paragraph'; content: Inline[] }
+  /** A small heading inside a section, for a part of it that has its own title. */
+  | { kind: 'subheading'; text: string }
   /** A list of entries; a title above it is shown as a small heading. */
   | { kind: 'list'; title?: string; items: ListItem[] }
   /** A labelled group of links, as a grid of buttons or a single row. */
@@ -35,10 +37,11 @@ export type ContentBlock =
   /** The province comparison of a hub: bars for every served province at one salary. It carries only the hub's slug; the page draws it from the hub's data block. */
   | { kind: 'provinceComparison'; province: FooterProvinceSlug };
 
-/** A heading and the blocks under it. With an `id` the section has a permalink, such as `#average-rate`. */
+/** A heading and the blocks under it. With an `id` the section has a permalink, such as `#average-rate`; with `card` it is drawn as a bordered card. */
 export type ContentSection = {
   heading: string;
   id?: string;
+  card?: true;
   blocks: ContentBlock[];
 };
 

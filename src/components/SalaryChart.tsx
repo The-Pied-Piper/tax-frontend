@@ -2,7 +2,13 @@ import { useMemo, useState } from 'react';
 import { ChartPeriodSwitch } from './ChartPeriodSwitch';
 import { LineChart, type ChartPoint } from './LineChart';
 import styles from './SalaryChart.module.css';
-import { displayMoney, displayRate, displayWholeMoney } from '../money/format';
+import {
+  displayMoney,
+  displayRate,
+  displayRateOneDecimal,
+  displayRoundedMoney,
+  displayWholeMoney,
+} from '../money/format';
 import { amountForPeriod } from '../money/payPeriod';
 import {
   CHART_COLUMN,
@@ -36,9 +42,7 @@ export function SalaryChart({ data, province, chart }: Props) {
 
 function yAxisLabel(chart: HubChartId, dollars: string): string {
   const t = strings.hubCharts;
-  if (chart === 'averageRate') return t.percentOfSalary;
-  if (chart === 'marginalRate') return t.percentOfExtra;
-  return dollars;
+  return isRateChart(chart) ? t.percent : dollars;
 }
 
 function Chart({ sweep, chart }: { sweep: ProvinceSweep; chart: HubChartId }) {
@@ -100,8 +104,8 @@ function Chart({ sweep, chart }: { sweep: ProvinceSweep; chart: HubChartId }) {
           t.hover(
             salaryAt,
             rate
-              ? displayRate(value, rateUnit)
-              : t.perPeriod(displayMoney(value, 'annually', unit), shown),
+              ? displayRateOneDecimal(value, rateUnit)
+              : displayRoundedMoney(value, 'annually', unit),
           )
         }
         ariaLabel={t.chartLabel(words.title, from, to)}
@@ -117,7 +121,6 @@ function Chart({ sweep, chart }: { sweep: ProvinceSweep; chart: HubChartId }) {
           {t.readout(salaryAt)}
         </p>
       )}
-      {!rate && <p className={styles.note}>{t.monthNote}</p>}
       <p className={styles.note}>
         {t.note}
         {sweep.provisional && (

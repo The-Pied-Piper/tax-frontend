@@ -351,10 +351,16 @@ describe('the province comparison', () => {
     const withIt = make(true);
     const rest = withIt.sections
       .filter((s) => !chartHeadings.includes(s.heading))
-      // The take-home section keeps its words and gains its permalink and its chart.
+      // The take-home section keeps its words and gains its permalink, its chart and the chart's heading and line.
       .map(({ heading, blocks }) => ({
         heading,
-        blocks: blocks.filter((block) => block.kind !== 'salaryChart'),
+        blocks: blocks.filter(
+          (block) =>
+            block.kind !== 'salaryChart' &&
+            block.kind !== 'subheading' &&
+            JSON.stringify(block) !==
+              JSON.stringify(paragraph(strings.hubCharts.charts.takeHome.text)),
+        ),
       }));
     expect(rest).toEqual(without.sections);
   });
@@ -363,12 +369,18 @@ describe('the province comparison', () => {
     const page = make(true);
     const how = section(page, 'How your Ontario take-home is worked out');
     expect(how?.id).toBe('take-home');
-    expect(how?.blocks.at(-1)).toEqual({
-      kind: 'salaryChart',
-      province: 'ca-on',
-      chart: 'takeHome',
-    });
+    expect(how?.card).toBe(true);
     const t = strings.hubCharts.charts;
+    expect(how?.blocks.slice(-3)).toEqual([
+      { kind: 'subheading', text: t.takeHome.title },
+      paragraph(t.takeHome.text),
+      { kind: 'salaryChart', province: 'ca-on', chart: 'takeHome' },
+    ]);
+    expect(
+      (['averageRate', 'marginalRate', 'yearTotal'] as const).map(
+        (chart) => section(page, t[chart].title)?.card,
+      ),
+    ).toEqual([true, true, true]);
     expect(
       (['averageRate', 'marginalRate', 'yearTotal'] as const).map((chart) => {
         const found = section(page, t[chart].title);

@@ -221,6 +221,20 @@ describe('generateContentPages validation', () => {
       expect(written).toEqual(['blocks-page/index.html']);
     });
 
+    it('rejects a sub-heading with no words and names the page', async () => {
+      const dir = outDir();
+      const empty = withBlocks({ kind: 'subheading', text: '' });
+      await expect(run(dir, [empty])).rejects.toThrow(/plain-page/);
+      expect(files(dir)).toEqual([]);
+    });
+
+    it('accepts a sub-heading with words', async () => {
+      const { written } = await run(outDir(), [
+        withBlocks({ kind: 'subheading', text: 'Take-home pay' }),
+      ]);
+      expect(written).toEqual(['plain-page/index.html']);
+    });
+
     it('rejects a table row longer than the head and names the page', async () => {
       const dir = outDir();
       const ragged = withBlocks({

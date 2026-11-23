@@ -1,9 +1,7 @@
 /* One salary chart of a province hub. Colours come only from styles/tokens.css. */
+/* The chart sits inside its section's card; it draws no frame of its own. */
 .card {
-  background: var(--surface);
-  border: 1px solid var(--line);
-  border-radius: 12px;
-  padding: 18px;
+  min-width: 0;
 }
 
 .bar {
