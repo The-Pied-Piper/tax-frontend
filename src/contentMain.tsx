@@ -19,6 +19,7 @@ import './styles/global.css';
 import './components/Breadcrumb.module.css';
 import './components/ContentPage.module.css';
 import './components/ChartPeriodSwitch.module.css';
+import './components/FoldingList.module.css';
 import './components/FormSections.module.css';
 import './components/LineChart.module.css';
 import './components/SalaryChart.module.css';

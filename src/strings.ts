@@ -106,6 +106,10 @@ export const strings = {
       tableProvince: 'Province',
     },
   },
+  fold: {
+    more: 'See more',
+    less: 'See less',
+  },
   formPage: {
     contents: 'On this page',
     permalink: (heading: string) => `Link to ${heading}`,

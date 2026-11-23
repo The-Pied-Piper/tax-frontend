@@ -69,6 +69,12 @@
   border-top: 0;
 }
 
+/* The items folded behind "See more" continue the list above them. */
+details > .formList li:first-child {
+  padding-top: 12px;
+  border-top: 1px solid var(--rule);
+}
+
 .formList a,
 .formName {
   font-size: 15px;

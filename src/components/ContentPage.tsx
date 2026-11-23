@@ -15,6 +15,7 @@ import { chartNotes } from '../state/hubNotes';
 import { strings } from '../strings';
 import { THEME_TOGGLE_SLOT_ID } from '../state/themeSlot';
 import { ProvinceComparison } from './ProvinceComparison';
+import { FoldingList } from './FoldingList';
 
 /** One block of a section: a paragraph, a list of forms, a group of links, a table or a hub's charts or comparison. */
 function ContentBlockView({
@@ -46,11 +47,15 @@ function ContentBlockView({
       );
       const notes = sweep ? chartNotes(block.province, block.chart, sweep) : [];
       return notes.length === 0 ? null : (
-        <ul className={styles.notes} data-chart-notes={block.chart}>
-          {notes.map((words) => (
-            <li key={words}>{words}</li>
-          ))}
-        </ul>
+        <FoldingList
+          listClassName={styles.notes}
+          data={{ 'data-chart-notes': block.chart }}
+          items={notes.map((words) => ({
+            key: words,
+            length: words.length,
+            content: words,
+          }))}
+        />
       );
     }
     case 'subheading':
@@ -73,18 +78,23 @@ function ContentBlockView({
       return (
         <>
           {block.title && <h3 className={styles.subheading}>{block.title}</h3>}
-          <ul className={styles.formList}>
-            {block.items.map((item) => (
-              <li key={item.label}>
-                {item.href ? (
-                  <a href={item.href}>{item.label}</a>
-                ) : (
-                  <span className={styles.formName}>{item.label}</span>
-                )}
-                <p>{item.description}</p>
-              </li>
-            ))}
-          </ul>
+          <FoldingList
+            listClassName={styles.formList}
+            items={block.items.map((item) => ({
+              key: item.label,
+              length: item.label.length + item.description.length,
+              content: (
+                <>
+                  {item.href ? (
+                    <a href={item.href}>{item.label}</a>
+                  ) : (
+                    <span className={styles.formName}>{item.label}</span>
+                  )}
+                  <p>{item.description}</p>
+                </>
+              ),
+            }))}
+          />
         </>
       );
     case 'links':

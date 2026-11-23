@@ -314,6 +314,43 @@ describe('ContentPage chart notes', () => {
     expect(partial.container.querySelector('[data-chart-notes]')).toBeNull();
   });
 
+  it('folds a chart with long text behind See more, for any province', () => {
+    for (const province of ['ca-on', 'ca-nl'] as const) {
+      const marginal = {
+        ...plainSpec,
+        sections: [
+          {
+            heading: 'Marginal tax rate',
+            blocks: [
+              {
+                kind: 'chartNotes' as const,
+                province,
+                chart: 'marginalRate' as const,
+              },
+            ],
+          },
+        ],
+      };
+      const { container, unmount } = render(
+        <ContentPage {...marginal} hubCharts={fullHubCharts([province])} />,
+      );
+      expect(
+        container.querySelector('ul[data-chart-notes="marginalRate"]')
+          ?.children,
+      ).toHaveLength(3);
+      expect(container.querySelector('details')).not.toBeNull();
+      expect(screen.getByText('See more')).toBeInTheDocument();
+      unmount();
+    }
+  });
+
+  it('does not fold a chart whose text is short', () => {
+    const { container } = render(
+      <ContentPage {...spec} hubCharts={fullHubCharts(['ca-on'])} />,
+    );
+    expect(container.querySelector('details')).toBeNull();
+  });
+
   it('writes the same markup on the server', () => {
     const html = renderToString(
       <ContentPage {...spec} hubCharts={fullHubCharts(['ca-on'])} />,
