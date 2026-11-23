@@ -44,6 +44,15 @@ export function provinceSweeps(
     }
     return {
       slug: province.slug,
+      edges: sweep.edges.map(
+        ([below = '', moves = '', settled = '', rate = '']) => [
+          below,
+          moves,
+          settled,
+          rate,
+        ],
+      ),
+      facts: sweep.facts,
       year: province.year,
       provisional,
       unit,
@@ -53,10 +62,9 @@ export function provinceSweeps(
         point.take_home,
         point.total_deductions,
         point.income_tax,
-        point.average_income_tax_rate,
-        point.net_marginal_rate,
-        point.net_total,
-        point.net_average_rate,
+        point.average_rate,
+        point.marginal_rate,
+        point.year_total,
       ]),
     };
   });

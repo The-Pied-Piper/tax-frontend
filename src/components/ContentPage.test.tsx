@@ -300,7 +300,11 @@ describe('ContentPage chart notes', () => {
     );
     const list = container.querySelector('ul[data-chart-notes="averageRate"]');
     expect(list).not.toBeNull();
-    expect(list?.textContent).toContain('lowest, -12.73%, at $9,000');
+    // Employment Insurance as the EI form sets it, and the average at $70,000, from the hub's data.
+    expect(list?.textContent).toContain(
+      'until the full rate applies by about $2,033',
+    );
+    expect(list?.textContent).toContain('23.2% at $70,000');
     expect(list?.textContent).not.toMatch(/[{}]/);
   });
 

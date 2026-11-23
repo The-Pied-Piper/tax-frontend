@@ -23,9 +23,9 @@ const sweep = {
   provisional: true,
   unit,
   rateUnit: { ...unit, as_percentage: true },
-  points: [
-    ['1000', '1000.00', '0.00', '0.00', '0.0000', '0.0505', '0.00', '0.0000'],
-  ],
+  points: [['1000', '1000.00', '0.00', '0.00', '0.0000', '0.0505', '0.00']],
+  edges: [['20000', '20160', '20170', '0.2640']],
+  facts: { surtax_first: '5818' },
 };
 
 describe('regularSalaries', () => {
@@ -117,6 +117,34 @@ describe('parseHubChartsData', () => {
     ],
     ['no unit', JSON.stringify({ provinces: [{ ...sweep, unit: null }] })],
     [
+      'an edge with three figures',
+      JSON.stringify({
+        provinces: [{ ...sweep, edges: [['20000', '20160', '20170']] }],
+      }),
+    ],
+    [
+      'an edge that is not a decimal',
+      JSON.stringify({
+        provinces: [{ ...sweep, edges: [['20000', '20160', '<b>', '0.2']] }],
+      }),
+    ],
+    [
+      'no edges',
+      JSON.stringify({ provinces: [{ ...sweep, edges: undefined }] }),
+    ],
+    [
+      'a fact that is not a decimal',
+      JSON.stringify({ provinces: [{ ...sweep, facts: { a: '<b>' } }] }),
+    ],
+    [
+      'a fact with a name that is not a name',
+      JSON.stringify({ provinces: [{ ...sweep, facts: { '../a': '1' } }] }),
+    ],
+    [
+      'no facts',
+      JSON.stringify({ provinces: [{ ...sweep, facts: undefined }] }),
+    ],
+    [
       'a year as text',
       JSON.stringify({ provinces: [{ ...sweep, year: '2026' }] }),
     ],
@@ -196,7 +224,6 @@ const point = (salary: string): SweepPoint => [
   '0',
   '0',
   '0',
-  '0',
 ];
 
 describe('the card constants', () => {
@@ -222,7 +249,7 @@ describe('the card constants', () => {
   it('reads each chart from its own place of a point', () => {
     expect(CHART_COLUMN).toEqual({
       takeHome: 1,
-      averageRate: 7,
+      averageRate: 4,
       marginalRate: 5,
       yearTotal: 6,
     });

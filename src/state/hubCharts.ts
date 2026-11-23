@@ -38,12 +38,13 @@ export function regularIndexes(points: readonly SweepPoint[]): number[] {
 }
 
 /**
- * One point of a sweep, all text as the engine wrote it: salary, take-home,
- * total deductions, income tax (the total payable, before credits paid to you) and its
- * average rate (the comparison's figures), then the figures the charts draw on one
- * basis, income tax plus Canada Pension Plan and Employment Insurance less the credits paid
- * to you when you file: the marginal rate (the change in that total per extra dollar),
- * the total for the year and its average rate.
+ * One point of a sweep, all text as the engine wrote it: salary, take-home, total
+ * deductions and income tax (the total payable, T1 line 43500, so tax cuts such as the Ontario
+ * LIFT credit count), then the figures the charts draw. The deductions are income tax plus
+ * Canada Pension Plan (all three parts) plus Employment Insurance as the Employment Insurance
+ * form sets it, and credits paid to you when you file are not counted. The average rate is the
+ * deductions over the salary and the marginal rate is their change per extra dollar. The last
+ * figure is the one that is net of credits: the "tax and contributions for the year" total.
  */
 export type SweepPoint = [
   salary: string,
@@ -53,7 +54,18 @@ export type SweepPoint = [
   averageRate: string,
   marginalRate: string,
   yearTotal: string,
-  yearAverageRate: string,
+];
+
+/**
+ * Where the marginal rate changes, as the engine found it on a $10 grid between two neighbouring sweep
+ * salaries: the sweep salary below, the salary the rate first moves, the salary it has settled at its
+ * new value and the marginal rate there (a fraction). A band starts where the rate has settled and ends where it first moves back. Whole dollars, as text.
+ */
+export type SweepEdge = [
+  below: string,
+  moves: string,
+  settled: string,
+  rate: string,
 ];
 
 /** The sweep of one province. */
@@ -66,6 +78,10 @@ export type ProvinceSweep = {
   /** The unit of the two rates. */
   rateUnit: Unit;
   points: SweepPoint[];
+  /** The changes of the marginal rate between sweep salaries, lowest first. */
+  edges: SweepEdge[];
+  /** Engine parameters and band figures the notes quote, by name: the Ontario surtax thresholds, a reduction's start, and so on. */
+  facts: Record<string, string>;
 };
 
 /** What a hub's data block holds: the sweep of every province the build served. */
@@ -76,16 +92,44 @@ const DECIMAL = /^-?(0|[1-9]\d*)(\.\d+)?$/;
 const MAX_FIGURE_LENGTH = 30;
 /** A slug as the site writes it. */
 const SLUG = /^[a-z0-9-]+$/;
+/** A fact's name as the engine step writes it. */
+const SLUG_NAME = /^[a-z0-9_]+$/;
 
 function isPoint(value: unknown): value is SweepPoint {
   return (
     Array.isArray(value) &&
-    value.length === 8 &&
+    value.length === 7 &&
     value.every(
       (part: unknown) =>
         typeof part === 'string' &&
         part.length <= MAX_FIGURE_LENGTH &&
         DECIMAL.test(part),
+    )
+  );
+}
+
+function isEdge(value: unknown): value is SweepEdge {
+  return (
+    Array.isArray(value) &&
+    value.length === 4 &&
+    value.every(
+      (part: unknown) =>
+        typeof part === 'string' &&
+        part.length <= MAX_FIGURE_LENGTH &&
+        DECIMAL.test(part),
+    )
+  );
+}
+
+function isFacts(value: unknown): value is Record<string, string> {
+  return (
+    isRecord(value) &&
+    Object.entries(value).every(
+      ([name, fact]) =>
+        SLUG_NAME.test(name) &&
+        typeof fact === 'string' &&
+        fact.length <= MAX_FIGURE_LENGTH &&
+        DECIMAL.test(fact),
     )
   );
 }
@@ -101,7 +145,10 @@ function isProvinceSweep(value: unknown): boolean {
     readUnit(value.rateUnit) !== null &&
     Array.isArray(value.points) &&
     value.points.length > 0 &&
-    value.points.every(isPoint)
+    value.points.every(isPoint) &&
+    Array.isArray(value.edges) &&
+    value.edges.every(isEdge) &&
+    isFacts(value.facts)
   );
 }
 
@@ -196,10 +243,9 @@ export const SWEEP_COLUMN = {
   takeHome: 1,
   deductions: 2,
   tax: 3,
-  taxAverage: 4,
+  average: 4,
   marginal: 5,
   total: 6,
-  average: 7,
 } as const;
 
 /** Which place of a `SweepPoint` each chart reads. */

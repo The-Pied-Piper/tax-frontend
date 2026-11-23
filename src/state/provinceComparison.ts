@@ -5,7 +5,7 @@ import {
   nearestAmountIndex,
   scalePosition,
 } from '../money/scale';
-import type { ProvinceSweep } from './hubCharts';
+import { SWEEP_COLUMN, type ProvinceSweep } from './hubCharts';
 
 /** What the bars show. */
 export type Measure = 'takeHome' | 'incomeTax' | 'averageRate';
@@ -18,7 +18,11 @@ export const MEASURES: readonly Measure[] = [
 ];
 
 // Each measure's place in a sweep point.
-const COLUMN = { takeHome: 1, incomeTax: 3, averageRate: 4 } as const;
+const COLUMN = {
+  takeHome: SWEEP_COLUMN.takeHome,
+  incomeTax: SWEEP_COLUMN.tax,
+  averageRate: SWEEP_COLUMN.average,
+} as const;
 
 /** The salary the comparison starts at. */
 export const DEFAULT_SALARY = '70000';

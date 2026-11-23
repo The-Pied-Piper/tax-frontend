@@ -53,12 +53,13 @@ describe("reading the Python step's file", () => {
         total_deductions: '100.00',
         income_tax: '40.00',
         take_home: '900.00',
-        average_income_tax_rate: '0.0100',
-        net_total: '100.00',
-        net_average_rate: '0.1000',
-        net_marginal_rate: '0.0505',
+        average_rate: '0.1000',
+        marginal_rate: '0.0505',
+        year_total: '100.00',
       },
     ],
+    edges: [['20000', '20160', '20170', '0.2640']],
+    facts: { surtax_first: '5818' },
     sweep_units: {
       unit: sweepUnit,
       average_income_tax_rate: saved.average_income_tax_rate.unit,
@@ -93,6 +94,8 @@ describe("reading the Python step's file", () => {
   it('returns the sweep of each province with its units', () => {
     const figures = readEngineFigures(written({ '70000': engineOf(saved) }));
     expect(figures.sweeps['CA-ON']?.points).toEqual(sweepFile.sweep);
+    expect(figures.sweeps['CA-ON']?.edges).toEqual(sweepFile.edges);
+    expect(figures.sweeps['CA-ON']?.facts).toEqual(sweepFile.facts);
     expect(figures.sweeps['CA-ON']?.units.unit).toEqual(sweepUnit);
   });
 
@@ -105,10 +108,20 @@ describe("reading the Python step's file", () => {
     expect(() => readEngineFigures(written(pages, bad))).toThrow(
       /CA-ON has no valid sweep/,
     );
-    const noUnits = { sweep: sweepFile.sweep };
+    const noUnits = { ...sweepFile, sweep_units: undefined };
     expect(() => readEngineFigures(written(pages, noUnits))).toThrow(
       /CA-ON has no sweep units/,
     );
+  });
+
+  it('fails when the edges or the facts of a province are not whole', () => {
+    const pages = { '70000': engineOf(saved) };
+    expect(() =>
+      readEngineFigures(written(pages, { ...sweepFile, edges: [['1', '2']] })),
+    ).toThrow(/CA-ON has no valid edges/);
+    expect(() =>
+      readEngineFigures(written(pages, { ...sweepFile, facts: { a: 1 } })),
+    ).toThrow(/CA-ON has no valid facts/);
   });
 
   it('fails, naming the page, when an answer does not fit the spec', () => {
@@ -169,28 +182,67 @@ describe.runIf(process.env.ENGINE_FIGURES_FILE)(
     });
 
     // The chart figures, pinned to the independent sweep of the hub-charts thread (tax-engine 0.4.1,
-    // 2026): net_total is income tax plus CPP and EI less the credits paid on filing, net_marginal_rate
-    // its change over the next $100 (or $10 near a narrow step).
+    // 2026, basis 2): the average rate is income tax, CPP and EI (the EI form's line 16) over the salary,
+    // the marginal rate its change over the next $100 (or $10 near a narrow step), and the year total is
+    // income tax, CPP and EI as deducted, less the credits paid on filing.
     it.each([
-      ['2000.00', '0.00', '0.0000', '1.0000'],
-      ['3000.00', '48.90', '0.0163', '-0.2537'],
-      ['38000.00', '5889.24', '0.1550', '0.5093'],
-      ['70000.00', '16213.75', '0.2316', '0.3435'],
-      ['201200.00', '69319.16', '0.3445', '0.7327'],
+      ['2000.00', '0.0000', '1.0000', '0.00', '2000.00'],
+      ['3000.00', '0.0163', '0.0163', '48.90', '2951.10'],
+      ['38000.00', '0.1583', '0.3608', '5889.24', '31985.21'],
+      ['70000.00', '0.2316', '0.3435', '16213.75', '53786.25'],
+      ['201200.00', '0.3445', '0.7327', '69319.16', '131880.84'],
     ])(
       'gives Ontario at %s the sweep figures',
-      (salary, total, average, marginal) => {
+      (salary, average, marginal, yearTotal, takeHome) => {
         const raw = JSON.parse(readFileSync(file, 'utf8')) as {
           provinces: Record<string, { sweep: Record<string, string>[] }>;
         };
         const point = raw.provinces['CA-ON']?.sweep.find(
           (entry) => entry.salary === salary,
         );
-        expect(point?.net_total).toBe(total);
-        expect(point?.net_average_rate).toBe(average);
-        expect(point?.net_marginal_rate).toBe(marginal);
+        expect(point?.average_rate).toBe(average);
+        expect(point?.marginal_rate).toBe(marginal);
+        expect(point?.year_total).toBe(yearTotal);
+        expect(point?.take_home).toBe(takeHome);
       },
     );
+
+    it('takes Employment Insurance from the EI form: nothing at $2,000, $1 at $2,001, the full premium from $2,034', () => {
+      const raw = JSON.parse(readFileSync(file, 'utf8')) as {
+        provinces: Record<string, { sweep: Record<string, string>[] }>;
+      };
+      const ei = (salary: string): string | undefined => {
+        const point = raw.provinces['CA-ON']?.sweep.find(
+          (entry) => entry.salary === salary,
+        );
+        return point?.total_deductions;
+      };
+      expect(ei('2000.00')).toBe('0.00');
+      expect(ei('2020.00')).toBe('20.00');
+      expect(ei('2040.00')).toBe('33.25');
+    });
+
+    it('writes the changes of the Ontario marginal rate and the 2026 parameters the notes quote', () => {
+      const raw = JSON.parse(readFileSync(file, 'utf8')) as {
+        provinces: Record<
+          string,
+          { edges: string[][]; facts: Record<string, string> }
+        >;
+      };
+      const ontario = raw.provinces['CA-ON'];
+      // The health premium band, and the first spike (settled, then first moving back).
+      expect(
+        ontario?.edges.find((edge) => edge[0] === '20000')?.slice(0, 3),
+      ).toEqual(['20000', '20160', '20170']);
+      expect(ontario?.edges.map((edge) => edge[2])).toEqual(
+        expect.arrayContaining(['25220', '48450', '72700', '201130']),
+      );
+      expect(ontario?.facts).toMatchObject({
+        surtax_first: '5818',
+        surtax_second: '7446',
+        ei_band_end: '2033',
+      });
+    });
 
     it('holds the 307 hub-chart points of every province, $1,000 to $500,000 and the seven extra salaries', () => {
       const raw = JSON.parse(readFileSync(file, 'utf8')) as {

@@ -1,5 +1,5 @@
 import {
-  halfOf,
+  roundToHalfPoint,
   ratioText,
   roundToWhole,
   subtractAmounts,
@@ -24,10 +24,15 @@ describe('roundToWhole', () => {
   });
 });
 
-describe('halfOf', () => {
-  it('halves exactly', () => {
-    expect(halfOf('0.4538')).toBe('0.2269');
-    expect(halfOf('3')).toBe('1.5');
+describe('roundToHalfPoint', () => {
+  it('rounds a rate to the nearest half point, a half going up', () => {
+    expect(roundToHalfPoint('0.0758')).toBe('0.075');
+    expect(roundToHalfPoint('0.2052')).toBe('0.205');
+    expect(roundToHalfPoint('0.5911')).toBe('0.59');
+    expect(roundToHalfPoint('0.7327')).toBe('0.735');
+    expect(roundToHalfPoint('0.0125')).toBe('0.015');
+    expect(roundToHalfPoint('0')).toBe('0');
+    expect(roundToHalfPoint('1')).toBe('1');
   });
 });
 
