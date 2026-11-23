@@ -199,9 +199,7 @@ export function hubPage(
 ): ContentPageSpec {
   // A hub with no salary pages must not promise salary examples.
   const withSalaries = salaryLinks.length > 0;
-  const title = withSalaries
-    ? `${name}: forms and take-home examples`
-    : `${name}: forms behind take-home pay`;
+  const title = `${name} take-home pay and income tax analysis`;
   const salaries: ContentBlock[] = [
     paragraph(
       'Pick a salary to see the whole breakdown, step by step. Salary not listed? Use the ',
@@ -218,13 +216,11 @@ export function hubPage(
   return {
     slug: text.slug,
     title,
-    description: withSalaries
-      ? `The forms behind take-home pay in ${name}, each explained in plain words, with full salary examples to look at.`
-      : `The forms behind take-home pay in ${name}, each explained in plain words.`,
+    description: `Take-home pay and income tax in ${name} by salary: tax rates, how it compares with other provinces, and the forms behind the numbers.`,
     heading: title,
     lede: withSalaries
-      ? `Everything this site uses to work out take-home pay in ${name}, in one place. Each form is explained in plain words, and each salary page shows a full example.`
-      : `Everything this site uses to work out take-home pay in ${name}, in one place. Each form is explained in plain words.`,
+      ? `See how take-home pay, income tax and tax rates change with salary in ${name}, compare it with other provinces, and read the forms behind the numbers. Full salary examples are at the bottom.`
+      : `See how take-home pay, income tax and tax rates change with salary in ${name}, compare it with other provinces, and read the forms behind the numbers.`,
     trail: [],
     sections: [
       {
