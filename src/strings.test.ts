@@ -42,6 +42,11 @@ describe('the province comparison copy', () => {
       incomeTax: 'Income tax',
       averageRate: 'Average income tax rate',
     });
+    expect(copy.measuresPhone).toEqual({
+      takeHome: 'Take-home pay',
+      incomeTax: 'Income tax',
+      averageRate: 'Average tax rate',
+    });
     expect(copy.measureNotes).toEqual({
       takeHome:
         'Your salary minus income tax, pension plan payments and Employment Insurance, before any credits paid to you when you file.',
