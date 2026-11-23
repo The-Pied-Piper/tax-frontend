@@ -94,9 +94,9 @@ export const averageLow = {
     ),
   ],
   // British Columbia and Manitoba: a provincial credit is paid from the first dollar.
-  credit: (name: string): Note[] => [
+  credit: (name: string, ending = '.', about = 'about '): Note[] => [
     note(
-      `Your ${name} is paid from the first dollar, so the average is below zero at every salary up to about {positive}. It is lowest, about {lowest}, at {lowAt}.`,
+      `Your ${name} is paid from the first dollar, so the average is below zero at every salary up to about {positive}. It is lowest, ${about}{lowest}, at {lowAt}${ending}`,
       {
         ...POOL,
         lowest: 'v:average',

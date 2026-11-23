@@ -49,7 +49,11 @@ export const manitoba: ProvinceNotes = {
   takeHome: takeHomeNotes(shared),
   averageRate: averageRateNotes(
     shared,
-    averageLow.credit('Manitoba personal tax credit'),
+    averageLow.credit(
+      'Manitoba personal tax credit',
+      ', then rises towards zero.',
+      '',
+    ),
   ),
   marginalRate: [
     ...marginalLowNotes(shared, true, 'c:marginal@12000'),
