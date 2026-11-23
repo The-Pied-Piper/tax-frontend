@@ -1,4 +1,4 @@
-import type { ProvinceNotes } from '../hubNotes';
+import type { ProvinceNotes } from '../hubNoteTypes';
 import {
   averageLow,
   averageRateNotes,
@@ -52,7 +52,7 @@ export const manitoba: ProvinceNotes = {
     averageLow.credit('Manitoba personal tax credit'),
   ),
   marginalRate: [
-    ...marginalLowNotes(shared, true),
+    ...marginalLowNotes(shared, true, 'c:marginal@12000'),
     note(
       'Manitoba’s own tax starts before the federal tax does. From {m1} the rate is {m2}: Manitoba tax, Canada Pension Plan and Employment Insurance, and 1 cent more for every dollar, because the Manitoba personal tax credit, which is paid when you file, shrinks by 1 cent for every dollar of income. It is {fed} from {fedStart}, once federal tax joins in.',
       pool,

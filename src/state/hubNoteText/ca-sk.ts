@@ -1,4 +1,4 @@
-import type { ProvinceNotes } from '../hubNotes';
+import type { ProvinceNotes } from '../hubNoteTypes';
 import {
   averageLow,
   averageRateNotes,

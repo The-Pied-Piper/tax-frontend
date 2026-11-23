@@ -9,9 +9,8 @@ import {
   noteWords,
   parseSpec,
   tokensOf,
-  type Note,
-  type ProvinceNotes,
 } from './hubNotes';
+import type { Note, ProvinceNotes } from './hubNoteTypes';
 import { hubNoteText } from './hubNoteText';
 import { FOOTER_PROVINCE_SLUGS } from './siteLinks';
 
@@ -114,6 +113,23 @@ describe('the text of the hub charts', () => {
     expect(chartNotes('ca-on', 'marginalRate', sweep).join(' ')).toContain(
       '59.11% from $72,700 to $73,290, and 73.27% from $201,130 to $201,720',
     );
+  });
+
+  it('writes every province and chart as one reviewed text, so a change in wording or in a figure shows in review', () => {
+    for (const slug of SLUGS) {
+      const sweep = sweepOf(slug);
+      const text = CHARTS.map(
+        (chart) => `${chart}\n${chartNotes(slug, chart, sweep).join('\n')}`,
+      ).join('\n\n');
+      expect(text).toMatchSnapshot(slug);
+    }
+  });
+
+  it('writes a rate as cents on the dollar', () => {
+    const sweep = sweepOf('ca-mb');
+    expect(
+      figureText(parseSpec('c:marginal@12000'), sweep.points, unit, rateUnit),
+    ).toBe('8.57 cents');
   });
 
   it('refuses a figure that is not a spec, and a name with no figure', () => {

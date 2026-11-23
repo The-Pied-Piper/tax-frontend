@@ -1,4 +1,4 @@
-import type { ProvinceNotes } from '../hubNotes';
+import type { ProvinceNotes } from '../hubNoteTypes';
 import {
   averageLow,
   averageRateNotes,
@@ -44,7 +44,6 @@ const pool: Record<string, string> = {
   s1a: 'e:59100:marginal',
   top: 'r:marginal@300000',
   topFrom: 'e:270000:marginal',
-  step: 'r:marginal@51000',
 };
 
 export const britishColumbia: ProvinceNotes = {
@@ -60,11 +59,11 @@ export const britishColumbia: ProvinceNotes = {
       pool,
     ),
     note(
-      'The BC tax reduction shrinks by 3.56 cents for every dollar of net income above {red}, which lifts the rate to {r1} from {r1a}. From {c1} to {c2} the rate is {cr}, higher than at $70,000 ({r70}), because the Canada workers benefit shrinks too. It is {again} again from {againAt}, until the reduction is gone at about {redEnd} of salary.',
+      'The BC tax reduction shrinks by 3.56 cents for every dollar of net income above {red}, which lifts the rate to {r1} from {r1a} (BC\u2019s 2026 base and amount come from the engine; the form we hold is 2025). From {c1} to {c2} the rate is {cr}, higher than at $70,000 ({r70}), because the Canada workers benefit shrinks too. It is {again} again from {againAt}, until the reduction is gone at about {redEnd} of salary.',
       pool,
     ),
     note(
-      'The rate dips to {dip} at {dipAt}, then climbs: {s1} at {s1a}, and the top rate of {top} from {topFrom}, where the line goes straight. Steps through {step} come a step later than in the other provinces.',
+      'The rate dips to {dip} at {dipAt}, then climbs: {s1} at {s1a}, and the top rate of {top} from {topFrom}, where the line goes straight.',
       pool,
     ),
   ],

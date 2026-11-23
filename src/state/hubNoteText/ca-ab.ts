@@ -1,4 +1,4 @@
-import type { ProvinceNotes } from '../hubNotes';
+import type { ProvinceNotes } from '../hubNoteTypes';
 import {
   averageLow,
   averageRateNotes,
@@ -15,7 +15,7 @@ const shared: SharedFigures = {
   cwbStart: '2760',
   cwbMax: '1785',
   cwbTo: '11100',
-  levels: ['0.10', '0.20', '0.30'],
+  levels: ['0.10', '0.20', '0.30', '0.40'],
 };
 
 const pool: Record<string, string> = {
@@ -29,7 +29,7 @@ const pool: Record<string, string> = {
   c1: 'e:27000:marginal',
   c2: 'e:38900:marginal',
   cr: 'r:marginal@30000',
-  cs: 'd:26200',
+  cs: 'd:27000',
   back: 'r:marginal@39000',
   backAt: 'e:39000:marginal',
   r70: 'r:marginal@70000',
@@ -57,7 +57,7 @@ export const alberta: ProvinceNotes = {
       pool,
     ),
     note(
-      'From {c1} to {c2} the rate is {cr}, because the Canada workers benefit shrinks by 21 cents for every dollar above {cs}, plus Canada Pension Plan and Employment Insurance. It drops back to {back} at {backAt}, below its level at $70,000 ({r70}).',
+      'From {c1} to {c2} the rate is {cr}, because the Canada workers benefit shrinks by 15 cents for every dollar above {cs} (the sweep\u2019s start), on top of 28 cents of Alberta and federal tax. It drops back to {back} at {backAt}, below its level at $70,000 ({r70}).',
       pool,
     ),
     note(

@@ -9,12 +9,14 @@ import {
   timesTenThousand,
 } from '../money/scale';
 import {
+  SWEEP_COLUMN,
   sweepSalaries,
   type HubChartId,
   type ProvinceSweep,
   type SweepPoint,
 } from './hubCharts';
 import { hubNoteText } from './hubNoteText';
+import type { Note } from './hubNoteTypes';
 
 /**
  * The text under each hub chart (#288): what the chart shows for this province. The wording is
@@ -26,6 +28,7 @@ import { hubNoteText } from './hubNoteText';
  *  - `r:column@salary`  a rate at a sweep salary;
  *  - `k:column@salary`  the share kept: one minus that rate;
  *  - `q:column@salary`  the column over the salary, as a rate (take-home over salary);
+ *  - `c:column@salary`  a rate as cents on the dollar: "8.57 cents";
  *  - `u:column@salary`  a rate times 10,000: what $10,000 more salary adds;
  *  - `x:column:level`   the first sweep salary where the column reaches the level;
  *  - `h:column`         the first sweep salary where the column reaches half its $500,000 value;
@@ -41,28 +44,11 @@ import { hubNoteText } from './hubNoteText';
  *  - `l:words`          words that go in a figure's place, such as "27 cents".
  * Salaries and amounts are written as the sweep writes them: whole dollars, no commas.
  */
-export type FigureSpec = string;
 
 /** The columns a spec can read: the places of a `SweepPoint`, plus the Canada Pension Plan and Employment Insurance together. */
-export const NOTE_COLUMNS = {
-  takeHome: 1,
-  deductions: 2,
-  tax: 3,
-  taxAverage: 4,
-  marginal: 5,
-  total: 6,
-  average: 7,
-} as const;
+export type NoteColumn = keyof typeof SWEEP_COLUMN | 'cpe';
 
-export type NoteColumn = keyof typeof NOTE_COLUMNS | 'cpe';
-
-/** One bullet: its words, with `{name}` where a figure goes, and the figures by name. */
-export type Note = { text: string; figures?: Record<string, FigureSpec> };
-
-/** The bullets of each chart of one province. The after-credits chart is not drawn, so it has none. */
-export type ProvinceNotes = Partial<Record<HubChartId, Note[]>>;
-
-const COLUMN_NAMES = [...Object.keys(NOTE_COLUMNS), 'cpe'];
+const COLUMN_NAMES = [...Object.keys(SWEEP_COLUMN), 'cpe'];
 
 function isColumn(name: string): name is NoteColumn {
   return COLUMN_NAMES.includes(name);
@@ -71,7 +57,7 @@ function isColumn(name: string): name is NoteColumn {
 /** What a column holds at a point, as text. */
 export function columnValue(point: SweepPoint, column: NoteColumn): string {
   if (column === 'cpe') return subtractAmounts(point[2], point[3]);
-  return point[NOTE_COLUMNS[column]];
+  return point[SWEEP_COLUMN[column]];
 }
 
 function pointAt(points: readonly SweepPoint[], salary: string): SweepPoint {
@@ -83,7 +69,7 @@ function pointAt(points: readonly SweepPoint[], salary: string): SweepPoint {
 /** A parsed spec. */
 export type ParsedSpec =
   | {
-      kind: 'm' | 'r' | 'k' | 'q' | 'u';
+      kind: 'm' | 'r' | 'k' | 'q' | 'u' | 'c';
       column: NoteColumn;
       salary: string;
     }
@@ -110,7 +96,8 @@ export function parseSpec(spec: string): ParsedSpec {
       kind === 'r' ||
       kind === 'k' ||
       kind === 'q' ||
-      kind === 'u') &&
+      kind === 'u' ||
+      kind === 'c') &&
     parts.length === 2
   ) {
     const [column = '', salary = ''] = first.split('@');
@@ -221,13 +208,17 @@ export function figureText(
     case 'r':
     case 'k':
     case 'q':
-    case 'u': {
+    case 'u':
+    case 'c': {
       const value = columnValue(pointAt(points, spec.salary), spec.column);
       if (spec.kind === 'm') {
         return displayWholeMoney(roundToWhole(value), 'annually', unit);
       }
       if (spec.kind === 'u') {
         return displayWholeMoney(timesTenThousand(value), 'annually', unit);
+      }
+      if (spec.kind === 'c') {
+        return `${displayRate(value, rateUnit).replace(/\s*%$/, '')} cents`;
       }
       if (spec.kind === 'k') {
         return displayRate(subtractAmounts('1', value), rateUnit);

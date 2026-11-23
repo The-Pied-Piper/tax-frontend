@@ -1,4 +1,4 @@
-import type { Note } from '../hubNotes';
+import type { Note } from '../hubNoteTypes';
 
 /** A bullet from its words and a pool of figures: it takes the ones its words use. */
 export function note(text: string, pool: Record<string, string>): Note {
@@ -130,7 +130,11 @@ export function averageRateNotes(f: SharedFigures, low: Note[]): Note[] {
 }
 
 /** The first three bullets of the "marginal tax rate" chart; `credit` provinces drop the first clause about the Employment Insurance refund below $2,000. */
-export function marginalLowNotes(f: SharedFigures, credit = false): Note[] {
+export function marginalLowNotes(
+  f: SharedFigures,
+  credit = false,
+  takes = 'l:7.6 cents',
+): Note[] {
   const pool: Record<string, string> = {
     ...POOL,
     cwbTo: `e:${f.cwbTo}:marginal`,
@@ -138,6 +142,7 @@ export function marginalLowNotes(f: SharedFigures, credit = false): Note[] {
     cwbStart: `d:${f.cwbStart}`,
     cwbMax: `d:${f.cwbMax}`,
     cwbFrom: 'e:3000:marginal',
+    takes,
   };
   return [
     note(
@@ -151,7 +156,7 @@ export function marginalLowNotes(f: SharedFigures, credit = false): Note[] {
       pool,
     ),
     note(
-      'Canada Pension Plan and Employment Insurance take about 7.6 cents of each dollar. The rate steps down where they stop: Employment Insurance at about {eiStop}, the main Canada Pension Plan amount at {cppStop} and its second tier at {cpeStop}.',
+      'Canada Pension Plan and Employment Insurance take about {takes} of each dollar. The rate steps down where they stop: Employment Insurance at about {eiStop}, the main Canada Pension Plan amount at {cppStop} and its second tier at {cpeStop}.',
       pool,
     ),
   ];
