@@ -10,6 +10,11 @@ import {
 import { displayTick, type MoneyUnit } from '../money/format';
 import styles from './LineChart.module.css';
 
+// The class names that are set, joined for one element.
+function classNames(...names: (string | undefined)[]): string {
+  return names.filter((name) => name !== undefined).join(' ');
+}
+
 // A point's salary and one value per series, all the API's own text.
 export interface ChartPoint {
   salary: string;
@@ -175,7 +180,7 @@ export function LineChart({
             <text
               className={
                 phoneHidesY && (at - zeroAt) % 2 !== 0
-                  ? [styles.tick, styles.desktopOnly].join(' ')
+                  ? classNames(styles.tick, styles.desktopOnly)
                   : styles.tick
               }
               x={LEFT - 6}
@@ -200,13 +205,11 @@ export function LineChart({
           return (
             <text
               key={`x${tick}`}
-              className={[
+              className={classNames(
                 styles.tick,
                 visibility,
                 ends ? styles.phoneEnd : undefined,
-              ]
-                .filter((name) => name !== undefined)
-                .join(' ')}
+              )}
               x={geometry.x(tick)}
               y={PLOT_BOTTOM + 14}
               textAnchor="middle"
@@ -216,7 +219,7 @@ export function LineChart({
           );
         })}
         <text
-          className={[styles.tick, styles.title].join(' ')}
+          className={classNames(styles.tick, styles.title)}
           x={(LEFT + PLOT_RIGHT) / 2}
           y={HEIGHT - 4}
           textAnchor="middle"
@@ -224,7 +227,7 @@ export function LineChart({
           {xAxisLabel}
         </text>
         <text
-          className={[styles.tick, styles.title, styles.yTitle].join(' ')}
+          className={classNames(styles.tick, styles.title, styles.yTitle)}
           transform={`translate(11 ${String((TOP + PLOT_BOTTOM) / 2)}) rotate(-90)`}
           textAnchor="middle"
         >
