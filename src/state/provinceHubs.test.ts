@@ -1,4 +1,7 @@
-import { DESCRIPTION_LIMIT, TITLE_LIMIT } from '../../build/salaryPages/limits';
+import {
+  CONTENT_TITLE_LIMIT,
+  DESCRIPTION_LIMIT,
+} from '../../build/salaryPages/limits';
 import { strings } from '../strings';
 import type {
   ContentBlock,
@@ -99,9 +102,9 @@ describe.each(FOOTER_PROVINCE_SLUGS)('the hub page for %s', (slug) => {
   });
 
   it('names the province in the title and the heading, within the limits', () => {
-    expect(page.title).toBe(`${name}: forms and take-home examples`);
-    expect(page.heading).toBe(`${name}: forms and take-home examples`);
-    expect(page.title.length).toBeLessThan(TITLE_LIMIT);
+    expect(page.title).toBe(`${name} take-home pay and income tax analysis`);
+    expect(page.heading).toBe(`${name} take-home pay and income tax analysis`);
+    expect(page.title.length).toBeLessThan(CONTENT_TITLE_LIMIT);
     expect(page.description.length).toBeGreaterThan(0);
     expect(page.description.length).toBeLessThan(DESCRIPTION_LIMIT);
     expect(page.description).toContain(name);
@@ -109,7 +112,10 @@ describe.each(FOOTER_PROVINCE_SLUGS)('the hub page for %s', (slug) => {
 
   it('has the lede with the province name', () => {
     expect(page.lede).toBe(
-      `Everything this site uses to work out take-home pay in ${name}, in one place. Each form is explained in plain words, and each salary page shows a full example.`,
+      `See how take-home pay, income tax and tax rates change with salary in ${name}, compare it with other provinces, and read the forms behind the numbers. Full salary examples are at the bottom.`,
+    );
+    expect(page.description).toBe(
+      `Take-home pay and income tax in ${name} by salary: tax rates, how it compares with other provinces, and the forms behind the numbers.`,
     );
   });
 
@@ -262,7 +268,9 @@ describe('the Saskatchewan hub', () => {
   const page = build('ca-sk', [], []);
 
   it('promises no salary examples and describes its form in plain words', () => {
-    expect(page.title).toBe('Saskatchewan: forms behind take-home pay');
+    expect(page.title).toBe(
+      'Saskatchewan take-home pay and income tax analysis',
+    );
     expect(
       page.sections.some((s) => s.heading === 'Take-home pay by salary'),
     ).toBe(false);
@@ -277,7 +285,7 @@ describe('the Newfoundland and Labrador hub', () => {
 
   it('promises no salary examples and describes its form in plain words', () => {
     expect(page.title).toBe(
-      'Newfoundland and Labrador: forms behind take-home pay',
+      'Newfoundland and Labrador take-home pay and income tax analysis',
     );
     expect(
       page.sections.some((s) => s.heading === 'Take-home pay by salary'),
@@ -292,16 +300,16 @@ describe('a hub with no salary pages', () => {
   const page = build('ca-mb', [], []);
 
   it('promises no salary examples in its title, description or lede', () => {
-    expect(page.title).toBe('Manitoba: forms behind take-home pay');
-    expect(page.heading).toBe('Manitoba: forms behind take-home pay');
+    expect(page.title).toBe('Manitoba take-home pay and income tax analysis');
+    expect(page.heading).toBe('Manitoba take-home pay and income tax analysis');
     expect(page.description).toBe(
-      'The forms behind take-home pay in Manitoba, each explained in plain words.',
+      'Take-home pay and income tax in Manitoba by salary: tax rates, how it compares with other provinces, and the forms behind the numbers.',
     );
     expect(page.lede).toBe(
-      'Everything this site uses to work out take-home pay in Manitoba, in one place. Each form is explained in plain words.',
+      'See how take-home pay, income tax and tax rates change with salary in Manitoba, compare it with other provinces, and read the forms behind the numbers.',
     );
     for (const text of [page.title, page.description, page.lede ?? '']) {
-      expect(text).not.toMatch(/salary|example/i);
+      expect(text).not.toMatch(/example|at the bottom/i);
     }
   });
 
@@ -433,7 +441,7 @@ describe('province names', () => {
       [],
       false,
     );
-    expect(page.heading).toBe('Zedland: forms and take-home examples');
+    expect(page.heading).toBe('Zedland take-home pay and income tax analysis');
     expect(page.lede).not.toContain('Ontario');
     expect(page.description).not.toContain('Ontario');
     const shared = page.sections.filter(

@@ -213,6 +213,12 @@ describe('the card constants', () => {
     );
   });
 
+  it('ends the phone salary axis at the axis end', () => {
+    expect(SALARY_AXIS.phoneTicks[SALARY_AXIS.phoneTicks.length - 1]).toBe(
+      SALARY_AXIS.max,
+    );
+  });
+
   it('reads each chart from its own place of a point', () => {
     expect(CHART_COLUMN).toEqual({
       takeHome: 1,
