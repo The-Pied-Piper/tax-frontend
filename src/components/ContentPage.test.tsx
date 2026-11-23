@@ -358,3 +358,42 @@ describe('ContentPage chart notes', () => {
     expect(html).toContain('data-chart-notes="averageRate"');
   });
 });
+
+describe('ContentPage lists of forms', () => {
+  const entries = Array.from({ length: 6 }, (_, at) => ({
+    label: `Form ${String(at + 1)}`,
+    description: 'A description of what the form is for. '.repeat(8),
+  }));
+  const spec = {
+    ...plainSpec,
+    sections: [
+      {
+        heading: 'The forms we follow',
+        blocks: [{ kind: 'list' as const, items: entries }],
+      },
+    ],
+  };
+
+  it('folds a long list of forms behind See more, keeping every form', () => {
+    const { container } = render(<ContentPage {...spec} />);
+    expect(container.querySelectorAll('details li')).toHaveLength(3);
+    expect(
+      container.querySelectorAll('section ul > li, section details li'),
+    ).toHaveLength(6);
+    expect(screen.getByText('See more')).toBeInTheDocument();
+  });
+
+  it('draws a short list of forms whole', () => {
+    const short = {
+      ...spec,
+      sections: [
+        {
+          heading: 'The forms we follow',
+          blocks: [{ kind: 'list' as const, items: entries.slice(0, 2) }],
+        },
+      ],
+    };
+    const { container } = render(<ContentPage {...short} />);
+    expect(container.querySelector('details')).toBeNull();
+  });
+});

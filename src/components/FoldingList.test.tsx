@@ -1,11 +1,10 @@
-import { render, screen } from '@testing-library/react';
+import { cleanup, render, screen } from '@testing-library/react';
 import { renderToString } from 'react-dom/server';
-import {
-  FOLD_ABOVE_CHARACTERS,
-  FOLD_SHOWN_ITEMS,
-  FoldingList,
-  type FoldingItem,
-} from './FoldingList';
+import { FoldingList, type FoldingItem } from './FoldingList';
+
+/** The limits the list folds at: over 1,000 characters, the first 3 items stay. */
+const FOLD_ABOVE_CHARACTERS = 1000;
+const FOLD_SHOWN_ITEMS = 3;
 import { strings } from '../strings';
 
 /** `count` items that share `total` characters between them. */
@@ -60,5 +59,28 @@ describe('FoldingList', () => {
     );
     expect(html).toContain('<details');
     expect(html).toContain('Item 8');
+  });
+
+  it('folds at over 1,000 characters, not at 1,000', () => {
+    const sized = (total: number): FoldingItem[] =>
+      items(5, 0).map((item, at) => ({
+        ...item,
+        length: at === 0 ? total : 0,
+      }));
+    expect(draw(sized(1000)).container.querySelector('details')).toBeNull();
+    cleanup();
+    expect(draw(sized(1001)).container.querySelector('details')).not.toBeNull();
+  });
+
+  it('folds five items, leaving two behind the link', () => {
+    const { container } = draw(items(5, 3000));
+    expect(container.querySelectorAll('details li')).toHaveLength(2);
+  });
+
+  it('labels the link for both states without running together', () => {
+    const { container } = draw(items(5, 3000));
+    expect(container.querySelector('summary')?.textContent).toBe(
+      'See more See less',
+    );
   });
 });

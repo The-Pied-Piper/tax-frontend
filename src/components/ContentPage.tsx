@@ -49,7 +49,7 @@ function ContentBlockView({
       return notes.length === 0 ? null : (
         <FoldingList
           listClassName={styles.notes}
-          data={{ 'data-chart-notes': block.chart }}
+          chart={block.chart}
           items={notes.map((words) => ({
             key: words,
             length: words.length,
@@ -80,6 +80,7 @@ function ContentBlockView({
           {block.title && <h3 className={styles.subheading}>{block.title}</h3>}
           <FoldingList
             listClassName={styles.formList}
+            foldedClassName={styles.formListFolded}
             items={block.items.map((item) => ({
               key: item.label,
               length: item.label.length + item.description.length,
