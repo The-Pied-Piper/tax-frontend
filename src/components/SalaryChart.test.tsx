@@ -55,24 +55,15 @@ describe('SalaryChart', () => {
     expect(container).toBeEmptyDOMElement();
   });
 
-  it('says the figures are provisional only when they are', () => {
-    const { unmount } = render(
+  it('shows the one-line note under the chart', () => {
+    render(
       <SalaryChart
         data={hubChartsData(['ca-on'], true)}
         province="ca-on"
         chart="yearTotal"
       />,
     );
-    expect(screen.getByText(t.provisional(2026))).toBeInTheDocument();
-    unmount();
-    render(
-      <SalaryChart
-        data={hubChartsData(['ca-on'], false)}
-        province="ca-on"
-        chart="yearTotal"
-      />,
-    );
-    expect(screen.queryByText(t.provisional(2026))).toBeNull();
+    expect(screen.getByText(t.note)).toBeInTheDocument();
   });
 
   it('has the Per year / Per month switch on the two money charts only', () => {

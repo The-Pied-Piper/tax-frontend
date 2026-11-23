@@ -36,10 +36,6 @@
   max-width: 70ch;
 }
 
-.provisional {
-  color: var(--warn-fg);
-}
-
 .details {
   margin-top: 10px;
 }
