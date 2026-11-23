@@ -155,3 +155,15 @@
   letter-spacing: 0.06em;
   text-transform: uppercase;
 }
+
+/* A section with a permalink: the link sits beside the heading, never inside it. */
+.headingRow {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+}
+
+.permalink {
+  font-size: 15px;
+  text-decoration: none;
+}

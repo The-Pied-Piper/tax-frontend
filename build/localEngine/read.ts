@@ -19,7 +19,9 @@ export type EngineSweepPoint = {
   income_tax: string;
   take_home: string;
   average_income_tax_rate: string;
-  marginal_income_tax_rate: string;
+  net_total: string;
+  net_average_rate: string;
+  net_marginal_rate: string;
 };
 
 /** The sweep of one province: its points, lowest salary first, and the units written once. */
@@ -28,7 +30,6 @@ export type EngineSweep = {
   units: {
     unit: unknown;
     average_income_tax_rate: unknown;
-    marginal_income_tax_rate: unknown;
   };
 };
 
@@ -38,7 +39,9 @@ const POINT_FIELDS = [
   'income_tax',
   'take_home',
   'average_income_tax_rate',
-  'marginal_income_tax_rate',
+  'net_total',
+  'net_average_rate',
+  'net_marginal_rate',
 ] as const;
 
 function isSweepPoint(value: unknown): value is EngineSweepPoint {
@@ -58,8 +61,7 @@ function readSweep(
   if (
     !isRecord(units) ||
     !('unit' in units) ||
-    !('average_income_tax_rate' in units) ||
-    !('marginal_income_tax_rate' in units)
+    !('average_income_tax_rate' in units)
   ) {
     throw new Error(`Engine figures: ${code} has no sweep units`);
   }
@@ -68,7 +70,6 @@ function readSweep(
     units: {
       unit: units.unit,
       average_income_tax_rate: units.average_income_tax_rate,
-      marginal_income_tax_rate: units.marginal_income_tax_rate,
     },
   };
 }

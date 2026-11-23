@@ -16,6 +16,14 @@ calculator says (when the two pin the same tax-engine release):
 Until tax-engine publishes this mapping itself, a change in the service's copy must be copied here;
 the Node build checks every answer against api/openapi.yml, so a change of shape fails the build.
 
+The hub-chart sweep also carries three figures of its own, all on one basis (income tax of T1 line 43500,
+plus CPP and EI, less the credits paid to you on filing, T1 line 48200 ("total_credits" in the engine's
+T1 trace)): `net_total`, `net_average_rate` (net_total / salary) and `net_marginal_rate` (the change in
+net_total over the next $100 of salary, or over the next $10 where the two readings differ by more than
+half a point, so a narrow band such as the Ontario health premium steps shows). They are the hub chart
+definitions, not the service's T4127 rates; tax-engine #1947 is to publish them, after which this
+derivation goes and the engine's figures are compared with the independent sweep.
+
 `provisional` is not an engine fact (it is the service's policy), so it is absent here and the Node
 build adds it. The credits of T1 line 48200 are not written: the pinned engine release does not have
 them yet.
@@ -41,6 +49,11 @@ from tax_engine.jurisdictions.ca.catalog.income import EMPLOYMENT_INCOME
 from tax_engine.registrations import artifact_kinds
 
 CENTS = Decimal("0.01")
+RATE = Decimal("0.0001")
+# The forward steps of the net marginal rate, and how far two readings may differ before the finer one is used.
+MARGINAL_STEP = 100
+FINE_MARGINAL_STEP = 10
+MARGINAL_DISAGREEMENT = Decimal("0.005")
 
 # The deduction items in the service's order (SupportedJurisdiction.deduction_items), each with the
 # engine's (form, kind) that holds its figure.
@@ -81,7 +94,7 @@ def _salaries(province: dict) -> list[int]:
 def _sweep_salaries(sweep: dict) -> list[int]:
     fine = range(sweep["first"], sweep["fineTo"] + 1, sweep["fineStep"])
     coarse = range(sweep["fineTo"] + sweep["coarseStep"], sweep["to"] + 1, sweep["coarseStep"])
-    return [*fine, *coarse]
+    return sorted({*fine, *coarse, *sweep["extra"]})
 
 
 class Figures:
@@ -89,6 +102,30 @@ class Figures:
         self._engine = build_tax_computation()
         self._kinds = artifact_kinds()
         self._renderer = EnglishTraceRenderer()
+
+    def net_total(self, code: str, year: int, salary: int) -> Decimal:
+        """Income tax, CPP and EI, less the credits paid on filing (T1 line 48200), unrounded."""
+        sheets = self._engine.compute(
+            JurisdictionCode(code), year, Artifact(EMPLOYMENT_INCOME, Decimal(salary))
+        )
+        total = Decimal(0)
+        for form, kind in (FIGURES[item] for item in FIGURES):
+            (sheet,) = sheets[form]
+            value = sheet.get(self._kinds.kind(kind)).value
+            if not isinstance(value, Decimal):
+                raise TypeError(f"{kind} is not a decimal")
+            total += value
+        (t1,) = sheets["ca/t1_tax_and_credits"]
+        paid = [line.amount for line in t1.trace if line.label == "total_credits"]
+        if len(paid) != 1:
+            raise ValueError(f"{code} {year}: expected one total_credits line, found {len(paid)}")
+        return total - paid[0]
+
+    def net_marginal_rate(self, code: str, year: int, salary: int, net: Decimal) -> Decimal:
+        """The change in net_total per extra dollar of salary, read forward."""
+        coarse = (self.net_total(code, year, salary + MARGINAL_STEP) - net) / MARGINAL_STEP
+        fine = (self.net_total(code, year, salary + FINE_MARGINAL_STEP) - net) / FINE_MARGINAL_STEP
+        return fine if abs(coarse - fine) > MARGINAL_DISAGREEMENT else coarse
 
     def answer(self, code: str, year: int, salary: int, with_trace: bool) -> dict:
         sheets = self._engine.compute(
@@ -180,12 +217,12 @@ def main(provinces_file: str, output_file: str) -> None:
             point_units = {
                 "unit": answer["unit"],
                 "average_income_tax_rate": answer["average_income_tax_rate"]["unit"],
-                "marginal_income_tax_rate": answer["marginal_income_tax_rate"]["unit"],
             }
             if units is None:
                 units = point_units
             elif units != point_units:
                 raise ValueError(f"{code} {year}: units change along the sweep")
+            net = figures.net_total(code, year, salary)
             points.append(
                 {
                     "salary": answer["salary"],
@@ -193,7 +230,11 @@ def main(provinces_file: str, output_file: str) -> None:
                     "income_tax": answer["income_tax"],
                     "take_home": answer["take_home"],
                     "average_income_tax_rate": answer["average_income_tax_rate"]["amount"],
-                    "marginal_income_tax_rate": answer["marginal_income_tax_rate"]["amount"],
+                    "net_total": str(net.quantize(CENTS)),
+                    "net_average_rate": str((net / salary).quantize(RATE)),
+                    "net_marginal_rate": str(
+                        figures.net_marginal_rate(code, year, salary, net).quantize(RATE)
+                    ),
                 }
             )
         provinces[code] = {"year": year, "pages": pages, "sweep": points, "sweep_units": units}

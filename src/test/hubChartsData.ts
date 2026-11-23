@@ -5,6 +5,7 @@ import type { HubChartsData, SweepPoint } from '../state/hubCharts';
 const unit = strings.fallbackUnit;
 const rateUnit = {
   ...strings.fallbackUnit,
+  placement: 'after' as const,
   singular: '%',
   plural: '%',
   as_percentage: true,

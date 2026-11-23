@@ -1,8 +1,11 @@
+import { compareAmounts } from '../money/scale';
 import {
   CHART_COLUMN,
   defaultIndex,
   parseHubChartsData,
   SALARY_AXIS,
+  regularIndexes,
+  regularSalaries,
   sweepSalaries,
   type SweepPoint,
 } from './hubCharts';
@@ -20,11 +23,13 @@ const sweep = {
   provisional: true,
   unit,
   rateUnit: { ...unit, as_percentage: true },
-  points: [['1000', '1000.00', '0.00', '0.00', '0.0000', '0.0505']],
+  points: [
+    ['1000', '1000.00', '0.00', '0.00', '0.0000', '0.0505', '0.00', '0.0000'],
+  ],
 };
 
-describe('sweepSalaries', () => {
-  const steps = sweepSalaries();
+describe('regularSalaries', () => {
+  const steps = regularSalaries();
 
   it('starts at $1,000, because the API takes no salary of 0', () => {
     expect(steps[0]).toBe('1000');
@@ -39,6 +44,30 @@ describe('sweepSalaries', () => {
     expect(steps[249]).toBe('250000');
     expect(steps[250]).toBe('255000');
     expect(steps[299]).toBe('500000');
+  });
+});
+
+describe('sweepSalaries', () => {
+  const steps = sweepSalaries();
+
+  it('is the regular salaries plus seven extra ones, lowest first', () => {
+    expect(steps).toHaveLength(307);
+    expect(
+      steps.filter((salary) => !regularSalaries().includes(salary)),
+    ).toEqual(['1990', '2020', '2040', '201100', '201200', '201700', '201800']);
+    expect(steps.slice(0, 5)).toEqual(['1000', '1990', '2000', '2020', '2040']);
+    expect(steps).toEqual([...steps].sort(compareAmounts));
+  });
+});
+
+describe('regularIndexes', () => {
+  it('points at the regular salaries only, which the comparison slider steps through', () => {
+    const points = sweepSalaries().map((salary) => point(`${salary}.00`));
+    const indexes = regularIndexes(points);
+    expect(indexes).toHaveLength(300);
+    expect(indexes.map((at) => points[at]?.[0])).toEqual(
+      regularSalaries().map((salary) => `${salary}.00`),
+    );
   });
 });
 
@@ -159,7 +188,16 @@ describe('parseHubChartsData', () => {
   });
 });
 
-const point = (salary: string): SweepPoint => [salary, '0', '0', '0', '0', '0'];
+const point = (salary: string): SweepPoint => [
+  salary,
+  '0',
+  '0',
+  '0',
+  '0',
+  '0',
+  '0',
+  '0',
+];
 
 describe('the card constants', () => {
   it('starts the marker on the $70,000 point, or the first point when there is none', () => {
@@ -178,9 +216,9 @@ describe('the card constants', () => {
   it('reads each chart from its own place of a point', () => {
     expect(CHART_COLUMN).toEqual({
       takeHome: 1,
-      incomeTax: 3,
-      averageRate: 4,
+      averageRate: 7,
       marginalRate: 5,
+      yearTotal: 6,
     });
   });
 });

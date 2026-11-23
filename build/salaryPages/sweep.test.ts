@@ -24,24 +24,26 @@ function sweepOf(): EngineSweep {
       income_tax: `i${salary}`,
       take_home: `t${salary}`,
       average_income_tax_rate: '0.1000',
-      marginal_income_tax_rate: '0.2000',
+      net_total: `n${salary}`,
+      net_average_rate: '0.0900',
+      net_marginal_rate: '0.2000',
     })),
     units: {
       unit: { ...saved.unit, singular: 'CA$', plural: 'CA$' },
       average_income_tax_rate: saved.average_income_tax_rate.unit,
-      marginal_income_tax_rate: saved.average_income_tax_rate.unit,
     },
   };
 }
 
 describe('the sweep steps of the Python step and of the charts', () => {
   it('are the same salaries: the one setting in provinces.json gives sweepSalaries()', () => {
-    const { first, fineStep, fineTo, coarseStep, to } = config.sweep;
-    const steps: string[] = [];
-    for (let n = first; n <= fineTo; n += fineStep) steps.push(n.toString());
-    for (let n = fineTo + coarseStep; n <= to; n += coarseStep)
-      steps.push(n.toString());
-    expect(steps).toEqual(sweepSalaries());
+    const { first, fineStep, fineTo, coarseStep, to, extra } = config.sweep;
+    const steps: number[] = [];
+    for (let n = first; n <= fineTo; n += fineStep) steps.push(n);
+    for (let n = fineTo + coarseStep; n <= to; n += coarseStep) steps.push(n);
+    steps.push(...extra);
+    steps.sort((a, b) => a - b);
+    expect(steps.map((n) => n.toString())).toEqual(sweepSalaries());
   });
 });
 
@@ -59,7 +61,8 @@ describe('provinceSweeps', () => {
       ?.years.find((y) => y.year === ontario.year)?.provisional;
     expect(sweep?.provisional).toBe(expected);
     expect(sweep?.unit.singular).toBe('$');
-    expect(sweep?.points).toHaveLength(300);
+    expect(sweep?.points).toHaveLength(307);
+    // Take-home, deductions, income tax, its average rate; then the charts' marginal rate, total and average rate.
     expect(sweep?.points[0]).toEqual([
       '1000.00',
       't1000',
@@ -67,6 +70,8 @@ describe('provinceSweeps', () => {
       'i1000',
       '0.1000',
       '0.2000',
+      'n1000',
+      '0.0900',
     ]);
   });
 
@@ -97,17 +102,17 @@ describe('provinceSweeps', () => {
     ).toThrow('does not hold the sweep salaries');
   });
 
-  it('fails when the units are not whole or the two rates differ in unit', () => {
+  it('fails when the units are not whole', () => {
     const noUnit = { ...sweepOf(), units: { ...sweepOf().units, unit: {} } };
     expect(() =>
       provinceSweeps({ 'CA-ON': noUnit }, builtOf(ontario), list),
     ).toThrow('has no whole units');
-    const differ = {
+    const noRateUnit = {
       ...sweepOf(),
-      units: { ...sweepOf().units, marginal_income_tax_rate: saved.unit },
+      units: { ...sweepOf().units, average_income_tax_rate: {} },
     };
     expect(() =>
-      provinceSweeps({ 'CA-ON': differ }, builtOf(ontario), list),
+      provinceSweeps({ 'CA-ON': noRateUnit }, builtOf(ontario), list),
     ).toThrow('has no whole units');
   });
 
@@ -141,7 +146,7 @@ describe.runIf(process.env.ENGINE_FIGURES_FILE)(
         everyone,
       );
       expect(sweeps.map((s) => s.slug)).toEqual(provinces.map((p) => p.slug));
-      for (const sweep of sweeps) expect(sweep.points).toHaveLength(300);
+      for (const sweep of sweeps) expect(sweep.points).toHaveLength(307);
       expect(hubChartBlocks(sweeps).size).toBe(provinces.length);
     });
   },

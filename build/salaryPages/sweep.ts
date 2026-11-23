@@ -39,12 +39,7 @@ export function provinceSweeps(
     }
     const unit = readUnit(sweep.units.unit);
     const rateUnit = readUnit(sweep.units.average_income_tax_rate);
-    const marginalUnit = readUnit(sweep.units.marginal_income_tax_rate);
-    if (
-      !unit ||
-      !rateUnit ||
-      JSON.stringify(rateUnit) !== JSON.stringify(marginalUnit)
-    ) {
+    if (!unit || !rateUnit) {
       throw new Error(`Salary sweep: ${province.code} has no whole units`);
     }
     return {
@@ -59,7 +54,9 @@ export function provinceSweeps(
         point.total_deductions,
         point.income_tax,
         point.average_income_tax_rate,
-        point.marginal_income_tax_rate,
+        point.net_marginal_rate,
+        point.net_total,
+        point.net_average_rate,
       ]),
     };
   });

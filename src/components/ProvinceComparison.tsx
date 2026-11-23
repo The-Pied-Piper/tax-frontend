@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { displayMoney, displayRate, displayWholeMoney } from '../money/format';
 import { PROVINCE_COMPARISON_SLOT_ID } from '../state/hubSlots';
-import type { HubChartsData } from '../state/hubCharts';
+import { regularIndexes, type HubChartsData } from '../state/hubCharts';
 import {
   comparisonRows,
   DEFAULT_SALARY,
@@ -42,7 +42,10 @@ type Props = {
 // from money/scale. It fetches nothing and stores nothing.
 export function ProvinceComparison({ data, province }: Props) {
   const current = data.provinces.find((sweep) => sweep.slug === province);
-  const salaries = (data.provinces[0]?.points ?? []).map((point) => point[0]);
+  // The slider has a step for each regular salary of the sweep, not for the extra points of the charts.
+  const points = data.provinces[0]?.points ?? [];
+  const pointIndexes = regularIndexes(points);
+  const salaries = pointIndexes.map((at) => points[at]?.[0] ?? '');
   const [index, setIndex] = useState(() =>
     nearestSalaryIndex(salaries, DEFAULT_SALARY),
   );
@@ -55,7 +58,11 @@ export function ProvinceComparison({ data, province }: Props) {
     current.unit,
   );
   const measureName = copy.measures[measure];
-  const rows = comparisonRows(data.provinces, index, measure);
+  const rows = comparisonRows(
+    data.provinces,
+    pointIndexes[index] ?? 0,
+    measure,
+  );
 
   return (
     <div className={styles.comparison}>

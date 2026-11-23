@@ -337,19 +337,72 @@ describe('the province comparison', () => {
     ]);
   });
 
-  it('is left out with the charts card when asked not to add them, and the rest of the page is the same', () => {
+  it('is left out with the chart sections when asked not to add them, and the rest of the page is the same', () => {
     const without = make(false);
     expect(
       section(without, strings.hubCharts.comparison.heading),
     ).toBeUndefined();
+    const chartHeadings = [
+      strings.hubCharts.comparison.heading,
+      strings.hubCharts.charts.averageRate.title,
+      strings.hubCharts.charts.marginalRate.title,
+      strings.hubCharts.charts.yearTotal.title,
+    ];
     const withIt = make(true);
+    const rest = withIt.sections
+      .filter((s) => !chartHeadings.includes(s.heading))
+      // The take-home section keeps its words and gains its permalink and its chart.
+      .map(({ heading, blocks }) => ({
+        heading,
+        blocks: blocks.filter((block) => block.kind !== 'salaryChart'),
+      }));
+    expect(rest).toEqual(without.sections);
+  });
+
+  it('has the take-home chart in the section that explains the take-home, then one section for each other chart, each with a permalink', () => {
+    const page = make(true);
+    const how = section(page, 'How your Ontario take-home is worked out');
+    expect(how?.id).toBe('take-home');
+    expect(how?.blocks.at(-1)).toEqual({
+      kind: 'salaryChart',
+      province: 'ca-on',
+      chart: 'takeHome',
+    });
+    const t = strings.hubCharts.charts;
     expect(
-      withIt.sections.filter(
-        (s) =>
-          s.heading !== strings.hubCharts.comparison.heading &&
-          s.heading !== strings.hubCharts.heading,
-      ),
-    ).toEqual(without.sections);
+      (['averageRate', 'marginalRate', 'yearTotal'] as const).map((chart) => {
+        const found = section(page, t[chart].title);
+        return [found?.id, found?.blocks];
+      }),
+    ).toEqual([
+      [
+        'average-rate',
+        [
+          paragraph(t.averageRate.text),
+          { kind: 'salaryChart', province: 'ca-on', chart: 'averageRate' },
+        ],
+      ],
+      [
+        'marginal-rate',
+        [
+          paragraph(t.marginalRate.text),
+          { kind: 'salaryChart', province: 'ca-on', chart: 'marginalRate' },
+        ],
+      ],
+      [
+        'tax-and-contributions',
+        [
+          paragraph(t.yearTotal.text),
+          { kind: 'salaryChart', province: 'ca-on', chart: 'yearTotal' },
+        ],
+      ],
+    ]);
+  });
+
+  it('keeps the take-home section as it was, with no permalink, on a hub with no charts', () => {
+    expect(
+      section(make(false), 'How your Ontario take-home is worked out')?.id,
+    ).toBeUndefined();
   });
 });
 

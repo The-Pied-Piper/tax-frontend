@@ -54,13 +54,14 @@ describe("reading the Python step's file", () => {
         income_tax: '40.00',
         take_home: '900.00',
         average_income_tax_rate: '0.0100',
-        marginal_income_tax_rate: '0.0505',
+        net_total: '100.00',
+        net_average_rate: '0.1000',
+        net_marginal_rate: '0.0505',
       },
     ],
     sweep_units: {
       unit: sweepUnit,
       average_income_tax_rate: saved.average_income_tax_rate.unit,
-      marginal_income_tax_rate: saved.marginal_income_tax_rate.unit,
     },
   };
 
@@ -167,7 +168,31 @@ describe.runIf(process.env.ENGINE_FIGURES_FILE)(
       );
     });
 
-    it('holds the 300 hub-chart points of every province, $1,000 to $500,000', () => {
+    // The chart figures, pinned to the independent sweep of the hub-charts thread (tax-engine 0.4.1,
+    // 2026): net_total is income tax plus CPP and EI less the credits paid on filing, net_marginal_rate
+    // its change over the next $100 (or $10 near a narrow step).
+    it.each([
+      ['2000.00', '0.00', '0.0000', '1.0000'],
+      ['3000.00', '48.90', '0.0163', '-0.2537'],
+      ['38000.00', '5889.24', '0.1550', '0.5093'],
+      ['70000.00', '16213.75', '0.2316', '0.3435'],
+      ['201200.00', '69319.16', '0.3445', '0.7327'],
+    ])(
+      'gives Ontario at %s the sweep figures',
+      (salary, total, average, marginal) => {
+        const raw = JSON.parse(readFileSync(file, 'utf8')) as {
+          provinces: Record<string, { sweep: Record<string, string>[] }>;
+        };
+        const point = raw.provinces['CA-ON']?.sweep.find(
+          (entry) => entry.salary === salary,
+        );
+        expect(point?.net_total).toBe(total);
+        expect(point?.net_average_rate).toBe(average);
+        expect(point?.net_marginal_rate).toBe(marginal);
+      },
+    );
+
+    it('holds the 307 hub-chart points of every province, $1,000 to $500,000 and the seven extra salaries', () => {
       const raw = JSON.parse(readFileSync(file, 'utf8')) as {
         provinces: Record<
           string,
@@ -179,10 +204,10 @@ describe.runIf(process.env.ENGINE_FIGURES_FILE)(
           sweep: [],
           sweep_units: undefined,
         };
-        expect(sweep, province.code).toHaveLength(300);
+        expect(sweep, province.code).toHaveLength(307);
         expect(sweep[0]?.salary).toBe('1000.00');
-        expect(sweep[249]?.salary).toBe('250000.00');
-        expect(sweep[299]?.salary).toBe('500000.00');
+        expect(sweep[1]?.salary).toBe('1990.00');
+        expect(sweep[306]?.salary).toBe('500000.00');
         expect(sweep_units).toBeDefined();
       }
     });
