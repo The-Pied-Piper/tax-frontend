@@ -43,6 +43,7 @@
   cursor: pointer;
 }
 
+/* The short label for narrow phones; shown only in the 480px block at the end of this file. */
 .phone {
   display: none;
 }
@@ -207,8 +208,14 @@
     font-size: 12px;
   }
 
+  /* Visually hidden, not display:none, so screen readers keep the full label. */
   .full {
-    display: none;
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
   }
 
   .phone {

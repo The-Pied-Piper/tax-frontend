@@ -77,6 +77,8 @@ export const strings = {
       },
       // Shorter wording for the toggle on narrow phones only, where the full label does not fit one line.
       measuresPhone: {
+        takeHome: 'Take-home pay',
+        incomeTax: 'Income tax',
         averageRate: 'Average tax rate',
       },
       measureNotes: {
