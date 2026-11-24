@@ -13,7 +13,12 @@ const real = [compute30000, compute70000, compute150000];
 
 describe('salaryPageText: the text of a page from its own answer', () => {
   it('names the place, year and salary in the title and heading', () => {
-    const { title, heading } = salaryPageText(compute70000, 'Ontario', 2026);
+    const { title, heading } = salaryPageText(
+      compute70000,
+      'Ontario',
+      2026,
+      'CA-ON',
+    );
     for (const text of [title, heading]) {
       expect(text).toContain('Ontario');
       expect(text).toContain('2026');
@@ -23,7 +28,7 @@ describe('salaryPageText: the text of a page from its own answer', () => {
   });
 
   it('shows whole-dollar salaries without cents and never says CA$', () => {
-    const text = salaryPageText(compute70000, 'Ontario', 2026);
+    const text = salaryPageText(compute70000, 'Ontario', 2026, 'CA-ON');
     for (const value of Object.values(text)) {
       expect(value).not.toContain('CA$');
     }
@@ -37,14 +42,17 @@ describe('salaryPageText: the text of a page from its own answer', () => {
       compute70000,
       'Ontario',
       2026,
+      'CA-ON',
     );
     expect(description).toContain('$53,786.25');
     expect(paragraph).toContain('$16,213.75');
   });
 
   it('trims stray spaces from the place name', () => {
-    const clean = salaryPageText(compute70000, 'Ontario', 2026);
-    expect(salaryPageText(compute70000, '  Ontario ', 2026)).toEqual(clean);
+    const clean = salaryPageText(compute70000, 'Ontario', 2026, 'CA-ON');
+    expect(salaryPageText(compute70000, '  Ontario ', 2026, 'CA-ON')).toEqual(
+      clean,
+    );
   });
 
   it('gives a description that says more than the title, not a repeat of it', () => {
@@ -52,6 +60,7 @@ describe('salaryPageText: the text of a page from its own answer', () => {
       compute70000,
       'Ontario',
       2026,
+      'CA-ON',
     );
     expect(description).not.toContain(title);
     expect(description).not.toContain('After Tax in');
@@ -62,12 +71,22 @@ describe('salaryPageText: the text of a page from its own answer', () => {
   });
 
   it('puts the take-home in the description, as an estimate', () => {
-    const { description } = salaryPageText(compute70000, 'Ontario', 2026);
+    const { description } = salaryPageText(
+      compute70000,
+      'Ontario',
+      2026,
+      'CA-ON',
+    );
     expect(description).toContain('an estimated $53,786.25');
   });
 
   it("states the page's own figures in the paragraph, as the API printed them", () => {
-    const { paragraph } = salaryPageText(compute70000, 'Ontario', 2026);
+    const { paragraph } = salaryPageText(
+      compute70000,
+      'Ontario',
+      2026,
+      'CA-ON',
+    );
     expect(paragraph).toContain('$53,786.25');
     expect(paragraph).toContain('$16,213.75');
     expect(paragraph).toContain('23.16%');
@@ -79,13 +98,13 @@ describe('salaryPageText: the text of a page from its own answer', () => {
     [compute30000, '$27,550.43'],
     [compute150000, '$104,319.88'],
   ])('uses the real take-home on the edge pages (%#)', (response, takeHome) => {
-    const text = salaryPageText(response, 'Ontario', 2026);
+    const text = salaryPageText(response, 'Ontario', 2026, 'CA-ON');
     expect(text.paragraph).toContain(takeHome);
     expect(text.description).toContain(takeHome.replace('$', ''));
   });
 
   it('takes the place and year from its arguments, never from the code', () => {
-    const text = salaryPageText(compute70000, 'Quebec', 2031);
+    const text = salaryPageText(compute70000, 'Quebec', 2031, 'CA-ON');
     for (const value of Object.values(text)) {
       expect(value).not.toContain('Ontario');
       expect(value).not.toContain('2026');
@@ -98,8 +117,8 @@ describe('salaryPageText: the text of a page from its own answer', () => {
   });
 
   it('is pure: the same answer gives the same text', () => {
-    expect(salaryPageText(compute70000, 'Ontario', 2026)).toEqual(
-      salaryPageText(compute70000, 'Ontario', 2026),
+    expect(salaryPageText(compute70000, 'Ontario', 2026, 'CA-ON')).toEqual(
+      salaryPageText(compute70000, 'Ontario', 2026, 'CA-ON'),
     );
   });
 
@@ -107,21 +126,23 @@ describe('salaryPageText: the text of a page from its own answer', () => {
     'differs between pages: no duplicate %s over the three real answers',
     (field) => {
       expect(
-        duplicates(real.map((r) => salaryPageText(r, 'Ontario', 2026)[field])),
+        duplicates(
+          real.map((r) => salaryPageText(r, 'Ontario', 2026, 'CA-ON')[field]),
+        ),
       ).toEqual([]);
     },
   );
 
   it('does not carry one page figures into another', () => {
-    const a = salaryPageText(compute30000, 'Ontario', 2026).paragraph;
-    const b = salaryPageText(compute150000, 'Ontario', 2026).paragraph;
+    const a = salaryPageText(compute30000, 'Ontario', 2026, 'CA-ON').paragraph;
+    const b = salaryPageText(compute150000, 'Ontario', 2026, 'CA-ON').paragraph;
     expect(a).not.toContain('104,319.88');
     expect(b).not.toContain('27,550.43');
   });
 
   it('never claims a CRA check or gives tax advice', () => {
     const all = [...real, syntheticResponse(95000)].flatMap((r) =>
-      Object.values(salaryPageText(r, 'Ontario', 2026)),
+      Object.values(salaryPageText(r, 'Ontario', 2026, 'CA-ON')),
     );
     for (const text of all) {
       const lower = text.toLowerCase();
@@ -147,7 +168,12 @@ describe('salaryPageText length limits', () => {
   it.each(built.flatMap((n) => answers.map(([s, r]) => [n, s, r] as const)))(
     '%s at %s: title under 60 and description under 160 characters',
     (name, _salary, response) => {
-      const { title, description } = salaryPageText(response, name, 2026);
+      const { title, description } = salaryPageText(
+        response,
+        name,
+        2026,
+        'CA-ON',
+      );
       expect(title.length).toBeLessThan(60);
       expect(description.length).toBeLessThan(160);
     },
@@ -168,7 +194,7 @@ describe('salaryPageText length limits', () => {
 
   it('does not cut a long name: the whole name appears and the limit is passed', () => {
     const long = 'The Very Long Named Province of Somewhere Far Away';
-    const { title } = salaryPageText(compute150000, long, 2026);
+    const { title } = salaryPageText(compute150000, long, 2026, 'CA-ON');
     expect(title).toContain(long);
     expect(title.length).toBeGreaterThanOrEqual(60);
   });
@@ -214,7 +240,12 @@ describe('natural-search wording of the page text', () => {
   it.each(['Ontario', 'Alberta'])(
     'gives the assembled title, heading and description for a 75,000 page in %s',
     (place) => {
-      const text = salaryPageText(syntheticResponse(75000), place, 2026);
+      const text = salaryPageText(
+        syntheticResponse(75000),
+        place,
+        2026,
+        'CA-ON',
+      );
       const tail = ` After Tax in ${place} (2026 Take-Home Pay)`;
       expect(text.title).toMatch(/^\D*75,000(\.00)?/);
       expect(text.title.endsWith(tail)).toBe(true);
@@ -226,8 +257,8 @@ describe('natural-search wording of the page text', () => {
 
   it('takes the year in the title and heading from the data: change the year, the text changes', () => {
     const response = syntheticResponse(75000);
-    const y2026 = salaryPageText(response, 'Ontario', 2026);
-    const y2027 = salaryPageText(response, 'Ontario', 2027);
+    const y2026 = salaryPageText(response, 'Ontario', 2026, 'CA-ON');
+    const y2027 = salaryPageText(response, 'Ontario', 2027, 'CA-ON');
     for (const field of ['title', 'heading'] as const) {
       expect(y2026[field]).toContain('(2026 Take-Home Pay)');
       expect(y2027[field]).toContain('(2027 Take-Home Pay)');
@@ -243,9 +274,15 @@ describe('natural-search wording of the page text', () => {
       compute150000,
       'Newfoundland and Labrador',
       2026,
+      'CA-ON',
     ).title;
     expect(long).toBe('$150,000 After Tax in Newfoundland and Labrador (2026)');
-    const normal = salaryPageText(compute150000, 'Ontario', 2026).title;
+    const normal = salaryPageText(
+      compute150000,
+      'Ontario',
+      2026,
+      'CA-ON',
+    ).title;
     expect(normal).toBe('$150,000 After Tax in Ontario (2026 Take-Home Pay)');
   });
 });

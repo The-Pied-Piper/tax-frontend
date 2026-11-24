@@ -3,6 +3,7 @@ import type { Rate } from '../api';
 import type { Unit } from '../adapters';
 import { displayMoney, displayRate } from '../money/format';
 import type { PayPeriod } from '../money/payPeriod';
+import { wordingFor } from '../state/wording';
 import { strings } from '../strings';
 import styles from './AnswerCard.module.css';
 import { HelpTerm } from './HelpTerm';
@@ -20,6 +21,8 @@ type Props = {
   /** The place and year the answer is for, as asked. */
   place: string;
   year: number;
+  /** Picks the wording of the help texts (Quebec words its own deductions). */
+  jurisdictionCode: string;
   payPeriod: PayPeriod;
   onPayPeriodChange: (period: PayPeriod) => void;
   /** The disclosures that sit under the split, inside this panel. */
@@ -37,10 +40,12 @@ export function AnswerCard({
   marginalRate,
   place,
   year,
+  jurisdictionCode,
   payPeriod,
   onPayPeriodChange,
   children,
 }: Props) {
+  const words = wordingFor(jurisdictionCode).answer;
   const headingId = useId();
   const show = (yearly: string) => displayMoney(yearly, payPeriod, unit);
   return (
@@ -63,10 +68,7 @@ export function AnswerCard({
         </div>
         <div className={styles.row}>
           <dt>
-            <HelpTerm
-              name={strings.answer.takenOff.name}
-              help={strings.answer.takenOff.help}
-            />
+            <HelpTerm name={words.takenOff.name} help={words.takenOff.help} />
           </dt>
           <dd>{show(totalDeductions)}</dd>
         </div>
@@ -75,8 +77,8 @@ export function AnswerCard({
           <dd>{show(takeHome)}</dd>
         </div>
         {[
-          { text: strings.answer.averageRate, rate: averageRate },
-          { text: strings.answer.marginalRate, rate: marginalRate },
+          { text: words.averageRate, rate: averageRate },
+          { text: words.marginalRate, rate: marginalRate },
         ].map(({ text, rate }) => (
           <div className={styles.row} key={text.name}>
             <dt>

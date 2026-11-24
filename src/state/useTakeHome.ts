@@ -157,6 +157,7 @@ function seedFrom(
           data.jurisdictions.find((j) => j.code === data.jurisdictionCode)
             ?.name ?? data.jurisdictionCode,
           data.year,
+          data.jurisdictionCode,
         ).heading,
         crumb: data.links
           ? salaryBreadcrumb(

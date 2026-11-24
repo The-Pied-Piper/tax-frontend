@@ -213,6 +213,37 @@ export const strings = {
     ) =>
       `On a salary of ${salary} in ${place} in ${String(year)}, this estimate puts your take-home at ${takeHome} for the year. ${takenOff} is taken off for income tax, Canada Pension Plan and Employment Insurance. Your average rate is ${averageRate}, and your marginal rate is ${marginalRate}: the share of your next dollar of salary that goes to income tax, Canada Pension Plan and Employment Insurance. It is an estimate for a single person, not tax advice.`,
   },
+  // Wording that differs for Quebec, which has its own pension plan, parental insurance and a drug insurance premium.
+  // Chosen by state/wording.ts; every other province uses `answer` and `pageText` above.
+  quebecWording: {
+    answer: {
+      takenOff:
+        'Income tax, Quebec Pension Plan, Employment Insurance, Quebec Parental Insurance Plan premiums and the drug insurance premium added together.',
+      averageRate:
+        'Income tax, Quebec Pension Plan, Employment Insurance, Quebec Parental Insurance Plan premiums and the drug insurance premium, divided by your salary. It is the share of your salary that comes off.',
+      marginalRate:
+        'Of your next dollar of salary, the share that goes to income tax, Quebec Pension Plan, Employment Insurance, Quebec Parental Insurance Plan premiums and the drug insurance premium.',
+    },
+    pageText: {
+      description: (
+        salary: string,
+        place: string,
+        year: number,
+        takeHome: string,
+      ) =>
+        `On a ${salary} salary in ${place} in ${String(year)}, you take home an estimated ${takeHome} a year after income tax, pension, parental insurance and Employment Insurance.`,
+      paragraph: (
+        salary: string,
+        place: string,
+        year: number,
+        takeHome: string,
+        takenOff: string,
+        averageRate: string,
+        marginalRate: string,
+      ) =>
+        `On a salary of ${salary} in ${place} in ${String(year)}, this estimate puts your take-home at ${takeHome} for the year. ${takenOff} is taken off for income tax, Quebec Pension Plan, Quebec Parental Insurance Plan premiums, Employment Insurance and the Quebec prescription drug insurance premium. Your average rate is ${averageRate}, and your marginal rate is ${marginalRate}: the share of your next dollar of salary that goes to income tax, Quebec Pension Plan, Employment Insurance, Quebec Parental Insurance Plan premiums and the drug insurance premium. It is an estimate for a single person, not tax advice.`,
+    },
+  },
   // Navigation between the pre-built salary pages; amounts come from displayMoney.
   salaryLinks: {
     label: 'More salaries',
@@ -349,6 +380,53 @@ export const strings = {
       totalTax: {
         name: 'Total income tax',
         help: 'Federal and Manitoba income tax added together.',
+      },
+    },
+    caQc: {
+      groups: {
+        pension: 'Quebec Pension Plan',
+        ei: 'Employment Insurance',
+        parentalInsurance: 'Quebec Parental Insurance Plan',
+        incomeTax: 'Income tax',
+        drugPremium: 'Drug insurance premium',
+      },
+      qpp: {
+        name: 'Quebec Pension Plan',
+        help: 'Your contribution to the Quebec Pension Plan, taken off your pay for a pension when you retire. It includes the extra part that builds on the base, up to the first yearly ceiling.',
+      },
+      qpp2: {
+        name: 'Quebec Pension Plan, second additional contribution',
+        help: (zero: string) =>
+          `An extra Quebec Pension Plan contribution on earnings above the first yearly ceiling. It is ${zero} if your pay is below that ceiling.`,
+      },
+      zero: 'nothing',
+      qpip: {
+        name: 'Quebec Parental Insurance Plan',
+        help: 'Your Quebec Parental Insurance Plan premium, taken off your pay to cover benefits when you have or adopt a child. It starts at $2,000 of pay.',
+      },
+      ei: {
+        name: 'Employment Insurance',
+        help: 'Your Employment Insurance premium at the lower Quebec rate, taken off your pay to cover benefits if you lose your job.',
+      },
+      federalTax: {
+        name: 'Federal income tax',
+        help: 'Income tax owed to the federal government after the federal credits that apply to you.',
+      },
+      quebecTax: {
+        name: 'Quebec income tax',
+        help: 'Income tax owed to Quebec on your Quebec return, after the Quebec credits that apply to you.',
+      },
+      drugPremium: {
+        name: 'Drug insurance premium',
+        help: 'The yearly Quebec prescription drug insurance premium, paid on your Quebec return if you have no drug plan through work. We assume you have none.',
+      },
+      totalTax: {
+        name: 'Total income tax',
+        help: 'Federal and Quebec income tax added together.',
+      },
+      totalTakenOff: {
+        name: 'Total taken off',
+        help: 'Income tax, Quebec Pension Plan, Employment Insurance, Quebec Parental Insurance Plan premiums and the drug insurance premium added together. Your salary minus this is your estimated take-home pay.',
       },
     },
   },

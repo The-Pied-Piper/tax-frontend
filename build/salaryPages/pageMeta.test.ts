@@ -45,7 +45,7 @@ describe('pageMeta: the wrapper around salaryPageText', () => {
 
   it('gives the text salaryPageText gives for that answer, place and year', () => {
     expect(pageMeta(page70000)).toEqual(
-      salaryPageText(compute70000, 'Ontario', 2026),
+      salaryPageText(compute70000, 'Ontario', 2026, 'CA-ON'),
     );
   });
 
@@ -97,7 +97,12 @@ describe('pageMeta limits, for every province in the list, at its widest', () =>
     (slug) => {
       const place = names[slug] ?? '';
       expect(place, slug).not.toBe('');
-      const { title, description } = salaryPageText(compute150000, place, 2026);
+      const { title, description } = salaryPageText(
+        compute150000,
+        place,
+        2026,
+        'CA-ON',
+      );
       expect(title.length).toBeLessThan(60);
       expect(description.length).toBeLessThan(160);
       expect(title).toContain(place);

@@ -14,5 +14,5 @@ export function pageMeta(data: SalaryPageData): PageMeta {
     placeOptions(data.jurisdictions, COMING_SOON).find(
       (p) => p.code === data.jurisdictionCode,
     )?.name ?? data.jurisdictionCode;
-  return salaryPageText(data.response, place, data.year);
+  return salaryPageText(data.response, place, data.year, data.jurisdictionCode);
 }

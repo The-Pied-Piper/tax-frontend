@@ -2,6 +2,7 @@ import { caAbAdapter } from './ca-ab';
 import { caBcAdapter } from './ca-bc';
 import { caMbAdapter } from './ca-mb';
 import { caOnAdapter } from './ca-on';
+import { caQcAdapter } from './ca-qc';
 import { caSkAdapter } from './ca-sk';
 import { AdapterRegistry } from './registry';
 
@@ -16,4 +17,5 @@ adapters.register(caAbAdapter);
 adapters.register(caBcAdapter);
 adapters.register(caMbAdapter);
 adapters.register(caOnAdapter);
+adapters.register(caQcAdapter);
 adapters.register(caSkAdapter);

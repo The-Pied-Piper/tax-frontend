@@ -46,6 +46,7 @@ export function App({ client, registry, initial, clock }: Props) {
           shown.response,
           shown.asked.jurisdictionName,
           shown.asked.year,
+          shown.asked.jurisdictionCode,
         )
       : null;
   // A pre-built salary page leads with its answer, so the first thing read, on
@@ -69,6 +70,7 @@ export function App({ client, registry, initial, clock }: Props) {
         marginalRate={shown.response.marginal_income_tax_rate}
         place={shown.asked.jurisdictionName}
         year={shown.asked.year}
+        jurisdictionCode={shown.asked.jurisdictionCode}
         payPeriod={page.payPeriod}
         onPayPeriodChange={page.setPayPeriod}
       >

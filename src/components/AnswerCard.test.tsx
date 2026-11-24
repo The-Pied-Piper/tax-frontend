@@ -10,6 +10,7 @@ const base = {
   takeHome: '53468.68',
   place: 'Ontario',
   year: 2025,
+  jurisdictionCode: 'CA-ON',
   payPeriod: 'annually' as const,
   onPayPeriodChange: () => {},
   unit: cad,

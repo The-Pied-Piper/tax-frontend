@@ -3,6 +3,7 @@ import type { ComputeTakeHomeCalculationResponse } from '../api';
 import { displayMoney, displayRate, displayWholeMoney } from '../money/format';
 import { strings } from '../strings';
 import { TITLE_LIMIT } from './pageLimits';
+import { wordingFor } from './wording';
 
 /** The text of one salary page, all built from that page's own answer. */
 export type SalaryPageText = {
@@ -21,6 +22,7 @@ export function salaryPageText(
   response: ComputeTakeHomeCalculationResponse,
   rawPlace: string,
   year: number,
+  jurisdictionCode: string,
 ): SalaryPageText {
   const place = rawPlace.trim();
   const unit = responseUnit(response);
@@ -28,15 +30,16 @@ export function salaryPageText(
   const salary = displayWholeMoney(response.salary, 'annually', unit);
   const takeHome = show(response.take_home);
   const text = strings.pageText;
+  const words = wordingFor(jurisdictionCode).pageText;
   const fullTitle = text.title(salary, place, year);
   return {
     title:
       fullTitle.length < TITLE_LIMIT
         ? fullTitle
         : text.shortTitle(salary, place, year),
-    description: text.description(salary, place, year, takeHome),
+    description: words.description(salary, place, year, takeHome),
     heading: text.heading(salary, place, year),
-    paragraph: text.paragraph(
+    paragraph: words.paragraph(
       salary,
       place,
       year,
