@@ -93,8 +93,9 @@ function chartSection(
 ): ContentSection {
   const words = strings.hubCharts.charts[chart];
   const province = text.slug;
-  const oneLine = text.words
-    ? text.words(name).charts[chart]
+  const own = text.words?.(name);
+  const oneLine = own
+    ? own.charts[chart]
     : chart === 'marginalRate' && text.taxReduction
       ? `${words.text} ${strings.hubCharts.marginalReduction}`
       : words.text.replace('{place}', name);
@@ -210,8 +211,7 @@ export const provinceHubs: ProvinceHubText[] = [
       charts: {
         takeHome:
           'Your salary minus income tax, Quebec Pension Plan, Employment Insurance, Quebec Parental Insurance Plan premiums and the Quebec prescription drug insurance premium.',
-        averageRate:
-          'The share of your salary that goes to income tax, Quebec Pension Plan, Employment Insurance and Quebec Parental Insurance Plan premiums together. Federal and ${name} income tax both count.',
+        averageRate: `The share of your salary that goes to income tax, Quebec Pension Plan, Employment Insurance and Quebec Parental Insurance Plan premiums together. Federal and ${name} income tax both count.`,
         marginalRate:
           'Out of your next dollar of salary, the share that goes to income tax, Quebec Pension Plan, Employment Insurance and Quebec Parental Insurance Plan premiums. The rate steps up where a new tax bracket starts, and across a band of lower salaries while the drug insurance premium grows. It falls where a pension or insurance payment stops.',
       },
@@ -303,6 +303,7 @@ export function hubPage(
   otherHubs: ContentLink[],
   withCharts = false,
 ): ContentPageSpec {
+  const own = text.words?.(name);
   // A hub with no salary pages must not promise salary examples.
   const withSalaries = salaryLinks.length > 0;
   const title = `${name} take-home pay and income tax analysis`;
@@ -336,7 +337,7 @@ export function hubPage(
           : {}),
         blocks: [
           paragraph(
-            text.words?.(name).takeHome ??
+            own?.takeHome ??
               `Take-home pay is your salary minus three things. The first is income tax, which comes in two parts: federal tax and ${name} tax. The second is your Canada Pension Plan payments, which build up your future pension. The third is Employment Insurance, or EI, which can pay you if you lose your job. The forms below are where each of those is worked out.`,
           ),
           ...(withCharts
@@ -346,7 +347,7 @@ export function hubPage(
                   text: strings.hubCharts.charts.takeHome.title,
                 },
                 paragraph(
-                  text.words?.(name).charts.takeHome ??
+                  own?.charts.takeHome ??
                     strings.hubCharts.charts.takeHome.text,
                 ),
                 {
@@ -395,10 +396,7 @@ export function hubPage(
             kind: 'list',
             title: `Federal forms ${name} also uses`,
             items: federalForms.map((form) =>
-              listItem(
-                { ...form, ...text.words?.(name).federal[form.id] },
-                published,
-              ),
+              listItem({ ...form, ...own?.federal[form.id] }, published),
             ),
           },
         ],

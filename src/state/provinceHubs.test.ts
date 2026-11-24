@@ -314,6 +314,20 @@ describe('the Quebec hub', () => {
     expect(every).not.toMatch(/taxtips/i);
   });
 
+  it('writes the province name into every chart line, with no template text left over', () => {
+    const charted = hubPage(
+      textOf('ca-qc'),
+      'Quebec',
+      salaryLinks,
+      new Set(),
+      [],
+      true,
+    );
+    const every = everyString(charted.sections.map((s) => s.blocks)).join(' ');
+    expect(every).toContain('Federal and Quebec income tax both count.');
+    expect(every).not.toContain('${');
+  });
+
   it('does not link the Canada Pension Plan page for Schedule 8, even when that page is published', () => {
     const published = build('ca-qc', [formSlug('schedule-8')]);
     const schedule8 = lists(published)[1]?.items.find((i) =>
