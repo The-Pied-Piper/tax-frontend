@@ -1,8 +1,11 @@
+import { adapters } from '../../src/adapters';
 import type { ComputeTakeHomeCalculationResponse } from '../../src/api';
 import fixtureQc from '../../src/api/fixtures/compute-qc-2025-70000.json';
 import { strings } from '../../src/strings';
 import { bareLinks } from '../../src/test/pageLinks';
 import type { SalaryPageData } from '../../src/state/useTakeHome';
+import { DESCRIPTION_LIMIT } from './limits';
+import { salaryPageText } from '../../src/state/salaryPageText';
 import { pageMeta } from './pageMeta';
 import { renderSalaryApp } from './prerender';
 
@@ -57,5 +60,25 @@ describe('a pre-built Quebec salary page', () => {
       expect(text).toContain(wanted);
     }
     expect(text).not.toMatch(/Canada Pension/);
+  });
+});
+
+describe('the Quebec page descriptions', () => {
+  it('stay under the description limit on the longest page, with or without the accent', () => {
+    // The longest page: the largest salary step with a six-figure take-home.
+    const longest = {
+      ...response,
+      salary: '150000.00',
+      take_home: '149999.99',
+    };
+    for (const name of ['Quebec', 'Québec']) {
+      const { description } = salaryPageText(
+        longest,
+        name,
+        2026,
+        adapters.adapt('CA-QC', 2026, longest).wording,
+      );
+      expect(description.length).toBeLessThan(DESCRIPTION_LIMIT);
+    }
   });
 });
