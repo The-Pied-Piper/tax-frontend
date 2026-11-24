@@ -2,18 +2,18 @@ import { figuresOf, type FormPageSpec } from '../formPage';
 
 const { result, printed } = figuresOf('ca/schedule_8');
 
-/** Schedule 8 for Quebec (5005-S8) in plain words. The figures are the 2025 form's, at a $70,000 salary. */
+/** Schedule 8 for Québec (5005-S8) in plain words. The figures are the 2025 form's, at a $70,000 salary. */
 export const schedule8Qc: FormPageSpec = {
   id: 'schedule-8-qc',
-  name: 'Schedule 8: Quebec Pension Plan Contributions',
+  name: 'Schedule 8: Québec Pension Plan Contributions',
   province: 'ca-qc',
   year: 2025,
   exampleSalary: '70000',
-  title: 'Schedule 8: Quebec Pension Plan, in plain words',
+  title: 'Schedule 8: Québec Pension Plan, in plain words',
   description:
     'What Schedule 8 is for and what each part asks, in plain words, with a worked example for a $70,000 salary.',
   intro:
-    'This form works out the contributions you were required to pay into the Quebec Pension Plan, or QPP. The QPP is the pension plan that people who work in Quebec pay into. The form also says where those payments go on your federal tax return. It is for people who lived in Quebec on December 31 and earned income only from Quebec. If a T4 slip shows Canada Pension Plan contributions, use Form RC381 instead. This page covers Part 2, for employment income.',
+    'This form works out the contributions you were required to pay into the Québec Pension Plan, or QPP. The QPP is the pension plan that people who work in Québec pay into. The form also says where those payments go on your federal tax return. It is for people who lived in Québec on December 31 and earned income only from Québec. If a T4 slip shows Canada Pension Plan contributions, use Form RC381 instead. This page covers Part 2, for employment income.',
   sections: [
     {
       id: 'months',
