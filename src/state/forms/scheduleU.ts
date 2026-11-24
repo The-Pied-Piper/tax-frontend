@@ -5,7 +5,7 @@ const { result, printed } = figuresOf('ca-qc/tp1_schedule_u');
 /** Schedule U (Part B) in plain words. The figures are the 2025 form's, at a $70,000 salary. */
 export const scheduleU: FormPageSpec = {
   id: 'schedule-u',
-  name: 'Schedule U: Quebec Pension Plan (QPP) Contribution and Deduction',
+  name: 'Schedule U: Québec Pension Plan (QPP) Contribution and Deduction',
   province: 'ca-qc',
   year: 2025,
   exampleSalary: '70000',
@@ -13,7 +13,7 @@ export const scheduleU: FormPageSpec = {
   description:
     'What Schedule U is for and how it works out your QPP deduction, in plain words, with a worked example for a $70,000 salary.',
   intro:
-    'Schedule U is where part of your Quebec Pension Plan, or QPP, payments becomes a tax deduction. You pay QPP out of your pay, and your employer reports the amount on your RL-1 slip. This page covers Part B, the part for people paid a salary.',
+    'Schedule U is where part of your Québec Pension Plan, or QPP, payments becomes a tax deduction. You pay QPP out of your pay, and your employer reports the amount on your RL-1 slip. This page covers Part B, the part for people paid a salary.',
   sections: [
     {
       id: 'contribution',
@@ -109,7 +109,7 @@ export const scheduleU: FormPageSpec = {
       heading: 'Your QPP deduction',
       lines: 'Lines 22.1–23',
       paragraph:
-        'Line 23 adds the two results. It is your deduction for QPP contributions on employment income. It goes to line 248 of your Quebec return. We do not use Part A, which is for stopping contributions, or Part C, which is for self-employed people.',
+        'Line 23 adds the two results. It is your deduction for QPP contributions on employment income. It goes to line 248 of your Québec return. We do not use Part A, which is for stopping contributions, or Part C, which is for self-employed people.',
       example:
         '{line16} plus {line22} is {deduction}. It goes to line 248 of Form TP-1.',
       figures: {

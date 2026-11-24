@@ -85,16 +85,16 @@ describe('salaryPageText: the text of a page from its own answer', () => {
   });
 
   it('takes the place and year from its arguments, never from the code', () => {
-    const text = salaryPageText(compute70000, 'Quebec', 2031);
+    const text = salaryPageText(compute70000, 'Québec', 2031);
     for (const value of Object.values(text)) {
       expect(value).not.toContain('Ontario');
       expect(value).not.toContain('2026');
     }
-    expect(text.title).toContain('Quebec');
+    expect(text.title).toContain('Québec');
     expect(text.title).toContain('2031');
-    expect(text.description).toContain('Quebec');
-    expect(text.heading).toContain('Quebec');
-    expect(text.paragraph).toContain('Quebec');
+    expect(text.description).toContain('Québec');
+    expect(text.heading).toContain('Québec');
+    expect(text.paragraph).toContain('Québec');
   });
 
   it('is pure: the same answer gives the same text', () => {

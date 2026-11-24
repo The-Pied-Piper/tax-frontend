@@ -15,7 +15,7 @@ function all(response: ComputeTakeHomeCalculationResponse) {
   return [...result.rows, ...result.totals];
 }
 
-describe('Quebec adapter', () => {
+describe('Québec adapter', () => {
   it('is registered for CA-QC in every year', () => {
     expect(adapters.find('CA-QC', 2025)?.jurisdictionCode).toBe('CA-QC');
     expect(adapters.find('CA-QC', 2026)?.jurisdictionCode).toBe('CA-QC');
@@ -50,18 +50,18 @@ describe('Quebec adapter', () => {
     expect(sumAmounts(parts.map(amount))).toBe(amount('total-taken-off'));
   });
 
-  it('counts the federal tax before the Quebec abatement', () => {
+  it('counts the federal tax before the Québec abatement', () => {
     const federal = all(r2025).find((r) => r.id === 'federal-tax');
     expect(federal?.amount).toBe('7523.55');
   });
 
-  it('lists rows under the Quebec headings, with no Canada Pension Plan wording', () => {
+  it('lists rows under the Québec headings, with no Canada Pension Plan wording', () => {
     const rows = all(r2025);
     expect(rows.map((r) => [r.id, r.group])).toEqual([
-      ['qpp', 'Quebec Pension Plan'],
-      ['qpp2', 'Quebec Pension Plan'],
+      ['qpp', 'Québec Pension Plan'],
+      ['qpp2', 'Québec Pension Plan'],
       ['ei', 'Employment Insurance'],
-      ['qpip', 'Quebec Parental Insurance Plan'],
+      ['qpip', 'Québec Parental Insurance Plan'],
       ['federal-tax', 'Income tax'],
       ['quebec-tax', 'Income tax'],
       ['drug-premium', 'Prescription drug insurance premium'],
@@ -132,7 +132,7 @@ describe('Quebec adapter', () => {
     expect(result.advanced.length).toBeGreaterThan(0);
   });
 
-  it('falls back when federal and Quebec tax are in different units', () => {
+  it('falls back when federal and Québec tax are in different units', () => {
     const mixed = {
       ...r2025,
       trace: (r2025.trace ?? []).map((f) => ({
@@ -159,7 +159,14 @@ describe('Quebec adapter', () => {
       }))
       .filter((f) => f.lines.length > 0);
     expect(result.advanced.map((g) => g.name)).toEqual([
-      ...new Set(numbered.map((f) => f.name)),
+      ...new Set(
+        numbered.map((f) =>
+          f.name ===
+          'Schedule 8: Canada Pension Plan Contributions and Overpayment'
+            ? strings.adapters.caQc.schedule8Title
+            : f.name,
+        ),
+      ),
     ]);
     expect(result.advanced.flatMap((g) => g.lines)).toHaveLength(
       numbered.flatMap((f) => f.lines).length,
@@ -167,9 +174,14 @@ describe('Quebec adapter', () => {
   });
 });
 
-describe('Quebec adapter, wording and help text', () => {
+describe('Québec adapter, wording and help text', () => {
   const { wording, zero, qpp2, ...rest } = strings.adapters.caQc;
-  const text = { ...rest, qpp2: { name: qpp2.name, help: qpp2.help(zero) } };
+  // The Schedule 8 title is a CRA form title with its number, not row copy.
+  const text = {
+    ...rest,
+    schedule8Title: '',
+    qpp2: { name: qpp2.name, help: qpp2.help(zero) },
+  };
 
   function leaves(value: unknown): string[] {
     if (typeof value === 'string') return [value];
@@ -188,10 +200,10 @@ describe('Quebec adapter, wording and help text', () => {
       wording.answer.takenOff,
       wording.answer.averageRate,
       wording.answer.marginalRate,
-      wording.pageText.description('$70,000', 'Quebec', 2026, '$49,073.39'),
+      wording.pageText.description('$70,000', 'Québec', 2026, '$49,073.39'),
       wording.pageText.paragraph(
         '$70,000',
-        'Quebec',
+        'Québec',
         2026,
         '$49,073.39',
         '$20,926.61',
@@ -219,5 +231,43 @@ describe('Quebec adapter, wording and help text', () => {
       expect(s).not.toMatch(/\d/);
       expect(s).not.toMatch(/CRA|checked|official|Ontario/i);
     }
+  });
+});
+
+describe('Québec adapter, advanced view wording', () => {
+  const groups = caQcAdapter.adapt(r2025).advanced;
+  const schedule8 = groups.find((g) => g.form === 'ca/schedule_8');
+
+  it('titles Schedule 8 for the Québec Pension Plan and links the Québec page', () => {
+    expect(schedule8?.name).toBe(
+      'Schedule 8: Québec Pension Plan Contributions',
+    );
+    expect(schedule8?.page).toBe('schedule-8-qc');
+  });
+
+  it('words the Schedule 8 lines with QPP, never CPP or the Canada Pension Plan', () => {
+    const words = (schedule8?.lines ?? []).flatMap((l) => [l.label, l.detail]);
+    expect(words.length).toBeGreaterThan(0);
+    for (const w of words) expect(w).not.toMatch(/Canada Pension|CPP/);
+    expect(words).toContain(
+      'Total QPP pensionable earnings from box 26 of all of your T4 slips',
+    );
+  });
+
+  it('spells the province with its accent in every group and line', () => {
+    for (const g of groups) {
+      for (const w of [
+        g.name,
+        ...g.lines.flatMap((l) => [l.label, l.detail]),
+      ]) {
+        expect(w).not.toContain('Quebec');
+      }
+    }
+  });
+
+  it('leaves other forms’ pages alone', () => {
+    expect(groups.find((g) => g.form === 'ca-qc/tp1_schedule_u')?.page).toBe(
+      'schedule-u',
+    );
   });
 });

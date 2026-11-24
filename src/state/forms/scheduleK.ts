@@ -5,15 +5,15 @@ const { result } = figuresOf('ca-qc/tp1_schedule_k');
 /** Schedule K in plain words. The figures are the 2025 form's, at a $70,000 salary. */
 export const scheduleK: FormPageSpec = {
   id: 'schedule-k',
-  name: 'Schedule K: Premium Payable Under the Quebec Prescription Drug Insurance Plan',
+  name: 'Schedule K: Premium Payable Under the Québec Prescription Drug Insurance Plan',
   province: 'ca-qc',
   year: 2025,
   exampleSalary: '70000',
-  title: 'Schedule K: Quebec Drug Insurance Premium, in plain words',
+  title: 'Schedule K: Québec Drug Insurance Premium, in plain words',
   description:
     'What Schedule K is for and what each part asks, in plain words, with a worked example for a $70,000 salary.',
   intro:
-    "Quebec's public drug insurance plan covers people who are not in a group plan, usually one through work. If that is you, you pay a yearly premium when you file your Quebec return. This schedule works it out. We assume you have no group plan.",
+    "Québec's public drug insurance plan covers people who are not in a group plan, usually one through work. If that is you, you pay a yearly premium when you file your Québec return. This schedule works it out. We assume you have no group plan.",
   sections: [
     {
       id: 'income',
@@ -59,7 +59,7 @@ export const scheduleK: FormPageSpec = {
       heading: 'Your premium',
       lines: 'Line 98',
       paragraph:
-        'Your premium goes to line 447 of your Quebec return, where it is added to your tax. This site counts it in your take-home pay, because you pay it when you file.',
+        'Your premium goes to line 447 of your Québec return, where it is added to your tax. This site counts it in your take-home pay, because you pay it when you file.',
       example: 'Your premium is {premium}. It goes to line 447 of Form TP-1.',
       figures: {
         premium: result('$755', 'schedule_k_premium_payable_line_98'),

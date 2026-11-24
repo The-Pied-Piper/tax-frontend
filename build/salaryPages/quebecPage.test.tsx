@@ -13,7 +13,7 @@ const data: SalaryPageData = {
   jurisdictions: [
     {
       code: 'CA-QC',
-      name: 'Quebec',
+      name: 'Québec',
       years: [{ year: 2025, provisional: false }],
     },
   ],
@@ -24,20 +24,20 @@ const data: SalaryPageData = {
   links: bareLinks,
 };
 
-describe('a pre-built Quebec salary page', () => {
+describe('a pre-built Québec salary page', () => {
   it('words the page text with QPP and QPIP, never the Canada Pension Plan', () => {
     const { description, paragraph } = pageMeta(data);
     for (const text of [description, paragraph]) {
       expect(text).not.toMatch(/Canada Pension|CPP/);
       expect(text).toMatch(/[Pp]arental [Ii]nsurance/);
     }
-    expect(paragraph).toContain('Quebec Pension Plan');
-    expect(paragraph).toContain('prescription drug insurance premium');
+    expect(paragraph).toContain('Québec Pension Plan');
+    expect(paragraph).toContain('prescription drug insurance plan');
     expect(paragraph).toContain('$21,382.18');
     expect(paragraph).not.toContain('abatement');
   });
 
-  it('puts the Quebec rows and help texts in the HTML a crawler reads', () => {
+  it('puts the Québec rows and help texts in the HTML a crawler reads', () => {
     document.body.innerHTML = renderSalaryApp(data);
     // The advanced view prints the engine's own form lines as sent, so it is left out here.
     for (const details of document.querySelectorAll('details')) {
@@ -48,8 +48,8 @@ describe('a pre-built Quebec salary page', () => {
     const text = document.body.textContent;
     for (const wanted of [
       '$48,617.82',
-      'Quebec Pension Plan',
-      'Quebec Parental Insurance Plan',
+      'Québec Pension Plan',
+      'Québec Parental Insurance Plan',
       'Prescription drug insurance premium',
       '$345.80',
       '$755.00',

@@ -20,7 +20,7 @@ describe('the province list', () => {
     }
   });
 
-  it('has Ontario, Alberta, British Columbia, Manitoba, Saskatchewan, Newfoundland and Labrador then Quebec, each from $30,000 to $150,000 in $5,000 steps', () => {
+  it('has Ontario, Alberta, British Columbia, Manitoba, Saskatchewan, Newfoundland and Labrador then Québec, each from $30,000 to $150,000 in $5,000 steps', () => {
     expect(provinces).toEqual([
       {
         code: 'CA-ON',

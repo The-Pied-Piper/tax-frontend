@@ -13,7 +13,7 @@ export const scheduleB: FormPageSpec = {
   description:
     'What Schedule B is for, including living alone, age, retirement income and medical expenses, in plain words, with a worked example for a $70,000 salary.',
   intro:
-    'Schedule B can lower your Quebec tax through amounts for living alone, age and retirement income, and through medical expenses and an independent living credit for seniors. The first three shrink as your family income grows. For a person living alone with a $70,000 salary, the living-alone amount comes to nothing.',
+    'Schedule B can lower your Québec tax through amounts for living alone, age and retirement income, and through medical expenses and an independent living credit for seniors. The first three shrink as your family income grows. For a person living alone with a $70,000 salary, the living-alone amount comes to nothing.',
   sections: [
     {
       id: 'income',
@@ -83,7 +83,7 @@ export const scheduleB: FormPageSpec = {
       heading: 'Your result',
       lines: 'Lines 33–34',
       paragraph:
-        'If your spouse claimed some of the amount, it is taken off. What is left goes to line 361 of your Quebec return.',
+        'If your spouse claimed some of the amount, it is taken off. What is left goes to line 361 of your Québec return.',
       example:
         'Your spouse claimed {spouseClaim}, so your result is {result}. It goes to line 361 of Form TP-1.',
       figures: {
