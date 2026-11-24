@@ -45,6 +45,29 @@ export interface AdvancedGroup {
   lines: AdvancedLine[];
 }
 
+/** Sentences a jurisdiction words itself where the shared ones name the Canada Pension Plan. */
+export interface Wording {
+  /** Help text of the three answer-card rows; the row names stay shared. */
+  answer: { takenOff: string; averageRate: string; marginalRate: string };
+  pageText: {
+    description(
+      salary: string,
+      place: string,
+      year: number,
+      takeHome: string,
+    ): string;
+    paragraph(
+      salary: string,
+      place: string,
+      year: number,
+      takeHome: string,
+      takenOff: string,
+      averageRate: string,
+      marginalRate: string,
+    ): string;
+  };
+}
+
 /** What the page shows for one calculation. */
 export interface AdaptedResult {
   /** The response's top-level unit, for salary, deductions and take-home. */
@@ -55,6 +78,8 @@ export interface AdaptedResult {
   totals: DisplayRow[];
   /** Every trace line, grouped by form. */
   advanced: AdvancedGroup[];
+  /** The jurisdiction's own sentences; left out, the shared wording is used. */
+  wording?: Wording;
 }
 
 /** Turns one jurisdiction's API response into display rows. */

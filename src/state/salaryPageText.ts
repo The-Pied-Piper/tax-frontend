@@ -1,3 +1,4 @@
+import type { Wording } from '../adapters';
 import { responseUnit } from '../adapters/fallback';
 import type { ComputeTakeHomeCalculationResponse } from '../api';
 import { displayMoney, displayRate, displayWholeMoney } from '../money/format';
@@ -21,6 +22,7 @@ export function salaryPageText(
   response: ComputeTakeHomeCalculationResponse,
   rawPlace: string,
   year: number,
+  wording?: Wording,
 ): SalaryPageText {
   const place = rawPlace.trim();
   const unit = responseUnit(response);
@@ -28,15 +30,16 @@ export function salaryPageText(
   const salary = displayWholeMoney(response.salary, 'annually', unit);
   const takeHome = show(response.take_home);
   const text = strings.pageText;
+  const words = wording?.pageText ?? text;
   const fullTitle = text.title(salary, place, year);
   return {
     title:
       fullTitle.length < TITLE_LIMIT
         ? fullTitle
         : text.shortTitle(salary, place, year),
-    description: text.description(salary, place, year, takeHome),
+    description: words.description(salary, place, year, takeHome),
     heading: text.heading(salary, place, year),
-    paragraph: text.paragraph(
+    paragraph: words.paragraph(
       salary,
       place,
       year,
