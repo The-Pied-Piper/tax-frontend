@@ -42,8 +42,6 @@ describe('FORM_PAGE_OF', () => {
       'ca-qc/tp1_credits': 'tp1',
       'ca-qc/tp1_tax': 'tp1',
       'ca-qc/tp1_totals': 'tp1',
-      'ca-qc/work_chart_201': 'tp1',
-      'ca-qc/work_chart_401': 'tp1',
       'ca/t1_taxable_income': 't1',
       'ca/t1_tax_and_credits': 't1',
       'ca/schedule_8': 'schedule-8',
