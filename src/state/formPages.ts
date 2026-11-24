@@ -4,6 +4,7 @@ import { t4 } from './forms/t4';
 import { ab428 } from './forms/ab428';
 import { bc428 } from './forms/bc428';
 import { schedule8 } from './forms/schedule8';
+import { schedule8Qc } from './forms/schedule8Qc';
 import { t1 } from './forms/t1';
 import { t2204 } from './forms/t2204';
 import { schedule6 } from './forms/schedule6';
@@ -15,6 +16,7 @@ import { mb428a } from './forms/mb428a';
 import { sk428 } from './forms/sk428';
 import { nl428 } from './forms/nl428';
 import { scheduleB } from './forms/scheduleB';
+import { scheduleF } from './forms/scheduleF';
 import { tp1 } from './forms/tp1';
 import { scheduleK } from './forms/scheduleK';
 import { scheduleU } from './forms/scheduleU';
@@ -26,6 +28,7 @@ export const formPages: FormPageSpec[] = [
   ab428,
   bc428,
   schedule8,
+  schedule8Qc,
   t1,
   t2204,
   schedule6,
@@ -37,6 +40,7 @@ export const formPages: FormPageSpec[] = [
   sk428,
   nl428,
   scheduleB,
+  scheduleF,
   tp1,
   scheduleK,
   scheduleU,
