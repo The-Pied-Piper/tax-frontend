@@ -16,6 +16,7 @@ import { sk428 } from './forms/sk428';
 import { nl428 } from './forms/nl428';
 import { tp1 } from './forms/tp1';
 import { scheduleK } from './forms/scheduleK';
+import { scheduleU } from './forms/scheduleU';
 
 /** Every form that has a page. Adding a form is one entry here and one file in `forms/`. */
 export const formPages: FormPageSpec[] = [
@@ -36,4 +37,5 @@ export const formPages: FormPageSpec[] = [
   nl428,
   tp1,
   scheduleK,
+  scheduleU,
 ];
