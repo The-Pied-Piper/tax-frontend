@@ -18,6 +18,7 @@ const FIXED_IDS = [
   't2204',
   'schedule-6',
   'schedule-b',
+  'schedule-f',
   'tp1',
   'schedule-k',
   'schedule-u',
@@ -53,6 +54,7 @@ describe('FORM_PAGE_OF', () => {
       'ca/schedule_8': 'schedule-8',
       'ca/t2204': 't2204',
       'ca/schedule_6': 'schedule-6',
+      'ca-qc/tp1_schedule_f': 'schedule-f',
     });
   });
 
