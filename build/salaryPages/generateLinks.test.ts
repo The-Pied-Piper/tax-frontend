@@ -135,6 +135,7 @@ describe('generateSalaryPages links', () => {
       'CA-MB',
       'CA-SK',
       'CA-NL',
+      'CA-QC',
       'CA-XX',
     ]);
     expect(written.some((f) => f.startsWith('ca-xx/'))).toBe(false);

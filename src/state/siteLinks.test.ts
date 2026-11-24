@@ -83,7 +83,7 @@ describe('footer targets', () => {
     expect(METHODOLOGY_SLUG).toBe('methodology');
   });
 
-  it('lists Ontario, Alberta, British Columbia, Manitoba, Saskatchewan and Newfoundland and Labrador, in that order', () => {
+  it('lists Ontario, Alberta, British Columbia, Manitoba, Saskatchewan, Newfoundland and Labrador and Quebec, in that order', () => {
     expect([...FOOTER_PROVINCE_SLUGS]).toEqual([
       'ca-on',
       'ca-ab',
@@ -91,6 +91,7 @@ describe('footer targets', () => {
       'ca-mb',
       'ca-sk',
       'ca-nl',
+      'ca-qc',
     ]);
   });
 

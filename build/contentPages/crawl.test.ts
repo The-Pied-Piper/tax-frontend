@@ -45,6 +45,7 @@ describe('crawl of a built one-entry content page folder', () => {
       'ca-mb/index.html',
       'ca-sk/index.html',
       'ca-nl/index.html',
+      'ca-qc/index.html',
     ]);
   });
 

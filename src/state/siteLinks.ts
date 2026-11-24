@@ -37,6 +37,7 @@ export const FOOTER_PROVINCE_SLUGS = [
   'ca-mb',
   'ca-sk',
   'ca-nl',
+  'ca-qc',
 ] as const;
 
 /** The province pages the footer links to, by slug. */

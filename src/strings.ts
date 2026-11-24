@@ -20,6 +20,7 @@ export const strings = {
       'ca-mb': 'Manitoba',
       'ca-sk': 'Saskatchewan',
       'ca-nl': 'Newfoundland and Labrador',
+      'ca-qc': 'Quebec',
     },
   },
   hubCharts: {
