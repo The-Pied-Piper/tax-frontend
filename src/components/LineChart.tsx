@@ -41,7 +41,7 @@ type Props = {
   yUnit: MoneyUnit;
   /** A money/format formatter: the label beside the marker. */
   formatValue: (value: string) => string;
-  /** The text for screen readers; the figures themselves are in the table. */
+  /** The text for screen readers. */
   ariaLabel: string;
   /** The shared marker: an index into points, or none. The card owns it. */
   activeIndex: number | null;

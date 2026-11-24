@@ -34,7 +34,7 @@ export const strings = {
     dollarsYear: 'Dollars a year',
     dollarsMonth: 'Dollars a month',
     chartLabel: (title: string, from: string, to: string) =>
-      `Line chart: ${title} against salary, from ${from} to ${to}. The same figures are in the table below the chart.`,
+      `Line chart: ${title} against salary, from ${from} to ${to}.`,
     note: 'These are estimates for a single person whose only income is a salary.',
     // Added to the marginal rate's line on a hub whose province has a tax reduction that shrinks to zero (not Alberta or Saskatchewan).
     marginalReduction:
