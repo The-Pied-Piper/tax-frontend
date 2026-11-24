@@ -77,7 +77,7 @@ describe("reading the Python step's file", () => {
     writeFileSync(
       file,
       JSON.stringify({
-        engine: '0.4.1',
+        engine: '0.5.1',
         provinces: { 'CA-ON': { pages, ...extra } },
       }),
     );
@@ -87,7 +87,7 @@ describe("reading the Python step's file", () => {
   it('returns the answers by province and salary', () => {
     const answer = engineOf(saved);
     const figures = readEngineFigures(written({ '70000': answer }));
-    expect(figures.engine).toBe('0.4.1');
+    expect(figures.engine).toBe('0.5.1');
     expect(figures.answers['CA-ON']?.['70000']).toEqual(answer);
   });
 
@@ -181,16 +181,16 @@ describe.runIf(process.env.ENGINE_FIGURES_FILE)(
       );
     });
 
-    // The chart figures, pinned to the independent sweep of the hub-charts thread (tax-engine 0.4.1,
-    // 2026, basis 2): the average rate is income tax, CPP and EI (the EI form's line 16) over the salary,
-    // the marginal rate its change over the next $100 (or $10 near a narrow step), and the year total is
-    // income tax, CPP and EI as deducted, less the credits paid on filing.
+    // The chart figures (tax-engine 0.5.1, 2026): the average and marginal rate are the engine's own
+    // (income tax, CPP and EI line 16, no credits paid on filing counted; at $2,000 the engine reads the
+    // marginal rate below the start of the EI band), and the year total is income tax, CPP and EI as
+    // deducted, less the credits paid on filing.
     it.each([
-      ['2000.00', '0.0000', '1.0000', '0.00', '2000.00'],
+      ['2000.00', '0.0000', '0.0000', '0.00', '2000.00'],
       ['3000.00', '0.0163', '0.0163', '48.90', '2951.10'],
       ['38000.00', '0.1583', '0.3608', '5889.24', '31985.21'],
-      ['70000.00', '0.2316', '0.3435', '16213.75', '53786.25'],
-      ['201200.00', '0.3445', '0.7327', '69319.16', '131880.84'],
+      ['70000.00', '0.2316', '0.3436', '16213.75', '53786.25'],
+      ['201200.00', '0.3445', '0.7326', '69319.16', '131880.84'],
     ])(
       'gives Ontario at %s the sweep figures',
       (salary, average, marginal, yearTotal, takeHome) => {

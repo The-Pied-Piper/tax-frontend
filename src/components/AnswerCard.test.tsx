@@ -142,7 +142,7 @@ describe('AnswerCard', () => {
     render(<AnswerCard {...base} />);
     const { name, help } = strings.answer.takenOff;
     expect(help).toBe(
-      'Income tax, Canada Pension Plan and Employment Insurance, less credits paid to you. A minus means you take home more than your salary.',
+      'Income tax, Canada Pension Plan and Employment Insurance added together.',
     );
     expect(screen.getByText(help)).not.toBeVisible();
     await userEvent.click(

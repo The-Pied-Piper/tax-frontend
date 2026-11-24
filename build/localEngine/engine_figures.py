@@ -2,35 +2,19 @@
 
 Usage: python -I build/localEngine/engine_figures.py <provinces.json> <output.json>
 
-This is the one place in the frontend that knows the engine's kinds. It mirrors, line for line, what
-tax-service does for POST /take-home-calculations:compute, so the pre-built pages say what the live
-calculator says (when the two pin the same tax-engine release):
+Every figure of an answer comes from tax-engine's own take-home function (`build_take_home`), the
+one tax-service serves POST /take-home-calculations:compute with (tax-service #93): the engine decides
+what the answer is made of and sums it, including the average and marginal rate. This script only asks
+and writes the answer in the API's shape (strings everywhere, a form's name falling back to its
+identifier), so the pre-built pages say what the live calculator says (when the two pin the same
+tax-engine release). The Node build checks every answer against api/openapi.yml, so a change of shape
+fails the build.
 
-  * app/adapters/outbound/tax_engine/engine.py  FIGURES, AVERAGE_RATES, MARGINAL_RATES, the unit and
-    trace mapping, and the rule that all figures share one unit;
-  * app/domain/take_home.py  TakeHomeResult.of: total = sum of the figures in the order of the
-    service's deduction items, quantized to cents; income_tax = the income tax figure alone, quantized; take_home = salary minus that total, quantized;
-  * app/adapters/inbound/take_home_calculations_adapter.py  the response shape (strings everywhere,
-    a form's name falls back to its identifier).
+The hub-chart sweep takes the engine's own answer for every salary: `total_deductions`, `income_tax`,
+`take_home`, and the engine's `average_tax_rate` and `marginal_tax_rate` (income tax of T1 line 43500, CPP both tiers
+and EI line 16; credits paid to you when you file are not counted, so tax cuts such as the Ontario LIFT credit count and
+the Canada workers benefit does not). One figure is the script's own:
 
-Until tax-engine publishes this mapping itself, a change in the service's copy must be copied here;
-the Node build checks every answer against api/openapi.yml, so a change of shape fails the build.
-
-The one difference from the service's copy is Employment Insurance: here it is the EI form's own figure, T2204
-line 16 (the premium after the refund at $2,000 or less, which goes to T1 line 31200), where the service still
-uses the premiums deducted from pay (`ca/t2204_premiums_deducted`). The two differ only below $2,034 of salary. Until
-tax-service moves to line 16 as well (Umar, 23 Nov 22:35Z), a live calculation under $2,034 differs from the
-pre-built figures by up to $33.
-
-The hub-chart sweep carries four figures of its own, which are the hub chart definitions, not the service's T4127
-rates:
-
-  * `average_rate`: (income tax of T1 line 43500 + CPP base + CPP enhanced + CPP2 + EI line 16) / salary, never
-    below 0. Credits paid to you when you file (T1 lines 45000, 45300 and 47900) are not counted, so tax cuts such as
-    the Ontario LIFT credit count and the Canada workers benefit does not;
-  * `marginal_rate`: the change in that same total over the next $100 of salary, or over the next $10 where the two
-    readings differ by more than half a point, so a narrow band such as the Ontario health premium steps shows,
-    never below 0;
   * `year_total`: for the "Tax and contributions for the year" chart only: income tax, CPP and EI as deducted from
     pay, less the credits paid on filing (T1 line 48200, "total_credits" in the engine's T1 trace). It is the one
     figure that stays net of credits.
@@ -62,34 +46,22 @@ from pathlib import Path
 
 import yaml
 
-from tax_engine import build_tax_computation
-from tax_engine.adapters.inbound.trace_english import EnglishTraceRenderer
-from tax_engine.adapters.inbound.trace_english.unit_text import EnglishUnitTextRegistry
-from tax_engine.domain.artifact import Artifact
+from tax_engine import build_take_home
+from tax_engine.application.models.take_home import TakeHomeResult, UnitDescription
+from tax_engine.application.models.take_home_request import TakeHomeRequest
 from tax_engine.domain.jurisdiction_code import JurisdictionCode
-from tax_engine.jurisdictions.ca.catalog.income import EMPLOYMENT_INCOME
-from tax_engine.registrations import artifact_kinds
 
 CENTS = Decimal("0.01")
 RATE = Decimal("0.0001")
-# The forward steps of the marginal rate, and how far two readings may differ before the finer one is used.
+# How far the engine's marginal rate and a $10 step reading may differ before they count as two rates, and the step the edges settle over.
 MARGINAL_STEP = 100
-FINE_MARGINAL_STEP = 10
 MARGINAL_DISAGREEMENT = Decimal("0.005")
 
-# The deduction items in the service's order (SupportedJurisdiction.deduction_items), each with the
-# engine's (form, kind) that holds its figure.
-FIGURES = {
-    "cpp_base": ("ca/schedule_8", "ca/schedule_8_cpp_base_contributions_on_return"),
-    "cpp_enhanced": ("ca/schedule_8", "ca/cpp_part_3_line_12"),
-    "cpp2": ("ca/schedule_8", "ca/cpp_part_3_line_22"),
-    "ei": ("ca/t2204", "ca/t2204_line_16"),
-    "income_tax": ("ca/t1_tax_and_credits", "ca/total_payable"),
-}
-
-
-# Employment Insurance as deducted from pay: the year-total chart keeps it, net of the credits paid on filing.
-EI_DEDUCTED = ("ca/t2204", "ca/t2204_premiums_deducted")
+# Employment Insurance as deducted from pay (T2204 `t2204_premiums_deducted`): the year-total chart keeps it, net of the
+# credits paid on filing. The engine's own EI figure is T2204 line 16 (after the refund at $2,000 or less).
+EI_DEDUCTED_LABEL = "t2204_premiums_deducted"
+EI_FIGURE = "ei"
+CREDITS_LABEL = "total_credits"
 
 
 # Parameters of the engine's datasets the notes quote: name -> (jurisdiction package, parameter family, path
@@ -136,20 +108,14 @@ def _fact(year: int, package: str, family: str, path: str) -> str:
     return str(node)
 
 
-def _rate_kinds(code: str, kind: str) -> tuple[str, str]:
-    prefix = code.lower()
-    return (f"{prefix}/return", f"{prefix}/{kind}")
-
-
-def _unit(unit):
-    text = EnglishUnitTextRegistry.shared().for_unit(unit)
+def _unit(unit: UnitDescription) -> dict:
     return {
-        "name": unit.identifier,
-        "placement": text.placement.value,
-        "singular": text.singular,
-        "plural": text.plural,
-        "spaced": text.spaced,
-        "as_percentage": text.as_percentage,
+        "name": unit.name,
+        "placement": unit.placement,
+        "singular": unit.singular,
+        "plural": unit.plural,
+        "spaced": unit.spaced,
+        "as_percentage": unit.as_percentage,
     }
 
 
@@ -169,48 +135,47 @@ def _sweep_salaries(sweep: dict) -> list[int]:
 
 class Figures:
     def __init__(self) -> None:
-        self._engine = build_tax_computation()
-        self._kinds = artifact_kinds()
-        self._renderer = EnglishTraceRenderer()
+        self._engine = build_take_home()
 
-    def _read(self, sheets, form: str, kind: str) -> Decimal:
-        (sheet,) = sheets[form]
-        value = sheet.get(self._kinds.kind(kind)).value
-        if not isinstance(value, Decimal):
-            raise TypeError(f"{kind} is not a decimal")
-        return value
+    def _ask(self, code: str, year: int, salary: int, *, trace: bool) -> TakeHomeResult:
+        return self._engine.compute(
+            TakeHomeRequest(
+                JurisdictionCode(code),
+                year,
+                Decimal(salary),
+                include_rates=True,
+                include_trace=trace,
+            )
+        )
 
     @lru_cache(maxsize=None)
-    def _totals(self, code: str, year: int, salary: int) -> tuple[Decimal, Decimal]:
-        """(basis total, year total) for one salary, unrounded."""
-        sheets = self._engine.compute(
-            JurisdictionCode(code), year, Artifact(EMPLOYMENT_INCOME, Decimal(salary))
-        )
-        total = sum((self._read(sheets, *FIGURES[item]) for item in FIGURES), Decimal(0))
-        (t1,) = sheets["ca/t1_tax_and_credits"]
-        paid = [line.amount for line in t1.trace if line.label == "total_credits"]
-        if len(paid) != 1:
-            raise ValueError(f"{code} {year}: expected one total_credits line, found {len(paid)}")
-        deducted = total - self._read(sheets, *FIGURES["ei"]) + self._read(sheets, *EI_DEDUCTED)
-        return total, deducted - paid[0]
+    def _result(self, code: str, year: int, salary: int) -> TakeHomeResult:
+        """The engine's answer without trace, cached: the edge search asks the same salaries again."""
+        return self._ask(code, year, salary, trace=False)
+
+    def _figure(self, result: TakeHomeResult, name: str) -> Decimal:
+        (amount,) = (figure.amount for figure in result.figures if figure.name == name)
+        return amount
 
     def basis_total(self, code: str, year: int, salary: int) -> Decimal:
-        """Income tax, CPP (all three parts) and EI line 16: what the average and marginal rate charts count."""
-        return self._totals(code, year, salary)[0]
+        """What the engine takes off the salary: income tax, CPP (all three parts) and EI line 16."""
+        return self._result(code, year, salary).total_deductions
 
     def year_total(self, code: str, year: int, salary: int) -> Decimal:
         """Income tax, CPP and EI as deducted, less the credits paid on filing (T1 line 48200), unrounded."""
-        return self._totals(code, year, salary)[1]
-
-    def marginal_rate(self, code: str, year: int, salary: int) -> Decimal:
-        """The change in the basis total per extra dollar of salary, read forward, never below 0."""
-        here = self.basis_total(code, year, salary)
-        coarse = (self.basis_total(code, year, salary + MARGINAL_STEP) - here) / MARGINAL_STEP
-        fine = (
-            self.basis_total(code, year, salary + FINE_MARGINAL_STEP) - here
-        ) / FINE_MARGINAL_STEP
-        rate = fine if abs(coarse - fine) > MARGINAL_DISAGREEMENT else coarse
-        return max(rate, Decimal(0))
+        result = self._ask(code, year, salary, trace=True)
+        lines = [
+            line
+            for form in result.trace or ()
+            for line in form.lines
+            if line.label in (CREDITS_LABEL, EI_DEDUCTED_LABEL)
+        ]
+        paid = [line.amount for line in lines if line.label == CREDITS_LABEL]
+        deducted = [line.amount for line in lines if line.label == EI_DEDUCTED_LABEL]
+        if len(paid) != 1 or len(deducted) != 1 or paid[0] is None or deducted[0] is None:
+            raise ValueError(f"{code} {year}: expected one credits line and one EI deducted line")
+        ei_line_16 = self._figure(result, EI_FIGURE)
+        return result.total_deductions - ei_line_16 + deducted[0] - paid[0]
 
     def ei_band(self, code: str, year: int) -> dict[str, str]:
         """The Employment Insurance band just above $2,000, whole dollars: where each extra dollar of salary still
@@ -221,12 +186,8 @@ class Figures:
         )
         return {"ei_band_end": str(last), "ei_band_top": str(ei[last].quantize(CENTS))}
 
-    @lru_cache(maxsize=None)
     def _ei(self, code: str, year: int, salary: int) -> Decimal:
-        sheets = self._engine.compute(
-            JurisdictionCode(code), year, Artifact(EMPLOYMENT_INCOME, Decimal(salary))
-        )
-        return self._read(sheets, *FIGURES["ei"])
+        return self._figure(self._result(code, year, salary), EI_FIGURE)
 
     def _step_rate(self, code: str, year: int, salary: int) -> Decimal:
         """The rate read over the next $10 of salary."""
@@ -278,74 +239,42 @@ class Figures:
         return found
 
     def answer(self, code: str, year: int, salary: int, with_trace: bool) -> dict:
-        sheets = self._engine.compute(
-            JurisdictionCode(code), year, Artifact(EMPLOYMENT_INCOME, Decimal(salary))
-        )
+        """The engine's take-home answer in the API's shape."""
+        result = self._ask(code, year, salary, trace=with_trace)
 
-        def read(form: str, kind: str):
-            (sheet,) = sheets[form]
-            artifact = sheet.get(self._kinds.kind(kind))
-            if not isinstance(artifact.value, Decimal):
-                raise TypeError(f"{kind} is not a decimal")
-            return artifact.value, artifact.unit
+        def rate(value) -> dict:
+            if value is None:
+                raise ValueError(f"{code} {year}: the engine declares no rates")
+            return {"amount": str(value.value), "unit": _unit(value.unit)}
 
-        amounts = []
-        units = []
-        for item in FIGURES:
-            value, unit = read(*FIGURES[item])
-            amounts.append(value)
-            units.append(unit)
-        unit = units[0]
-        if unit is None or any(other != unit for other in units):
-            raise ValueError(f"{code} {year}: the figures do not share one unit")
-
-        def rate(kind: str) -> dict:
-            value, rate_unit = read(*_rate_kinds(code, kind))
-            if rate_unit is None:
-                raise ValueError(f"{code} {year}: {kind} has no unit")
-            return {"amount": str(value), "unit": _unit(rate_unit)}
-
-        total = sum(amounts, Decimal(0))
-        # The income tax part on its own (the service's TakeHomeResult.income_tax): the total
-        # payable before the credits, contributions not in it.
-        income_tax = amounts[list(FIGURES).index("income_tax")]
         answer = {
-            "salary": str(Decimal(salary).quantize(CENTS)),
-            "total_deductions": str(total.quantize(CENTS)),
-            "income_tax": str(income_tax.quantize(CENTS)),
-            "take_home": str((Decimal(salary) - total).quantize(CENTS)),
-            "unit": _unit(unit),
-            "average_income_tax_rate": rate("average_income_tax_rate"),
-            "marginal_income_tax_rate": rate("marginal_tax_rate"),
+            "salary": str(result.salary),
+            "total_deductions": str(result.total_deductions.quantize(CENTS)),
+            "income_tax": str(result.income_tax.quantize(CENTS)),
+            "take_home": str(result.take_home.quantize(CENTS)),
+            "unit": _unit(result.unit),
+            "average_income_tax_rate": rate(result.average_tax_rate),
+            "marginal_income_tax_rate": rate(result.marginal_tax_rate),
         }
         if with_trace:
-            trace = []
-            for form, form_sheets in sheets.items():
-                for sheet in form_sheets:
-                    lines = []
-                    for line in sheet.trace:
-                        label = line.label
-                        line_unit = None if label is None else sheet.unit(label)
-                        lines.append(
-                            {
-                                "label": label,
-                                "name": _present(None if label is None else sheet.title(label)),
-                                "reference": _present(
-                                    None if label is None else sheet.reference(label)
-                                ),
-                                "amount": str(line.amount),
-                                "text": self._renderer.render(line, sheet),
-                                "unit": None if line_unit is None else _unit(line_unit),
-                            }
-                        )
-                    trace.append(
+            answer["trace"] = [
+                {
+                    "form": form.form,
+                    "name": _present(form.name) or form.form,
+                    "lines": [
                         {
-                            "form": form,
-                            "name": _present(sheet.form_title) or form,
-                            "lines": lines,
+                            "label": line.label,
+                            "name": _present(line.name),
+                            "reference": _present(line.reference),
+                            "amount": None if line.amount is None else str(line.amount),
+                            "text": line.text,
+                            "unit": None if line.unit is None else _unit(line.unit),
                         }
-                    )
-            answer["trace"] = trace
+                        for line in form.lines
+                    ],
+                }
+                for form in result.trace or ()
+            ]
         return answer
 
 
@@ -372,15 +301,18 @@ def main(provinces_file: str, output_file: str) -> None:
                 units = point_units
             elif units != point_units:
                 raise ValueError(f"{code} {year}: units change along the sweep")
-            average = max(figures.basis_total(code, year, salary) / salary, Decimal(0))
             points.append(
                 {
                     "salary": answer["salary"],
                     "total_deductions": answer["total_deductions"],
                     "income_tax": answer["income_tax"],
                     "take_home": answer["take_home"],
-                    "average_rate": str(average.quantize(RATE)),
-                    "marginal_rate": str(figures.marginal_rate(code, year, salary).quantize(RATE)),
+                    "average_rate": str(
+                        Decimal(answer["average_income_tax_rate"]["amount"]).quantize(RATE)
+                    ),
+                    "marginal_rate": str(
+                        Decimal(answer["marginal_income_tax_rate"]["amount"]).quantize(RATE)
+                    ),
                     "year_total": str(figures.year_total(code, year, salary).quantize(CENTS)),
                 }
             )

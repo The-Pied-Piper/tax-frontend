@@ -77,7 +77,7 @@ pyyaml==6.0.4 \
     --hash=sha256:f5c410f9e2ffc9286279a46f2e8c107edaf3b1123510af59c828a9c15b23c9db \
     --hash=sha256:f617e4e5c619fef5284335b24e3af3a77ce08dc5c389ff4b25033bb2749032b7
     # via tax-engine
-tax-engine==0.4.1 \
-    --hash=sha256:6907770187926a3629756ece408c70bde04efee9f2a3c171cfe9781fb6eb7bd0 \
-    --hash=sha256:c3c36d8625699fe5048b2ec847a2bc48535bbb27d8582a96c6ee61d0832bcb6d
+tax-engine==0.5.1 \
+    --hash=sha256:a77794df4fd814a1557863162eb109fa2c66cb1b2a9f49736ac56933201a6d72 \
+    --hash=sha256:7d14f73729ea791c8215ea5a65604f466336e49a2d355710d8fc73d34342762c
     # via -r build/localEngine/requirements.in

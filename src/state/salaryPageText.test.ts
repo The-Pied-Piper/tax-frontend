@@ -70,8 +70,8 @@ describe('salaryPageText: the text of a page from its own answer', () => {
     const { paragraph } = salaryPageText(compute70000, 'Ontario', 2026);
     expect(paragraph).toContain('$53,786.25');
     expect(paragraph).toContain('$16,213.75');
-    expect(paragraph).toContain('15.91%');
-    expect(paragraph).toContain('29.65%');
+    expect(paragraph).toContain('23.16%');
+    expect(paragraph).toContain('34.36%');
     expect(paragraph.toLowerCase()).toContain('estimate');
   });
 

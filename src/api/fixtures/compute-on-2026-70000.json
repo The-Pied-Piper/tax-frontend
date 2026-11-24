@@ -11,7 +11,7 @@
     "as_percentage": false
   },
   "average_income_tax_rate": {
-    "amount": "0.1591",
+    "amount": "0.2316",
     "unit": {
       "name": "core/percent",
       "placement": "after",
@@ -22,7 +22,7 @@
     }
   },
   "marginal_income_tax_rate": {
-    "amount": "0.2965",
+    "amount": "0.3436",
     "unit": {
       "name": "core/percent",
       "placement": "after",
