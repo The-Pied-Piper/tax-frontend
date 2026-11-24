@@ -1,4 +1,5 @@
 import { figuresOf, type FormPageSpec } from '../formPage';
+import { contentPath, formSlug } from '../siteLinks';
 
 const inc = figuresOf('ca-qc/tp1_income');
 const u = figuresOf('ca-qc/tp1_schedule_u');
@@ -96,6 +97,12 @@ export const tp1: FormPageSpec = {
         qppDeduction: net.result('$665', 'tp1_qpp_deduction_line_248'),
         totalDeductions: net.result('$2,085', 'tp1_total_deductions_line_254'),
       },
+      links: [
+        {
+          label: 'See how the QPP deduction is worked out on Schedule U',
+          href: contentPath(formSlug('schedule-u')),
+        },
+      ],
     },
     {
       id: 'net-income',
@@ -216,6 +223,18 @@ export const tp1: FormPageSpec = {
         hsf: tot.result('$0', 'tp1_health_services_fund_line_446'),
         balanceDue: tot.result('$8,396.16', 'tp1_balance_due_line_479'),
       },
+      links: [
+        {
+          label:
+            'See how the drug insurance premium is worked out on Schedule K',
+          href: contentPath(formSlug('schedule-k')),
+        },
+        {
+          label:
+            'See how the health services fund contribution is worked out on Schedule F',
+          href: contentPath(formSlug('schedule-f')),
+        },
+      ],
     },
   ],
 };
