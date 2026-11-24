@@ -357,16 +357,16 @@ export const strings = {
         ei: 'Employment Insurance',
         parentalInsurance: 'Quebec Parental Insurance Plan',
         incomeTax: 'Income tax',
-        drugPremium: 'Drug insurance premium',
+        drugPremium: 'Prescription drug insurance premium',
       },
       qpp: {
         name: 'Quebec Pension Plan',
-        help: 'Your contribution to the Quebec Pension Plan, taken off your pay for a pension when you retire. It includes the extra part that builds on the base, up to the first yearly ceiling.',
+        help: 'Your contribution to the Quebec Pension Plan, taken off your pay to build your pension. It has a base part and an extra, or enhanced, part. Both are charged on pay above a small starting amount, up to the first yearly limit.',
       },
       qpp2: {
         name: 'Quebec Pension Plan, second additional contribution',
         help: (zero: string) =>
-          `An extra Quebec Pension Plan contribution on earnings above the first yearly ceiling. It is ${zero} if your pay is below that ceiling.`,
+          `An extra Quebec Pension Plan contribution on pay between the first yearly limit and a higher second limit. It is ${zero} if your pay is below the first limit.`,
       },
       zero: 'nothing',
       // Quebec words what is taken off itself: the card's help texts and the page's description and paragraph.
@@ -375,9 +375,9 @@ export const strings = {
           takenOff:
             'Income tax, Quebec Pension Plan, Employment Insurance, Quebec Parental Insurance Plan premiums and the drug insurance premium added together.',
           averageRate:
-            'Income tax, Quebec Pension Plan, Employment Insurance, Quebec Parental Insurance Plan premiums and the drug insurance premium, divided by your salary. It is the share of your salary that comes off.',
+            'Income tax, Quebec Pension Plan, Employment Insurance, parental insurance and drug insurance premiums, divided by your salary.',
           marginalRate:
-            'Of your next dollar of salary, the share that goes to income tax, Quebec Pension Plan, Employment Insurance, Quebec Parental Insurance Plan premiums and the drug insurance premium.',
+            'Of your next dollar, the share that goes to income tax, Quebec Pension Plan, Employment Insurance, parental insurance and drug insurance premiums.',
         },
         pageText: {
           description: (
@@ -386,7 +386,7 @@ export const strings = {
             year: number,
             takeHome: string,
           ) =>
-            `On a ${salary} salary in ${place} in ${String(year)}, you take home an estimated ${takeHome} a year after income tax, pension, parental insurance and Employment Insurance.`,
+            `On a ${salary} salary in ${place} in ${String(year)}, you take home an estimated ${takeHome} a year after income tax, pension, parental insurance, Employment Insurance and the drug insurance premium.`,
           paragraph: (
             salary: string,
             place: string,
@@ -401,19 +401,19 @@ export const strings = {
       },
       qpip: {
         name: 'Quebec Parental Insurance Plan',
-        help: 'Your Quebec Parental Insurance Plan premium, taken off your pay to cover benefits when you have or adopt a child. It starts once your pay passes a set amount.',
+        help: 'Your Quebec Parental Insurance Plan premium, taken off your pay to cover benefits when you have or adopt a child. You pay none if your pay for the year is below a set amount. Above it, the premium is charged on all your pay, up to a yearly limit.',
       },
       ei: {
         name: 'Employment Insurance',
-        help: 'Your Employment Insurance premium at the lower Quebec rate, taken off your pay to cover benefits if you lose your job.',
+        help: 'Your Employment Insurance premium at the lower Quebec rate, taken off your pay to cover benefits if you lose your job. None is counted if your pay is below a set amount.',
       },
       quebecTax: {
         name: 'Quebec income tax',
         help: 'Income tax owed to Quebec on your Quebec return, after the Quebec credits that apply to you.',
       },
       drugPremium: {
-        name: 'Drug insurance premium',
-        help: 'The yearly Quebec prescription drug insurance premium, paid on your Quebec return if you have no drug plan through work. We assume you have none.',
+        name: 'Prescription drug insurance premium',
+        help: "The yearly premium for Quebec's public prescription drug insurance plan, paid on your Quebec return if you are not in a group drug plan, usually one through work. It rises with your income up to a yearly maximum. We assume you are not in a group plan.",
       },
       totalTax: {
         name: 'Total income tax',

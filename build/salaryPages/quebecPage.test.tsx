@@ -50,7 +50,7 @@ describe('a pre-built Quebec salary page', () => {
       '$48,617.82',
       'Quebec Pension Plan',
       'Quebec Parental Insurance Plan',
-      'Drug insurance premium',
+      'Prescription drug insurance premium',
       '$345.80',
       '$755.00',
     ]) {

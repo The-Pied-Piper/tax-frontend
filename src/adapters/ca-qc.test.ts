@@ -64,7 +64,7 @@ describe('Quebec adapter', () => {
       ['qpip', 'Quebec Parental Insurance Plan'],
       ['federal-tax', 'Income tax'],
       ['quebec-tax', 'Income tax'],
-      ['drug-premium', 'Drug insurance premium'],
+      ['drug-premium', 'Prescription drug insurance premium'],
       ['total-tax', 'Income tax'],
       ['total-taken-off', undefined],
     ]);
