@@ -65,8 +65,14 @@ const OWN: Record<Slug, (readonly [string, string])[]> = {
   ],
 };
 
-/** The provinces whose hub uses the shared wording (Quebec words its own). */
-const SHARED = FOOTER_PROVINCE_SLUGS.filter((slug) => slug !== 'ca-qc');
+/** The federal forms a hub lists: the shared ones, with a province's own replacements (Quebec's Schedule 8 has its own id and name). */
+function federalOf(slug: Slug): (readonly [string, string])[] {
+  return FEDERAL.map(([id, label]) =>
+    slug === 'ca-qc' && id === 'schedule-8'
+      ? (['schedule-8-qc', 'Schedule 8: Quebec Pension Plan'] as const)
+      : ([id, label] as const),
+  );
+}
 
 const SALARIES = ['30000', '35000', '40000'];
 const salaryLinks: ContentLink[] = SALARIES.map((s) => ({
@@ -110,7 +116,7 @@ describe('provinceHubs', () => {
   });
 });
 
-describe.each(SHARED)('the hub page for %s', (slug) => {
+describe.each(FOOTER_PROVINCE_SLUGS)('the hub page for %s', (slug) => {
   const name = strings.siteNav.provinceNames[slug];
   const page = build(slug, [], salaryLinks);
 
@@ -142,9 +148,13 @@ describe.each(SHARED)('the hub page for %s', (slug) => {
     expect(how).toBeDefined();
     const words = everyString(how?.blocks).join(' ');
     expect(words).toContain(
-      `income tax, which comes in two parts: federal tax and ${name} tax`,
+      slug === 'ca-qc'
+        ? `income tax, which comes in two parts: federal tax, and ${name} tax`
+        : `income tax, which comes in two parts: federal tax and ${name} tax`,
     );
-    expect(words).toContain('Canada Pension Plan');
+    expect(words).toContain(
+      slug === 'ca-qc' ? 'Quebec Pension Plan' : 'Canada Pension Plan',
+    );
     expect(words).toContain('EI');
   });
 
@@ -182,12 +192,12 @@ describe.each(SHARED)('the hub page for %s', (slug) => {
     }
   });
 
-  it('then lists the six federal forms, titled for the province', () => {
+  it('then lists the five federal forms, titled for the province', () => {
     const federal = lists(page)[1];
     expect(lists(page)).toHaveLength(2);
     expect(federal?.title).toBe(`Federal forms ${name} also uses`);
     expect(federal?.items.map((item) => item.label)).toEqual(
-      FEDERAL.map(([, label]) => label),
+      federalOf(slug).map(([, label]) => label),
     );
     for (const item of federal?.items ?? []) {
       expect(item.description.length).toBeGreaterThan(0);
@@ -262,10 +272,10 @@ describe.each(SHARED)('the hub page for %s', (slug) => {
   it('links a federal form when its page is published', () => {
     const published = build(
       slug,
-      FEDERAL.map(([id]) => formSlug(id)),
+      federalOf(slug).map(([id]) => formSlug(id)),
     );
     expect(lists(published)[1]?.items.map((item) => item.href)).toEqual(
-      FEDERAL.map(([id]) => contentPath(formSlug(id))),
+      federalOf(slug).map(([id]) => contentPath(formSlug(id))),
     );
     expect(lists(published)[0]?.items.every((i) => i.href === undefined)).toBe(
       true,
@@ -304,15 +314,13 @@ describe('the Quebec hub', () => {
     expect(every).not.toMatch(/taxtips/i);
   });
 
-  it('lists the Quebec version of Schedule 8 and the Quebec-rate T2204', () => {
-    const federal = lists(page)[1]?.items ?? [];
-    expect(federal.map((i) => i.label)).toEqual([
-      'T4 slip',
-      'T1 return',
-      'Schedule 8: Quebec Pension Plan',
-      'Form T2204: EI overpayment',
-      'Schedule 6: Canada Workers Benefit',
-    ]);
+  it('does not link the Canada Pension Plan page for Schedule 8, even when that page is published', () => {
+    const published = build('ca-qc', [formSlug('schedule-8')]);
+    const schedule8 = lists(published)[1]?.items.find((i) =>
+      i.label.startsWith('Schedule 8'),
+    );
+    expect(schedule8?.label).toBe('Schedule 8: Quebec Pension Plan');
+    expect(schedule8?.href).toBeUndefined();
   });
 });
 

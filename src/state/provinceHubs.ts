@@ -26,9 +26,16 @@ export type ProvinceHubText = {
   own: HubForm[];
   /** True when a tax reduction in the province shrinks to zero as salary rises, which bends the marginal rate. Alberta and Saskatchewan have none. */
   taxReduction: boolean;
-  /** Province wording that replaces the shared wording (Quebec has its own pension plan, parental insurance and drug premium). */
-  words?: ProvinceWords;
+  /**
+   * Province wording that replaces the shared wording (Quebec has its own pension plan, parental insurance and drug premium),
+   * written from the province's name, which always comes from `strings.siteNav.provinceNames`. When it is set it wins: the
+   * chart lines are written out whole, so `taxReduction` does not add its sentence to them.
+   */
+  words?: (name: string) => ProvinceWords;
 };
+
+/** The ids of the federal forms every hub lists. */
+type FederalFormId = 't4' | 't1' | 'schedule-8' | 't2204' | 'schedule-6';
 
 /** The shared hub wording a province may replace. */
 export type ProvinceWords = {
@@ -37,11 +44,11 @@ export type ProvinceWords = {
   /** The one line under each chart. */
   charts: Record<HubChartId, string>;
   /** Replacements for the shared federal form entries, by form id. */
-  federal: Record<string, Partial<HubForm>>;
+  federal: Partial<Record<FederalFormId, Partial<HubForm>>>;
 };
 
 /** The federal forms every hub lists, in the order shown. */
-const federalForms: HubForm[] = [
+const federalForms: (HubForm & { id: FederalFormId })[] = [
   {
     id: 't4',
     name: 'T4 slip',
@@ -87,7 +94,7 @@ function chartSection(
   const words = strings.hubCharts.charts[chart];
   const province = text.slug;
   const oneLine = text.words
-    ? text.words.charts[chart]
+    ? text.words(name).charts[chart]
     : chart === 'marginalRate' && text.taxReduction
       ? `${words.text} ${strings.hubCharts.marginalReduction}`
       : words.text.replace('{place}', name);
@@ -198,14 +205,13 @@ export const provinceHubs: ProvinceHubText[] = [
   {
     slug: 'ca-qc',
     taxReduction: false,
-    words: {
-      takeHome:
-        'Take-home pay is your salary minus five things. The first is income tax, which comes in two parts: federal tax, and Quebec tax worked out on your Quebec return from Revenu Québec. The second is your Quebec Pension Plan, or QPP, payments, which build up your future pension. The third is Employment Insurance, or EI, which can pay you if you lose your job. Quebec workers pay a lower EI rate. The fourth is Quebec Parental Insurance Plan, or QPIP, premiums, which pay benefits when you have or adopt a child. The fifth is the Quebec prescription drug insurance premium. You pay it on your Quebec return if you have no drug plan through work, and we assume you do not. We do not count the Quebec abatement, a credit equal to 16.5% of your basic federal tax that Quebec residents get on their federal return. The forms below are where each of these is worked out.',
+    words: (name) => ({
+      takeHome: `Take-home pay is your salary minus five things. The first is income tax, which comes in two parts: federal tax, and ${name} tax worked out on your ${name} return from Revenu Québec. The second is your Quebec Pension Plan, or QPP, payments, which build up your future pension. The third is Employment Insurance, or EI, which can pay you if you lose your job. Quebec workers pay a lower EI rate. The fourth is Quebec Parental Insurance Plan, or QPIP, premiums, which pay benefits when you have or adopt a child. The fifth is the Quebec prescription drug insurance premium. You pay it on your ${name} return if you have no drug plan through work, and we assume you do not. We do not count the ${name} abatement, a credit equal to 16.5% of your basic federal tax that ${name} residents get on their federal return. The forms below are where each of these is worked out.`,
       charts: {
         takeHome:
           'Your salary minus income tax, Quebec Pension Plan, Employment Insurance, Quebec Parental Insurance Plan premiums and the Quebec prescription drug insurance premium.',
         averageRate:
-          'The share of your salary that goes to income tax, Quebec Pension Plan, Employment Insurance and Quebec Parental Insurance Plan premiums together. Federal and Quebec income tax both count.',
+          'The share of your salary that goes to income tax, Quebec Pension Plan, Employment Insurance and Quebec Parental Insurance Plan premiums together. Federal and ${name} income tax both count.',
         marginalRate:
           'Out of your next dollar of salary, the share that goes to income tax, Quebec Pension Plan, Employment Insurance and Quebec Parental Insurance Plan premiums. The rate steps up where a new tax bracket starts, and across a band of lower salaries while the drug insurance premium grows. It falls where a pension or insurance payment stops.',
       },
@@ -223,7 +229,7 @@ export const provinceHubs: ProvinceHubText[] = [
             'Checks that you have not paid more EI than the yearly limit, at the lower Quebec rate.',
         },
       },
-    },
+    }),
     own: [
       {
         id: 'tp1',
@@ -253,7 +259,7 @@ export const provinceHubs: ProvinceHubText[] = [
         id: 'schedule-f',
         name: 'Schedule F: Contribution to the Health Services Fund',
         description:
-          'A 1% contribution on income other than employment income over $18,130. A salary-only filer owes nothing, so it comes to $0.',
+          'A small contribution on income other than employment income, above a set amount. A salary-only filer owes nothing, so it comes to $0.',
       },
       {
         id: 'work-chart-201',
@@ -330,7 +336,7 @@ export function hubPage(
           : {}),
         blocks: [
           paragraph(
-            text.words?.takeHome ??
+            text.words?.(name).takeHome ??
               `Take-home pay is your salary minus three things. The first is income tax, which comes in two parts: federal tax and ${name} tax. The second is your Canada Pension Plan payments, which build up your future pension. The third is Employment Insurance, or EI, which can pay you if you lose your job. The forms below are where each of those is worked out.`,
           ),
           ...(withCharts
@@ -340,7 +346,7 @@ export function hubPage(
                   text: strings.hubCharts.charts.takeHome.title,
                 },
                 paragraph(
-                  text.words?.charts.takeHome ??
+                  text.words?.(name).charts.takeHome ??
                     strings.hubCharts.charts.takeHome.text,
                 ),
                 {
@@ -389,7 +395,10 @@ export function hubPage(
             kind: 'list',
             title: `Federal forms ${name} also uses`,
             items: federalForms.map((form) =>
-              listItem({ ...form, ...text.words?.federal[form.id] }, published),
+              listItem(
+                { ...form, ...text.words?.(name).federal[form.id] },
+                published,
+              ),
             ),
           },
         ],
