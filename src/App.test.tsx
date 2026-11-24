@@ -621,7 +621,7 @@ describe('App answer card', () => {
   it('shows the 2026 rates as sent', async () => {
     await calculate(fixtureClient(undefined, compute2026), '2026');
     expect(screen.getByText('23.16%')).toBeInTheDocument();
-    expect(screen.getByText('34.360525%')).toBeInTheDocument();
+    expect(screen.getByText('34.36%')).toBeInTheDocument();
   });
 
   it('keeps the chosen pay period for the next answer', async () => {

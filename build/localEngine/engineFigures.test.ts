@@ -181,7 +181,7 @@ describe.runIf(process.env.ENGINE_FIGURES_FILE)(
       );
     });
 
-    // The chart figures (tax-engine 0.5.0, 2026): the average and marginal rate are the engine's own
+    // The chart figures (tax-engine 0.5.1, 2026): the average and marginal rate are the engine's own
     // (income tax, CPP and EI line 16, no credits paid on filing counted; at $2,000 the engine reads the
     // marginal rate below the start of the EI band), and the year total is income tax, CPP and EI as
     // deducted, less the credits paid on filing.

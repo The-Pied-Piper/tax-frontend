@@ -71,7 +71,7 @@ describe('salaryPageText: the text of a page from its own answer', () => {
     expect(paragraph).toContain('$53,786.25');
     expect(paragraph).toContain('$16,213.75');
     expect(paragraph).toContain('23.16%');
-    expect(paragraph).toContain('34.360525%');
+    expect(paragraph).toContain('34.36%');
     expect(paragraph.toLowerCase()).toContain('estimate');
   });
 
