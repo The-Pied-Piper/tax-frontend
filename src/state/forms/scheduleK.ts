@@ -9,8 +9,7 @@ export const scheduleK: FormPageSpec = {
   province: 'ca-qc',
   year: 2025,
   exampleSalary: '70000',
-  title:
-    'Schedule K: Quebec Prescription Drug Insurance Premium, in plain words',
+  title: 'Schedule K: Quebec Drug Insurance Premium, in plain words',
   description:
     'What Schedule K is for and what each part asks, in plain words, with a worked example for a $70,000 salary.',
   intro:
