@@ -254,6 +254,7 @@ describe('salaryPages closeBundle', () => {
       '/forms/schedule-8/',
       '/forms/schedule-b/',
       '/forms/schedule-k/',
+      '/forms/schedule-u/',
       '/forms/sk428/',
       '/forms/t1/',
       '/forms/t2204/',

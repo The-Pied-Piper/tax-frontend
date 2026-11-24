@@ -20,6 +20,7 @@ const FIXED_IDS = [
   'schedule-b',
   'tp1',
   'schedule-k',
+  'schedule-u',
 ];
 
 describe('FORM_PAGE_OF', () => {
@@ -46,6 +47,7 @@ describe('FORM_PAGE_OF', () => {
       'ca-qc/tp1_tax': 'tp1',
       'ca-qc/tp1_totals': 'tp1',
       'ca-qc/tp1_schedule_k': 'schedule-k',
+      'ca-qc/tp1_schedule_u': 'schedule-u',
       'ca/t1_taxable_income': 't1',
       'ca/t1_tax_and_credits': 't1',
       'ca/schedule_8': 'schedule-8',
