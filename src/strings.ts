@@ -39,7 +39,7 @@ export const strings = {
     // Added to the marginal rate's line on a hub whose province has a tax reduction that shrinks to zero (not Alberta or Saskatchewan).
     marginalReduction:
       'In some provinces it also rises across a band of lower salaries, while a tax reduction shrinks to zero.',
-    // One entry per chart: its title (the section heading, or for take-home a sub-heading in the existing section), its one line, and its table column.
+    // One entry per chart: its title (the section heading, or for take-home a sub-heading in the existing section) and its one line.
     charts: {
       takeHome: {
         title: 'Take-home pay',
