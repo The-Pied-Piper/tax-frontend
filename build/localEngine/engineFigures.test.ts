@@ -55,7 +55,6 @@ describe("reading the Python step's file", () => {
         take_home: '900.00',
         average_rate: '0.1000',
         marginal_rate: '0.0505',
-        year_total: '100.00',
       },
     ],
     edges: [['20000', '20160', '20170', '0.2640']],
