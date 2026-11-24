@@ -1,6 +1,6 @@
 import { useId, type ReactNode } from 'react';
 import type { Rate } from '../api';
-import type { Unit } from '../adapters';
+import type { Unit, Wording } from '../adapters';
 import { displayMoney, displayRate } from '../money/format';
 import type { PayPeriod } from '../money/payPeriod';
 import { strings } from '../strings';
@@ -20,6 +20,8 @@ type Props = {
   /** The place and year the answer is for, as asked. */
   place: string;
   year: number;
+  /** The jurisdiction's own help texts, when it words them itself. */
+  wording?: Wording;
   payPeriod: PayPeriod;
   onPayPeriodChange: (period: PayPeriod) => void;
   /** The disclosures that sit under the split, inside this panel. */
@@ -37,10 +39,25 @@ export function AnswerCard({
   marginalRate,
   place,
   year,
+  wording,
   payPeriod,
   onPayPeriodChange,
   children,
 }: Props) {
+  const words = {
+    takenOff: {
+      ...strings.answer.takenOff,
+      help: wording?.answer.takenOff ?? strings.answer.takenOff.help,
+    },
+    averageRate: {
+      ...strings.answer.averageRate,
+      help: wording?.answer.averageRate ?? strings.answer.averageRate.help,
+    },
+    marginalRate: {
+      ...strings.answer.marginalRate,
+      help: wording?.answer.marginalRate ?? strings.answer.marginalRate.help,
+    },
+  };
   const headingId = useId();
   const show = (yearly: string) => displayMoney(yearly, payPeriod, unit);
   return (
@@ -63,10 +80,7 @@ export function AnswerCard({
         </div>
         <div className={styles.row}>
           <dt>
-            <HelpTerm
-              name={strings.answer.takenOff.name}
-              help={strings.answer.takenOff.help}
-            />
+            <HelpTerm name={words.takenOff.name} help={words.takenOff.help} />
           </dt>
           <dd>{show(totalDeductions)}</dd>
         </div>
@@ -75,8 +89,8 @@ export function AnswerCard({
           <dd>{show(takeHome)}</dd>
         </div>
         {[
-          { text: strings.answer.averageRate, rate: averageRate },
-          { text: strings.answer.marginalRate, rate: marginalRate },
+          { text: words.averageRate, rate: averageRate },
+          { text: words.marginalRate, rate: marginalRate },
         ].map(({ text, rate }) => (
           <div className={styles.row} key={text.name}>
             <dt>
