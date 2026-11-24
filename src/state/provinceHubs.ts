@@ -211,22 +211,29 @@ export const provinceHubs: ProvinceHubText[] = [
       charts: {
         takeHome:
           'Your salary minus income tax, Quebec Pension Plan, Employment Insurance, Quebec Parental Insurance Plan premiums and the Quebec prescription drug insurance premium.',
-        averageRate: `The share of your salary that goes to income tax, Quebec Pension Plan, Employment Insurance and Quebec Parental Insurance Plan premiums together. Federal and ${name} income tax both count.`,
+        averageRate: `The share of your salary that goes to income tax, Quebec Pension Plan, Employment Insurance, Quebec Parental Insurance Plan premiums and the drug insurance premium together. Federal and ${name} income tax both count.`,
         marginalRate:
-          'Out of your next dollar of salary, the share that goes to income tax, Quebec Pension Plan, Employment Insurance and Quebec Parental Insurance Plan premiums. The rate steps up where a new tax bracket starts, and across a band of lower salaries while the drug insurance premium grows. It falls where a pension or insurance payment stops.',
+          'Out of your next dollar of salary, the share that goes to income tax, Quebec Pension Plan, Employment Insurance, Quebec Parental Insurance Plan premiums and the drug insurance premium. The rate steps up where a new tax bracket starts, and across a band of lower salaries while the drug insurance premium grows. It falls where a pension or insurance payment stops.',
       },
       federal: {
+        t4: {
+          description:
+            'Your employer’s pay slips: the T4 for your federal return and the RL-1 for your Quebec return. They show your pay and what was taken off.',
+        },
+        t1: {
+          description:
+            'Works out your federal tax. This site counts the federal tax on line 43500 and adds the Quebec tax and premium from your Quebec return.',
+        },
         'schedule-8': {
           // Its own id: the Canada Pension Plan page must not be linked for a Quebec filer.
           id: 'schedule-8-qc',
-          name: 'Schedule 8: Quebec Pension Plan',
+          name: 'Schedule 8: Quebec Pension Plan Contributions',
           description:
-            'Works out how much you pay into the Quebec pension plan.',
+            'Works out how much you pay into the Quebec Pension Plan, or QPP.',
         },
         t2204: {
-          name: 'Form T2204: EI overpayment',
           description:
-            'Checks that you have not paid more EI than the yearly limit, at the lower Quebec rate.',
+            'Checks whether you paid more Employment Insurance than the rules require, for example on the first $2,000 of pay or above the yearly maximum. Quebec workers pay a lower rate, so the most they can pay is lower.',
         },
       },
     }),
