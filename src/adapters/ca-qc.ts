@@ -40,16 +40,20 @@ const SCHEDULE_8_FORM = 'ca/schedule_8';
 /** The page of the Québec Schedule 8 (QPP), not the Canada Pension Plan page the shared form key points at. */
 const SCHEDULE_8_QC_PAGE = 'schedule-8-qc';
 
-/** The engine writes the province "Quebec"; the site writes "Québec". Words only. */
-function accent(text: string): string {
-  return text.replaceAll('Quebec', 'Québec');
-}
-
-/** The engine words its Schedule 8 for the Canada Pension Plan; a Québec filer pays into the QPP. */
-function qpp(text: string): string {
-  return text
-    .replaceAll('Canada Pension Plan', 'Québec Pension Plan')
-    .replaceAll('CPP', 'QPP');
+/**
+ * The engine's words become Québec's: the province's name with its accent everywhere, and, where its
+ * Schedule 8 is quoted, the Québec Pension Plan in place of the Canada Pension Plan. Words only.
+ */
+function quebecWords(text: string, schedule8: boolean): string {
+  const { province, plan, planAcronym, exemption } =
+    strings.adapters.caQc.rewrite;
+  const accented = text.replaceAll(province.from, province.to);
+  // The label "Earnings left after the Canada Pension Plan exemption" is quoted by other forms too.
+  const named = accented.replaceAll(exemption.from, exemption.to);
+  if (!schedule8) return named;
+  return named
+    .replaceAll(plan.from, plan.to)
+    .replaceAll(planAcronym.from, planAcronym.to);
 }
 
 /**
@@ -59,12 +63,12 @@ function qpp(text: string): string {
 function quebecGroups(groups: AdvancedGroup[]): AdvancedGroup[] {
   return groups.map((group) => {
     const isSchedule8 = group.form === SCHEDULE_8_FORM;
-    const words = (text: string) => accent(isSchedule8 ? qpp(text) : text);
+    const words = (text: string) => quebecWords(text, isSchedule8);
     return {
       ...group,
       name: isSchedule8
         ? strings.adapters.caQc.schedule8Title
-        : accent(group.name),
+        : words(group.name),
       page: isSchedule8 ? SCHEDULE_8_QC_PAGE : group.page,
       lines: group.lines.map((line) => ({
         ...line,

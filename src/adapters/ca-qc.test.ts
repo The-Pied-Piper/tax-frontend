@@ -180,6 +180,7 @@ describe('Québec adapter, wording and help text', () => {
   const text = {
     ...rest,
     schedule8Title: '',
+    rewrite: '',
     qpp2: { name: qpp2.name, help: qpp2.help(zero) },
   };
 
@@ -252,6 +253,26 @@ describe('Québec adapter, advanced view wording', () => {
     expect(words).toContain(
       'Total QPP pensionable earnings from box 26 of all of your T4 slips',
     );
+  });
+
+  it('words the exemption label as the basic exemption, in Schedule 8 and where it is quoted', () => {
+    const details = groups.flatMap((g) => g.lines.map((l) => l.detail));
+    expect(details.some((d) => d.includes('after the basic exemption'))).toBe(
+      true,
+    );
+    for (const d of details) expect(d).not.toMatch(/Pension Plan exemption/);
+  });
+
+  it('words the fallback advanced view the same way', () => {
+    const noLabels = {
+      ...r2025,
+      trace: r2025.trace?.filter((f) => f.form !== 'ca-qc/tp1_tax'),
+    };
+    const fallback = caQcAdapter.adapt(noLabels);
+    expect(fallback.rows).toEqual([]);
+    const s8 = fallback.advanced.find((g) => g.form === 'ca/schedule_8');
+    expect(s8?.name).toBe('Schedule 8: Québec Pension Plan Contributions');
+    expect(s8?.page).toBe('schedule-8-qc');
   });
 
   it('spells the province with its accent in every group and line', () => {

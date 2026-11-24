@@ -354,6 +354,16 @@ export const strings = {
     caQc: {
       // The engine's Schedule 8 is the Canada Pension Plan form; for a Québec filer it is the QPP form, so its title is ours.
       schedule8Title: 'Schedule 8: Québec Pension Plan Contributions',
+      // Engine text rewritten for Québec. The order matters: the exemption label goes before the plan's name.
+      rewrite: {
+        province: { from: 'Quebec', to: 'Québec' },
+        exemption: {
+          from: 'Canada Pension Plan exemption',
+          to: 'basic exemption',
+        },
+        plan: { from: 'Canada Pension Plan', to: 'Québec Pension Plan' },
+        planAcronym: { from: 'CPP', to: 'QPP' },
+      },
       groups: {
         pension: 'Québec Pension Plan',
         ei: 'Employment Insurance',
@@ -415,7 +425,7 @@ export const strings = {
       },
       drugPremium: {
         name: 'Prescription drug insurance premium',
-        help: "The yearly premium for Québec's public prescription drug insurance plan, paid on your Québec return if you are not in a group drug plan, usually one through work. It rises with your income up to a yearly maximum. We assume you are not in a group plan.",
+        help: 'The yearly premium for Québec’s public prescription drug insurance plan, paid on your Québec return if you are not in a group drug plan, usually one through work. It rises with your income up to a yearly maximum. We assume you are not in a group plan.',
       },
       totalTax: {
         name: 'Total income tax',
