@@ -1,10 +1,8 @@
-import { useMemo, useState } from 'react';
+import { useMemo } from 'react';
 import { ChartPeriodSwitch } from './ChartPeriodSwitch';
 import { LineChart, type ChartPoint } from './LineChart';
 import styles from './SalaryChart.module.css';
 import {
-  displayMoney,
-  displayRate,
   displayRateOneDecimal,
   displayRoundedMoney,
   displayWholeMoney,
@@ -33,7 +31,7 @@ type Props = {
   chart: HubChartId;
 };
 
-/** One salary chart of a province hub, from the sweep in the hub's data block, with the table of its figures. Draws nothing for a province with no sweep. */
+/** One salary chart of a province hub, from the sweep in the hub's data block. Draws nothing for a province with no sweep. */
 export function SalaryChart({ data, province, chart }: Props) {
   const sweep = data.provinces.find((entry) => entry.slug === province);
   if (!sweep) return null;
@@ -50,7 +48,6 @@ function Chart({ sweep, chart }: { sweep: ProvinceSweep; chart: HubChartId }) {
   const words = t.charts[chart];
   const { period, marker } = useHubChartView();
   const { unit, rateUnit, points } = sweep;
-  const [tableOpen, setTableOpen] = useState(false);
   const rate = isRateChart(chart);
   const column = CHART_COLUMN[chart];
   // Rates ignore Per month; money is divided by 12 through money/.
@@ -123,39 +120,6 @@ function Chart({ sweep, chart }: { sweep: ProvinceSweep; chart: HubChartId }) {
         </p>
       )}
       <p className={styles.note}>{t.note}</p>
-      <details
-        className={styles.details}
-        open={tableOpen}
-        onToggle={(event) => {
-          setTableOpen(event.currentTarget.open);
-        }}
-      >
-        <summary>{tableOpen ? t.hideTable : t.showTable}</summary>
-        <div className={styles.tableWrap}>
-          <table className={styles.table}>
-            <thead>
-              <tr>
-                <th scope="col">{t.salaryHeader}</th>
-                <th scope="col">{words.header}</th>
-              </tr>
-            </thead>
-            <tbody>
-              {points.map((point) => (
-                <tr key={point[0]}>
-                  <th scope="row">
-                    {displayWholeMoney(point[0], 'annually', unit)}
-                  </th>
-                  <td>
-                    {rate
-                      ? displayRate(point[column] ?? '0', rateUnit)
-                      : displayMoney(point[column] ?? '0', shown, unit)}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </details>
     </div>
   );
 }

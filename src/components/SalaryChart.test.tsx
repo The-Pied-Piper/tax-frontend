@@ -92,7 +92,7 @@ describe('SalaryChart', () => {
   it('divides money by 12 under Per month in every money chart, and leaves rates alone', () => {
     hub();
     const row = (chart: HubChartId) =>
-      section(chart).getByRole('row', { name: /^\$70,000/ }).textContent;
+      section(chart).getByText(/^\$70,000: /).textContent;
     const before = HUB_CHART_IDS.map(row);
     fireEvent.click(
       section('takeHome').getByRole('button', { name: t.perMonth }),
@@ -112,36 +112,32 @@ describe('SalaryChart', () => {
     expect(HUB_CHART_IDS.map(row)).toEqual(before);
   });
 
-  it('holds every sweep point in a table of its own figures, shown by a real details', () => {
+  it('draws no table of figures under a chart', () => {
     hub();
-    const details = screen
-      .getByRole('region', { name: 'marginalRate' })
-      .querySelector('details');
-    expect(details).not.toBeNull();
-    expect(details?.open).toBe(false);
-    const rows = within(details as HTMLElement).getAllByRole('row', {
-      hidden: true,
-    });
-    // Header row plus 307 sweep points.
-    expect(rows).toHaveLength(1 + 307);
-    expect(
-      within(details as HTMLElement).getByRole('columnheader', {
-        name: t.charts.marginalRate.header,
-        hidden: true,
-      }),
-    ).toBeInTheDocument();
-    expect(section('marginalRate').getByText(t.showTable)).toBeInTheDocument();
+    expect(document.querySelector('details')).toBeNull();
+    expect(screen.queryByRole('table', { hidden: true })).toBeNull();
   });
 
-  it('draws every figure of a table in the one basis: the year total is income tax, CPP and EI less credits paid', () => {
+  it('labels the marker of every chart in the one basis: the year total is income tax, CPP and EI less credits paid', () => {
     hub();
     // At $3,000 Ontario pays $48.90 of EI and no income tax. The year total takes off the Canada workers
     // benefit paid on filing; the average and marginal rates do not count it.
-    const rowAt = (chart: HubChartId) =>
-      section(chart).getByRole('row', { name: /^\$3,000/, hidden: true });
-    expect(rowAt('yearTotal')).toHaveTextContent('$48.90');
-    expect(rowAt('averageRate')).toHaveTextContent('1.63%');
-    expect(rowAt('marginalRate')).toHaveTextContent('1.63%');
+    const [first] = screen.getAllByRole('img');
+    if (!first) throw new Error('no charts');
+    fireEvent.keyDown(first, { key: 'Home' });
+    // The sweep also has finer points near some salaries, so step until the marker reads $3,000.
+    for (
+      let step = 0;
+      step < 10 && !screen.queryAllByText(/^\$3,000: /).length;
+      step++
+    ) {
+      fireEvent.keyDown(first, { key: 'ArrowRight' });
+    }
+    const label = (chart: HubChartId) =>
+      section(chart).getByText(/^\$3,000: /).textContent;
+    expect(label('yearTotal')).toBe('$3,000: $49');
+    expect(label('averageRate')).toBe('$3,000: 1.6%');
+    expect(label('marginalRate')).toBe('$3,000: 1.6%');
   });
 
   it('moves the marker of every chart, and the announcement, with the keyboard in one', () => {

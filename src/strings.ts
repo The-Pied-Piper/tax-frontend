@@ -29,41 +29,34 @@ export const strings = {
     hover: (salary: string, value: string) => `${salary}: ${value}`,
     // Read aloud when the marker moves; not shown.
     readout: (salary: string) => `Salary ${salary} a year`,
-    showTable: 'Show the figures as a table',
-    hideTable: 'Hide the table',
-    salaryHeader: 'Salary',
     salaryAxis: 'Salary before tax',
     percent: 'Percent',
     dollarsYear: 'Dollars a year',
     dollarsMonth: 'Dollars a month',
     chartLabel: (title: string, from: string, to: string) =>
-      `Line chart: ${title} against salary, from ${from} to ${to}. The same figures are in the table below the chart.`,
+      `Line chart: ${title} against salary, from ${from} to ${to}.`,
     note: 'These are estimates for a single person whose only income is a salary.',
     // Added to the marginal rate's line on a hub whose province has a tax reduction that shrinks to zero (not Alberta or Saskatchewan).
     marginalReduction:
       'In some provinces it also rises across a band of lower salaries, while a tax reduction shrinks to zero.',
-    // One entry per chart: its title (the section heading, or for take-home a sub-heading in the existing section), its one line, and its table column.
+    // One entry per chart: its title (the section heading, or for take-home a sub-heading in the existing section) and its one line.
     charts: {
       takeHome: {
         title: 'Take-home pay',
         text: 'Your salary minus income tax, Canada Pension Plan and Employment Insurance. It is before any credits paid to you when you file.',
-        header: 'Take-home',
       },
       averageRate: {
         title: 'Average tax rate',
         // {place} is the province's name.
         text: 'The share of your salary that goes to income tax, Canada Pension Plan and Employment Insurance together. Federal and {place} income tax both count.',
-        header: 'Average rate',
       },
       marginalRate: {
         title: 'Marginal tax rate',
         text: 'Out of your next dollar of salary, the share that goes to income tax, Canada Pension Plan and Employment Insurance. The rate steps up where a new tax bracket starts.',
-        header: 'Marginal rate',
       },
       yearTotal: {
         title: 'Tax and contributions for the year',
         text: 'Income tax, Canada Pension Plan and Employment Insurance for the year, less benefits paid to you when you file. Below zero means money comes back to you.',
-        header: 'Tax and contributions',
       },
     },
     // The province comparison on a hub; amounts come from money/format.

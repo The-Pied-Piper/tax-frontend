@@ -100,7 +100,7 @@ export function displayWholeMoney(
 
 // Like displayMoney, but rounded to whole dollars (half away from zero) and with
 // no cents: "$53,786" for "53786.25". For the short label beside a chart's
-// marker, where cents are noise. The table keeps the exact figure.
+// marker, where cents are noise.
 export function displayRoundedMoney(
   yearly: string,
   period: PayPeriod,
