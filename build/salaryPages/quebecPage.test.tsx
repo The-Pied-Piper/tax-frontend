@@ -4,7 +4,7 @@ import fixtureQc from '../../src/api/fixtures/compute-qc-2025-70000.json';
 import { strings } from '../../src/strings';
 import { bareLinks } from '../../src/test/pageLinks';
 import type { SalaryPageData } from '../../src/state/useTakeHome';
-import { DESCRIPTION_LIMIT } from '../../src/state/pageLimits';
+import { DESCRIPTION_LIMIT } from './limits';
 import { salaryPageText } from '../../src/state/salaryPageText';
 import { pageMeta } from './pageMeta';
 import { renderSalaryApp } from './prerender';
