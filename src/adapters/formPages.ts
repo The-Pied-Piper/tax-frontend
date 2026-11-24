@@ -19,6 +19,7 @@ export const FORM_PAGE_OF: Readonly<Record<string, string>> = {
   'ca-sk/sk428_credits': 'sk428',
   'ca-nl/nl428': 'nl428',
   'ca-nl/nl428_credits': 'nl428',
+  'ca-qc/tp1_schedule_k': 'schedule-k',
   'ca/t1_taxable_income': 't1',
   'ca/t1_tax_and_credits': 't1',
   'ca/schedule_8': 'schedule-8',
