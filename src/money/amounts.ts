@@ -6,7 +6,6 @@
 //   - Canada Pension Plan and Employment Insurance together: total deductions less
 //     income tax (subtractAmounts);
 //   - the share kept: one less a rate (subtractAmounts);
-//   - a rate times 10,000: what $10,000 more salary adds (timesTenThousand);
 //   - take-home over salary, as a rate (ratioText);
 //   - a rate to the nearest half point (roundToHalfPoint);
 //   - a whole-dollar figure, a half going up (roundToWhole).
@@ -41,15 +40,6 @@ export function roundToHalfPoint(rate: string): string {
   const scale = 10n ** BigInt(digits);
   // A half point is 0.005, so the rate is a whole number of two-hundredths.
   return unitsText(divideHalfUp(x * 200n, scale) * 5n, 3);
-}
-
-/** `amount` times 10,000, exact: a rate of "0.5353" gives "5353". */
-export function timesTenThousand(amount: string): string {
-  const {
-    units: [x = 0n],
-    digits,
-  } = parseAll([amount]);
-  return unitsText(x * 10000n, digits);
 }
 
 /** `numerator` over `denominator` as a fraction written to four decimals, half up: 273077.60 over 500000 gives "0.5462". The denominator must be above zero. */

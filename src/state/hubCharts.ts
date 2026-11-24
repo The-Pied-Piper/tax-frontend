@@ -251,7 +251,7 @@ export const CHART_COLUMN: Record<HubChartId, number> = {
   marginalRate: SWEEP_COLUMN.marginal,
 };
 
-/** True for the two charts that draw a rate; the others draw money and follow Per year / Per month. */
+/** True for the two charts that draw a rate; the other draws money and follow Per year / Per month. */
 export function isRateChart(chart: HubChartId): boolean {
   return chart === 'averageRate' || chart === 'marginalRate';
 }
