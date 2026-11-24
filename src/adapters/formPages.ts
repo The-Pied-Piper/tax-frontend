@@ -19,6 +19,7 @@ export const FORM_PAGE_OF: Readonly<Record<string, string>> = {
   'ca-sk/sk428_credits': 'sk428',
   'ca-nl/nl428': 'nl428',
   'ca-nl/nl428_credits': 'nl428',
+  'ca-qc/schedule_b': 'schedule-b',
   'ca-qc/tp1_income': 'tp1',
   'ca-qc/tp1_net_income': 'tp1',
   'ca-qc/tp1_credits': 'tp1',
@@ -31,6 +32,7 @@ export const FORM_PAGE_OF: Readonly<Record<string, string>> = {
   'ca/schedule_8': 'schedule-8',
   'ca/t2204': 't2204',
   'ca/schedule_6': 'schedule-6',
+  'ca-qc/tp1_schedule_f': 'schedule-f',
 };
 
 /** The id of the page that explains an engine form, or null when it has none. */

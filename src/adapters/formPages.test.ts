@@ -17,6 +17,8 @@ const FIXED_IDS = [
   'schedule-8',
   't2204',
   'schedule-6',
+  'schedule-b',
+  'schedule-f',
   'tp1',
   'schedule-k',
   'schedule-u',
@@ -39,6 +41,7 @@ describe('FORM_PAGE_OF', () => {
       'ca-sk/sk428_credits': 'sk428',
       'ca-nl/nl428': 'nl428',
       'ca-nl/nl428_credits': 'nl428',
+      'ca-qc/schedule_b': 'schedule-b',
       'ca-qc/tp1_income': 'tp1',
       'ca-qc/tp1_net_income': 'tp1',
       'ca-qc/tp1_credits': 'tp1',
@@ -51,6 +54,7 @@ describe('FORM_PAGE_OF', () => {
       'ca/schedule_8': 'schedule-8',
       'ca/t2204': 't2204',
       'ca/schedule_6': 'schedule-6',
+      'ca-qc/tp1_schedule_f': 'schedule-f',
     });
   });
 
@@ -62,7 +66,10 @@ describe('FORM_PAGE_OF', () => {
 
   // The T4 slip is read, not computed, so the service has no form of that
   // name and the advanced view has no heading for it to link from.
-  const NO_ENGINE_FORM = ['t4'];
+  // The Quebec Schedule 8 page shares the engine form `ca/schedule_8` with the
+  // Canada Pension Plan page; telling the two apart by province is the
+  // calculator's job (#310), so no entry maps to it yet.
+  const NO_ENGINE_FORM = ['t4', 'schedule-8-qc'];
 
   it('has an entry for every published page that has an engine form', () => {
     const targets = new Set(Object.values(FORM_PAGE_OF));

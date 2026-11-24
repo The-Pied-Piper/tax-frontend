@@ -13,6 +13,7 @@ const FIXED_IDS = [
   'schedule-8',
   't2204',
   'schedule-6',
+  'schedule-b',
 ];
 
 describe('formPageLink', () => {
