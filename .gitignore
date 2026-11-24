@@ -4,3 +4,6 @@ dist
 .DS_Store
 coverage
 api/openapi.yml.tmp
+
+__pycache__/
+*.pyc

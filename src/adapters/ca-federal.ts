@@ -28,7 +28,7 @@ export type ProvincialLine = {
   };
 };
 
-type Found = { amount: string; unit: Unit | null };
+export type Found = { amount: string; unit: Unit | null };
 
 /** Exact trace labels read from the real $70,000 and $90,000 responses for 2025 and 2026. */
 const LABELS = {
@@ -46,7 +46,7 @@ const LABELS = {
   totalTax: { form: 'ca/t1_tax_and_credits', label: 'total_payable' },
 } as const;
 
-function find(
+export function find(
   response: ComputeTakeHomeCalculationResponse,
   wanted: Wanted,
 ): Found | undefined {
@@ -58,11 +58,11 @@ function find(
   return { amount: line.amount, unit: readUnit(line.unit) };
 }
 
-function sameUnit(a: Unit | null, b: Unit | null): boolean {
+export function sameUnit(a: Unit | null, b: Unit | null): boolean {
   return a === null || b === null ? a === b : a.name === b.name;
 }
 
-function row(
+export function row(
   id: string,
   text: { name: string; help: string },
   found: Found,
