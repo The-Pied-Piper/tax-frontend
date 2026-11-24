@@ -58,7 +58,7 @@ export function find(
   return { amount: line.amount, unit: readUnit(line.unit) };
 }
 
-function sameUnit(a: Unit | null, b: Unit | null): boolean {
+export function sameUnit(a: Unit | null, b: Unit | null): boolean {
   return a === null || b === null ? a === b : a.name === b.name;
 }
 

@@ -1,9 +1,8 @@
 import { useId, type ReactNode } from 'react';
 import type { Rate } from '../api';
-import type { Unit } from '../adapters';
+import type { Unit, Wording } from '../adapters';
 import { displayMoney, displayRate } from '../money/format';
 import type { PayPeriod } from '../money/payPeriod';
-import { wordingFor } from '../state/wording';
 import { strings } from '../strings';
 import styles from './AnswerCard.module.css';
 import { HelpTerm } from './HelpTerm';
@@ -21,8 +20,8 @@ type Props = {
   /** The place and year the answer is for, as asked. */
   place: string;
   year: number;
-  /** Picks the wording of the help texts (Quebec words its own deductions). */
-  jurisdictionCode: string;
+  /** The jurisdiction's own help texts, when it words them itself. */
+  wording?: Wording;
   payPeriod: PayPeriod;
   onPayPeriodChange: (period: PayPeriod) => void;
   /** The disclosures that sit under the split, inside this panel. */
@@ -40,12 +39,25 @@ export function AnswerCard({
   marginalRate,
   place,
   year,
-  jurisdictionCode,
+  wording,
   payPeriod,
   onPayPeriodChange,
   children,
 }: Props) {
-  const words = wordingFor(jurisdictionCode).answer;
+  const words = {
+    takenOff: {
+      ...strings.answer.takenOff,
+      help: wording?.answer.takenOff ?? strings.answer.takenOff.help,
+    },
+    averageRate: {
+      ...strings.answer.averageRate,
+      help: wording?.answer.averageRate ?? strings.answer.averageRate.help,
+    },
+    marginalRate: {
+      ...strings.answer.marginalRate,
+      help: wording?.answer.marginalRate ?? strings.answer.marginalRate.help,
+    },
+  };
   const headingId = useId();
   const show = (yearly: string) => displayMoney(yearly, payPeriod, unit);
   return (

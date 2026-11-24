@@ -213,37 +213,6 @@ export const strings = {
     ) =>
       `On a salary of ${salary} in ${place} in ${String(year)}, this estimate puts your take-home at ${takeHome} for the year. ${takenOff} is taken off for income tax, Canada Pension Plan and Employment Insurance. Your average rate is ${averageRate}, and your marginal rate is ${marginalRate}: the share of your next dollar of salary that goes to income tax, Canada Pension Plan and Employment Insurance. It is an estimate for a single person, not tax advice.`,
   },
-  // Wording that differs for Quebec, which has its own pension plan, parental insurance and a drug insurance premium.
-  // Chosen by state/wording.ts; every other province uses `answer` and `pageText` above.
-  quebecWording: {
-    answer: {
-      takenOff:
-        'Income tax, Quebec Pension Plan, Employment Insurance, Quebec Parental Insurance Plan premiums and the drug insurance premium added together.',
-      averageRate:
-        'Income tax, Quebec Pension Plan, Employment Insurance, Quebec Parental Insurance Plan premiums and the drug insurance premium, divided by your salary. It is the share of your salary that comes off.',
-      marginalRate:
-        'Of your next dollar of salary, the share that goes to income tax, Quebec Pension Plan, Employment Insurance, Quebec Parental Insurance Plan premiums and the drug insurance premium.',
-    },
-    pageText: {
-      description: (
-        salary: string,
-        place: string,
-        year: number,
-        takeHome: string,
-      ) =>
-        `On a ${salary} salary in ${place} in ${String(year)}, you take home an estimated ${takeHome} a year after income tax, pension, parental insurance and Employment Insurance.`,
-      paragraph: (
-        salary: string,
-        place: string,
-        year: number,
-        takeHome: string,
-        takenOff: string,
-        averageRate: string,
-        marginalRate: string,
-      ) =>
-        `On a salary of ${salary} in ${place} in ${String(year)}, this estimate puts your take-home at ${takeHome} for the year. ${takenOff} is taken off for income tax, Quebec Pension Plan, Quebec Parental Insurance Plan premiums, Employment Insurance and the Quebec prescription drug insurance premium. Your average rate is ${averageRate}, and your marginal rate is ${marginalRate}: the share of your next dollar of salary that goes to income tax, Quebec Pension Plan, Employment Insurance, Quebec Parental Insurance Plan premiums and the drug insurance premium. It is an estimate for a single person, not tax advice.`,
-    },
-  },
   // Navigation between the pre-built salary pages; amounts come from displayMoney.
   salaryLinks: {
     label: 'More salaries',
@@ -400,17 +369,43 @@ export const strings = {
           `An extra Quebec Pension Plan contribution on earnings above the first yearly ceiling. It is ${zero} if your pay is below that ceiling.`,
       },
       zero: 'nothing',
+      // Quebec words what is taken off itself: the card's help texts and the page's description and paragraph.
+      wording: {
+        answer: {
+          takenOff:
+            'Income tax, Quebec Pension Plan, Employment Insurance, Quebec Parental Insurance Plan premiums and the drug insurance premium added together.',
+          averageRate:
+            'Income tax, Quebec Pension Plan, Employment Insurance, Quebec Parental Insurance Plan premiums and the drug insurance premium, divided by your salary. It is the share of your salary that comes off.',
+          marginalRate:
+            'Of your next dollar of salary, the share that goes to income tax, Quebec Pension Plan, Employment Insurance, Quebec Parental Insurance Plan premiums and the drug insurance premium.',
+        },
+        pageText: {
+          description: (
+            salary: string,
+            place: string,
+            year: number,
+            takeHome: string,
+          ) =>
+            `On a ${salary} salary in ${place} in ${String(year)}, you take home an estimated ${takeHome} a year after income tax, pension, parental insurance and Employment Insurance.`,
+          paragraph: (
+            salary: string,
+            place: string,
+            year: number,
+            takeHome: string,
+            takenOff: string,
+            averageRate: string,
+            marginalRate: string,
+          ) =>
+            `On a salary of ${salary} in ${place} in ${String(year)}, this estimate puts your take-home at ${takeHome} for the year. ${takenOff} is taken off for income tax, Quebec Pension Plan, Quebec Parental Insurance Plan premiums, Employment Insurance and the Quebec prescription drug insurance premium. Your average rate is ${averageRate}, and your marginal rate is ${marginalRate}: the share of your next dollar of salary that goes to income tax, Quebec Pension Plan, Employment Insurance, Quebec Parental Insurance Plan premiums and the drug insurance premium. It is an estimate for a single person, not tax advice.`,
+        },
+      },
       qpip: {
         name: 'Quebec Parental Insurance Plan',
-        help: 'Your Quebec Parental Insurance Plan premium, taken off your pay to cover benefits when you have or adopt a child. It starts at $2,000 of pay.',
+        help: 'Your Quebec Parental Insurance Plan premium, taken off your pay to cover benefits when you have or adopt a child. It starts once your pay passes a set amount.',
       },
       ei: {
         name: 'Employment Insurance',
         help: 'Your Employment Insurance premium at the lower Quebec rate, taken off your pay to cover benefits if you lose your job.',
-      },
-      federalTax: {
-        name: 'Federal income tax',
-        help: 'Income tax owed to the federal government after the federal credits that apply to you.',
       },
       quebecTax: {
         name: 'Quebec income tax',

@@ -2,7 +2,7 @@ import { displayMoney } from '../money/format';
 import { isPositive, isZero } from '../money/sign';
 import { sumAmounts } from '../money/sum';
 import { strings } from '../strings';
-import { find, row, type Found, type Wanted } from './ca-federal';
+import { find, row, sameUnit, type Found, type Wanted } from './ca-federal';
 import { advancedGroups, fallbackResult, responseUnit } from './fallback';
 import type { AdaptedResult, JurisdictionAdapter } from './types';
 
@@ -58,6 +58,10 @@ export const caQcAdapter: JurisdictionAdapter = {
     const text = strings.adapters.caQc;
     let totalTax: string;
     let eiHelp = text.ei.help;
+    // Two lines in different units cannot be added.
+    if (!sameUnit(federalTax.unit, quebecTax.unit)) {
+      return fallbackResult(response);
+    }
     try {
       totalTax = sumAmounts([federalTax.amount, quebecTax.amount]);
       // No premium counted on a real salary: say why, since a pay slip shows one.
@@ -80,13 +84,19 @@ export const caQcAdapter: JurisdictionAdapter = {
         ),
         row('ei', { name: text.ei.name, help: eiHelp }, ei, GROUPS.ei),
         row('qpip', text.qpip, qpip, GROUPS.parentalInsurance),
-        row('federal-tax', text.federalTax, federalTax, GROUPS.incomeTax),
+        row(
+          'federal-tax',
+          strings.adapters.caFederal.federalTax,
+          federalTax,
+          GROUPS.incomeTax,
+        ),
         row('quebec-tax', text.quebecTax, quebecTax, GROUPS.incomeTax),
         row('drug-premium', text.drugPremium, drugPremium, GROUPS.drugPremium),
       ],
       totals: [
         row(
           'total-tax',
+          // Federal plus Quebec tax; the engine's own total payable also holds the drug premium, which has its own row.
           text.totalTax,
           { amount: totalTax, unit: federalTax.unit },
           GROUPS.incomeTax,
@@ -97,6 +107,7 @@ export const caQcAdapter: JurisdictionAdapter = {
         }),
       ],
       advanced: advancedGroups(response),
+      wording: text.wording,
     };
   },
 };
