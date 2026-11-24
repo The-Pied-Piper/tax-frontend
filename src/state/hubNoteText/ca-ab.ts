@@ -5,7 +5,6 @@ import {
   note,
   POOL,
   takeHomeNotes,
-  yearTotalNotes,
   type SharedFigures,
 } from './shared';
 
@@ -51,5 +50,4 @@ export const alberta: ProvinceNotes = {
       pool,
     ),
   ],
-  yearTotal: yearTotalNotes(shared),
 };

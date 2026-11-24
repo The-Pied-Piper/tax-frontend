@@ -9,7 +9,6 @@ import {
   roundToHalfPoint,
   roundToWhole,
   subtractAmounts,
-  timesTenThousand,
 } from '../money/amounts';
 import { compareAmounts } from '../money/scale';
 import {
@@ -36,7 +35,6 @@ import type { FooterProvinceSlug } from './siteLinks';
  *  - `k:column@salary`  the share kept: one minus that rate;
  *  - `q:column@salary`  the column over the salary, as a rate (take-home over salary);
  *  - `c:column@salary`  a rate as cents on the dollar, to the nearest half cent: "7.5 cents";
- *  - `u:column@salary`  a rate times 10,000: what $10,000 more salary adds;
  *  - `e:amount`         where the marginal rate changes, from the engine's edges: the salary at which
  *                       the new rate has taken hold. The amount only says which change (the
  *                       one between the sweep salary just below it and the next); the figure is the
@@ -78,7 +76,7 @@ function pointAt(points: readonly SweepPoint[], salary: string): SweepPoint {
 /** A parsed spec. */
 export type ParsedSpec =
   | {
-      kind: 'm' | 'r' | 'k' | 'q' | 'u' | 'c';
+      kind: 'm' | 'r' | 'k' | 'q' | 'c';
       column: NoteColumn;
       salary: string;
     }
@@ -115,7 +113,6 @@ export function parseSpec(spec: string): ParsedSpec {
       kind === 'r' ||
       kind === 'k' ||
       kind === 'q' ||
-      kind === 'u' ||
       kind === 'c') &&
     parts.length === 2
   ) {
@@ -203,14 +200,10 @@ export function figureText(spec: ParsedSpec, sweep: ProvinceSweep): string {
     case 'r':
     case 'k':
     case 'q':
-    case 'u':
     case 'c': {
       const value = columnValue(pointAt(points, spec.salary), spec.column);
       if (spec.kind === 'm') {
         return displayWholeMoney(roundToWhole(value), 'annually', unit);
-      }
-      if (spec.kind === 'u') {
-        return displayWholeMoney(timesTenThousand(value), 'annually', unit);
       }
       if (spec.kind === 'c') {
         return displayCents(roundToHalfPoint(value));

@@ -52,11 +52,6 @@ describe('a hub with a sweep', () => {
         'marginalRate',
         strings.hubCharts.charts.marginalRate.title,
       ],
-      [
-        'tax-and-contributions',
-        'yearTotal',
-        strings.hubCharts.charts.yearTotal.title,
-      ],
     ] as const) {
       const section = doc.getElementById(id);
       expect(section?.tagName, id).toBe('SECTION');
@@ -66,11 +61,11 @@ describe('a hub with a sweep', () => {
         section?.querySelector(`#${HUB_CHART_SLOT_IDS[chart]} svg`),
       ).not.toBeNull();
     }
-    // Four sections with a chart: the take-home section exists once.
+    // Three sections with a chart: the take-home section exists once.
     expect(doc.querySelectorAll('h2')).toHaveLength(
       new Set([...doc.querySelectorAll('h2')].map((h) => h.textContent)).size,
     );
-    expect(doc.querySelectorAll('[id^="hub-chart-"] svg')).toHaveLength(4);
+    expect(doc.querySelectorAll('[id^="hub-chart-"] svg')).toHaveLength(3);
   });
 
   it("writes each chart's marker into the static HTML and no figures table", () => {

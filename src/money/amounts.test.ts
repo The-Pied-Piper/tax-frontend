@@ -3,7 +3,6 @@ import {
   ratioText,
   roundToWhole,
   subtractAmounts,
-  timesTenThousand,
 } from './amounts';
 
 describe('subtractAmounts', () => {
@@ -33,13 +32,6 @@ describe('roundToHalfPoint', () => {
     expect(roundToHalfPoint('0.0125')).toBe('0.015');
     expect(roundToHalfPoint('0')).toBe('0');
     expect(roundToHalfPoint('1')).toBe('1');
-  });
-});
-
-describe('timesTenThousand', () => {
-  it('moves the decimal point four places', () => {
-    expect(timesTenThousand('0.5353')).toBe('5353');
-    expect(timesTenThousand('0.47')).toBe('4700');
   });
 });
 

@@ -113,7 +113,7 @@ function Chart({ sweep, chart }: { sweep: ProvinceSweep; chart: HubChartId }) {
           setChartMarker(index);
         }}
       />
-      {/* One announcement for the four charts, which share the marker: the take-home chart's. */}
+      {/* One announcement for the three charts, which share the marker: the take-home chart's. */}
       {chart === 'takeHome' && (
         <p className={styles.visuallyHidden} aria-live="polite">
           {t.readout(salaryAt)}

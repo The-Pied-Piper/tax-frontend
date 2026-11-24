@@ -23,7 +23,7 @@ const sweep = {
   provisional: true,
   unit,
   rateUnit: { ...unit, as_percentage: true },
-  points: [['1000', '1000.00', '0.00', '0.00', '0.0000', '0.0505', '0.00']],
+  points: [['1000', '1000.00', '0.00', '0.00', '0.0000', '0.0505']],
   edges: [['20000', '20160', '20170', '0.2640']],
   facts: { surtax_first: '5818' },
 };
@@ -216,15 +216,7 @@ describe('parseHubChartsData', () => {
   });
 });
 
-const point = (salary: string): SweepPoint => [
-  salary,
-  '0',
-  '0',
-  '0',
-  '0',
-  '0',
-  '0',
-];
+const point = (salary: string): SweepPoint => [salary, '0', '0', '0', '0', '0'];
 
 describe('the card constants', () => {
   it('starts the marker on the $70,000 point, or the first point when there is none', () => {
@@ -251,7 +243,6 @@ describe('the card constants', () => {
       takeHome: 1,
       averageRate: 4,
       marginalRate: 5,
-      yearTotal: 6,
     });
   });
 });

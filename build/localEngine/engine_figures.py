@@ -13,11 +13,7 @@ fails the build.
 The hub-chart sweep takes the engine's own answer for every salary: `total_deductions`, `income_tax`,
 `take_home`, and the engine's `average_tax_rate` and `marginal_tax_rate` (income tax of T1 line 43500, CPP both tiers
 and EI line 16; credits paid to you when you file are not counted, so tax cuts such as the Ontario LIFT credit count and
-the Canada workers benefit does not). One figure is the script's own:
-
-  * `year_total`: for the "Tax and contributions for the year" chart only: income tax, CPP and EI as deducted from
-    pay, less the credits paid on filing (T1 line 48200, "total_credits" in the engine's T1 trace). It is the one
-    figure that stays net of credits.
+the Canada workers benefit does not).
 
 Two more things are written for the notes under the charts, so no figure in them is typed:
 
@@ -57,11 +53,7 @@ RATE = Decimal("0.0001")
 MARGINAL_STEP = 100
 MARGINAL_DISAGREEMENT = Decimal("0.005")
 
-# Employment Insurance as deducted from pay (T2204 `t2204_premiums_deducted`): the year-total chart keeps it, net of the
-# credits paid on filing. The engine's own EI figure is T2204 line 16 (after the refund at $2,000 or less).
-EI_DEDUCTED_LABEL = "t2204_premiums_deducted"
 EI_FIGURE = "ei"
-CREDITS_LABEL = "total_credits"
 
 
 # Parameters of the engine's datasets the notes quote: name -> (jurisdiction package, parameter family, path
@@ -160,22 +152,6 @@ class Figures:
     def basis_total(self, code: str, year: int, salary: int) -> Decimal:
         """What the engine takes off the salary: income tax, CPP (all three parts) and EI line 16."""
         return self._result(code, year, salary).total_deductions
-
-    def year_total(self, code: str, year: int, salary: int) -> Decimal:
-        """Income tax, CPP and EI as deducted, less the credits paid on filing (T1 line 48200), unrounded."""
-        result = self._ask(code, year, salary, trace=True)
-        lines = [
-            line
-            for form in result.trace or ()
-            for line in form.lines
-            if line.label in (CREDITS_LABEL, EI_DEDUCTED_LABEL)
-        ]
-        paid = [line.amount for line in lines if line.label == CREDITS_LABEL]
-        deducted = [line.amount for line in lines if line.label == EI_DEDUCTED_LABEL]
-        if len(paid) != 1 or len(deducted) != 1 or paid[0] is None or deducted[0] is None:
-            raise ValueError(f"{code} {year}: expected one credits line and one EI deducted line")
-        ei_line_16 = self._figure(result, EI_FIGURE)
-        return result.total_deductions - ei_line_16 + deducted[0] - paid[0]
 
     def ei_band(self, code: str, year: int) -> dict[str, str]:
         """The Employment Insurance band just above $2,000, whole dollars: where each extra dollar of salary still
@@ -313,7 +289,6 @@ def main(provinces_file: str, output_file: str) -> None:
                     "marginal_rate": str(
                         Decimal(answer["marginal_income_tax_rate"]["amount"]).quantize(RATE)
                     ),
-                    "year_total": str(figures.year_total(code, year, salary).quantize(CENTS)),
                 }
             )
         edges = figures.edges(

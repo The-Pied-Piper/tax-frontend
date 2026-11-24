@@ -25,7 +25,6 @@ function sweepOf(): EngineSweep {
       take_home: `t${salary}`,
       average_rate: '0.0900',
       marginal_rate: '0.2000',
-      year_total: `n${salary}`,
     })),
     edges: [['20000', '20160', '20170', '0.2640']],
     facts: { surtax_first: '5818' },
@@ -63,7 +62,7 @@ describe('provinceSweeps', () => {
     expect(sweep?.provisional).toBe(expected);
     expect(sweep?.unit.singular).toBe('$');
     expect(sweep?.points).toHaveLength(307);
-    // Take-home, deductions and income tax; then the charts' average rate, marginal rate and year total.
+    // Take-home, deductions and income tax; then the charts' average rate and marginal rate.
     expect(sweep?.points[0]).toEqual([
       '1000.00',
       't1000',
@@ -71,7 +70,6 @@ describe('provinceSweeps', () => {
       'i1000',
       '0.0900',
       '0.2000',
-      'n1000',
     ]);
     // The engine's changes of rate and parameters travel with the points.
     expect(sweep?.edges).toEqual([['20000', '20160', '20170', '0.2640']]);

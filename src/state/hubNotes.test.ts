@@ -30,7 +30,7 @@ function everyNote(): { slug: string; chart: HubChartId; note: Note }[] {
 }
 
 describe('the text of the hub charts', () => {
-  it('has text for the take-home, average, marginal and yearly charts of every province', () => {
+  it('has text for the take-home, average and marginal charts of every province', () => {
     for (const slug of SLUGS) {
       const text: ProvinceNotes = hubNoteText[slug] ?? {};
       for (const chart of CHARTS) {
@@ -82,13 +82,9 @@ describe('the text of the hub charts', () => {
     for (const [name, rule] of copyRules) {
       expect(all, name).not.toMatch(rule);
     }
-    // The marginal and yearly-total text never says take-home; no province is ranked.
+    // The rate text never says take-home; no province is ranked.
     for (const { slug, chart, note } of everyNote()) {
-      if (
-        chart === 'marginalRate' ||
-        chart === 'yearTotal' ||
-        chart === 'averageRate'
-      ) {
+      if (chart === 'marginalRate' || chart === 'averageRate') {
         expect(note.text, `${slug} ${chart}`).not.toMatch(/take-home/i);
       }
       expect(note.text, `${slug} ${chart}`).not.toMatch(
@@ -101,9 +97,6 @@ describe('the text of the hub charts', () => {
     const sweep = sweepOf('ca-on');
     expect(chartNotes('ca-on', 'averageRate', sweep)[0]).toBe(
       'Up to $2,000 the average is 0%. Employment Insurance starts just above $2,000 and counts for more as your salary rises, until the full rate applies by about $2,033. The average is about 1.6% from about $2,040.',
-    );
-    expect(chartNotes('ca-on', 'yearTotal', sweep)[0]).toBe(
-      'This chart adds income tax, Canada Pension Plan and Employment Insurance, then takes off benefits paid to you when you file. At low salaries the total is below zero. It is $16,214 at $70,000, and $25,794 at $100,000.',
     );
     const marginal = chartNotes('ca-on', 'marginalRate', sweep).join(' ');
     // The three spikes, from the engine's edges and read to one decimal.

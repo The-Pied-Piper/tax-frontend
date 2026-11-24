@@ -47,10 +47,6 @@ export const POOL = {
   topRate: 'r:marginal@300000',
   keepTop: 'k:marginal@300000',
   keepAll: 'q:takeHome@500000',
-  perTen: 'u:marginal@300000',
-  total70: 'm:total@70000',
-  total100: 'm:total@100000',
-  total500: 'm:total@500000',
   avg10: 'r:average@10000',
   avg20: 'r:average@20000',
   avg30: 'r:average@30000',
@@ -141,22 +137,4 @@ export function straightLineNote(f: SharedFigures): Note {
     'From {flatFrom} of salary the line is straight: the rate stops rising, and every extra dollar loses the top rate, {topRate}.',
     { ...POOL, flatFrom: `e:${f.flatFrom}` },
   );
-}
-
-/** The bullets of the "tax and contributions for the year" chart, the same wording in every province. */
-export function yearTotalNotes(f: SharedFigures): Note[] {
-  const pool: Record<string, string> = {
-    ...POOL,
-    flatFrom: `e:${f.flatFrom}`,
-  };
-  return [
-    note(
-      'This chart adds income tax, Canada Pension Plan and Employment Insurance, then takes off benefits paid to you when you file. At low salaries the total is below zero. It is {total70} at $70,000, and {total100} at $100,000.',
-      pool,
-    ),
-    note(
-      'The line bends upward at each new bracket, then goes straight. From {flatFrom} up, every extra dollar loses the top rate, {topRate}, so each extra $10,000 of salary adds {perTen}. At {top} the total is {total500}.',
-      pool,
-    ),
-  ];
 }
