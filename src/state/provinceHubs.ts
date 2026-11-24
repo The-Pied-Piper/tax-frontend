@@ -26,6 +26,18 @@ export type ProvinceHubText = {
   own: HubForm[];
   /** True when a tax reduction in the province shrinks to zero as salary rises, which bends the marginal rate. Alberta and Saskatchewan have none. */
   taxReduction: boolean;
+  /** Province wording that replaces the shared wording (Quebec has its own pension plan, parental insurance and drug premium). */
+  words?: ProvinceWords;
+};
+
+/** The shared hub wording a province may replace. */
+export type ProvinceWords = {
+  /** The paragraph that explains how the take-home is worked out. */
+  takeHome: string;
+  /** The one line under each chart. */
+  charts: Record<HubChartId, string>;
+  /** Replacements for the shared federal form entries, by form id. */
+  federal: Record<string, Partial<HubForm>>;
 };
 
 /** The federal forms every hub lists, in the order shown. */
@@ -74,8 +86,9 @@ function chartSection(
 ): ContentSection {
   const words = strings.hubCharts.charts[chart];
   const province = text.slug;
-  const oneLine =
-    chart === 'marginalRate' && text.taxReduction
+  const oneLine = text.words
+    ? text.words.charts[chart]
+    : chart === 'marginalRate' && text.taxReduction
       ? `${words.text} ${strings.hubCharts.marginalReduction}`
       : words.text.replace('{place}', name);
   return {
@@ -182,6 +195,80 @@ export const provinceHubs: ProvinceHubText[] = [
       },
     ],
   },
+  {
+    slug: 'ca-qc',
+    taxReduction: false,
+    words: {
+      takeHome:
+        'Take-home pay is your salary minus five things. The first is income tax, which comes in two parts: federal tax, and Quebec tax worked out on your Quebec return from Revenu Québec. The second is your Quebec Pension Plan, or QPP, payments, which build up your future pension. The third is Employment Insurance, or EI, which can pay you if you lose your job. Quebec workers pay a lower EI rate. The fourth is Quebec Parental Insurance Plan, or QPIP, premiums, which pay benefits when you have or adopt a child. The fifth is the Quebec prescription drug insurance premium. You pay it on your Quebec return if you have no drug plan through work, and we assume you do not. We do not count the Quebec abatement, a credit equal to 16.5% of your basic federal tax that Quebec residents get on their federal return. The forms below are where each of these is worked out.',
+      charts: {
+        takeHome:
+          'Your salary minus income tax, Quebec Pension Plan, Employment Insurance, Quebec Parental Insurance Plan premiums and the Quebec prescription drug insurance premium.',
+        averageRate:
+          'The share of your salary that goes to income tax, Quebec Pension Plan, Employment Insurance and Quebec Parental Insurance Plan premiums together. Federal and Quebec income tax both count.',
+        marginalRate:
+          'Out of your next dollar of salary, the share that goes to income tax, Quebec Pension Plan, Employment Insurance and Quebec Parental Insurance Plan premiums. The rate steps up where a new tax bracket starts, and across a band of lower salaries while the drug insurance premium grows. It falls where a pension or insurance payment stops.',
+      },
+      federal: {
+        'schedule-8': {
+          // Its own id: the Canada Pension Plan page must not be linked for a Quebec filer.
+          id: 'schedule-8-qc',
+          name: 'Schedule 8: Quebec Pension Plan',
+          description:
+            'Works out how much you pay into the Quebec pension plan.',
+        },
+        t2204: {
+          name: 'Form T2204: EI overpayment',
+          description:
+            'Checks that you have not paid more EI than the yearly limit, at the lower Quebec rate.',
+        },
+      },
+    },
+    own: [
+      {
+        id: 'tp1',
+        name: 'TP-1 Income Tax Return',
+        description:
+          'The Quebec income tax return. It works out your Quebec tax, and brings in your QPP and drug insurance amounts.',
+      },
+      {
+        id: 'schedule-u',
+        name: 'Schedule U: Quebec Pension Plan (QPP) Contribution and Deduction',
+        description:
+          'Turns the QPP payments on your pay slip into the amount you deduct from your income.',
+      },
+      {
+        id: 'schedule-k',
+        name: 'Schedule K: Premium Payable Under the Quebec Prescription Drug Insurance Plan',
+        description:
+          'Works out the yearly drug insurance premium if you have no drug plan through work.',
+      },
+      {
+        id: 'schedule-b',
+        name: 'Schedule B: Tax Relief Measures',
+        description:
+          'Amounts for living alone, age and retirement income. We do not claim any of them, so it changes nothing here.',
+      },
+      {
+        id: 'schedule-f',
+        name: 'Schedule F: Contribution to the Health Services Fund',
+        description:
+          'A 1% contribution on income other than employment income over $18,130. A salary-only filer owes nothing, so it comes to $0.',
+      },
+      {
+        id: 'work-chart-201',
+        name: 'Work Chart 201: Deduction for workers',
+        description:
+          'Takes 6% of your work income off your income, up to a yearly maximum.',
+      },
+      {
+        id: 'work-chart-401',
+        name: 'Work Chart 401: Income tax on taxable income',
+        description:
+          'Applies the Quebec tax rates to your taxable income, bracket by bracket.',
+      },
+    ],
+  },
 ];
 
 /** A form as a list entry: linked only when its page is published. */
@@ -243,7 +330,8 @@ export function hubPage(
           : {}),
         blocks: [
           paragraph(
-            `Take-home pay is your salary minus three things. The first is income tax, which comes in two parts: federal tax and ${name} tax. The second is your Canada Pension Plan payments, which build up your future pension. The third is Employment Insurance, or EI, which can pay you if you lose your job. The forms below are where each of those is worked out.`,
+            text.words?.takeHome ??
+              `Take-home pay is your salary minus three things. The first is income tax, which comes in two parts: federal tax and ${name} tax. The second is your Canada Pension Plan payments, which build up your future pension. The third is Employment Insurance, or EI, which can pay you if you lose your job. The forms below are where each of those is worked out.`,
           ),
           ...(withCharts
             ? [
@@ -251,7 +339,10 @@ export function hubPage(
                   kind: 'subheading' as const,
                   text: strings.hubCharts.charts.takeHome.title,
                 },
-                paragraph(strings.hubCharts.charts.takeHome.text),
+                paragraph(
+                  text.words?.charts.takeHome ??
+                    strings.hubCharts.charts.takeHome.text,
+                ),
                 {
                   kind: 'salaryChart' as const,
                   province: text.slug,
@@ -297,7 +388,9 @@ export function hubPage(
           {
             kind: 'list',
             title: `Federal forms ${name} also uses`,
-            items: federalForms.map((form) => listItem(form, published)),
+            items: federalForms.map((form) =>
+              listItem({ ...form, ...text.words?.federal[form.id] }, published),
+            ),
           },
         ],
       },

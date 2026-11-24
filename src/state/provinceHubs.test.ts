@@ -48,7 +48,25 @@ const OWN: Record<Slug, (readonly [string, string])[]> = {
     ['mb428-a', 'Schedule MB428-A: Manitoba Family Tax Benefit'],
     ['mb479', 'Form MB479: Manitoba credits'],
   ],
+  'ca-qc': [
+    ['tp1', 'TP-1 Income Tax Return'],
+    [
+      'schedule-u',
+      'Schedule U: Quebec Pension Plan (QPP) Contribution and Deduction',
+    ],
+    [
+      'schedule-k',
+      'Schedule K: Premium Payable Under the Quebec Prescription Drug Insurance Plan',
+    ],
+    ['schedule-b', 'Schedule B: Tax Relief Measures'],
+    ['schedule-f', 'Schedule F: Contribution to the Health Services Fund'],
+    ['work-chart-201', 'Work Chart 201: Deduction for workers'],
+    ['work-chart-401', 'Work Chart 401: Income tax on taxable income'],
+  ],
 };
+
+/** The provinces whose hub uses the shared wording (Quebec words its own). */
+const SHARED = FOOTER_PROVINCE_SLUGS.filter((slug) => slug !== 'ca-qc');
 
 const SALARIES = ['30000', '35000', '40000'];
 const salaryLinks: ContentLink[] = SALARIES.map((s) => ({
@@ -92,7 +110,7 @@ describe('provinceHubs', () => {
   });
 });
 
-describe.each(FOOTER_PROVINCE_SLUGS)('the hub page for %s', (slug) => {
+describe.each(SHARED)('the hub page for %s', (slug) => {
   const name = strings.siteNav.provinceNames[slug];
   const page = build(slug, [], salaryLinks);
 
@@ -261,6 +279,40 @@ describe.each(FOOTER_PROVINCE_SLUGS)('the hub page for %s', (slug) => {
         expect(item.href, item.label).toBeUndefined();
       }
     }
+  });
+});
+
+describe('the Quebec hub', () => {
+  const page = build('ca-qc', [], salaryLinks);
+  const how = section(page, 'How your Quebec take-home is worked out');
+  const words = everyString(how?.blocks).join(' ');
+
+  it('has the Quebec title and its own forms in plain words', () => {
+    expect(page.title).toBe('Quebec take-home pay and income tax analysis');
+    expect(lists(page)[0]?.items.map((i) => i.label)).toEqual(
+      OWN['ca-qc'].map(([, label]) => label),
+    );
+  });
+
+  it('says QPP and QPIP, never the Canada Pension Plan, and no calculator name', () => {
+    expect(words).toContain('Quebec Pension Plan');
+    expect(words).toContain('Quebec Parental Insurance Plan');
+    expect(words).toContain('prescription drug insurance premium');
+    expect(words).toContain('Quebec abatement');
+    const every = everyString(page.sections.map((s) => s.blocks)).join(' ');
+    expect(every).not.toContain('Canada Pension Plan');
+    expect(every).not.toMatch(/taxtips/i);
+  });
+
+  it('lists the Quebec version of Schedule 8 and the Quebec-rate T2204', () => {
+    const federal = lists(page)[1]?.items ?? [];
+    expect(federal.map((i) => i.label)).toEqual([
+      'T4 slip',
+      'T1 return',
+      'Schedule 8: Quebec Pension Plan',
+      'Form T2204: EI overpayment',
+      'Schedule 6: Canada Workers Benefit',
+    ]);
   });
 });
 

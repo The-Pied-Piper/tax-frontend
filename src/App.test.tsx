@@ -1039,6 +1039,7 @@ describe.each(['light', 'dark'] as const)(
         ['Manitoba', '/ca-mb/'],
         ['Saskatchewan', '/ca-sk/'],
         ['Newfoundland and Labrador', '/ca-nl/'],
+        ['Quebec', '/ca-qc/'],
       ]);
       expect(nav).toHaveTextContent('Provinces:');
       expect(footer).toHaveTextContent(strings.footer);
@@ -1069,6 +1070,7 @@ describe.each(['light', 'dark'] as const)(
         '/ca-mb/',
         '/ca-sk/',
         '/ca-nl/',
+        '/ca-qc/',
       ]);
       expect(page.querySelector('footer')?.textContent).toContain(
         strings.footer,
