@@ -175,15 +175,15 @@ export const strings = {
     takeHomeRow: 'Take-home',
     takenOff: {
       name: 'Taken off (tax and contributions)',
-      help: 'Income tax, Canada Pension Plan and Employment Insurance, less credits paid to you. A minus means you take home more than your salary.',
+      help: 'Income tax, Canada Pension Plan and Employment Insurance added together.',
     },
     averageRate: {
-      name: 'Average income tax rate',
-      help: 'Your income tax divided by your salary. It is the share of your salary that goes to income tax, federal and provincial together.',
+      name: 'Average rate',
+      help: 'Income tax, Canada Pension Plan and Employment Insurance, divided by your salary. It is the share of your salary that comes off.',
     },
     marginalRate: {
-      name: 'Marginal income tax rate',
-      help: 'The federal and provincial income tax, including any surtax and health premium, on your next dollar of salary. Canada Pension Plan and Employment Insurance are not included.',
+      name: 'Marginal rate',
+      help: 'Of your next dollar of salary, the share that goes to income tax, Canada Pension Plan and Employment Insurance, counting any surtax or health premium.',
     },
     estimateNote:
       'This is an estimate for a single yearly salary. Your own situation may differ.',
@@ -214,7 +214,7 @@ export const strings = {
       averageRate: string,
       marginalRate: string,
     ) =>
-      `On a salary of ${salary} in ${place} in ${String(year)}, this estimate puts your take-home at ${takeHome} for the year. ${takenOff} is taken off for income tax, Canada Pension Plan and Employment Insurance. Your average income tax rate is ${averageRate}, and your marginal income tax rate is ${marginalRate}: the rate on your next dollar of salary. It is an estimate for a single person, not tax advice.`,
+      `On a salary of ${salary} in ${place} in ${String(year)}, this estimate puts your take-home at ${takeHome} for the year. ${takenOff} is taken off for income tax, Canada Pension Plan and Employment Insurance. Your average rate is ${averageRate}, and your marginal rate is ${marginalRate}: the share of your next dollar of salary that goes to income tax, Canada Pension Plan and Employment Insurance. It is an estimate for a single person, not tax advice.`,
   },
   // Navigation between the pre-built salary pages; amounts come from displayMoney.
   salaryLinks: {
@@ -296,7 +296,7 @@ export const strings = {
       },
       totalTakenOff: {
         name: 'Total taken off',
-        help: 'Tax, Canada Pension Plan and Employment Insurance, less credits paid to you. Salary minus this is take-home. A minus means take-home is above salary.',
+        help: 'Income tax, Canada Pension Plan and Employment Insurance added together. Your salary minus this is your estimated take-home pay.',
       },
     },
     caOn: {
