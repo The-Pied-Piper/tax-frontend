@@ -257,6 +257,7 @@ describe('salaryPages closeBundle', () => {
       '/forms/t1/',
       '/forms/t2204/',
       '/forms/t4/',
+      '/forms/tp1/',
       '/methodology/',
     ]);
 

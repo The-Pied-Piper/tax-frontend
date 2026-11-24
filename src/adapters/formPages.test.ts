@@ -17,6 +17,7 @@ const FIXED_IDS = [
   'schedule-8',
   't2204',
   'schedule-6',
+  'tp1',
 ];
 
 describe('FORM_PAGE_OF', () => {
@@ -36,6 +37,11 @@ describe('FORM_PAGE_OF', () => {
       'ca-sk/sk428_credits': 'sk428',
       'ca-nl/nl428': 'nl428',
       'ca-nl/nl428_credits': 'nl428',
+      'ca-qc/tp1_income': 'tp1',
+      'ca-qc/tp1_net_income': 'tp1',
+      'ca-qc/tp1_credits': 'tp1',
+      'ca-qc/tp1_tax': 'tp1',
+      'ca-qc/tp1_totals': 'tp1',
       'ca/t1_taxable_income': 't1',
       'ca/t1_tax_and_credits': 't1',
       'ca/schedule_8': 'schedule-8',
