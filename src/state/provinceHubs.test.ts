@@ -69,7 +69,10 @@ const OWN: Record<Slug, (readonly [string, string])[]> = {
 function federalOf(slug: Slug): (readonly [string, string])[] {
   return FEDERAL.map(([id, label]) =>
     slug === 'ca-qc' && id === 'schedule-8'
-      ? (['schedule-8-qc', 'Schedule 8: Quebec Pension Plan'] as const)
+      ? ([
+          'schedule-8-qc',
+          'Schedule 8: Quebec Pension Plan Contributions',
+        ] as const)
       : ([id, label] as const),
   );
 }
@@ -326,6 +329,10 @@ describe('the Quebec hub', () => {
     const every = everyString(charted.sections.map((s) => s.blocks)).join(' ');
     expect(every).toContain('Federal and Quebec income tax both count.');
     expect(every).not.toContain('${');
+    expect(every).toContain('and the drug insurance premium together');
+    expect(every).toContain(
+      'premiums and the drug insurance premium. The rate steps up',
+    );
   });
 
   it('does not link the Canada Pension Plan page for Schedule 8, even when that page is published', () => {
@@ -333,7 +340,9 @@ describe('the Quebec hub', () => {
     const schedule8 = lists(published)[1]?.items.find((i) =>
       i.label.startsWith('Schedule 8'),
     );
-    expect(schedule8?.label).toBe('Schedule 8: Quebec Pension Plan');
+    expect(schedule8?.label).toBe(
+      'Schedule 8: Quebec Pension Plan Contributions',
+    );
     expect(schedule8?.href).toBeUndefined();
   });
 });
