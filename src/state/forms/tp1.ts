@@ -128,13 +128,32 @@ export const tp1: FormPageSpec = {
       },
     },
     {
+      id: 'credits',
+      heading: 'Credits that lower your tax',
+      lines: 'Lines 350–399',
+      paragraph:
+        'A credit lowers your tax bill. Most people get a basic personal amount ({basic} in 2025). The form has other amounts too, such as for age, living alone and retirement income. We do not use them. The form adds the amounts up, then takes {creditRate} of the total. That is your credit. Medical costs, gifts and union dues have their own lines and rates. We do not use those.',
+      example:
+        'Your total amount is {creditBase}. {creditRate} of that is {creditAmount}, so your credits come to {creditsTotal}.',
+      figures: {
+        basic: cred.result('$18,571', 'tp1_basic_personal_amount_line_350'),
+        creditRate: cred.result('14%', 'tp1_line_377_1'),
+        creditBase: cred.result('$18,571', 'tp1_line_377'),
+        creditAmount: cred.result('$2,599.94', 'tp1_line_377_1'),
+        creditsTotal: cred.result(
+          '$2,599.94',
+          'tp1_non_refundable_tax_credits_line_399',
+        ),
+      },
+    },
+    {
       id: 'tax',
       heading: 'Tax on your income, slice by slice (Work Chart 401)',
       lines: 'Line 401',
       paragraph:
-        "Quebec does not tax all of your income at one rate. It cuts your income into slices, called brackets, and each slice has its own rate. The work chart finds the top slice your income reaches. It adds up the tax on all the slices below that one, then charges the top slice's rate on the rest of your income.",
+        'Quebec does not tax all of your taxable income at one rate. It cuts it into slices, called brackets, and each slice has its own rate. The work chart finds the top slice your taxable income reaches. It adds up the tax on all the slices below that one, then charges the top slice’s rate on the rest.',
       example:
-        'Your income reaches the slice that starts at {bracketStart}. That slice is taxed at {bracketRate}. The tax on the slices below it comes to {taxBelow}. The {incomeAbove} of your income above {bracketStart} adds {taxAdded}. Tax on your taxable income: {taxOnIncome}.',
+        'Your taxable income reaches the slice that starts at {bracketStart}. That slice is taxed at {bracketRate}. The tax on the slices below it comes to {taxBelow}. The {incomeAbove} of your taxable income above {bracketStart} adds {taxAdded}. Tax on your taxable income, line 401: {taxOnIncome}.',
       figures: {
         bracketStart: wc401.result(
           '$53,255',
@@ -160,30 +179,11 @@ export const tp1: FormPageSpec = {
       },
     },
     {
-      id: 'credits',
-      heading: 'Credits that lower your tax',
-      lines: 'Lines 350–399',
-      paragraph:
-        'A credit lowers your tax bill. Most people get a basic personal amount ({basic} in 2025). The form has other amounts too, such as for age, living alone and retirement income. We do not use them. The form adds the amounts up, then takes {creditRate} of the total. That is your credit. Medical costs, gifts and union dues have their own lines and rates. We do not use those.',
-      example:
-        'Your total amount is {creditBase}. {creditRate} of that is {creditAmount}, so your credits come to {creditsTotal}.',
-      figures: {
-        basic: cred.result('$18,571', 'tp1_basic_personal_amount_line_350'),
-        creditRate: cred.result('14%', 'tp1_line_377_1'),
-        creditBase: cred.result('$18,571', 'tp1_line_377'),
-        creditAmount: cred.result('$2,599.94', 'tp1_line_377_1'),
-        creditsTotal: cred.result(
-          '$2,599.94',
-          'tp1_non_refundable_tax_credits_line_399',
-        ),
-      },
-    },
-    {
       id: 'tax-after-credits',
       heading: 'Your tax after credits',
-      lines: 'Lines 401–432',
+      lines: 'Lines 406–432',
       paragraph:
-        'Now the form takes your credits away from your tax. The tax can go down to zero, but not below it. The form has more lines here, for contributions to municipal political parties, spouse transfers and a few other credits. We do not use them.',
+        'Now the form takes your credits away from the tax on line 401. The tax can go down to zero, but not below it. The form has more lines here, for contributions to municipal political parties, spouse transfers and a few other credits. We do not use them.',
       example:
         'Your tax of {taxOnIncome} less credits of {creditsTotal} leaves {taxAfterCredits}.',
       figures: {
@@ -200,12 +200,12 @@ export const tp1: FormPageSpec = {
     },
     {
       id: 'total',
-      heading: 'What you owe Quebec',
+      heading: 'Your Quebec tax and premium',
       lines: 'Lines 432–479',
       paragraph:
-        "Line 450 is your income tax and contributions. It adds your Quebec tax to other amounts you owe on the return. For a salary-only filer these are the premium for Quebec's prescription drug insurance plan (line 447, from Schedule K) and the health services fund contribution (line 446, from Schedule F). Then the form takes off tax already withheld and credits paid to you, such as the work premium. We do not use those. This site's take-home figure counts line 450, and your QPP and QPIP payments, but not credits paid to you.",
+        'Line 450 is your income tax and contributions. It adds your Quebec tax to other amounts that can be owed on the return. Two matter here. One is the premium for Quebec’s prescription drug insurance plan (line 447, from Schedule K). It is not owed if a group plan, such as one through work, covers you, and this site assumes none does. The other is the health services fund contribution (line 446, from Schedule F), which does not apply to employment income. Then the form takes off tax already withheld from your pay, shown on your RL-1 slip (line 451), and credits paid to you, such as the work premium. This site’s take-home figure counts the federal tax on line 43500, the Quebec amount on line 450, and your QPP, QPIP and Employment Insurance payments, but not credits paid to you.',
       example:
-        'Your tax of {taxAfterCredits} plus the drug insurance premium of {drugPremium} comes to {total450}. The health services fund contribution is {hsf}. We take nothing off for tax already withheld or for credits paid to you, so the balance due on line 479 is {balanceDue}.',
+        'Your tax of {taxAfterCredits} plus the drug insurance premium of {drugPremium} comes to {total450}. The health services fund contribution is {hsf}. Without the tax your employer took off your pay (line 451), the balance due on line 479 would be {balanceDue}.',
       figures: {
         taxAfterCredits: tot.result('$7,641.16', 'tp1_totals_line_432'),
         drugPremium: tot.result('$755', 'tp1_drug_insurance_premium_line_447'),
