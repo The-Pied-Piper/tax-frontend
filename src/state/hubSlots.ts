@@ -8,7 +8,6 @@ export const HUB_CHART_SLOT_IDS: Record<HubChartId, string> = {
   takeHome: 'hub-chart-take-home',
   averageRate: 'hub-chart-average-rate',
   marginalRate: 'hub-chart-marginal-rate',
-  yearTotal: 'hub-chart-year-total',
 };
 
 /** The id of the slot in a pre-built province hub where the province comparison is mounted. Its `data-province` holds the hub's province slug. */

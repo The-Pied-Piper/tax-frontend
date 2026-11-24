@@ -5,7 +5,6 @@ import {
   note,
   POOL,
   takeHomeNotes,
-  yearTotalNotes,
   type SharedFigures,
 } from './shared';
 
@@ -70,5 +69,4 @@ export const manitoba: ProvinceNotes = {
       pool,
     ),
   ],
-  yearTotal: yearTotalNotes(shared),
 };

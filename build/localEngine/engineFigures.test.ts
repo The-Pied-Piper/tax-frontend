@@ -183,17 +183,16 @@ describe.runIf(process.env.ENGINE_FIGURES_FILE)(
 
     // The chart figures (tax-engine 0.5.1, 2026): the average and marginal rate are the engine's own
     // (income tax, CPP and EI line 16, no credits paid on filing counted; at $2,000 the engine reads the
-    // marginal rate below the start of the EI band), and the year total is income tax, CPP and EI as
-    // deducted, less the credits paid on filing.
+    // marginal rate below the start of the EI band).
     it.each([
-      ['2000.00', '0.0000', '0.0000', '0.00', '2000.00'],
-      ['3000.00', '0.0163', '0.0163', '48.90', '2951.10'],
-      ['38000.00', '0.1583', '0.3608', '5889.24', '31985.21'],
-      ['70000.00', '0.2316', '0.3436', '16213.75', '53786.25'],
-      ['201200.00', '0.3445', '0.7326', '69319.16', '131880.84'],
+      ['2000.00', '0.0000', '0.0000', '2000.00'],
+      ['3000.00', '0.0163', '0.0163', '2951.10'],
+      ['38000.00', '0.1583', '0.3608', '31985.21'],
+      ['70000.00', '0.2316', '0.3436', '53786.25'],
+      ['201200.00', '0.3445', '0.7326', '131880.84'],
     ])(
       'gives Ontario at %s the sweep figures',
-      (salary, average, marginal, yearTotal, takeHome) => {
+      (salary, average, marginal, takeHome) => {
         const raw = JSON.parse(readFileSync(file, 'utf8')) as {
           provinces: Record<string, { sweep: Record<string, string>[] }>;
         };
@@ -202,7 +201,6 @@ describe.runIf(process.env.ENGINE_FIGURES_FILE)(
         );
         expect(point?.average_rate).toBe(average);
         expect(point?.marginal_rate).toBe(marginal);
-        expect(point?.year_total).toBe(yearTotal);
         expect(point?.take_home).toBe(takeHome);
       },
     );

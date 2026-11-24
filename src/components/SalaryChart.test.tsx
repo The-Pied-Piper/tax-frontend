@@ -60,25 +60,22 @@ describe('SalaryChart', () => {
       <SalaryChart
         data={hubChartsData(['ca-on'], true)}
         province="ca-on"
-        chart="yearTotal"
+        chart="takeHome"
       />,
     );
     expect(screen.getByText(t.note)).toBeInTheDocument();
   });
 
-  it('has the Per year / Per month switch on the two money charts only', () => {
+  it('has the Per year / Per month switch on the money chart only', () => {
     hub();
     expect(
       section('takeHome').getByRole('button', { name: t.perMonth }),
-    ).toBeInTheDocument();
-    expect(
-      section('yearTotal').getByRole('button', { name: t.perMonth }),
     ).toBeInTheDocument();
     expect(section('averageRate').queryByRole('button')).toBeNull();
     expect(section('marginalRate').queryByRole('button')).toBeNull();
   });
 
-  it('shows no salary readout, and has one hidden announcement for the four charts', () => {
+  it('shows no salary readout, and has one hidden announcement for the three charts', () => {
     hub();
     const announcements = screen.getAllByText(t.readout('$70,000'));
     expect(announcements).toHaveLength(1);
@@ -89,7 +86,7 @@ describe('SalaryChart', () => {
     );
   });
 
-  it('divides money by 12 under Per month in every money chart, and leaves rates alone', () => {
+  it('divides money by 12 under Per month in the money chart, and leaves rates alone', () => {
     hub();
     const row = (chart: HubChartId) =>
       section(chart).getByText(/^\$70,000: /).textContent;
@@ -99,15 +96,10 @@ describe('SalaryChart', () => {
     );
     const after = HUB_CHART_IDS.map(row);
     expect(after[0]).not.toBe(before[0]);
-    expect(after[3]).not.toBe(before[3]);
     expect(after[1]).toBe(before[1]);
     expect(after[2]).toBe(before[2]);
-    // Pressing the switch of the other money chart reads the same period.
-    expect(
-      section('yearTotal').getByRole('button', { name: t.perMonth }),
-    ).toHaveAttribute('aria-pressed', 'true');
     fireEvent.click(
-      section('yearTotal').getByRole('button', { name: t.perYear }),
+      section('takeHome').getByRole('button', { name: t.perYear }),
     );
     expect(HUB_CHART_IDS.map(row)).toEqual(before);
   });
@@ -118,10 +110,9 @@ describe('SalaryChart', () => {
     expect(screen.queryByRole('table', { hidden: true })).toBeNull();
   });
 
-  it('labels the marker of every chart in the one basis: the year total is income tax, CPP and EI less credits paid', () => {
+  it('labels the marker of every chart in the one basis: income tax, CPP and EI, no credits paid', () => {
     hub();
-    // At $3,000 Ontario pays $48.90 of EI and no income tax. The year total takes off the Canada workers
-    // benefit paid on filing; the average and marginal rates do not count it.
+    // At $3,000 Ontario pays $48.90 of EI and no income tax; credits paid on filing are not counted.
     const [first] = screen.getAllByRole('img');
     if (!first) throw new Error('no charts');
     fireEvent.keyDown(first, { key: 'Home' });
@@ -135,7 +126,7 @@ describe('SalaryChart', () => {
     }
     const label = (chart: HubChartId) =>
       section(chart).getByText(/^\$3,000: /).textContent;
-    expect(label('yearTotal')).toBe('$3,000: $49');
+    expect(label('takeHome')).toBe('$3,000: $2,951');
     expect(label('averageRate')).toBe('$3,000: 1.6%');
     expect(label('marginalRate')).toBe('$3,000: 1.6%');
   });

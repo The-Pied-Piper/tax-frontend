@@ -64,7 +64,6 @@ export function provinceSweeps(
         point.income_tax,
         point.average_rate,
         point.marginal_rate,
-        point.year_total,
       ]),
     };
   });

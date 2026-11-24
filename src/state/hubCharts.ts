@@ -43,8 +43,7 @@ export function regularIndexes(points: readonly SweepPoint[]): number[] {
  * LIFT credit count), then the figures the charts draw. The deductions are income tax plus
  * Canada Pension Plan (all three parts) plus Employment Insurance as the Employment Insurance
  * form sets it, and credits paid to you when you file are not counted. The average rate is the
- * deductions over the salary and the marginal rate is their change per extra dollar. The last
- * figure is the one that is net of credits: the "tax and contributions for the year" total.
+ * deductions over the salary and the marginal rate is their change per extra dollar.
  */
 export type SweepPoint = [
   salary: string,
@@ -53,7 +52,6 @@ export type SweepPoint = [
   incomeTax: string,
   averageRate: string,
   marginalRate: string,
-  yearTotal: string,
 ];
 
 /**
@@ -98,7 +96,7 @@ const SLUG_NAME = /^[a-z0-9_]+$/;
 function isPoint(value: unknown): value is SweepPoint {
   return (
     Array.isArray(value) &&
-    value.length === 7 &&
+    value.length === 6 &&
     value.every(
       (part: unknown) =>
         typeof part === 'string' &&
@@ -228,12 +226,11 @@ export const SALARY_AXIS = {
   phoneTicks: ['250000', '500000'],
 } as const;
 
-/** The four charts of a hub, in the order of its sections. */
+/** The three charts of a hub, in the order of its sections. */
 export const HUB_CHART_IDS = [
   'takeHome',
   'averageRate',
   'marginalRate',
-  'yearTotal',
 ] as const;
 
 export type HubChartId = (typeof HUB_CHART_IDS)[number];
@@ -245,7 +242,6 @@ export const SWEEP_COLUMN = {
   tax: 3,
   average: 4,
   marginal: 5,
-  total: 6,
 } as const;
 
 /** Which place of a `SweepPoint` each chart reads. */
@@ -253,7 +249,6 @@ export const CHART_COLUMN: Record<HubChartId, number> = {
   takeHome: SWEEP_COLUMN.takeHome,
   averageRate: SWEEP_COLUMN.average,
   marginalRate: SWEEP_COLUMN.marginal,
-  yearTotal: SWEEP_COLUMN.total,
 };
 
 /** True for the two charts that draw a rate; the others draw money and follow Per year / Per month. */

@@ -20,7 +20,6 @@ export type EngineSweepPoint = {
   take_home: string;
   average_rate: string;
   marginal_rate: string;
-  year_total: string;
 };
 
 /** The sweep of one province: its points, lowest salary first, and the units written once. */
@@ -43,7 +42,6 @@ const POINT_FIELDS = [
   'take_home',
   'average_rate',
   'marginal_rate',
-  'year_total',
 ] as const;
 
 function isSweepPoint(value: unknown): value is EngineSweepPoint {

@@ -17,11 +17,7 @@ From $4,000 to about $19,200 the rate is 7.5%: Canada Pension Plan and Employmen
 Canada Pension Plan and Employment Insurance take about 7.5 cents of each dollar. Employment Insurance stops at about $68,900, and the main Canada Pension Plan amount at $74,600. A second Canada Pension Plan tier takes 4 cents of each dollar from $74,600 to $85,000, so the rate falls less at $74,600 than at $85,000.
 Alberta’s 8% tax starts at about $24,420. The rate is 28% from $24,420 to $59,070. Alberta has no tax reduction or premium that bends the line, so there are no spikes.
 It steps up to 34.5% at $59,080 (the federal 20.5% bracket). From there it falls as Employment Insurance and the Canada Pension Plan stop. It reaches 36.5% from $61,780 (Alberta’s 10% bracket), then 35% at $68,900, 33.5% at $74,600 and 30.5% at $85,000.
-After that it only climbs: 36% from $118,180, then 38%, 41.5%, 42.5%, 43.5%, 47% from $259,610, and 48% from $371,350, where the line is straight.
-
-yearTotal
-This chart adds income tax, Canada Pension Plan and Employment Insurance, then takes off benefits paid to you when you file. At low salaries the total is below zero. It is $15,893 at $70,000, and $25,542 at $100,000.
-The line bends upward at each new bracket, then goes straight. From $371,350 up, every extra dollar loses the top rate, 47%, so each extra $10,000 of salary adds $4,700. At $500,000 the total is $201,745."
+After that it only climbs: 36% from $118,180, then 38%, 41.5%, 42.5%, 43.5%, 47% from $259,610, and 48% from $371,350, where the line is straight."
 `;
 
 exports[`the text of the hub charts > writes every province and chart as one reviewed text, so a change in wording or in a figure shows in review > ca-bc 1`] = `
@@ -42,11 +38,7 @@ Canada Pension Plan and Employment Insurance take about 7.5 cents of each dollar
 From $26,760 to $45,370 the rate is 29%, higher than the 20.5% before it. BC tax starts here, and the BC tax reduction, which lowers your BC tax, shrinks by 3.56 cents for every dollar of income above $25,570. So more of each extra dollar goes to BC tax. The reduction is gone at about $45,370 of salary.
 Once the reduction is gone, the rate falls to 25.5%. It is 28% from $50,840 (the next BC bracket) and 34% from $59,080 (the federal 20.5% bracket).
 Then it falls as Employment Insurance and the Canada Pension Plan stop: 33% at $68,900, 31% at $74,600 and 28% at $85,000. After that it climbs to a top rate of 53.5%, where the line is straight.
-From $266,680 of salary the line is straight: the rate stops rising, and every extra dollar loses the top rate, 53.5%.
-
-yearTotal
-This chart adds income tax, Canada Pension Plan and Employment Insurance, then takes off benefits paid to you when you file. At low salaries the total is below zero. It is $15,652 at $70,000, and $24,627 at $100,000.
-The line bends upward at each new bracket, then goes straight. From $266,680 up, every extra dollar loses the top rate, 53.5%, so each extra $10,000 of salary adds $5,350. At $500,000 the total is $219,550."
+From $266,680 of salary the line is straight: the rate stops rising, and every extra dollar loses the top rate, 53.5%."
 `;
 
 exports[`the text of the hub charts > writes every province and chart as one reviewed text, so a change in wording or in a figure shows in review > ca-mb 1`] = `
@@ -67,11 +59,7 @@ From $4,000 to about $17,410 the rate is 7.5%: Canada Pension Plan and Employmen
 Canada Pension Plan and Employment Insurance take about 7.5 cents of each dollar. Employment Insurance stops at about $68,900, and the main Canada Pension Plan amount at $74,600. A second Canada Pension Plan tier takes 4 cents of each dollar from $74,600 to $85,000, so the rate falls less at $74,600 than at $85,000.
 Manitoba’s own tax starts before the federal tax does. The rate is 18.5% from $17,410: Manitoba tax, Canada Pension Plan and Employment Insurance. It is 31.5% from $19,200, once federal tax joins in, then 30.5% from $23,140. The Manitoba Family Tax Benefit lowers your Manitoba tax and shrinks by 9 cents for every dollar of income. It is gone at about $23,140, so the rate falls by about 1 point there.
 It steps up to 32.5% at $47,440 (Manitoba’s next bracket) and 39% at $59,080 (the federal 20.5% bracket), then falls as Employment Insurance and the Canada Pension Plan stop: 37.5% at $68,900, 36% at $74,600 and 33.5% at $85,000.
-At $201,130 of salary it steps up about 1 point to 47.5%, and it reaches 51.3% from $259,610 to $401,130. Then it drops about 1 point, to 50.4%. The cause is the Manitoba basic personal amount, which shrinks to zero as net income goes from $200,000 to $400,000, so you lose a little tax saving on each extra dollar. The line is straight from $401,130.
-
-yearTotal
-This chart adds income tax, Canada Pension Plan and Employment Insurance, then takes off benefits paid to you when you file. At low salaries the total is below zero. It is $18,101 at $70,000, and $28,555 at $100,000.
-The line bends upward at each new bracket, then goes straight. From $401,130 up, every extra dollar loses the top rate, 51.5%, so each extra $10,000 of salary adds $5,126. At $500,000 the total is $222,174."
+At $201,130 of salary it steps up about 1 point to 47.5%, and it reaches 51.3% from $259,610 to $401,130. Then it drops about 1 point, to 50.4%. The cause is the Manitoba basic personal amount, which shrinks to zero as net income goes from $200,000 to $400,000, so you lose a little tax saving on each extra dollar. The line is straight from $401,130."
 `;
 
 exports[`the text of the hub charts > writes every province and chart as one reviewed text, so a change in wording or in a figure shows in review > ca-nl 1`] = `
@@ -91,11 +79,7 @@ From $4,000 to about $19,200 the rate is 7.5%: Canada Pension Plan and Employmen
 Canada Pension Plan and Employment Insurance take about 7.5 cents of each dollar. Employment Insurance stops at about $68,900, and the main Canada Pension Plan amount at $74,600. A second Canada Pension Plan tier takes 4 cents of each dollar from $74,600 to $85,000, so the rate falls less at $74,600 than at $85,000.
 The rate stays 20.5% (federal tax only) until about $25,100, because Newfoundland and Labrador’s low-income tax reduction removes the provincial tax at low incomes.
 From $25,100 to $30,760 the rate is 44.5%, much higher than before. The reduction shrinks by 16 cents for every dollar of income above $24,191, so you start paying the provincial tax and lose the reduction at the same time. It is gone at about $30,770.
-Once the reduction is gone the rate falls to 28.5% from $30,770. It steps up to 34.5% from $45,100 (the second bracket) and 40.5% from $59,080 (the federal 20.5% bracket), then down as pension and insurance stop. The top rate in this chart is 54%, from $286,450, where the line is straight. The form adds higher rates above about $564,000.
-
-yearTotal
-This chart adds income tax, Canada Pension Plan and Employment Insurance, then takes off benefits paid to you when you file. At low salaries the total is below zero. It is $18,297 at $70,000, and $29,397 at $100,000.
-The line bends upward at each new bracket, then goes straight. From $286,450 up, every extra dollar loses the top rate, 54%, so each extra $10,000 of salary adds $5,380. At $500,000 the total is $229,397."
+Once the reduction is gone the rate falls to 28.5% from $30,770. It steps up to 34.5% from $45,100 (the second bracket) and 40.5% from $59,080 (the federal 20.5% bracket), then down as pension and insurance stop. The top rate in this chart is 54%, from $286,450, where the line is straight. The form adds higher rates above about $564,000."
 `;
 
 exports[`the text of the hub charts > writes every province and chart as one reviewed text, so a change in wording or in a figure shows in review > ca-on 1`] = `
@@ -118,11 +102,7 @@ From $32,800 to $38,850 the rate is 30% or more, higher than the 20.5% before it
 From $36,000 to $38,500 of taxable income the Ontario Health Premium adds 6 cents more, lifting the rate to 36%. LIFT keeps shrinking until about $50,470, and the rate falls to 25% once it is gone.
 Three short spikes push the rate above the top rate of 53.5%: 54.9% from $48,450 to $49,050, 59.1% from $72,700 to $73,290, and 73.3% from $201,130 to $201,720 of salary. Each one is a step in the Ontario Health Premium. Across a band about $600 wide, the premium grows by 25 cents for every extra dollar, adding $150 in all. The rate falls back as soon as the band ends.
 Ontario’s surtax raises the rate twice. A surtax is an extra tax on top of your Ontario tax, charged once that tax passes a set amount. It adds 20 cents for every dollar of Ontario tax above $5,818, and another 36 cents above $7,446. The rate rises to 31.5% at $98,590, and to 38% at $115,040.
-From $259,610 of salary the line is straight: the rate stops rising, and every extra dollar loses the top rate, 53.5%.
-
-yearTotal
-This chart adds income tax, Canada Pension Plan and Employment Insurance, then takes off benefits paid to you when you file. At low salaries the total is below zero. It is $16,214 at $70,000, and $25,794 at $100,000.
-The line bends upward at each new bracket, then goes straight. From $259,610 up, every extra dollar loses the top rate, 53.5%, so each extra $10,000 of salary adds $5,353. At $500,000 the total is $226,922."
+From $259,610 of salary the line is straight: the rate stops rising, and every extra dollar loses the top rate, 53.5%."
 `;
 
 exports[`the text of the hub charts > writes every province and chart as one reviewed text, so a change in wording or in a figure shows in review > ca-sk 1`] = `
@@ -142,9 +122,5 @@ From $4,000 to about $19,200 the rate is 7.5%: Canada Pension Plan and Employmen
 Canada Pension Plan and Employment Insurance take about 7.5 cents of each dollar. Employment Insurance stops at about $68,900, and the main Canada Pension Plan amount at $74,600. A second Canada Pension Plan tier takes 4 cents of each dollar from $74,600 to $85,000, so the rate falls less at $74,600 than at $85,000.
 Saskatchewan’s tax starts at about $21,830. The rate is 30% from $21,830 to $55,050.
 It is 32% from $55,050 (the second bracket) and 38.5% from $59,080 (the federal 20.5% bracket), then falls as Employment Insurance and the Canada Pension Plan stop: 37.5% at $68,900, 35.5% at $74,600 and 33% at $85,000.
-After that it climbs to a top rate of 47.5% from $259,610, where the line is straight.
-
-yearTotal
-This chart adds income tax, Canada Pension Plan and Employment Insurance, then takes off benefits paid to you when you file. At low salaries the total is below zero. It is $17,331 at $70,000, and $27,712 at $100,000.
-The line bends upward at each new bracket, then goes straight. From $259,610 up, every extra dollar loses the top rate, 47.5%, so each extra $10,000 of salary adds $4,750. At $500,000 the total is $206,940."
+After that it climbs to a top rate of 47.5% from $259,610, where the line is straight."
 `;

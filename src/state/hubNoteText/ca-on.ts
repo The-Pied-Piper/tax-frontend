@@ -6,7 +6,6 @@ import {
   POOL,
   straightLineNote,
   takeHomeNotes,
-  yearTotalNotes,
   type SharedFigures,
 } from './shared';
 
@@ -84,5 +83,4 @@ export const ontario: ProvinceNotes = {
     ),
     straightLineNote(shared),
   ],
-  yearTotal: yearTotalNotes(shared),
 };

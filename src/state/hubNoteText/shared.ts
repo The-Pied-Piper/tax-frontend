@@ -142,21 +142,3 @@ export function straightLineNote(f: SharedFigures): Note {
     { ...POOL, flatFrom: `e:${f.flatFrom}` },
   );
 }
-
-/** The bullets of the "tax and contributions for the year" chart, the same wording in every province. */
-export function yearTotalNotes(f: SharedFigures): Note[] {
-  const pool: Record<string, string> = {
-    ...POOL,
-    flatFrom: `e:${f.flatFrom}`,
-  };
-  return [
-    note(
-      'This chart adds income tax, Canada Pension Plan and Employment Insurance, then takes off benefits paid to you when you file. At low salaries the total is below zero. It is {total70} at $70,000, and {total100} at $100,000.',
-      pool,
-    ),
-    note(
-      'The line bends upward at each new bracket, then goes straight. From {flatFrom} up, every extra dollar loses the top rate, {topRate}, so each extra $10,000 of salary adds {perTen}. At {top} the total is {total500}.',
-      pool,
-    ),
-  ];
-}

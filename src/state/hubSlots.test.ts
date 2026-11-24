@@ -10,7 +10,6 @@ describe('the hub chart ids', () => {
       takeHome: 'hub-chart-take-home',
       averageRate: 'hub-chart-average-rate',
       marginalRate: 'hub-chart-marginal-rate',
-      yearTotal: 'hub-chart-year-total',
     });
     expect(HUB_CHARTS_DATA_ID).toBe('hub-charts-data');
     expect(PROVINCE_COMPARISON_SLOT_ID).toBe('province-comparison');

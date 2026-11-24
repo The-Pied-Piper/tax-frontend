@@ -5,7 +5,6 @@ import {
   note,
   POOL,
   takeHomeNotes,
-  yearTotalNotes,
   type SharedFigures,
 } from './shared';
 
@@ -46,5 +45,4 @@ export const newfoundlandAndLabrador: ProvinceNotes = {
       { ...pool, flatFrom: `e:${shared.flatFrom}` },
     ),
   ],
-  yearTotal: yearTotalNotes(shared),
 };

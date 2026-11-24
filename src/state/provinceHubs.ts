@@ -64,7 +64,6 @@ const CHART_SECTION_IDS = {
   takeHome: 'take-home',
   averageRate: 'average-rate',
   marginalRate: 'marginal-rate',
-  yearTotal: 'tax-and-contributions',
 } as const;
 
 /** A chart's section: its heading, its one line and the chart. The province's own text (#288) goes after the chart block. */
@@ -271,7 +270,6 @@ export function hubPage(
         ? [
             chartSection('averageRate', text, name),
             chartSection('marginalRate', text, name),
-            chartSection('yearTotal', text, name),
           ]
         : []),
       ...(!withCharts

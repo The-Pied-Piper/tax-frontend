@@ -354,7 +354,6 @@ describe('the province comparison', () => {
       strings.hubCharts.comparison.heading,
       strings.hubCharts.charts.averageRate.title,
       strings.hubCharts.charts.marginalRate.title,
-      strings.hubCharts.charts.yearTotal.title,
     ];
     const withIt = make(true);
     const rest = withIt.sections
@@ -387,12 +386,12 @@ describe('the province comparison', () => {
       { kind: 'chartNotes', province: 'ca-on', chart: 'takeHome' },
     ]);
     expect(
-      (['averageRate', 'marginalRate', 'yearTotal'] as const).map(
+      (['averageRate', 'marginalRate'] as const).map(
         (chart) => section(page, t[chart].title)?.card,
       ),
-    ).toEqual([true, true, true]);
+    ).toEqual([true, true]);
     expect(
-      (['averageRate', 'marginalRate', 'yearTotal'] as const).map((chart) => {
+      (['averageRate', 'marginalRate'] as const).map((chart) => {
         const found = section(page, t[chart].title);
         return [found?.id, found?.blocks];
       }),
@@ -413,14 +412,6 @@ describe('the province comparison', () => {
           ),
           { kind: 'salaryChart', province: 'ca-on', chart: 'marginalRate' },
           { kind: 'chartNotes', province: 'ca-on', chart: 'marginalRate' },
-        ],
-      ],
-      [
-        'tax-and-contributions',
-        [
-          paragraph(t.yearTotal.text),
-          { kind: 'salaryChart', province: 'ca-on', chart: 'yearTotal' },
-          { kind: 'chartNotes', province: 'ca-on', chart: 'yearTotal' },
         ],
       ],
     ]);

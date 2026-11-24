@@ -54,10 +54,6 @@ export const strings = {
         title: 'Marginal tax rate',
         text: 'Out of your next dollar of salary, the share that goes to income tax, Canada Pension Plan and Employment Insurance. The rate steps up where a new tax bracket starts.',
       },
-      yearTotal: {
-        title: 'Tax and contributions for the year',
-        text: 'Income tax, Canada Pension Plan and Employment Insurance for the year, less benefits paid to you when you file. Below zero means money comes back to you.',
-      },
     },
     // The province comparison on a hub; amounts come from money/format.
     comparison: {
