@@ -61,7 +61,6 @@ MARGINAL_DISAGREEMENT = Decimal("0.005")
 # credits paid on filing. The engine's own EI figure is T2204 line 16 (after the refund at $2,000 or less).
 EI_DEDUCTED_LABEL = "t2204_premiums_deducted"
 EI_FIGURE = "ei"
-INCOME_TAX_FIGURE = "income_tax"
 CREDITS_LABEL = "total_credits"
 
 
@@ -267,7 +266,7 @@ class Figures:
                             "label": line.label,
                             "name": _present(line.name),
                             "reference": _present(line.reference),
-                            "amount": str(line.amount),
+                            "amount": None if line.amount is None else str(line.amount),
                             "text": line.text,
                             "unit": None if line.unit is None else _unit(line.unit),
                         }

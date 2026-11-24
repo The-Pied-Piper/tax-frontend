@@ -77,7 +77,7 @@ describe("reading the Python step's file", () => {
     writeFileSync(
       file,
       JSON.stringify({
-        engine: '0.4.1',
+        engine: '0.5.1',
         provinces: { 'CA-ON': { pages, ...extra } },
       }),
     );
@@ -87,7 +87,7 @@ describe("reading the Python step's file", () => {
   it('returns the answers by province and salary', () => {
     const answer = engineOf(saved);
     const figures = readEngineFigures(written({ '70000': answer }));
-    expect(figures.engine).toBe('0.4.1');
+    expect(figures.engine).toBe('0.5.1');
     expect(figures.answers['CA-ON']?.['70000']).toEqual(answer);
   });
 
