@@ -31,7 +31,7 @@ type Props = {
   chart: HubChartId;
 };
 
-/** One salary chart of a province hub, from the sweep in the hub's data block, with the table of its figures. Draws nothing for a province with no sweep. */
+/** One salary chart of a province hub, from the sweep in the hub's data block. Draws nothing for a province with no sweep. */
 export function SalaryChart({ data, province, chart }: Props) {
   const sweep = data.provinces.find((entry) => entry.slug === province);
   if (!sweep) return null;
