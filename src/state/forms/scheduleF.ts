@@ -66,7 +66,7 @@ export const scheduleF: FormPageSpec = {
       heading: 'Your contribution',
       lines: 'Lines 76–82',
       paragraph:
-        'The contribution is a small percentage of the income charged above a set amount, up to a most you can pay in a year. We do not fill in this part, because with no income to charge it on the contribution is zero. The result goes to line 446 of your Quebec return.',
+        'The contribution is a small percentage of the income charged above a set amount, up to a most you can pay in a year. We do not fill in this part, because with no income to charge it on the contribution is zero. The result goes to line 446 of your Québec return.',
       example:
         'Your income charged is {line70}, so your contribution is {line82}. It goes to line 446 of Form TP-1.',
       figures: {

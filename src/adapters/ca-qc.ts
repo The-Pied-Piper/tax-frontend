@@ -1,3 +1,4 @@
+import type { ComputeTakeHomeCalculationResponse } from '../api';
 import { displayMoney } from '../money/format';
 import { isPositive, isZero } from '../money/sign';
 import { subtractAmounts } from '../money/amounts';
@@ -5,11 +6,15 @@ import { sumAmounts } from '../money/sum';
 import { strings } from '../strings';
 import { find, row, sameUnit, type Found, type Wanted } from './ca-federal';
 import { advancedGroups, fallbackResult, responseUnit } from './fallback';
-import type { AdaptedResult, JurisdictionAdapter } from './types';
+import type {
+  AdaptedResult,
+  AdvancedGroup,
+  JurisdictionAdapter,
+} from './types';
 
 /**
  * Exact trace labels read from the real engine answers for 2025 and 2026. Quebec has its own pension
- * plan, parental insurance and drug premium, and the federal tax shown is after the Quebec abatement
+ * plan, parental insurance and drug premium, and the federal tax shown is after the Québec abatement
  * (the take-home basis), so it does not share `adaptCanadian`.
  */
 const LABELS = {
@@ -35,6 +40,58 @@ const LABELS = {
 } as const satisfies Record<string, Wanted>;
 
 const GROUPS = strings.adapters.caQc.groups;
+
+/** The engine form key of Schedule 8, which Québec shares with the rest of Canada. */
+const SCHEDULE_8_FORM = 'ca/schedule_8';
+/** The page of the Québec Schedule 8 (QPP), not the Canada Pension Plan page the shared form key points at. */
+const SCHEDULE_8_QC_PAGE = 'schedule-8-qc';
+
+/**
+ * The engine's words become Québec's: the province's name with its accent everywhere, and, where its
+ * Schedule 8 is quoted, the Québec Pension Plan in place of the Canada Pension Plan. Words only.
+ */
+function quebecWords(text: string, schedule8: boolean): string {
+  const { province, plan, planAcronym, exemption } =
+    strings.adapters.caQc.rewrite;
+  const accented = text.replaceAll(province.from, province.to);
+  // The label "Earnings left after the Canada Pension Plan exemption" is quoted by other forms too.
+  const named = accented.replaceAll(exemption.from, exemption.to);
+  if (!schedule8) return named;
+  return named
+    .replaceAll(plan.from, plan.to)
+    .replaceAll(planAcronym.from, planAcronym.to);
+}
+
+/**
+ * The advanced view for Québec: the province's name with its accent, and Schedule 8 (which the engine
+ * words for the Canada Pension Plan) relabelled for the Québec Pension Plan, linking to the Québec page.
+ */
+function quebecGroups(groups: AdvancedGroup[]): AdvancedGroup[] {
+  return groups.map((group) => {
+    const isSchedule8 = group.form === SCHEDULE_8_FORM;
+    const words = (text: string) => quebecWords(text, isSchedule8);
+    return {
+      ...group,
+      name: isSchedule8
+        ? strings.adapters.caQc.schedule8Title
+        : words(group.name),
+      page: isSchedule8 ? SCHEDULE_8_QC_PAGE : group.page,
+      lines: group.lines.map((line) => ({
+        ...line,
+        label: words(line.label),
+        detail: words(line.detail),
+      })),
+    };
+  });
+}
+
+/** The shared fallback (no simple rows), with the Québec wording on its advanced view. */
+function quebecFallback(
+  response: ComputeTakeHomeCalculationResponse,
+): AdaptedResult {
+  const fallback = fallbackResult(response);
+  return { ...fallback, advanced: quebecGroups(fallback.advanced) };
+}
 
 export const caQcAdapter: JurisdictionAdapter = {
   jurisdictionCode: 'CA-QC',
@@ -70,7 +127,7 @@ export const caQcAdapter: JurisdictionAdapter = {
       drugPremium === undefined
     ) {
       // A label we rely on is missing: show nothing half-right, keep the advanced view.
-      return fallbackResult(response);
+      return quebecFallback(response);
     }
     const text = strings.adapters.caQc;
     let federalAfterAbatement: string;
@@ -81,7 +138,7 @@ export const caQcAdapter: JurisdictionAdapter = {
       !sameUnit(federalTax.unit, abatement.unit) ||
       !sameUnit(federalTax.unit, quebecTax.unit)
     ) {
-      return fallbackResult(response);
+      return quebecFallback(response);
     }
     try {
       federalAfterAbatement = subtractAmounts(
@@ -95,7 +152,7 @@ export const caQcAdapter: JurisdictionAdapter = {
       }
     } catch {
       // An amount we cannot add exactly: show nothing half-right.
-      return fallbackResult(response);
+      return quebecFallback(response);
     }
     return {
       unit: responseUnit(response),
@@ -131,7 +188,7 @@ export const caQcAdapter: JurisdictionAdapter = {
           unit: responseUnit(response),
         }),
       ],
-      advanced: advancedGroups(response),
+      advanced: quebecGroups(advancedGroups(response)),
       wording: text.wording,
     };
   },

@@ -107,7 +107,7 @@ From $259,610 of salary the line is straight: the rate stops rising, and every e
 
 exports[`the text of the hub charts > writes every province and chart as one reviewed text, so a change in wording or in a figure shows in review > ca-qc 1`] = `
 "takeHome
-Quebec Pension Plan, Employment Insurance and QPIP stop growing at different salaries. Employment Insurance stops at $68,900, at most $895.70 a year. The main QPP amount stops at $74,600, and its second tier at $85,000. QPIP stops at $103,000, at most $442.90.
+Québec Pension Plan, Employment Insurance and QPIP stop growing at different salaries. Employment Insurance stops at $68,900, at most $895.70 a year. The main QPP amount stops at $74,600, and its second tier at $85,000. QPIP stops at $103,000, at most $442.90.
 From $259,610 up, the line is straight: you keep 46.69% of every extra dollar. At $500,000 you keep 47.04% of your salary.
 
 averageRate
@@ -117,12 +117,12 @@ It climbs more slowly than the marginal rate, because each higher rate applies o
 
 marginalRate
 Up to $2,000 the rate is 0%. At $2,000 QPIP starts and its whole $8.60 counts at once. From $2,000 to about $2,026 the rate is about 100%, because the Employment Insurance counted rises by $1 for every $1 of salary, until it reaches $26. After that Employment Insurance and QPIP take 1.73 cents of each extra dollar.
-From $3,500 the rate is 8.0%: Quebec Pension Plan, Employment Insurance and QPIP, with no income tax yet. The QPP payment starts above $3,500.
-It is 18.8% from $19,290, when federal income tax starts, and 31.8% from $20,350, when Quebec income tax starts.
+From $3,500 the rate is 8.0%: Québec Pension Plan, Employment Insurance and QPIP, with no income tax yet. The QPP payment starts above $3,500.
+It is 18.8% from $19,290, when federal income tax starts, and 31.8% from $20,350, when Québec income tax starts.
 From $21,350 to $29,890 the rate is 39.1%, then 40.4% from $24,170 and 44.3% from $26,570. Two things cause this. The drug insurance premium grows by 7.84 cents for every dollar of income, then 11.76 cents, until it reaches its maximum at $29,890. And the deduction for workers stops growing at $24,170. Then the rate falls to 32.6%.
-It stays 32.6% until $56,330. It is 37.6% from $56,330 (Quebec’s second bracket) and 43.0% from $59,080 (the federal 20.5% bracket).
+It stays 32.6% until $56,330. It is 37.6% from $56,330 (Québec’s second bracket) and 43.0% from $59,080 (the federal 20.5% bracket).
 Then it falls as payments stop: Employment Insurance at $68,900, the main QPP amount at $74,600 (a second QPP tier takes 4 cents of each dollar from there to $85,000), and QPIP at $103,000.
-After that it only climbs: 41.1% from $111,260 (Quebec’s third bracket), 45.7% from $118,180 (the federal 26% bracket), 47.4% from $134,820 (Quebec’s top bracket), 50.2% from $182,570 (the federal 29% bracket), and 53.3% from $259,610, where the line is straight."
+After that it only climbs: 41.1% from $111,260 (Québec’s third bracket), 45.7% from $118,180 (the federal 26% bracket), 47.4% from $134,820 (Québec’s top bracket), 50.2% from $182,570 (the federal 29% bracket), and 53.3% from $259,610, where the line is straight."
 `;
 
 exports[`the text of the hub charts > writes every province and chart as one reviewed text, so a change in wording or in a figure shows in review > ca-sk 1`] = `

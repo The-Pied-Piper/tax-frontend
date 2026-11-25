@@ -52,7 +52,7 @@ const pool: Record<string, string> = {
 export const quebec: ProvinceNotes = {
   takeHome: [
     note(
-      'Quebec Pension Plan, Employment Insurance and QPIP stop growing at different salaries. Employment Insurance stops at {eiStop}, at most {eiMax} a year. The main QPP amount stops at {qppStop}, and its second tier at {qppTwo}. QPIP stops at {qpipStop}, at most {qpipMax}.',
+      'Québec Pension Plan, Employment Insurance and QPIP stop growing at different salaries. Employment Insurance stops at {eiStop}, at most {eiMax} a year. The main QPP amount stops at {qppStop}, and its second tier at {qppTwo}. QPIP stops at {qpipStop}, at most {qpipMax}.',
       pool,
     ),
     note(
@@ -80,11 +80,11 @@ export const quebec: ProvinceNotes = {
       pool,
     ),
     note(
-      'From {three} the rate is {threeRate}: Quebec Pension Plan, Employment Insurance and QPIP, with no income tax yet. The QPP payment starts above {three}.',
+      'From {three} the rate is {threeRate}: Québec Pension Plan, Employment Insurance and QPIP, with no income tax yet. The QPP payment starts above {three}.',
       pool,
     ),
     note(
-      'It is {fedRate} from {fedFrom}, when federal income tax starts, and {qcRate} from {qcFrom}, when Quebec income tax starts.',
+      'It is {fedRate} from {fedFrom}, when federal income tax starts, and {qcRate} from {qcFrom}, when Québec income tax starts.',
       pool,
     ),
     note(
@@ -92,7 +92,7 @@ export const quebec: ProvinceNotes = {
       pool,
     ),
     note(
-      'It stays {drugEndRate} until {second}. It is {secondRate} from {second} (Quebec’s second bracket) and {fedBracketRate} from {fedBracket} (the federal 20.5% bracket).',
+      'It stays {drugEndRate} until {second}. It is {secondRate} from {second} (Québec’s second bracket) and {fedBracketRate} from {fedBracket} (the federal 20.5% bracket).',
       pool,
     ),
     note(
@@ -100,7 +100,7 @@ export const quebec: ProvinceNotes = {
       pool,
     ),
     note(
-      'After that it only climbs: {thirdRate} from {third} (Quebec’s third bracket), {fed26Rate} from {fed26} (the federal 26% bracket), {topBracketRate} from {topBracket} (Quebec’s top bracket), {fed29Rate} from {fed29} (the federal 29% bracket), and {topRate} from {flatFrom}, where the line is straight.',
+      'After that it only climbs: {thirdRate} from {third} (Québec’s third bracket), {fed26Rate} from {fed26} (the federal 26% bracket), {topBracketRate} from {topBracket} (Québec’s top bracket), {fed29Rate} from {fed29} (the federal 29% bracket), and {topRate} from {flatFrom}, where the line is straight.',
       pool,
     ),
   ],

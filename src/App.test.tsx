@@ -1039,7 +1039,7 @@ describe.each(['light', 'dark'] as const)(
         ['Manitoba', '/ca-mb/'],
         ['Saskatchewan', '/ca-sk/'],
         ['Newfoundland and Labrador', '/ca-nl/'],
-        ['Quebec', '/ca-qc/'],
+        ['Québec', '/ca-qc/'],
       ]);
       expect(nav).toHaveTextContent('Provinces:');
       expect(footer).toHaveTextContent(strings.footer);

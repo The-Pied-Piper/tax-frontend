@@ -37,8 +37,8 @@ function elsewhere(name: string, year: number) {
 
 describe('pageMeta: the wrapper around salaryPageText', () => {
   it('takes the place name from the province list by code, and the year from the data', () => {
-    const meta = pageMeta(elsewhere('Quebec', 2031));
-    expect(meta.title).toContain('Quebec');
+    const meta = pageMeta(elsewhere('Québec', 2031));
+    expect(meta.title).toContain('Québec');
     expect(meta.title).toContain('2031');
     expect(meta.title).not.toContain('Ontario');
   });
