@@ -133,7 +133,7 @@ function ContentBlockView({
           return (
             <>
               {view.groups.map((group) => (
-                <div key={group.heading} data-rates-group={group.heading}>
+                <div key={group.heading}>
                   <h3 className={styles.chartHeading}>{group.heading}</h3>
                   <ul className={styles.notes}>
                     {group.notes.map((note) => (

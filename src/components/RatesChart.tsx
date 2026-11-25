@@ -74,6 +74,7 @@ export function RatesChart({ sweep, place }: Props) {
     );
     return { at, range: needed < 0 ? RANGE_MAXIMA.length - 1 : needed };
   }, [sweep, search]);
+  const [tableOpen, setTableOpen] = useState(false);
   const [rangePick, setRangePick] = useState<number | null>(null);
   const [markerPick, setMarkerPick] = useState<number | null | undefined>(
     undefined,
@@ -219,8 +220,13 @@ export function RatesChart({ sweep, place }: Props) {
           ))}
         </span>
       </label>
-      <details className={styles.details}>
-        <summary>{t.tableShow}</summary>
+      <details
+        className={styles.details}
+        onToggle={(event) => {
+          setTableOpen(event.currentTarget.open);
+        }}
+      >
+        <summary>{tableOpen ? t.tableHide : t.tableShow}</summary>
         <div className={styles.tableWrap}>
           <table className={styles.table}>
             <caption>

@@ -2,10 +2,21 @@ import { note } from '../hubNoteText/shared';
 import type { CauseForm, RatesNote, RatesPageText } from '../ratesPageTypes';
 
 /**
- * The Ontario rates page: the copy thread's CRA-reviewed wording, with every figure a spec the Ontario sweep resolves
+ * The Ontario rates page: the wording of the rates page, with every figure a spec the Ontario sweep resolves
  * (see `hubNotes.ts`). The words say "about" where the copy thread's text does; a bracket's salary is worked out exactly from the form's taxable income, and a band's edges are the engine's own.
  */
 const pool: Record<string, string> = {
+  // Rules the forms print as words or round numbers, which no data of ours holds: declared, so a test can see them.
+  cpp2Cents: 'l:4 cents',
+  sixCents: 'l:6 cents',
+  liftCents: 'l:5 cents',
+  quarterCents: 'l:25 cents',
+  oneDollar: 'l:$1',
+  zeroDollars: 'l:$0',
+  fedLowestPct: 'p:fed_bracket_1_rate',
+  surtax1Cents: 't:surtax_first_rate',
+  surtax2Cents: 't:surtax_second_rate',
+  surtaxTotalCents: 't:surtax_total_rate',
   // The two rates, at sweep salaries just after each change.
   lowMarginal: 'h:marginal@4000',
   topMarginal: 'h:marginal@300000',
@@ -267,7 +278,7 @@ export const ontarioRatesPage: RatesPageText = {
       'The bracket and Ontario Health Premium thresholds printed on the tax forms are taxable incomes. The federal basic personal amount and the LIFT Credit use net income and adjusted net income. The surtax uses your Ontario tax after credits. None of these is your salary. For a salary only, taxable income, net income and adjusted net income are the same amount: your salary less the enhanced part of your Canada Pension Plan, which you deduct. The Canada Pension Plan and Employment Insurance limits are on pay, so they are already salaries.',
     ),
     words(
-      'From {cppStart} up to {cppYmpe}, taxable income is about {taxableFactor} of your salary plus {taxableConstant}. From {cppYmpe} to {yampe} the first tier has stopped and the second tier takes off 4 cents for every dollar, so taxable income is about {taxableFactor2} of your salary plus {taxableConstant2}. From {yampe} up it is your salary less {taxableCut}. So a threshold on a form sits a little higher in salary: about {shiftOhp1} higher at a taxable income of {ohp1FromTi}, about {shiftOntBracket2} higher at {ontBracket2Ti}, and {taxableCut} higher from {yampe}. This page gives the salary.',
+      'From {cppStart} up to {cppYmpe}, taxable income is about {taxableFactor} of your salary plus {taxableConstant}. From {cppYmpe} to {yampe} the first tier has stopped and the second tier takes off {cpp2Cents} for every dollar, so taxable income is about {taxableFactor2} of your salary plus {taxableConstant2}. From {yampe} up it is your salary less {taxableCut}. So a threshold on a form sits a little higher in salary: about {shiftOhp1} higher at a taxable income of {ohp1FromTi}, about {shiftOntBracket2} higher at {ontBracket2Ti}, and {taxableCut} higher from {yampe}. This page gives the salary.',
     ),
   ],
   groups: [
@@ -275,7 +286,7 @@ export const ontarioRatesPage: RatesPageText = {
       heading: 'Up to $20,000',
       notes: [
         words(
-          'Up to {eiStart} the marginal rate is {zeroRate}. From {eiStart} to about {eiFullSalary} it is {eiBandRate}, because the Employment Insurance counted rises by $1 for every $1 of salary, until it reaches about {eiFullAmount}.',
+          'Up to {eiStart} the marginal rate is {zeroRate}. From {eiStart} to about {eiFullSalary} it is {eiBandRate}, because the Employment Insurance counted rises by {oneDollar} for every {oneDollar} of salary, until it reaches about {eiFullAmount}.',
           ['t2204'],
         ),
         words(
@@ -287,7 +298,7 @@ export const ontarioRatesPage: RatesPageText = {
           ['schedule8', 't2204'],
         ),
         words(
-          'It is {fedFirstRate} from about {fedStartSalary}, when federal income tax starts. That is {cppEiRate} for the pension and insurance payments plus about {fedTaxPart} of federal tax (14% of each extra dollar, less the credits that grow with it). It is a total, not a tax rate. The federal {fedBracket2} rate starts much higher, at a taxable income of {fedBracket2Ti}. Federal tax begins at about {fedStartSalary}, above the basic amount of {fedBasicAmount}, because of the Canada employment amount and the pension and insurance credits.',
+          'It is {fedFirstRate} from about {fedStartSalary}, when federal income tax starts. That is {cppEiRate} for the pension and insurance payments plus about {fedTaxPart} of federal tax ({fedLowestPct} of each extra dollar, less the credits that grow with it). It is a total, not a tax rate. The federal {fedBracket2} rate starts much higher, at a taxable income of {fedBracket2Ti}. Federal tax begins at about {fedStartSalary}, above the basic amount of {fedBasicAmount}, because of the Canada employment amount and the pension and insurance credits.',
           ['t1'],
         ),
       ],
@@ -296,7 +307,7 @@ export const ontarioRatesPage: RatesPageText = {
       heading: '$20,000 to $50,000',
       notes: [
         words(
-          'From {ohp1From} to {ohp1To} the Ontario Health Premium adds 6 cents for every dollar of taxable income, up to {ohp1Max} in all. The rate is {ohp1Rate}, then {fedFirstRate} again.',
+          'From {ohp1From} to {ohp1To} the Ontario Health Premium adds {sixCents} for every dollar of taxable income, up to {ohp1Max} in all. The rate is {ohp1Rate}, then {fedFirstRate} again.',
           ['on428'],
         ),
         words(
@@ -304,11 +315,11 @@ export const ontarioRatesPage: RatesPageText = {
           ['on428', 'on428a'],
         ),
         words(
-          'From {ontStartSalary} the rate is {ontStartRate}, then {liftRate} from {liftStartSalary}. The Ontario LIFT Credit lowers your Ontario tax, up to {liftMax}. It shrinks by 5 cents for every dollar of adjusted net income above {liftThreshold}, and that is about {liftStartSalary} of salary. It does not lower the Ontario Health Premium.',
+          'From {ontStartSalary} the rate is {ontStartRate}, then {liftRate} from {liftStartSalary}. The Ontario LIFT Credit lowers your Ontario tax, up to {liftMax}. It shrinks by {liftCents} for every dollar of adjusted net income above {liftThreshold}, and that is about {liftStartSalary} of salary. It does not lower the Ontario Health Premium.',
           ['on428a'],
         ),
         words(
-          'From {ohp2From} to {ohp2To} the rate is {ohp2Rate}: a second step in the Ontario Health Premium, 6 cents for every dollar of taxable income, up to {ohp2Max} in all.',
+          'From {ohp2From} to {ohp2To} the rate is {ohp2Rate}: a second step in the Ontario Health Premium, {sixCents} for every dollar of taxable income, up to {ohp2Max} in all.',
           ['on428'],
         ),
         words(
@@ -316,7 +327,7 @@ export const ontarioRatesPage: RatesPageText = {
           ['on428a'],
         ),
         words(
-          'A short spike to {ohp3Rate} from {ohp3From} to {ohp3To}: a step in the Ontario Health Premium, 25 cents for every dollar of taxable income, up to {ohp3Max} in all, while the LIFT Credit is still shrinking.',
+          'A short spike to {ohp3Rate} from {ohp3From} to {ohp3To}: a step in the Ontario Health Premium, {quarterCents} for every dollar of taxable income, up to {ohp3Max} in all, while the LIFT Credit is still shrinking.',
           ['on428', 'on428a'],
         ),
       ],
@@ -345,7 +356,7 @@ export const ontarioRatesPage: RatesPageText = {
           ['schedule8'],
         ),
         words(
-          'Ontario’s surtax adds 20 cents for every dollar of your Ontario tax above {surtax1}. This is the tax after your credits, before the LIFT Credit and the health premium. It starts at a salary of {surtax1Salary}, and the rate rises to {surtax1Rate}.',
+          'Ontario’s surtax adds {surtax1Cents} for every dollar of your Ontario tax above {surtax1}. This is the tax after your credits, before the LIFT Credit and the health premium. It starts at a salary of {surtax1Salary}, and the rate rises to {surtax1Rate}.',
           ['on428'],
         ),
       ],
@@ -358,7 +369,7 @@ export const ontarioRatesPage: RatesPageText = {
           ['on428'],
         ),
         words(
-          'A second surtax step adds a further 36 cents for every dollar of your Ontario tax above {surtax2}, so 56 cents in all. It starts at a salary of {surtax2Salary}, and the rate rises to {surtax2Rate}.',
+          'A second surtax step adds a further {surtax2Cents} for every dollar of your Ontario tax above {surtax2}, so {surtaxTotalCents} in all. It starts at a salary of {surtax2Salary}, and the rate rises to {surtax2Rate}.',
           ['on428'],
         ),
         words(
@@ -445,7 +456,7 @@ export const ontarioRatesPage: RatesPageText = {
       caption: 'Ontario Health Premium, 2026',
       head: ['Taxable income', 'Premium', 'Salary equivalent'],
       ...cells([
-        ['up to {o2Ti}', '$0', 'up to {o2SalTo}'],
+        ['up to {o2Ti}', '{zeroDollars}', 'up to {o2SalTo}'],
         [
           '{o2Ti} to {o3Ti}',
           '{o2Rate} of the part above {o2Ti}, up to {o3Amount}',
@@ -489,7 +500,7 @@ export const ontarioRatesPage: RatesPageText = {
         ['Most Employment Insurance a year', '{eiPremiumMax}'],
         [
           'The $2,000 rule',
-          'Nothing is counted up to {eiStart}. Then $1 for every $1 of salary, until {eiFullAmount} at {eiFullSalary}.',
+          'Nothing is counted up to {eiStart}. Then $1 for every {oneDollar} of salary, until {eiFullAmount} at {eiFullSalary}.',
         ],
         ['Canada Pension Plan starts above', '{cppStart}'],
         [

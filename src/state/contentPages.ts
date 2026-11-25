@@ -38,7 +38,7 @@ export type ContentBlock =
   | { kind: 'chartNotes'; province: FooterProvinceSlug; chart: HubChartId }
   /** The province comparison of a hub: bars for every served province at one salary. It carries only the hub's slug; the page draws it from the hub's data block. */
   | { kind: 'provinceComparison'; province: FooterProvinceSlug }
-  /** One part of a province's rates page, written from the hub data block's sweep so no figure is typed here: the opening finding and basis, how to read the salaries, the notes grouped by salary range, or the bracket tables. Draws nothing when the sweep is missing or not the full one. */
+  /** One part of a province's rates page, written from the hub data block's sweep so no figure is typed here: the opening finding and basis, how to read the salaries, the notes grouped by salary range, or the bracket tables. Draws nothing when the sweep is missing; a sweep that is not the full one never gets this far, the build refuses it. */
   | { kind: 'ratesPart'; province: FooterProvinceSlug; part: RatesPart }
   /** The rates page's chart with its slider and closed table; a slot the browser hydrates from the page's data block. */
   | { kind: 'ratesChart'; province: FooterProvinceSlug };

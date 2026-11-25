@@ -7,7 +7,7 @@ import { strings } from '../../src/strings';
  * One rates page for each province that has both its wording (`ratesPageText`) and a sweep, at `/ca-xx/tax-rates/`.
  * The parts are blocks that read the sweep in the page's own data block, so no figure is typed in the spec. A province
  * with wording but no sweep gets no page (and nothing links to it); a sweep that is not the full one fails the build
- * when the page is drawn.
+ * in `provinceSweeps`, before any page is drawn.
  */
 export function ratesPages(chartSlugs: ReadonlySet<string>): ContentPageSpec[] {
   const t = strings.ratesPage;

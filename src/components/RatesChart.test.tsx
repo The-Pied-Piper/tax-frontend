@@ -35,6 +35,9 @@ describe('RatesChart', () => {
     const details = container.querySelector('details');
     expect(details).not.toBeNull();
     expect(details?.open).toBe(false);
+    expect(details?.querySelector('summary')?.textContent).toBe(
+      'Show the figures as a table',
+    );
     expect(screen.getByText('Show the figures as a table')).toBeInTheDocument();
     expect(container.querySelectorAll('tbody tr')).toHaveLength(327);
     expect(container.querySelector('caption')?.textContent).toContain(

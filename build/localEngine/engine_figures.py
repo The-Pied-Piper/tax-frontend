@@ -17,9 +17,10 @@ the Canada workers benefit does not).
 
 Two more things are written for the notes under the charts, so no figure in them is typed:
 
-  * `edges`: where the marginal rate changes between two neighbouring sweep salaries, found on a $10 grid (the rate
-    read over the next $10): [the sweep salary below, the salary the rate first moves, the salary it has settled at its
-    new value, the rate there over the next $100]. A band's start is the settled salary and its end is the salary the rate first moves;
+  * `edges`: where the marginal rate changes between two neighbouring sweep salaries, found by bisection on the
+    engine's own marginal rate, to the cent: [the sweep salary below, the last whole salary at the old rate, the first
+    whole salary at the new rate, the rate there]. A band's start is the settled salary and its end is the last
+    salary at the old rate;
   * `facts`: by name, 2026 parameters read from the engine's own dataset files (the Ontario surtax thresholds and
     rates, the BC and Newfoundland and Labrador reduction starts, and so on), and the end of the Employment Insurance
     band above $2,000 as found in the engine's answers.
@@ -260,7 +261,10 @@ def _rates_page_facts(year: int, code: str) -> dict[str, str]:
     for number, row in enumerate(_params(year, "ca_on", "health_premium_rows")["rows"], start=1):
         over = Decimal(row["over"])
         facts[f"ohp_{number}_ti"] = str(over)
-        facts[f"ohp_{number}_salary"] = str(_salary_of_taxable(year, over))
+        # The band above a threshold starts at the first whole salary strictly above it.
+        facts[f"ohp_{number}_salary"] = str(
+            _exact_salary_of_taxable(year, over).to_integral_value(rounding=ROUND_FLOOR) + 1
+        )
         facts[f"ohp_{number}_salary_to"] = str(_salary_to_taxable(year, over))
         if "amount" in row:
             facts[f"ohp_{number}_amount"] = row["amount"]

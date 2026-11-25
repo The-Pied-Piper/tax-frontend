@@ -1,10 +1,10 @@
-import { formPages } from './formPages';
-import { sweepSalaries, type ProvinceSweep } from './hubCharts';
-import { noteWords } from './hubNotes';
+import { formPageLink } from './formLinks';
+import type { ProvinceSweep } from './hubCharts';
+import { isFullSweep, noteWords } from './hubNotes';
 import { ontarioRatesPage } from './ratesPageText/ca-on';
 import type { CauseForm, RatesPageText } from './ratesPageTypes';
-import { compareAmounts } from '../money/scale';
-import { contentPath, formSlug, type FooterProvinceSlug } from './siteLinks';
+import type { FooterProvinceSlug } from './siteLinks';
+import { strings } from '../strings';
 
 /** The text of the rates page of each province that has one. Adding a province is one file in `ratesPageText/` and one entry here. */
 export const ratesPageText: Partial<Record<FooterProvinceSlug, RatesPageText>> =
@@ -19,23 +19,22 @@ export function ratesProvinces(): FooterProvinceSlug[] {
   );
 }
 
-/** What a cause form is called on a chip, and the form page it is. */
-const CAUSE: Record<CauseForm, { label: string; id: string }> = {
-  t1: { label: 'Form T1', id: 't1' },
-  on428: { label: 'Form ON428', id: 'on428' },
-  on428a: { label: 'Schedule ON428-A', id: 'on428a' },
-  t2204: { label: 'Form T2204', id: 't2204' },
-  schedule8: { label: 'Schedule 8', id: 'schedule8' },
+/** The form page each cause form is, by the page's id. */
+const CAUSE_PAGE: Record<CauseForm, string> = {
+  t1: 't1',
+  on428: 'on428',
+  on428a: 'on428-a',
+  t2204: 't2204',
+  schedule8: 'schedule-8',
 };
 
-/** A chip: the form's name, and its page when this site has one. */
+/** A chip: the form's name, and its page when this build writes one. */
 export type CauseChip = { label: string; href?: string };
 
 export function causeChip(form: CauseForm): CauseChip {
-  const { label, id } = CAUSE[form];
-  return formPages.some((page) => page.id === id)
-    ? { label, href: contentPath(formSlug(id)) }
-    : { label };
+  const label = strings.ratesPage.causes[form];
+  const href = formPageLink(CAUSE_PAGE[form]);
+  return href === null ? { label } : { label, href };
 }
 
 /** A rates page's words with every figure filled from the sweep. */
@@ -55,17 +54,6 @@ export type RatesView = {
     after?: string;
   }[];
 };
-
-/** True when the sweep holds every salary the figures are read at; the build refuses any other. */
-function isFullSweep(sweep: ProvinceSweep): boolean {
-  const expected = sweepSalaries();
-  return (
-    sweep.points.length === expected.length &&
-    sweep.points.every(
-      (point, at) => compareAmounts(point[0], expected[at] ?? '') === 0,
-    )
-  );
-}
 
 function cellWords(
   cell: string,

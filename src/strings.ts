@@ -101,6 +101,14 @@ export const strings = {
     },
   },
   ratesPage: {
+    // What a cause form is called on a "Caused by" chip.
+    causes: {
+      t1: 'Form T1',
+      on428: 'Form ON428',
+      on428a: 'Schedule ON428-A',
+      t2204: 'Form T2204',
+      schedule8: 'Schedule 8',
+    },
     chartHeading: 'Marginal and average rate by salary',
     marginal: 'Marginal rate',
     average: 'Average rate',
@@ -118,6 +126,7 @@ export const strings = {
     chartLabel: (from: string, to: string) =>
       `Line chart: marginal rate and average rate against salary, from ${from} to ${to}. The same figures are in the table below the chart.`,
     tableShow: 'Show the figures as a table',
+    tableHide: 'Hide the table',
     tableCaption: (place: string, year: number, count: number) =>
       `Rates by salary, ${place}, ${year.toString()}: all ${count.toString()} figures behind the chart`,
     salaryHeader: 'Salary',

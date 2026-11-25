@@ -75,9 +75,9 @@ export type SweepPoint = [
 ];
 
 /**
- * Where the marginal rate changes, as the engine found it on a $10 grid between two neighbouring sweep
- * salaries: the sweep salary below, the salary the rate first moves, the salary it has settled at its
- * new value and the marginal rate there (a fraction). A band starts where the rate has settled and ends where it first moves back. Whole dollars, as text.
+ * Where the marginal rate changes, as the engine found it, to the cent, between two neighbouring sweep
+ * salaries: the sweep salary below, the last whole salary at the old rate, the first whole salary at the
+ * new rate (a ramp settles later) and the marginal rate there (a fraction). A band starts where the rate has settled and ends where it first moves back. Whole dollars, as text.
  */
 export type SweepEdge = [
   below: string,

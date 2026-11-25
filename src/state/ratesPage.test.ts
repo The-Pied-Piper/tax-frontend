@@ -5,6 +5,8 @@ import {
   ratesPageView,
   ratesProvinces,
 } from './ratesPage';
+import { subtractAmounts } from '../money/amounts';
+import { compareAmounts } from '../money/scale';
 import { ratesSlug } from './siteLinks';
 
 const sweep = () => {
@@ -65,6 +67,33 @@ describe('ratesPageView', () => {
     }
     expect(causeChip('t2204').href).toBe('/forms/t2204/');
     expect(causeChip('on428a').label).toBe('Schedule ON428-A');
+  });
+
+  it('links the cause forms that have a page in this build, and names the rest without a link', () => {
+    // The vitest define lists the form pages the app has; ids must be the real page ids.
+    for (const form of [
+      't1',
+      'on428',
+      'on428a',
+      't2204',
+      'schedule8',
+    ] as const) {
+      const chip = causeChip(form);
+      expect(chip.href, form).toMatch(/^\/forms\/[a-z0-9-]+\/$/);
+    }
+    expect(causeChip('on428a').href).toBe('/forms/on428-a/');
+    expect(causeChip('schedule8').href).toBe('/forms/schedule-8/');
+  });
+
+  it('puts the last group heading at the salary the data says the top bracket starts at', () => {
+    const groups = ratesPageText['ca-on']?.groups ?? [];
+    const last = groups[groups.length - 1]?.heading ?? '';
+    const top = sweep().facts['fed_bracket_5_salary'] ?? '';
+    // "Above $260,000": the heading's round figure is within $1,000 above the data's.
+    const heading = last.replace(/\D/g, '');
+    const gap = subtractAmounts(heading, top);
+    expect(compareAmounts(gap, '0')).toBeGreaterThanOrEqual(0);
+    expect(compareAmounts(gap, '1000')).toBeLessThan(0);
   });
 
   it('keeps the tab title under 64 characters and the description under 160', () => {

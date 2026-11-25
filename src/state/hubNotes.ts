@@ -292,7 +292,7 @@ export function noteWords(note: Note, sweep: ProvinceSweep): string {
 }
 
 /** True when the sweep holds every salary of `sweepSalaries()`, which the notes read figures at. The build refuses any other, so only partial test data fails this. */
-function isFullSweep(sweep: ProvinceSweep): boolean {
+export function isFullSweep(sweep: ProvinceSweep): boolean {
   const expected = sweepSalaries();
   return (
     sweep.points.length === expected.length &&
