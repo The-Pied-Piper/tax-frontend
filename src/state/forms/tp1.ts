@@ -13,22 +13,22 @@ const tot = figuresOf('ca-qc/tp1_totals');
 /** Form TP-1 in plain words, with Work Charts 201 and 401 as sections. The figures are the 2025 form's, at a $70,000 salary. */
 export const tp1: FormPageSpec = {
   id: 'tp1',
-  name: 'Form TP-1: Quebec Income Tax Return',
+  name: 'Form TP-1: Québec Income Tax Return',
   province: 'ca-qc',
   year: 2025,
   exampleSalary: '70000',
-  title: 'Form TP-1: Quebec Income Tax Return, in plain words',
+  title: 'Form TP-1: Québec Income Tax Return, in plain words',
   description:
-    'What the Quebec income tax return (Form TP-1) is for and what each part asks, in plain words, with a worked example for a $70,000 salary.',
+    'What the Québec income tax return (Form TP-1) is for and what each part asks, in plain words, with a worked example for a $70,000 salary.',
   intro:
-    'This is the Quebec income tax return. If you lived in Quebec at the end of the year, you file it with Revenu Québec, as well as your federal return. This page follows the form in the order it works.',
+    'This is the Québec income tax return. If you lived in Québec at the end of the year, you file it with Revenu Québec, as well as your federal return. This page follows the form in the order it works.',
   sections: [
     {
       id: 'contributions',
       heading: 'Pension plan and parental insurance payments',
       lines: 'Lines 97–98.2',
       paragraph:
-        "Your employer takes payments from your pay for Quebec's own programs and puts them on your RL-1 slip. Line 98 is your Quebec Pension Plan, or QPP, contribution, which builds up your future pension. Pay above a higher limit has a small second contribution, on line 98.2. Line 98.1 is the pay the plan counted. Line 97 is your Quebec Parental Insurance Plan, or QPIP, premium, which pays benefits when you have or adopt a child. You copy these from the slip.",
+        "Your employer takes payments from your pay for Québec's own programs and puts them on your RL-1 slip. Line 98 is your Québec Pension Plan, or QPP, contribution, which builds up your future pension. Pay above a higher limit has a small second contribution, on line 98.2. Line 98.1 is the pay the plan counted. Line 97 is your Québec Parental Insurance Plan, or QPIP, premium, which pays benefits when you have or adopt a child. You copy these from the slip.",
       example:
         'Your QPP contribution is {qpp}, which is {qppRate} of your pay between {qppStart} and {qppEnd}. Your QPIP premium is {qpip}, which is {qpipRate} of your pay.',
       figures: {
@@ -158,7 +158,7 @@ export const tp1: FormPageSpec = {
       heading: 'Tax on your income, slice by slice (Work Chart 401)',
       lines: 'Line 401',
       paragraph:
-        'Quebec does not tax all of your taxable income at one rate. It cuts it into slices, called brackets, and each slice has its own rate. The work chart finds the top slice your taxable income reaches. It adds up the tax on all the slices below that one, then charges the top slice’s rate on the rest.',
+        'Québec does not tax all of your taxable income at one rate. It cuts it into slices, called brackets, and each slice has its own rate. The work chart finds the top slice your taxable income reaches. It adds up the tax on all the slices below that one, then charges the top slice’s rate on the rest.',
       example:
         'Your taxable income reaches the slice that starts at {bracketStart}. That slice is taxed at {bracketRate}. The tax on the slices below it comes to {taxBelow}. The {incomeAbove} of your taxable income above {bracketStart} adds {taxAdded}. Tax on your taxable income, line 401: {taxOnIncome}.',
       figures: {
@@ -207,10 +207,10 @@ export const tp1: FormPageSpec = {
     },
     {
       id: 'total',
-      heading: 'Your Quebec tax and premium',
+      heading: 'Your Québec tax and premium',
       lines: 'Lines 432–479',
       paragraph:
-        'Line 450 is your income tax and contributions. It adds your Quebec tax to other amounts that can be owed on the return. Two matter here. One is the premium for Quebec’s prescription drug insurance plan (line 447, from Schedule K). It is not owed if a group plan, such as one through work, covers you, and this site assumes none does. The other is the health services fund contribution (line 446, from Schedule F), which does not apply to employment income. Then the form takes off tax already withheld from your pay, shown on your RL-1 slip (line 451), and credits paid to you, such as the work premium. This site’s take-home figure counts the federal tax on line 43500, the Quebec amount on line 450, and your QPP, QPIP and Employment Insurance payments, but not credits paid to you.',
+        'Line 450 is your income tax and contributions. It adds your Québec tax to other amounts that can be owed on the return. Two matter here. One is the premium for Québec’s prescription drug insurance plan (line 447, from Schedule K). It is not owed if a group plan, such as one through work, covers you, and this site assumes none does. The other is the health services fund contribution (line 446, from Schedule F), which does not apply to employment income. Then the form takes off tax already withheld from your pay, shown on your RL-1 slip (line 451), and credits paid to you, such as the work premium. This site’s take-home figure counts the federal tax on line 43500, the Québec amount on line 450, and your QPP, QPIP and Employment Insurance payments, but not credits paid to you.',
       example:
         'Your tax of {taxAfterCredits} plus the drug insurance premium of {drugPremium} comes to {total450}. The health services fund contribution is {hsf}. Without the tax your employer took off your pay (line 451), the balance due on line 479 would be {balanceDue}.',
       figures: {

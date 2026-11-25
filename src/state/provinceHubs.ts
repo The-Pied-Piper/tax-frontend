@@ -207,33 +207,33 @@ export const provinceHubs: ProvinceHubText[] = [
     slug: 'ca-qc',
     taxReduction: false,
     words: (name) => ({
-      takeHome: `Take-home pay is your salary minus five things. The first is income tax, which comes in two parts: federal tax, and ${name} tax worked out on your ${name} return from Revenu Québec. The second is your Quebec Pension Plan, or QPP, payments, which build up your future pension. The third is Employment Insurance, or EI, which can pay you if you lose your job. Quebec workers pay a lower EI rate. The fourth is Quebec Parental Insurance Plan, or QPIP, premiums, which pay benefits when you have or adopt a child. The fifth is the Quebec prescription drug insurance premium. You pay it on your ${name} return if you have no drug plan through work, and we assume you do not. We do not count the ${name} abatement, a credit equal to 16.5% of your basic federal tax that ${name} residents get on their federal return. The forms below are where each of these is worked out.`,
+      takeHome: `Take-home pay is your salary minus five things. The first is income tax, which comes in two parts: federal tax, and ${name} tax worked out on your ${name} return from Revenu Québec. The second is your Québec Pension Plan, or QPP, payments, which build up your future pension. The third is Employment Insurance, or EI, which can pay you if you lose your job. Québec workers pay a lower EI rate. The fourth is Québec Parental Insurance Plan, or QPIP, premiums, which pay benefits when you have or adopt a child. The fifth is the premium for Québec’s prescription drug insurance plan. You pay it on your ${name} return if you have no drug plan through work, and we assume you do not. We do not count the ${name} abatement, a credit equal to 16.5% of your basic federal tax that ${name} residents get on their federal return. The forms below are where each of these is worked out.`,
       charts: {
         takeHome:
-          'Your salary minus income tax, Quebec Pension Plan, Employment Insurance, Quebec Parental Insurance Plan premiums and the Quebec prescription drug insurance premium.',
-        averageRate: `The share of your salary that goes to income tax, Quebec Pension Plan, Employment Insurance, Quebec Parental Insurance Plan premiums and the drug insurance premium together. Federal and ${name} income tax both count.`,
+          'Your salary minus income tax, Québec Pension Plan, Employment Insurance, Québec Parental Insurance Plan premiums and the premium for Québec’s prescription drug insurance plan.',
+        averageRate: `The share of your salary that goes to income tax, Québec Pension Plan, Employment Insurance, Québec Parental Insurance Plan premiums and the drug insurance premium together. Federal and ${name} income tax both count.`,
         marginalRate:
-          'Out of your next dollar of salary, the share that goes to income tax, Quebec Pension Plan, Employment Insurance, Quebec Parental Insurance Plan premiums and the drug insurance premium. The rate steps up where a new tax bracket starts, and across a band of lower salaries while the drug insurance premium grows. It falls where a pension or insurance payment stops.',
+          'Out of your next dollar of salary, the share that goes to income tax, Québec Pension Plan, Employment Insurance, Québec Parental Insurance Plan premiums and the drug insurance premium. The rate steps up where a new tax bracket starts, and across a band of lower salaries while the drug insurance premium grows. It falls where a pension or insurance payment stops.',
       },
       federal: {
         t4: {
           description:
-            'Your employer’s pay slips: the T4 for your federal return and the RL-1 for your Quebec return. They show your pay and what was taken off.',
+            'Your employer’s pay slips: the T4 for your federal return and the RL-1 for your Québec return. They show your pay and what was taken off.',
         },
         t1: {
           description:
-            'Works out your federal tax. This site counts the federal tax on line 43500 and adds the Quebec tax and premium from your Quebec return.',
+            'Works out your federal tax. This site counts the federal tax on line 43500 and adds the Québec tax and premium from your Québec return.',
         },
         'schedule-8': {
           // Its own id: the Canada Pension Plan page must not be linked for a Quebec filer.
           id: 'schedule-8-qc',
-          name: 'Schedule 8: Quebec Pension Plan Contributions',
+          name: 'Schedule 8: Québec Pension Plan Contributions',
           description:
-            'Works out how much you pay into the Quebec Pension Plan, or QPP.',
+            'Works out how much you pay into the Québec Pension Plan, or QPP.',
         },
         t2204: {
           description:
-            'Checks whether you paid more Employment Insurance than the rules require, for example on the first $2,000 of pay or above the yearly maximum. Quebec workers pay a lower rate, so the most they can pay is lower.',
+            'Checks whether you paid more Employment Insurance than the rules require, for example on the first $2,000 of pay or above the yearly maximum. Québec workers pay a lower rate, so the most they can pay is lower.',
         },
       },
     }),
@@ -242,17 +242,17 @@ export const provinceHubs: ProvinceHubText[] = [
         id: 'tp1',
         name: 'TP-1 Income Tax Return',
         description:
-          'The Quebec income tax return. It works out your Quebec tax, and brings in your QPP and drug insurance amounts.',
+          'The Québec income tax return. It works out your Québec tax, and brings in your QPP and drug insurance amounts.',
       },
       {
         id: 'schedule-u',
-        name: 'Schedule U: Quebec Pension Plan (QPP) Contribution and Deduction',
+        name: 'Schedule U: Québec Pension Plan (QPP) Contribution and Deduction',
         description:
           'Turns the QPP payments on your pay slip into the amount you deduct from your income.',
       },
       {
         id: 'schedule-k',
-        name: 'Schedule K: Premium Payable Under the Quebec Prescription Drug Insurance Plan',
+        name: 'Schedule K: Premium Payable Under the Québec Prescription Drug Insurance Plan',
         description:
           'Works out the yearly drug insurance premium if you have no drug plan through work.',
       },
@@ -278,7 +278,7 @@ export const provinceHubs: ProvinceHubText[] = [
         id: 'work-chart-401',
         name: 'Work Chart 401: Income tax on taxable income',
         description:
-          'Applies the Quebec tax rates to your taxable income, bracket by bracket.',
+          'Applies the Québec tax rates to your taxable income, bracket by bracket.',
       },
     ],
   },

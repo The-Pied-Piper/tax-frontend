@@ -52,11 +52,11 @@ const OWN: Record<Slug, (readonly [string, string])[]> = {
     ['tp1', 'TP-1 Income Tax Return'],
     [
       'schedule-u',
-      'Schedule U: Quebec Pension Plan (QPP) Contribution and Deduction',
+      'Schedule U: Québec Pension Plan (QPP) Contribution and Deduction',
     ],
     [
       'schedule-k',
-      'Schedule K: Premium Payable Under the Quebec Prescription Drug Insurance Plan',
+      'Schedule K: Premium Payable Under the Québec Prescription Drug Insurance Plan',
     ],
     ['schedule-b', 'Schedule B: Tax Relief Measures'],
     ['schedule-f', 'Schedule F: Contribution to the Health Services Fund'],
@@ -71,7 +71,7 @@ function federalOf(slug: Slug): (readonly [string, string])[] {
     slug === 'ca-qc' && id === 'schedule-8'
       ? ([
           'schedule-8-qc',
-          'Schedule 8: Quebec Pension Plan Contributions',
+          'Schedule 8: Québec Pension Plan Contributions',
         ] as const)
       : ([id, label] as const),
   );
@@ -156,7 +156,7 @@ describe.each(FOOTER_PROVINCE_SLUGS)('the hub page for %s', (slug) => {
         : `income tax, which comes in two parts: federal tax and ${name} tax`,
     );
     expect(words).toContain(
-      slug === 'ca-qc' ? 'Quebec Pension Plan' : 'Canada Pension Plan',
+      slug === 'ca-qc' ? 'Québec Pension Plan' : 'Canada Pension Plan',
     );
     expect(words).toContain('EI');
   });
@@ -295,23 +295,23 @@ describe.each(FOOTER_PROVINCE_SLUGS)('the hub page for %s', (slug) => {
   });
 });
 
-describe('the Quebec hub', () => {
+describe('the Québec hub', () => {
   const page = build('ca-qc', [], salaryLinks);
-  const how = section(page, 'How your Quebec take-home is worked out');
+  const how = section(page, 'How your Québec take-home is worked out');
   const words = everyString(how?.blocks).join(' ');
 
-  it('has the Quebec title and its own forms in plain words', () => {
-    expect(page.title).toBe('Quebec take-home pay and income tax analysis');
+  it('has the Québec title and its own forms in plain words', () => {
+    expect(page.title).toBe('Québec take-home pay and income tax analysis');
     expect(lists(page)[0]?.items.map((i) => i.label)).toEqual(
       OWN['ca-qc'].map(([, label]) => label),
     );
   });
 
   it('says QPP and QPIP, never the Canada Pension Plan, and no calculator name', () => {
-    expect(words).toContain('Quebec Pension Plan');
-    expect(words).toContain('Quebec Parental Insurance Plan');
-    expect(words).toContain('prescription drug insurance premium');
-    expect(words).toContain('Quebec abatement');
+    expect(words).toContain('Québec Pension Plan');
+    expect(words).toContain('Québec Parental Insurance Plan');
+    expect(words).toContain('prescription drug insurance plan');
+    expect(words).toContain('Québec abatement');
     const every = everyString(page.sections.map((s) => s.blocks)).join(' ');
     expect(every).not.toContain('Canada Pension Plan');
     expect(every).not.toMatch(/taxtips/i);
@@ -320,14 +320,14 @@ describe('the Quebec hub', () => {
   it('writes the province name into every chart line, with no template text left over', () => {
     const charted = hubPage(
       textOf('ca-qc'),
-      'Quebec',
+      'Québec',
       salaryLinks,
       new Set(),
       [],
       true,
     );
     const every = everyString(charted.sections.map((s) => s.blocks)).join(' ');
-    expect(every).toContain('Federal and Quebec income tax both count.');
+    expect(every).toContain('Federal and Québec income tax both count.');
     expect(every).not.toContain('${');
     expect(every).toContain('and the drug insurance premium together');
     expect(every).toContain(
@@ -341,7 +341,7 @@ describe('the Quebec hub', () => {
       i.label.startsWith('Schedule 8'),
     );
     expect(schedule8?.label).toBe(
-      'Schedule 8: Quebec Pension Plan Contributions',
+      'Schedule 8: Québec Pension Plan Contributions',
     );
     expect(schedule8?.href).toBeUndefined();
   });
