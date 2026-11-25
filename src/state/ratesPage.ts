@@ -4,16 +4,7 @@ import { noteWords } from './hubNotes';
 import { ontarioRatesPage } from './ratesPageText/ca-on';
 import type { CauseForm, RatesPageText } from './ratesPageTypes';
 import { compareAmounts } from '../money/scale';
-import { formSlug, type FooterProvinceSlug } from './siteLinks';
-import { contentPath } from './siteLinks';
-
-/** The last segment of every rates page address, below the province's hub: `/ca-on/tax-rates/`. No year, so links last across years. */
-export const RATES_SEGMENT = 'tax-rates';
-
-/** The slug of a province's rates page. */
-export function ratesSlug(province: FooterProvinceSlug): string {
-  return `${province}/${RATES_SEGMENT}`;
-}
+import { contentPath, formSlug, type FooterProvinceSlug } from './siteLinks';
 
 /** The text of the rates page of each province that has one. Adding a province is one file in `ratesPageText/` and one entry here. */
 export const ratesPageText: Partial<Record<FooterProvinceSlug, RatesPageText>> =

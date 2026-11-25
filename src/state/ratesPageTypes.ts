@@ -23,7 +23,7 @@ export type RatesTable = {
 
 /** Everything one province's rates page says. Every figure is a spec resolved from the province's sweep, never typed. */
 export type RatesPageText = {
-  /** The page's address segment below the hub: `tax-rates`. */
+  /** The tab title and share title; under 64 characters, so a long name shortens here and keeps its full form in `heading`. */
   title: string;
   description: string;
   /** The h1. */

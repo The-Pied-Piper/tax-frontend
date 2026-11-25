@@ -168,4 +168,27 @@ describe('the text of the hub charts', () => {
       /no figure/,
     );
   });
+
+  it('reads the rates page kinds: cents as written, a rate to one decimal, a gap of two rates, a factor as written', () => {
+    const sweep = sweepOf('ca-on');
+    expect(figureText(parseSpec('n:ei_max_premium'), sweep)).toBe('$1,123.07');
+    expect(figureText(parseSpec('h:marginal@300000'), sweep)).toBe('53.5%');
+    expect(figureText(parseSpec('h:average@500000'), sweep)).toBe('45.4%');
+    // Round once from the exact rate: the sweep keeps seven places, and 0.3436053 is 34.4%.
+    expect(figureText(parseSpec('h:marginal@70000'), sweep)).toBe('34.4%');
+    expect(figureText(parseSpec('w:marginal@300000-12000'), sweep)).toBe(
+      '45.9%',
+    );
+    expect(figureText(parseSpec('x:taxable_factor'), sweep)).toBe('0.99');
+  });
+
+  it('keeps the edge of a band exact to the dollar, and the next edge apart from the one before', () => {
+    const sweep = sweepOf('ca-on');
+    // The surtax steps are whole-salary thresholds read from the engine, not a grid.
+    expect(figureText(parseSpec('e:98000'), sweep)).toBe('$98,591');
+    expect(figureText(parseSpec('o:98000'), sweep)).toBe('$98,590');
+    // Inside a span with extra points (the 48,450 step) the near edge is chosen.
+    expect(figureText(parseSpec('e:48000'), sweep)).toBe('$48,450');
+    expect(figureText(parseSpec('o:49000'), sweep)).toBe('$49,055');
+  });
 });

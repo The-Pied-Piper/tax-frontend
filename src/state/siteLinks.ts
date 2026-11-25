@@ -56,6 +56,14 @@ export function formSlug(id: string): string {
   return `${FORMS_SEGMENT}/${id}`;
 }
 
+/** The last segment of every rates page address, below the province's hub: `/ca-on/tax-rates/`. No year, so links last across years. */
+export const RATES_SEGMENT = 'tax-rates';
+
+/** The slug of a province's rates page, such as `ca-on/tax-rates`. */
+export function ratesSlug(province: FooterProvinceSlug): string {
+  return `${province}/${RATES_SEGMENT}`;
+}
+
 /** The address of a content page, such as `/ca-on/`. */
 export function contentPath(slug: string): string {
   return `/${slug}/`;

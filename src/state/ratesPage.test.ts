@@ -4,8 +4,8 @@ import {
   ratesPageText,
   ratesPageView,
   ratesProvinces,
-  ratesSlug,
 } from './ratesPage';
+import { ratesSlug } from './siteLinks';
 
 const sweep = () => {
   const found = fullHubCharts(['ca-on']).provinces[0];

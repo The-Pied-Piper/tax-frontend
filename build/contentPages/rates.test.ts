@@ -1,4 +1,5 @@
 import { fullHubCharts } from '../../src/test/hubNotesData';
+import { hubChartBlocks } from './hubs';
 import { ratesBlocks, ratesPages } from './rates';
 
 describe('ratesPages', () => {
@@ -30,9 +31,15 @@ describe('ratesPages', () => {
 
   it('gives each page the sweep block the hubs carry', () => {
     const pages = ratesPages(new Set(['ca-on']));
-    const blocks = ratesBlocks(pages, fullHubCharts(['ca-on']).provinces);
+    const hubBlocks = hubChartBlocks(fullHubCharts(['ca-on']).provinces);
+    const blocks = ratesBlocks(pages, hubBlocks);
     expect([...blocks.keys()]).toEqual(['ca-on/tax-rates']);
-    expect(blocks.get('ca-on/tax-rates')).toContain('hub-charts-data');
-    expect(ratesBlocks([], fullHubCharts().provinces).size).toBe(0);
+    expect(blocks.get('ca-on/tax-rates')).toBe(hubBlocks.get('ca-on'));
+    expect(ratesBlocks([], hubBlocks).size).toBe(0);
+  });
+
+  it('fails for a page whose province has no hub block', () => {
+    const pages = ratesPages(new Set(['ca-on']));
+    expect(() => ratesBlocks(pages, new Map())).toThrow(/no hub data block/);
   });
 });

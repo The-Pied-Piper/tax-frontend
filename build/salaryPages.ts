@@ -175,6 +175,7 @@ export function salaryPages(
           new Set(sweeps.map((sweep) => sweep.slug)),
         );
         const rates = ratesPages(new Set(sweeps.map((sweep) => sweep.slug)));
+        const hubBlocks = hubChartBlocks(sweeps);
         const content = await generateContentPages({
           outDir,
           template: await readFile(contentFile, 'utf8'),
@@ -185,10 +186,7 @@ export function salaryPages(
               sweeps.length > 0 ? { provinces: sweeps } : undefined,
             ),
           siteUrl,
-          dataBlocks: new Map([
-            ...hubChartBlocks(sweeps),
-            ...ratesBlocks(rates, sweeps),
-          ]),
+          dataBlocks: new Map([...hubBlocks, ...ratesBlocks(rates, hubBlocks)]),
         });
         const notFound = await generateNotFoundPage({
           outDir,

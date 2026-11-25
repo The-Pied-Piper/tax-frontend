@@ -20,6 +20,43 @@ import { THEME_TOGGLE_SLOT_ID } from '../state/themeSlot';
 import { ProvinceComparison } from './ProvinceComparison';
 import { FoldingList } from './FoldingList';
 
+/** A table with a caption and column headings; every row has one cell per heading. */
+function ContentTable({
+  caption,
+  head,
+  rows,
+}: {
+  caption: string;
+  head: string[];
+  rows: string[][];
+}) {
+  return (
+    <div className={styles.tableWrap}>
+      <table className={styles.table}>
+        <caption>{caption}</caption>
+        <thead>
+          <tr>
+            {head.map((cell) => (
+              <th key={cell} scope="col">
+                {cell}
+              </th>
+            ))}
+          </tr>
+        </thead>
+        <tbody>
+          {rows.map((row, at) => (
+            <tr key={at}>
+              {row.map((cell, column) => (
+                <td key={column}>{cell}</td>
+              ))}
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  );
+}
+
 /** One block of a section: a paragraph, a list of forms, a group of links, a table or a hub's charts or comparison. */
 function ContentBlockView({
   block,
@@ -84,17 +121,10 @@ function ContentBlockView({
       if (!view) return null;
       switch (block.part) {
         case 'intro':
-          return (
-            <>
-              {view.intro.map((words) => (
-                <p key={words}>{words}</p>
-              ))}
-            </>
-          );
         case 'howToRead':
           return (
             <>
-              {view.howToRead.map((words) => (
+              {view[block.part].map((words) => (
                 <p key={words}>{words}</p>
               ))}
             </>
@@ -139,29 +169,11 @@ function ContentBlockView({
                   <h3 className={styles.chartHeading}>{table.heading}</h3>
                   {table.before && <p>{table.before}</p>}
                   {table.rows.length > 0 && (
-                    <div className={styles.tableWrap}>
-                      <table className={styles.table}>
-                        <caption>{table.caption}</caption>
-                        <thead>
-                          <tr>
-                            {table.head.map((cell) => (
-                              <th key={cell} scope="col">
-                                {cell}
-                              </th>
-                            ))}
-                          </tr>
-                        </thead>
-                        <tbody>
-                          {table.rows.map((row, at) => (
-                            <tr key={at}>
-                              {row.map((cell, column) => (
-                                <td key={column}>{cell}</td>
-                              ))}
-                            </tr>
-                          ))}
-                        </tbody>
-                      </table>
-                    </div>
+                    <ContentTable
+                      caption={table.caption}
+                      head={table.head}
+                      rows={table.rows}
+                    />
                   )}
                   {table.after && <p>{table.after}</p>}
                 </div>
@@ -225,29 +237,11 @@ function ContentBlockView({
       );
     case 'table':
       return (
-        <div className={styles.tableWrap}>
-          <table className={styles.table}>
-            <caption>{block.caption}</caption>
-            <thead>
-              <tr>
-                {block.head.map((cell) => (
-                  <th key={cell} scope="col">
-                    {cell}
-                  </th>
-                ))}
-              </tr>
-            </thead>
-            <tbody>
-              {block.rows.map((row, at) => (
-                <tr key={at}>
-                  {row.map((cell, column) => (
-                    <td key={column}>{cell}</td>
-                  ))}
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+        <ContentTable
+          caption={block.caption}
+          head={block.head}
+          rows={block.rows}
+        />
       );
     case 'provinceComparison':
       // The slot the browser mounts the same component into; a hub with no

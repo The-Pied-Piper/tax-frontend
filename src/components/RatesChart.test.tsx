@@ -82,4 +82,29 @@ describe('RatesChart', () => {
     );
     expect(window.location.search).toBe('?salary=70000');
   });
+
+  it('leaves the $2,000 band out of the scale and says where it goes off the top', () => {
+    render(<RatesChart sweep={sweep()} place="Ontario" />);
+    expect(
+      screen.getByText('Off the top: 100.0% from $2,000 to $2,033'),
+    ).toBeInTheDocument();
+    // The scale is set by the rates above $5,000 (the 59.1% spike is the highest at $150,000), not by 100%.
+    expect(screen.getByRole('img').textContent).not.toContain('100%');
+  });
+
+  it('labels every $50,000 up to $250,000 and every $100,000 beyond, ending the axis at the range', () => {
+    const labels = () =>
+      [...screen.getByRole('img').querySelectorAll('text')].map(
+        (t) => t.textContent,
+      );
+    render(<RatesChart sweep={sweep()} place="Ontario" />);
+    expect(labels()).toEqual(
+      expect.arrayContaining(['$50k', '$100k', '$150k']),
+    );
+    fireEvent.change(screen.getByRole('slider'), { target: { value: '7' } });
+    expect(labels()).toEqual(
+      expect.arrayContaining(['$100k', '$200k', '$300k', '$400k', '$500k']),
+    );
+    expect(labels()).not.toContain('$50k');
+  });
 });

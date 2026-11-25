@@ -40,9 +40,10 @@ const SPARSE_TICKS = ['100000', '200000', '300000', '400000'] as const;
 /** Salaries below this are the Employment Insurance band, which must not set the scale. */
 const BAND_CEILING = '5000';
 
-/** The sweep's salary as text for the address: `70000.00` is `70000`. */
+/** The address is read once after hydration; nothing in it changes by itself, so there is nothing to subscribe to. */
 const noSubscription = () => () => undefined;
 
+/** The sweep's salary as text for the address: `70000.00` is `70000`. */
 function salaryParam(salary: string): string {
   return salary.replace(/\.00$/, '');
 }
@@ -137,10 +138,6 @@ export function RatesChart({ sweep, place }: Props) {
   const from = displayWholeMoney('0', 'annually', unit);
   const to = displayWholeMoney(max, 'annually', unit);
 
-  function pick(index: number | null) {
-    setMarkerPick(index);
-  }
-
   /** The address names the picked salary; only this changes it, never the slider. */
   function linkToSalary(point: SweepPoint) {
     const url = new URL(window.location.href);
@@ -178,7 +175,7 @@ export function RatesChart({ sweep, place }: Props) {
         formatValue={(value) => displayRateOneDecimal(value, rateUnit)}
         ariaLabel={t.chartLabel(from, to)}
         activeIndex={active}
-        onActiveChange={pick}
+        onActiveChange={setMarkerPick}
         scaleValues={scaleValues}
         markerLabel={false}
         topNote={bandNote}

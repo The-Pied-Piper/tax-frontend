@@ -1,10 +1,6 @@
-import { dataBlock } from '../salaryPages/pageHtml';
-import { HUB_CHARTS_DATA_ID } from '../../src/state/hubSlots';
 import type { ContentPageSpec } from '../../src/state/contentPages';
-import type { ProvinceSweep } from '../../src/state/hubCharts';
-import { ratesPageText, ratesSlug } from '../../src/state/ratesPage';
-import { ratesProvinces } from '../../src/state/ratesPage';
-import type { FooterProvinceSlug } from '../../src/state/siteLinks';
+import { ratesPageText, ratesProvinces } from '../../src/state/ratesPage';
+import { ratesSlug, type FooterProvinceSlug } from '../../src/state/siteLinks';
 import { strings } from '../../src/strings';
 
 /**
@@ -59,14 +55,22 @@ export function ratesPages(chartSlugs: ReadonlySet<string>): ContentPageSpec[] {
     });
 }
 
-/** The data block of each rates page by its slug: the same sweep block the hubs carry (`blocks` is `hubChartBlocks`' map). */
+/**
+ * The data block of each rates page by its slug: the block the hub of the same province carries (`hubBlocks` is
+ * `hubChartBlocks`' map, so its guard and size limit already ran). A page whose province has no hub block fails.
+ */
 export function ratesBlocks(
   pages: readonly ContentPageSpec[],
-  sweeps: readonly ProvinceSweep[],
+  hubBlocks: ReadonlyMap<string, string>,
 ): Map<string, string> {
   const blocks = new Map<string, string>();
-  if (pages.length === 0) return blocks;
-  const block = dataBlock(HUB_CHARTS_DATA_ID, { provinces: sweeps });
-  for (const page of pages) blocks.set(page.slug, block);
+  for (const page of pages) {
+    const province = page.trail[0]?.slug ?? '';
+    const block = hubBlocks.get(province);
+    if (block === undefined) {
+      throw new Error(`Rates: ${page.slug} has no hub data block`);
+    }
+    blocks.set(page.slug, block);
+  }
   return blocks;
 }

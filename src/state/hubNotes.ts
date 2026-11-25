@@ -38,11 +38,12 @@ import type { FooterProvinceSlug } from './siteLinks';
  *  - `k:column@salary`  the share kept: one minus that rate;
  *  - `q:column@salary`  the column over the salary, as a rate (take-home over salary);
  *  - `c:column@salary`  a rate as cents on the dollar, to the nearest half cent: "7.5 cents";
- *  - `e:amount`         where the marginal rate changes, from the engine's edges: the salary at which
- *                       the new rate has taken hold. The amount only says which change (the
- *                       one between the sweep salary just below it and the next); the figure is the
- *                       engine's. Where two changes fall in one step, the nearer is read;
- *  - `o:amount`         the same change, read as the salary where the rate first moves (the end of a band);
+ *  - `e:amount`         where the marginal rate changes, from the engine's edges: the salary from which
+ *                       the new rate applies (found to the dollar). The amount only says which change (one
+ *                       between the regular sweep salary just below it and the next; the extra points
+ *                       around a narrow step sit inside that span); the figure is the engine's. Where two
+ *                       changes fall in one span, the nearer is read;
+ *  - `o:amount`         the same change, read as the last salary at the old rate (the end of a band);
  *  - `y:amount`         the marginal rate once that change has taken hold, to one decimal ("54.9%");
  *  - `f:name`           a dollar figure the engine wrote for the province, to the whole dollar: a
  *                       parameter of its 2026 dataset (a surtax threshold) or a band it found;
