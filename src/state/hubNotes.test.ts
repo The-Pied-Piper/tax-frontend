@@ -96,12 +96,12 @@ describe('the text of the hub charts', () => {
   it('reads Ontario as the copy thread wrote it, with the engine’s figures', () => {
     const sweep = sweepOf('ca-on');
     expect(chartNotes('ca-on', 'averageRate', sweep)[0]).toBe(
-      'Up to $2,000 the average is 0%. Employment Insurance starts just above $2,000 and counts for more as your salary rises, until the full rate applies by about $2,033. The average is about 1.6% from about $2,040.',
+      'Up to $2,000 the average is 0%. Employment Insurance starts just above $2,000 and counts for more as your salary rises, until the full rate applies by about $2,033. The average is about 1.6% from about $2,034.',
     );
     const marginal = chartNotes('ca-on', 'marginalRate', sweep).join(' ');
     // The three spikes, from the engine's edges and read to one decimal.
     expect(marginal).toContain(
-      '54.9% from $48,450 to $49,050, 59.1% from $72,700 to $73,290, and 73.3% from $201,130 to $201,720',
+      '54.9% from $48,450 to $49,055, 59.1% from $72,692 to $73,297, and 73.3% from $201,128 to $201,727',
     );
     // The surtax thresholds are the 2026 engine parameters, not the 2025 form's.
     expect(marginal).toContain(
@@ -153,8 +153,8 @@ describe('the text of the hub charts', () => {
   it('names a change of rate by a salary near it and prints the engine’s figure', () => {
     const sweep = sweepOf('ca-on');
     // A band starts where the rate has settled and ends where it first moves.
-    expect(figureText(parseSpec('e:20000'), sweep)).toBe('$20,170');
-    expect(figureText(parseSpec('o:25000'), sweep)).toBe('$25,210');
+    expect(figureText(parseSpec('e:20000'), sweep)).toBe('$20,167');
+    expect(figureText(parseSpec('o:25000'), sweep)).toBe('$25,217');
     expect(figureText(parseSpec('y:48000'), sweep)).toBe('54.9%');
   });
 

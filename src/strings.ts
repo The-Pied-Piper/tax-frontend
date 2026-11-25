@@ -100,6 +100,37 @@ export const strings = {
       tableProvince: 'Province',
     },
   },
+  ratesPage: {
+    chartHeading: 'Marginal and average rate by salary',
+    marginal: 'Marginal rate',
+    average: 'Average rate',
+    salaryAxis: 'Salary before tax',
+    percent: 'Percent',
+    hint: 'Hover or tap the chart to read a salary.',
+    readout: (salary: string, marginal: string, average: string) =>
+      `At ${salary}: marginal rate ${marginal}, average rate ${average}`,
+    linkToSalary: 'Link to this salary',
+    sliderLabel: 'Show salaries up to',
+    sliderValueText: (salary: string) => `Salaries up to ${salary}`,
+    // The words near the top of the plot where the Employment Insurance band leaves it. {rate} is the rate there.
+    topNote: (rate: string, from: string, to: string) =>
+      `Off the top: ${rate} from ${from} to ${to}`,
+    chartLabel: (from: string, to: string) =>
+      `Line chart: marginal rate and average rate against salary, from ${from} to ${to}. The same figures are in the table below the chart.`,
+    tableShow: 'Show the figures as a table',
+    tableHide: 'Hide the table',
+    tableCaption: (place: string, year: number, count: number) =>
+      `Rates by salary, ${place}, ${year.toString()}: all ${count.toString()} figures behind the chart`,
+    salaryHeader: 'Salary',
+    marginalHeader: 'Marginal rate',
+    averageHeader: 'Average rate',
+    causedBy: 'Caused by',
+    heading: (place: string, year: number) =>
+      `${place} marginal and average tax rate by salary, ${year.toString()}`,
+    howToRead: 'How to read these salaries',
+    notesHeading: 'What moves the rate, by salary',
+    bracketsHeading: 'Brackets by salary',
+  },
   fold: {
     more: 'See more',
     less: 'See less',

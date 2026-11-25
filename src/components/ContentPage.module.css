@@ -200,3 +200,11 @@
   font-weight: 600;
   color: var(--fg);
 }
+
+/* "Caused by" form links under a rates note. */
+.causes {
+  display: block;
+  margin-top: 2px;
+  font-size: 13px;
+  color: var(--muted);
+}

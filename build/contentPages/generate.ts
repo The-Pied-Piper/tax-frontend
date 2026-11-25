@@ -68,6 +68,8 @@ function blockProblem(block: ContentBlock): string | null {
         ? `has a table row that does not have ${block.head.length.toString()} cells`
         : null;
     case 'provinceComparison':
+    case 'ratesPart':
+    case 'ratesChart':
       return null;
   }
 }

@@ -34,7 +34,8 @@ from __future__ import annotations
 
 import json
 import sys
-from decimal import Decimal
+from decimal import ROUND_HALF_UP, Decimal
+from contextlib import contextmanager
 from functools import lru_cache
 from importlib.metadata import version
 from importlib.resources import files
@@ -46,12 +47,49 @@ from tax_engine import build_take_home
 from tax_engine.application.models.take_home import TakeHomeResult, UnitDescription
 from tax_engine.application.models.take_home_request import TakeHomeRequest
 from tax_engine.domain.jurisdiction_code import JurisdictionCode
+from tax_engine.domain.parameters.rounding import RoundTo
+
+_UNROUNDED = [False]
+
+
+def _install_rate_rounding() -> None:
+    """Lets a block of this script ask the engine for its two rates to seven places instead of four (`unrounded_rates`).
+
+    The rule that rounds the take-home average and marginal rates (family `ca/take_home_average_rate_rounding`) is
+    the only rounding of 0.0001 in the engine, and the engine documents it as the project's own choice, not a form's.
+    Only the hub-chart sweep asks for it; the full answers of the pages stay exactly what the service gives."""
+    original = RoundTo.apply
+
+    def apply(self, amount):
+        if _UNROUNDED[0] and self.increment == ENGINE_RATE_INCREMENT:
+            return RoundTo(RATE, self.mode).apply(amount)
+        return original(self, amount)
+
+    RoundTo.apply = apply  # type: ignore[method-assign]
+
+
+_install_rate_rounding()
+
+
+@contextmanager
+def unrounded_rates():
+    """For the block: the engine's average and marginal rates are written to seven places."""
+    _UNROUNDED[0] = True
+    try:
+        yield
+    finally:
+        _UNROUNDED[0] = False
+
+
+def _rate_text(value: Decimal) -> str:
+    """A rate as text without trailing zeros: 0.3435, 1, 0."""
+    return format(value.quantize(RATE).normalize(), "f")
 
 CENTS = Decimal("0.01")
-RATE = Decimal("0.0001")
-# How far the engine's marginal rate and a $10 step reading may differ before they count as two rates, and the step the edges settle over.
-MARGINAL_STEP = 100
-MARGINAL_DISAGREEMENT = Decimal("0.005")
+ENGINE_RATE_INCREMENT = Decimal("0.0001")
+# The two rates are written to seven places: the engine rounds both to 0.0001 (half up) before it answers, and a
+# display of one decimal must round the exact rate once, not that rounded value (0.34347 is 34.3%, not 34.4%).
+RATE = Decimal("0.0000001")
 
 EI_FIGURE = "ei"
 
@@ -84,8 +122,7 @@ COMMON_FACTS = {
     "ei_stop": ("ca", "ei_maximum_insurable_earnings", "amount"),
     "federal_second_rate": ("ca", "brackets", "brackets.1.rate"),
 }
-# The edges of the marginal rate are found on a $10 grid.
-EDGE_STEP = 10
+# The edges of the marginal rate are found by bisection to the whole dollar.
 
 
 def _fact(year: int, package: str, family: str, path: str) -> str:
@@ -98,6 +135,123 @@ def _fact(year: int, package: str, family: str, path: str) -> str:
     for part in path.split("."):
         node = node[int(part)] if part.isdigit() else node[part]
     return str(node)
+
+
+def _params(year: int, package: str, family: str) -> dict:
+    text = (
+        files(f"tax_engine.jurisdictions.{package}")
+        .joinpath("parameters", family, f"{year}.yaml")
+        .read_text(encoding="utf-8")
+    )
+    return yaml.safe_load(text)
+
+
+def _half_up(value: Decimal) -> Decimal:
+    """Whole dollars, halves up."""
+    return value.quantize(Decimal("1"), rounding=ROUND_HALF_UP)
+
+
+def _pension_deduction(year: int) -> dict[str, Decimal]:
+    """The enhanced Canada Pension Plan deducted from salary before it is taxable income (T4127: 1% of earnings
+    above the basic exemption up to the earnings limit, plus the second tier): taxable income is `factor` x
+    salary + `constant` up to the earnings limit, and salary less `cut` from the second tier's limit up."""
+    exemption = Decimal(_params(year, "ca", "cpp_basic_exemption")["amounts"]["12"])
+    limit = Decimal(_params(year, "ca", "cpp_maximum_pensionable_earnings")["amounts"]["12"])
+    second_limit = Decimal(_params(year, "ca", "cpp_additional_maximum_pensionable_earnings")["amounts"]["12"])
+    enhanced = Decimal(_params(year, "ca", "cpp_line_12_first_additional_contribution")["rate"])
+    first_max = Decimal(_params(year, "ca", "cpp_line_12_first_additional_contribution")["maximum"])
+    second_max = Decimal(_params(year, "ca", "cpp_line_22_second_additional_contribution")["maximum"])
+    second_rate = Decimal(_params(year, "ca", "cpp_line_22_second_additional_contribution")["rate"])
+    return {
+        "exemption": exemption,
+        "limit": limit,
+        "second_limit": second_limit,
+        "factor": 1 - enhanced,
+        "constant": enhanced * exemption,
+        "cut": first_max + second_max,
+        "factor_2": 1 - second_rate,
+        "constant_2": second_rate * limit - first_max,
+    }
+
+
+def _salary_of_taxable(year: int, taxable: Decimal) -> Decimal:
+    """The salary at which taxable income (which is also net income) reaches `taxable`, whole dollars."""
+    d = _pension_deduction(year)
+    below_limit = max(Decimal(0), (taxable - d["constant"]) / d["factor"])
+    if below_limit <= d["limit"]:
+        return _half_up(below_limit)
+    return _half_up(taxable + d["cut"])
+
+
+def _rates_page_facts(year: int, code: str) -> dict[str, str]:
+    """The figures the rates page quotes besides the sweep: brackets, basic amounts, the surtax and the health
+    premium, the Canada Pension Plan and Employment Insurance limits, and where each form threshold falls in
+    salary. Every one is read from the engine's own 2026 dataset files; the salary of a taxable-income threshold
+    is worked out from the pension deduction (see `_pension_deduction`)."""
+    if code != "CA-ON":
+        return {}
+    d = _pension_deduction(year)
+    facts: dict[str, str] = {
+        "cpp_start": str(d["exemption"]),
+        "cpp_ympe": str(d["limit"]),
+        "yampe": str(d["second_limit"]),
+        "taxable_factor": str(d["factor"]),
+        "taxable_constant": str(d["constant"]),
+        "taxable_cut": str(d["cut"]),
+        "taxable_factor_2": str(d["factor_2"]),
+        "taxable_constant_2": str(d["constant_2"]),
+    }
+    for package, family, prefix in (("ca", "brackets", "fed"), ("ca_on", "brackets", "ont")):
+        for number, bracket in enumerate(_params(year, package, family)["brackets"], start=1):
+            taxable = Decimal(bracket["from"])
+            facts[f"{prefix}_bracket_{number}_ti"] = str(taxable)
+            facts[f"{prefix}_bracket_{number}_rate"] = bracket["rate"]
+            facts[f"{prefix}_bracket_{number}_salary"] = str(_salary_of_taxable(year, taxable))
+    bpa = _params(year, "ca", "basic_personal_amount")
+    facts["fed_bpa_min"] = bpa["base"]
+    facts["fed_bpa"] = str(Decimal(bpa["base"]) + Decimal(bpa["supplement"]))
+    facts["fed_bpa_taper_start"] = bpa["threshold"]
+    facts["fed_bpa_taper_end"] = str(Decimal(bpa["threshold"]) + Decimal(bpa["range"]))
+    facts["cea"] = _params(year, "ca", "canada_employment_amount")["amount"]
+    facts["fed_lowest_rate"] = facts["fed_bracket_1_rate"]
+    facts["ont_bpa"] = _params(year, "ca_on", "basic_personal_amount")["amount"]
+    facts["lift_max"] = _params(year, "ca_on", "lift_maximum")["amount"]
+    facts["lift_end_ani"] = str(
+        Decimal(_params(year, "ca_on", "lift_individual_income_threshold")["amount"])
+        + Decimal(facts["lift_max"]) / Decimal(_params(year, "ca_on", "lift_single_rate")["rate"])
+    )
+    facts["ei_exemption"] = _params(year, "ca", "t2204_exemption")["amount"]
+    facts["ei_max_premium"] = _params(year, "ca", "ei_premium")["maximum"]
+    base = _params(year, "ca", "cpp_line_11_base_contribution")
+    enhanced = _params(year, "ca", "cpp_line_12_first_additional_contribution")
+    second = _params(year, "ca", "cpp_line_22_second_additional_contribution")
+    facts["cpp_base_rate"] = base["rate"]
+    facts["cpp_enhanced_rate"] = enhanced["rate"]
+    facts["cpp_rate"] = str(Decimal(base["rate"]) + Decimal(enhanced["rate"]))
+    facts["cpp_max"] = str(Decimal(base["maximum"]) + Decimal(enhanced["maximum"]))
+    facts["cpp2_rate"] = second["rate"]
+    facts["cpp2_max"] = second["maximum"]
+    facts["surtax_total_rate"] = str(
+        Decimal(_params(year, "ca_on", "surtax_line_66")["tiers"][0]["rate"])
+        + Decimal(_params(year, "ca_on", "surtax_line_67")["tiers"][0]["rate"])
+    )
+    for number, row in enumerate(_params(year, "ca_on", "health_premium_rows")["rows"], start=1):
+        over = Decimal(row["over"])
+        facts[f"ohp_{number}_ti"] = str(over)
+        facts[f"ohp_{number}_salary"] = str(_salary_of_taxable(year, over))
+        if "amount" in row:
+            facts[f"ohp_{number}_amount"] = row["amount"]
+        else:
+            facts[f"ohp_{number}_rate"] = row["rate"]
+            facts[f"ohp_{number}_plus"] = row["plus"]
+    # each salary shift: how much higher the salary is than the taxable income at a form's threshold
+    facts["shift_ohp_1"] = str(
+        Decimal(facts["ohp_2_salary"]) - Decimal(facts["ohp_2_ti"])
+    )
+    facts["shift_ont_bracket_2"] = str(
+        Decimal(facts["ont_bracket_2_salary"]) - Decimal(facts["ont_bracket_2_ti"])
+    )
+    return facts
 
 
 def _unit(unit: UnitDescription) -> dict:
@@ -165,53 +319,53 @@ class Figures:
     def _ei(self, code: str, year: int, salary: int) -> Decimal:
         return self._figure(self._result(code, year, salary), EI_FIGURE)
 
-    def _step_rate(self, code: str, year: int, salary: int) -> Decimal:
-        """The rate read over the next $10 of salary."""
-        here = self.basis_total(code, year, salary)
-        return (self.basis_total(code, year, salary + EDGE_STEP) - here) / EDGE_STEP
-
-    def _differs(self, first: Decimal, second: Decimal) -> bool:
-        return abs(first - second) > MARGINAL_DISAGREEMENT
+    def _marginal(self, code: str, year: int, salary: Decimal | int) -> Decimal:
+        """The engine's own marginal rate at a salary (an exact fraction rounded as the engine rounds it)."""
+        rate = self._result(code, year, Decimal(salary)).marginal_tax_rate
+        if rate is None:
+            raise ValueError(f"{code} {year}: the engine declares no rates")
+        return rate.value
 
     def edges(
         self, code: str, year: int, salaries: list[int], rates: list[Decimal]
     ) -> list[list[str]]:
         """Where the marginal rate changes between neighbouring sweep salaries: [the sweep salary below, the
-        salary the rate first moves, the salary it has settled at its new value, the rate there], on the $10 grid."""
+        salary above which the new rate applies, the whole-dollar salary it has settled at its new value, the rate
+        there].
+
+        Found by bisection on the engine's own marginal rate, to the cent. At a threshold the engine still reads
+        the lower rate, so the first cent with the new rate is one cent past the threshold `t`. The whole salaries a
+        band takes in are then those above `t`: the old rate holds to `moves` = floor(t) (74,600 for the Canada
+        Pension Plan limit, 38,853 for a taxable income of 38,500) and the new rate holds from `settled` = moves + 1
+        (74,601; 36,329 where a taxable income of 36,000 falls), or later where a rate lasts only a dollar or so."""
+        cents = Decimal("0.01")
         found: list[list[str]] = []
-        for low, high, rate_high in zip(salaries, salaries[1:], rates[1:]):
-            start = low
-            reference = self._step_rate(code, year, low)
-            while self._differs(reference, rate_high) and self._differs(
-                reference, self._step_rate(code, year, high)
-            ):
-                # the first grid salary in (start, high] at which the rate differs from the reference
-                near, far = start, high
-                while far - near > EDGE_STEP:
-                    middle = max(near + EDGE_STEP, (near + far) // (2 * EDGE_STEP) * EDGE_STEP)
-                    if self._differs(reference, self._step_rate(code, year, middle)):
+        for low, high in zip(salaries, salaries[1:]):
+            start = low * 100
+            reference = self._marginal(code, year, low)
+            target = self._marginal(code, year, high)
+            while reference != target:
+                # the first cent in (start, high] at which the rate is no longer the reference
+                near, far = start, high * 100
+                while far - near > 1:
+                    middle = (near + far) // 2
+                    if self._marginal(code, year, Decimal(middle) * cents) != reference:
                         far = middle
                     else:
                         near = middle
-                moves = far
-                settled = moves
-                while self._differs(
-                    self._step_rate(code, year, settled),
-                    self._step_rate(code, year, settled + EDGE_STEP),
+                moves = (far - 1) // 100
+                settled = moves + 1
+                while self._marginal(code, year, settled) != self._marginal(
+                    code, year, settled + 1
                 ):
-                    settled += EDGE_STEP
-                # the rate once it has settled, read over the next $100 (or up to the next sweep salary) so a
-                # cent of rounding does not move it
-                end = min(settled + MARGINAL_STEP, high)
-                if end == settled:
-                    end = settled + EDGE_STEP
-                settled_rate = (
-                    (self.basis_total(code, year, end) - self.basis_total(code, year, settled))
-                    / (end - settled)
-                ).quantize(RATE)
-                found.append([str(low), str(moves), str(settled), str(settled_rate)])
-                start = settled
-                reference = self._step_rate(code, year, settled)
+                    settled += 1
+                found.append(
+                    [str(low), str(moves), str(settled), _rate_text(self._marginal(code, year, settled))]
+                )
+                if settled >= high:
+                    break
+                start = settled * 100
+                reference = self._marginal(code, year, settled)
         return found
 
     def answer(self, code: str, year: int, salary: int, with_trace: bool) -> dict:
@@ -265,44 +419,42 @@ def main(provinces_file: str, output_file: str) -> None:
         pages = {}
         for salary in _salaries(province):
             pages[str(salary)] = figures.answer(code, year, salary, with_trace=True)
-        points = []
-        units = None
-        for salary in sweep:
-            answer = figures.answer(code, year, salary, with_trace=False)
-            point_units = {
-                "unit": answer["unit"],
-                "average_income_tax_rate": answer["average_income_tax_rate"]["unit"],
-            }  # the two rates share the service's rate unit
-            if units is None:
-                units = point_units
-            elif units != point_units:
-                raise ValueError(f"{code} {year}: units change along the sweep")
-            points.append(
-                {
-                    "salary": answer["salary"],
-                    "total_deductions": answer["total_deductions"],
-                    "income_tax": answer["income_tax"],
-                    "take_home": answer["take_home"],
-                    "average_rate": str(
-                        Decimal(answer["average_income_tax_rate"]["amount"]).quantize(RATE)
-                    ),
-                    "marginal_rate": str(
-                        Decimal(answer["marginal_income_tax_rate"]["amount"]).quantize(RATE)
-                    ),
-                }
+        with unrounded_rates():
+            points = []
+            units = None
+            for salary in sweep:
+                answer = figures.answer(code, year, salary, with_trace=False)
+                point_units = {
+                    "unit": answer["unit"],
+                    "average_income_tax_rate": answer["average_income_tax_rate"]["unit"],
+                }  # the two rates share the service's rate unit
+                if units is None:
+                    units = point_units
+                elif units != point_units:
+                    raise ValueError(f"{code} {year}: units change along the sweep")
+                points.append(
+                    {
+                        "salary": answer["salary"],
+                        "total_deductions": answer["total_deductions"],
+                        "income_tax": answer["income_tax"],
+                        "take_home": answer["take_home"],
+                        "average_rate": _rate_text(Decimal(answer["average_income_tax_rate"]["amount"])),
+                        "marginal_rate": _rate_text(Decimal(answer["marginal_income_tax_rate"]["amount"])),
+                    }
+                )
+            edges = figures.edges(
+                code,
+                year,
+                [int(Decimal(point["salary"])) for point in points],
+                [Decimal(point["marginal_rate"]) for point in points],
             )
-        edges = figures.edges(
-            code,
-            year,
-            [int(Decimal(point["salary"])) for point in points],
-            [Decimal(point["marginal_rate"]) for point in points],
-        )
         facts = {
             **figures.ei_band(code, year),
             **{
                 name: _fact(year, *place)
                 for name, place in {**COMMON_FACTS, **FACTS.get(code, {})}.items()
             },
+            **_rates_page_facts(year, code),
         }
         provinces[code] = {
             "year": year,

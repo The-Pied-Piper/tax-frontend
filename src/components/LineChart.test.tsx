@@ -48,7 +48,8 @@ function chart(
 }
 
 const hitRect = (container: HTMLElement) => {
-  const rect = container.querySelector('rect');
+  // The last rectangle is the one over the plot that takes the pointer (the first is the clip).
+  const rect = [...container.querySelectorAll('rect')].pop();
   if (!rect) throw new Error('no hit rect');
   return rect;
 };

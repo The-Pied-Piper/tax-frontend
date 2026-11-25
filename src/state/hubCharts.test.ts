@@ -50,11 +50,35 @@ describe('regularSalaries', () => {
 describe('sweepSalaries', () => {
   const steps = sweepSalaries();
 
-  it('is the regular salaries plus seven extra ones, lowest first', () => {
-    expect(steps).toHaveLength(307);
+  it('is the regular salaries plus twenty-three extra ones, lowest first', () => {
+    expect(steps).toHaveLength(323);
     expect(
       steps.filter((salary) => !regularSalaries().includes(salary)),
-    ).toEqual(['1990', '2020', '2040', '201100', '201200', '201700', '201800']);
+    ).toEqual([
+      '1990',
+      '2020',
+      '2040',
+      '36320',
+      '36340',
+      '38840',
+      '38860',
+      '48440',
+      '48460',
+      '49050',
+      '49070',
+      '72680',
+      '72700',
+      '73290',
+      '73310',
+      '201100',
+      '201120',
+      '201140',
+      '201200',
+      '201700',
+      '201720',
+      '201740',
+      '201800',
+    ]);
     expect(steps.slice(0, 5)).toEqual(['1000', '1990', '2000', '2020', '2040']);
     expect(steps).toEqual([...steps].sort(compareAmounts));
   });

@@ -1,6 +1,7 @@
 import { StrictMode } from 'react';
 import { createRoot, hydrateRoot } from 'react-dom/client';
 import { ProvinceComparison } from './components/ProvinceComparison';
+import { RatesChart } from './components/RatesChart';
 import { SalaryChart } from './components/SalaryChart';
 import { ThemeToggle } from './components/ThemeToggle';
 import { HUB_CHART_IDS, parseHubChartsData } from './state/hubCharts';
@@ -8,8 +9,10 @@ import {
   HUB_CHARTS_DATA_ID,
   HUB_CHART_SLOT_IDS,
   PROVINCE_COMPARISON_SLOT_ID,
+  RATES_CHART_SLOT_ID,
 } from './state/hubSlots';
 import { FOOTER_PROVINCE_SLUGS } from './state/siteLinks';
+import { strings } from './strings';
 import { THEME_TOGGLE_SLOT_ID } from './state/themeSlot';
 import './styles/fonts.css';
 import './styles/tokens.css';
@@ -22,6 +25,7 @@ import './components/ChartPeriodSwitch.module.css';
 import './components/FoldingList.module.css';
 import './components/FormSections.module.css';
 import './components/LineChart.module.css';
+import './components/RatesChart.module.css';
 import './components/SalaryChart.module.css';
 import './components/SiteFooter.module.css';
 
@@ -68,6 +72,26 @@ if (comparisonSlot && chartsData && comparisonProvince) {
     comparisonSlot,
     <StrictMode>
       <ProvinceComparison data={chartsData} province={comparisonProvince} />
+    </StrictMode>,
+  );
+}
+
+// A rates page has a slot for its chart, drawn in the page's HTML from the same data block.
+const ratesSlot = document.getElementById(RATES_CHART_SLOT_ID);
+const ratesProvince = FOOTER_PROVINCE_SLUGS.find(
+  (slug) => slug === ratesSlot?.dataset.province,
+);
+const ratesSweep = chartsData?.provinces.find(
+  (sweep) => sweep.slug === ratesProvince,
+);
+if (ratesSlot && ratesProvince && ratesSweep) {
+  hydrateRoot(
+    ratesSlot,
+    <StrictMode>
+      <RatesChart
+        sweep={ratesSweep}
+        place={strings.siteNav.provinceNames[ratesProvince]}
+      />
     </StrictMode>,
   );
 }

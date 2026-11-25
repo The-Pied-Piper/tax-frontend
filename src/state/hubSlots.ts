@@ -12,3 +12,6 @@ export const HUB_CHART_SLOT_IDS: Record<HubChartId, string> = {
 
 /** The id of the slot in a pre-built province hub where the province comparison is mounted. Its `data-province` holds the hub's province slug. */
 export const PROVINCE_COMPARISON_SLOT_ID = 'province-comparison';
+
+/** The id of the slot in a pre-built rates page where its chart is mounted. Its `data-province` holds the province slug. */
+export const RATES_CHART_SLOT_ID = 'rates-chart';

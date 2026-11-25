@@ -10,8 +10,11 @@ import type { HubChartsData } from '../state/hubCharts';
 import {
   HUB_CHART_SLOT_IDS,
   PROVINCE_COMPARISON_SLOT_ID,
+  RATES_CHART_SLOT_ID,
 } from '../state/hubSlots';
 import { chartNotes } from '../state/hubNotes';
+import { ratesPageView } from '../state/ratesPage';
+import { RatesChart } from './RatesChart';
 import { strings } from '../strings';
 import { THEME_TOGGLE_SLOT_ID } from '../state/themeSlot';
 import { ProvinceComparison } from './ProvinceComparison';
@@ -57,6 +60,116 @@ function ContentBlockView({
           }))}
         />
       );
+    }
+    case 'ratesChart': {
+      const sweep = hubCharts?.provinces.find(
+        (entry) => entry.slug === block.province,
+      );
+      return (
+        <div id={RATES_CHART_SLOT_ID} data-province={block.province}>
+          {sweep && (
+            <RatesChart
+              sweep={sweep}
+              place={strings.siteNav.provinceNames[block.province]}
+            />
+          )}
+        </div>
+      );
+    }
+    case 'ratesPart': {
+      const sweep = hubCharts?.provinces.find(
+        (entry) => entry.slug === block.province,
+      );
+      const view = sweep ? ratesPageView(block.province, sweep) : null;
+      if (!view) return null;
+      switch (block.part) {
+        case 'intro':
+          return (
+            <>
+              {view.intro.map((words) => (
+                <p key={words}>{words}</p>
+              ))}
+            </>
+          );
+        case 'howToRead':
+          return (
+            <>
+              {view.howToRead.map((words) => (
+                <p key={words}>{words}</p>
+              ))}
+            </>
+          );
+        case 'groups':
+          return (
+            <>
+              {view.groups.map((group) => (
+                <div key={group.heading} data-rates-group={group.heading}>
+                  <h3 className={styles.chartHeading}>{group.heading}</h3>
+                  <ul className={styles.notes}>
+                    {group.notes.map((note) => (
+                      <li key={note.words}>
+                        {note.words}
+                        {note.causes.length > 0 && (
+                          <span className={styles.causes}>
+                            {strings.ratesPage.causedBy}:{' '}
+                            {note.causes.map((cause, at) => (
+                              <span key={cause.label}>
+                                {at > 0 && ', '}
+                                {cause.href ? (
+                                  <a href={cause.href}>{cause.label}</a>
+                                ) : (
+                                  cause.label
+                                )}
+                              </span>
+                            ))}
+                          </span>
+                        )}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              ))}
+            </>
+          );
+        case 'tables':
+          return (
+            <>
+              {view.tables.map((table) => (
+                <div key={table.heading}>
+                  <h3 className={styles.chartHeading}>{table.heading}</h3>
+                  {table.before && <p>{table.before}</p>}
+                  {table.rows.length > 0 && (
+                    <div className={styles.tableWrap}>
+                      <table className={styles.table}>
+                        <caption>{table.caption}</caption>
+                        <thead>
+                          <tr>
+                            {table.head.map((cell) => (
+                              <th key={cell} scope="col">
+                                {cell}
+                              </th>
+                            ))}
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {table.rows.map((row, at) => (
+                            <tr key={at}>
+                              {row.map((cell, column) => (
+                                <td key={column}>{cell}</td>
+                              ))}
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  )}
+                  {table.after && <p>{table.after}</p>}
+                </div>
+              ))}
+            </>
+          );
+      }
+      return null;
     }
     case 'subheading':
       return <h3 className={styles.chartHeading}>{block.text}</h3>;
