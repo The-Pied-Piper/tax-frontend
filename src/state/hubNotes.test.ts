@@ -101,7 +101,7 @@ describe('the text of the hub charts', () => {
     const marginal = chartNotes('ca-on', 'marginalRate', sweep).join(' ');
     // The three spikes, from the engine's edges and read to one decimal.
     expect(marginal).toContain(
-      '54.9% from $48,450 to $49,055, 59.1% from $72,692 to $73,297, and 73.3% from $201,128 to $201,727',
+      '54.9% from $48,450 to $49,055, 59.1% from $72,692 to $73,297, and 73.3% from $201,127 to $201,727',
     );
     // The surtax thresholds are the 2026 engine parameters, not the 2025 form's.
     expect(marginal).toContain(

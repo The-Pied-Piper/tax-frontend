@@ -334,10 +334,11 @@ class Figures:
         there].
 
         Found by bisection on the engine's own marginal rate, to the cent. At a threshold the engine still reads
-        the lower rate, so the first cent with the new rate is one cent past the threshold `t`. The whole salaries a
-        band takes in are then those above `t`: the old rate holds to `moves` = floor(t) (74,600 for the Canada
-        Pension Plan limit, 38,853 for a taxable income of 38,500) and the new rate holds from `settled` = moves + 1
-        (74,601; 36,329 where a taxable income of 36,000 falls), or later where a rate lasts only a dollar or so."""
+        the lower rate, so the first cent with the new rate is one cent past the threshold `t`. The old rate holds
+        up to `moves` = floor(t), the last whole salary below or at the threshold (74,600 for the Canada Pension Plan
+        limit, 38,853 for a taxable income of 38,500), and the new rate applies above `t`, from `settled` = ceil(t)
+        (74,600 again where the threshold is a whole salary; 20,167 where a taxable income of 20,000 falls). A rate
+        that lasts only a dollar or so settles later, where two whole dollars agree."""
         cents = Decimal("0.01")
         found: list[list[str]] = []
         for low, high in zip(salaries, salaries[1:]):
@@ -354,18 +355,20 @@ class Figures:
                     else:
                         near = middle
                 moves = (far - 1) // 100
+                ceiling = (far - 1 + 99) // 100
                 settled = moves + 1
                 while self._marginal(code, year, settled) != self._marginal(
                     code, year, settled + 1
                 ):
                     settled += 1
-                found.append(
-                    [str(low), str(moves), str(settled), _rate_text(self._marginal(code, year, settled))]
-                )
+                rate = _rate_text(self._marginal(code, year, settled))
+                if settled == moves + 1:
+                    settled = ceiling
+                found.append([str(low), str(moves), str(settled), rate])
                 if settled >= high:
                     break
                 start = settled * 100
-                reference = self._marginal(code, year, settled)
+                reference = self._marginal(code, year, settled + 1)
         return found
 
     def answer(self, code: str, year: int, salary: int, with_trace: bool) -> dict:

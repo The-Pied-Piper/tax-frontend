@@ -76,7 +76,7 @@ describe("reading the Python step's file", () => {
     writeFileSync(
       file,
       JSON.stringify({
-        engine: '0.5.1',
+        engine: '0.5.2',
         provinces: { 'CA-ON': { pages, ...extra } },
       }),
     );
@@ -86,7 +86,7 @@ describe("reading the Python step's file", () => {
   it('returns the answers by province and salary', () => {
     const answer = engineOf(saved);
     const figures = readEngineFigures(written({ '70000': answer }));
-    expect(figures.engine).toBe('0.5.1');
+    expect(figures.engine).toBe('0.5.2');
     expect(figures.answers['CA-ON']?.['70000']).toEqual(answer);
   });
 
@@ -180,7 +180,7 @@ describe.runIf(process.env.ENGINE_FIGURES_FILE)(
       );
     });
 
-    // The chart figures (tax-engine 0.5.1, 2026): the average and marginal rate are the engine's own, written to seven
+    // The chart figures (tax-engine 0.5.2, 2026): the average and marginal rate are the engine's own, written to seven
     // places (the engine rounds to four, and a display of one decimal must round once; the pages' answers stay at four)
     // (income tax, CPP and EI line 16, no credits paid on filing counted; at $2,000 the engine reads the
     // marginal rate below the start of the EI band).
@@ -234,7 +234,7 @@ describe.runIf(process.env.ENGINE_FIGURES_FILE)(
       ).toEqual(['20000', '20166', '20167']);
       // Exact to the dollar: the old rate holds to the second figure and the new one from the third.
       expect(ontario?.edges.map((edge) => edge[2])).toEqual(
-        expect.arrayContaining(['25218', '48450', '72692', '201128']),
+        expect.arrayContaining(['25218', '48450', '72692', '201127']),
       );
       expect(ontario?.facts).toMatchObject({
         surtax_first: '5818',

@@ -36,7 +36,7 @@ describe('a pre-built Québec salary page', () => {
     }
     expect(paragraph).toContain('Québec Pension Plan');
     expect(paragraph).toContain('prescription drug insurance plan');
-    expect(paragraph).toContain('$21,382.18');
+    expect(paragraph).toContain('$20,140.79');
     expect(paragraph).not.toContain('abatement');
   });
 
@@ -50,7 +50,7 @@ describe('a pre-built Québec salary page', () => {
     }
     const text = document.body.textContent;
     for (const wanted of [
-      '$48,617.82',
+      '$49,859.21',
       'Québec Pension Plan',
       'Québec Parental Insurance Plan',
       'Prescription drug insurance premium',
