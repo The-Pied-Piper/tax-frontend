@@ -36,7 +36,7 @@ describe('RatesChart', () => {
     expect(details).not.toBeNull();
     expect(details?.open).toBe(false);
     expect(screen.getByText('Show the figures as a table')).toBeInTheDocument();
-    expect(container.querySelectorAll('tbody tr')).toHaveLength(323);
+    expect(container.querySelectorAll('tbody tr')).toHaveLength(327);
     expect(container.querySelector('caption')?.textContent).toContain(
       'Ontario',
     );

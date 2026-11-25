@@ -11,11 +11,15 @@ export function regularSalaries(): string[] {
   return salaries;
 }
 
-/** Salaries added to the sweep so the lines show what a regular step would miss: the $2,000 Employment Insurance band and, for each narrow Ontario health premium step, a salary just either side of both its edges (the lines join the points, so a step shows at its true place and width). */
+/** Salaries added to the sweep so the lines show what a regular step would miss: the $2,000 Employment Insurance band the narrow stretch where Ontario tax has started and the LIFT credit has not yet begun to shrink, and, for each narrow Ontario health premium step, a salary just either side of both its edges (the lines join the points, so a step shows at its true place and width). */
 const EXTRA_SALARIES = [
   '1990',
   '2020',
   '2040',
+  '32570',
+  '32580',
+  '32790',
+  '32800',
   '36320',
   '36340',
   '38840',

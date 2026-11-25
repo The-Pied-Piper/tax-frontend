@@ -1,4 +1,6 @@
+import { subtractAmounts } from '../money/amounts';
 import { compareAmounts } from '../money/scale';
+import { fullHubCharts } from '../test/hubNotesData';
 import {
   CHART_COLUMN,
   defaultIndex,
@@ -50,14 +52,18 @@ describe('regularSalaries', () => {
 describe('sweepSalaries', () => {
   const steps = sweepSalaries();
 
-  it('is the regular salaries plus twenty-three extra ones, lowest first', () => {
-    expect(steps).toHaveLength(323);
+  it('is the regular salaries plus twenty-seven extra ones, lowest first', () => {
+    expect(steps).toHaveLength(327);
     expect(
       steps.filter((salary) => !regularSalaries().includes(salary)),
     ).toEqual([
       '1990',
       '2020',
       '2040',
+      '32570',
+      '32580',
+      '32790',
+      '32800',
       '36320',
       '36340',
       '38840',
@@ -268,5 +274,39 @@ describe('the card constants', () => {
       averageRate: 4,
       marginalRate: 5,
     });
+  });
+});
+
+describe('the spike edges of the sweep', () => {
+  // A narrow band (the Ontario Health Premium steps) is drawn at its true place and width only when the sweep has a
+  // salary just before and just after each edge, because the lines join the points.
+  it('has a point within $30 of both edges of every Ontario band under $700 wide, and of the second health premium step', () => {
+    const [sweep] = fullHubCharts(['ca-on']).provinces;
+    if (!sweep) throw new Error('no sweep');
+    const salaries = sweep.points.map((point) => point[0]);
+    const edges = sweep.edges.map((edge) => ({ start: edge[2], end: edge[1] }));
+    const narrow = edges.flatMap((edge, at) => {
+      const next = edges[at + 1];
+      return next !== undefined &&
+        compareAmounts(subtractAmounts(next.end, edge.start), '700') < 0
+        ? [edge.start, next.end]
+        : [];
+    });
+    expect(narrow).toHaveLength(10);
+    for (const edge of [...narrow, '36329', '38854']) {
+      const within = (from: string, to: string) =>
+        salaries.some(
+          (salary) =>
+            compareAmounts(salary, from) >= 0 &&
+            compareAmounts(salary, to) <= 0,
+        );
+      expect(within(subtractAmounts(edge, '30'), edge), `before ${edge}`).toBe(
+        true,
+      );
+      expect(
+        within(edge, subtractAmounts('30', `-${edge}`)),
+        `after ${edge}`,
+      ).toBe(true);
+    }
   });
 });
