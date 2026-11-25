@@ -35,7 +35,7 @@ from __future__ import annotations
 
 import json
 import sys
-from decimal import ROUND_CEILING, ROUND_HALF_UP, Decimal
+from decimal import ROUND_CEILING, ROUND_FLOOR, ROUND_HALF_UP, Decimal
 from contextlib import contextmanager
 from functools import lru_cache
 from importlib.metadata import version
@@ -263,6 +263,7 @@ def _rates_page_facts(year: int, code: str) -> dict[str, str]:
         facts[f"ohp_{number}_ti"] = str(over)
         facts[f"ohp_{number}_salary"] = str(_salary_of_taxable(year, over))
         facts[f"ohp_{number}_salary_to"] = str(_salary_to_taxable(year, over))
+        facts[f"ohp_{number}_salary_end"] = str(_exact_salary_of_taxable(year, over).to_integral_value(rounding=ROUND_FLOOR))
         if "amount" in row:
             facts[f"ohp_{number}_amount"] = row["amount"]
         else:
