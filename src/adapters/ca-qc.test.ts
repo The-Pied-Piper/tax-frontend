@@ -27,11 +27,11 @@ describe('Québec adapter', () => {
       ['qpp2', '0.00'],
       ['ei', '860.67'],
       ['qpip', '345.80'],
-      ['federal-tax', '7523.55'],
+      ['federal-tax', '6282.16'],
       ['quebec-tax', '7641.16'],
       ['drug-premium', '755.00'],
-      ['total-tax', '15164.71'],
-      ['total-taken-off', '21382.18'],
+      ['total-tax', '13923.32'],
+      ['total-taken-off', '20140.79'],
     ]);
   });
 
@@ -50,9 +50,23 @@ describe('Québec adapter', () => {
     expect(sumAmounts(parts.map(amount))).toBe(amount('total-taken-off'));
   });
 
-  it('counts the federal tax before the Québec abatement', () => {
+  it('counts the federal tax after the Québec abatement', () => {
+    // 7523.55 (line 146) less 1241.39 (line 156).
     const federal = all(r2025).find((r) => r.id === 'federal-tax');
-    expect(federal?.amount).toBe('7523.55');
+    expect(federal?.amount).toBe('6282.16');
+  });
+
+  it('shows the abatement as it is when it is nil, with the federal tax unchanged', () => {
+    const lines = (r2025.trace ?? []).map((form) => ({
+      ...form,
+      lines: form.lines.map((line) =>
+        line.label === 'refundable_quebec_abatement_line_156'
+          ? { ...line, amount: '0.00' }
+          : line,
+      ),
+    }));
+    const rows = all({ ...r2025, trace: lines });
+    expect(rows.find((r) => r.id === 'federal-tax')?.amount).toBe('7523.55');
   });
 
   it('lists rows under the Québec headings, with no Canada Pension Plan wording', () => {
@@ -99,6 +113,7 @@ describe('Québec adapter', () => {
     'ppip_premiums_paid',
     'ei_premiums_line_89',
     'net_federal_tax_line_146',
+    'refundable_quebec_abatement_line_156',
     'tp1_line_432',
     'tp1_drug_insurance_premium_line_447',
   ])('falls back to the advanced view when %s is missing', (missing) => {
@@ -115,35 +130,39 @@ describe('Québec adapter', () => {
     expect(result.advanced.length).toBeGreaterThan(0);
   });
 
-  it('falls back instead of throwing when the federal tax is not a money amount', () => {
-    const odd: ComputeTakeHomeCalculationResponse = {
-      ...r2025,
-      trace: (r2025.trace ?? []).map((f) => ({
-        ...f,
-        lines: f.lines.map((l) =>
-          l.label === 'net_federal_tax_line_146'
-            ? { ...l, amount: '7523.555' }
-            : l,
-        ),
-      })),
-    };
-    const result = caQcAdapter.adapt(odd);
-    expect(result.rows).toEqual([]);
-    expect(result.advanced.length).toBeGreaterThan(0);
-  });
+  it.each(['net_federal_tax_line_146', 'refundable_quebec_abatement_line_156'])(
+    'falls back instead of throwing when %s is not a money amount',
+    (label) => {
+      const odd: ComputeTakeHomeCalculationResponse = {
+        ...r2025,
+        trace: (r2025.trace ?? []).map((f) => ({
+          ...f,
+          lines: f.lines.map((l) =>
+            l.label === label ? { ...l, amount: '7523.555' } : l,
+          ),
+        })),
+      };
+      const result = caQcAdapter.adapt(odd);
+      expect(result.rows).toEqual([]);
+      expect(result.advanced.length).toBeGreaterThan(0);
+    },
+  );
 
-  it('falls back when federal and Québec tax are in different units', () => {
-    const mixed = {
-      ...r2025,
-      trace: (r2025.trace ?? []).map((f) => ({
-        ...f,
-        lines: f.lines.map((l) =>
-          l.label === 'tp1_line_432' ? { ...l, unit: months } : l,
-        ),
-      })),
-    } as ComputeTakeHomeCalculationResponse;
-    expect(caQcAdapter.adapt(mixed).rows).toEqual([]);
-  });
+  it.each(['tp1_line_432', 'refundable_quebec_abatement_line_156'])(
+    'falls back when federal tax and %s are in different units',
+    (label) => {
+      const mixed = {
+        ...r2025,
+        trace: (r2025.trace ?? []).map((f) => ({
+          ...f,
+          lines: f.lines.map((l) =>
+            l.label === label ? { ...l, unit: months } : l,
+          ),
+        })),
+      } as ComputeTakeHomeCalculationResponse;
+      expect(caQcAdapter.adapt(mixed).rows).toEqual([]);
+    },
+  );
 
   it('gives a row the unit of its own line', () => {
     const rows = all(r2025);

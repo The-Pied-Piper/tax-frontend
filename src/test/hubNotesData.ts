@@ -10,7 +10,7 @@ type Saved = {
 
 /**
  * The full sweep (all 307 salaries) of the seven provinces, one engine run in the form the build
- * embeds: the figures of the hub-charts thread's independent sweep (tax-engine 0.4.1, 2026,
+ * embeds: the figures of the hub-charts thread's independent sweep (tax-engine 0.5.2 for Québec, 0.4.1 for the others, 2026,
  * a single person with a salary only), on the return basis. The hub notes read their figures
  * from it.
  */
