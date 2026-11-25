@@ -3,8 +3,7 @@ import type { CauseForm, RatesNote, RatesPageText } from '../ratesPageTypes';
 
 /**
  * The Ontario rates page: the copy thread's CRA-reviewed wording, with every figure a spec the Ontario sweep resolves
- * (see `hubNotes.ts`). Salaries read from the engine's changes of the marginal rate are to the nearest $10, so the
- * words say "about" where they use one; a bracket's salary is worked out exactly from the form's taxable income.
+ * (see `hubNotes.ts`). The words say "about" where the copy thread's text does; a bracket's salary is worked out exactly from the form's taxable income, and a band's edges are the engine's own.
  */
 const pool: Record<string, string> = {
   // The two rates, at sweep salaries just after each change.
@@ -35,7 +34,7 @@ const pool: Record<string, string> = {
   fedBasicAmount: 'f:fed_bpa',
   // The Ontario Health Premium, its five steps.
   ohp1From: 'f:ohp_2_salary',
-  ohp1To: 'f:ohp_3_salary',
+  ohp1To: 'f:ohp_3_salary_to',
   ohp1Max: 'f:ohp_3_amount',
   ohp1Rate: 'h:marginal@21000',
   ohp2From: 'e:36330',
@@ -87,7 +86,7 @@ const pool: Record<string, string> = {
   fedBracket4Salary: 'f:fed_bracket_4_salary',
   fedBracket4Rate: 'h:marginal@183000',
   fedBracket4: 'p:fed_bracket_4_rate',
-  bpaTaperPoint: 'l:0.3 point',
+  bpaTaperPoint: 'x:fed_bpa_taper_points',
   ontBracket5Salary: 'f:ont_bracket_5_salary',
   ontBracket5Rate: 'h:marginal@222000',
   ontBracket5: 'p:ont_bracket_5_rate',
@@ -180,46 +179,57 @@ const tablePool: Record<string, string> = {
   fedBpaStart: 'f:fed_bpa_taper_start',
   fedBpaEnd: 'f:fed_bpa_taper_end',
   fedLowest: 'p:fed_bracket_1_rate',
+  fedLowestRatePrior: 'p:fed_lowest_rate_prior',
   cea: 'f:cea',
   ontBpa: 'f:ont_bpa',
   surtax1Pct: 'p:surtax_first_rate',
   surtax2Pct: 'p:surtax_second_rate',
   surtaxTotalPct: 'p:surtax_total_rate',
   // The Ontario Health Premium rows: where each starts in taxable income and in salary, and what it adds.
-  o1Sal: 'f:ohp_2_salary',
   o2Ti: 'f:ohp_2_ti',
+  o2Sal: 'f:ohp_2_salary',
+  o2SalTo: 'f:ohp_2_salary_to',
   o2Rate: 'p:ohp_2_rate',
   o3Ti: 'f:ohp_3_ti',
   o3Amount: 'f:ohp_3_amount',
   o3Sal: 'f:ohp_3_salary',
+  o3SalTo: 'f:ohp_3_salary_to',
   o4Ti: 'f:ohp_4_ti',
   o4Plus: 'f:ohp_4_plus',
   o4Rate: 'p:ohp_4_rate',
   o4Sal: 'f:ohp_4_salary',
+  o4SalTo: 'f:ohp_4_salary_to',
   o5Ti: 'f:ohp_5_ti',
   o5Amount: 'f:ohp_5_amount',
   o5Sal: 'f:ohp_5_salary',
+  o5SalTo: 'f:ohp_5_salary_to',
   o6Ti: 'f:ohp_6_ti',
   o6Plus: 'f:ohp_6_plus',
   o6Rate: 'p:ohp_6_rate',
   o6Sal: 'f:ohp_6_salary',
+  o6SalTo: 'f:ohp_6_salary_to',
   o7Ti: 'f:ohp_7_ti',
   o7Amount: 'f:ohp_7_amount',
   o7Sal: 'f:ohp_7_salary',
+  o7SalTo: 'f:ohp_7_salary_to',
   o8Ti: 'f:ohp_8_ti',
   o8Plus: 'f:ohp_8_plus',
   o8Rate: 'p:ohp_8_rate',
   o8Sal: 'f:ohp_8_salary',
+  o8SalTo: 'f:ohp_8_salary_to',
   o9Ti: 'f:ohp_9_ti',
   o9Amount: 'f:ohp_9_amount',
   o9Sal: 'f:ohp_9_salary',
+  o9SalTo: 'f:ohp_9_salary_to',
   o10Ti: 'f:ohp_10_ti',
   o10Plus: 'f:ohp_10_plus',
   o10Rate: 'p:ohp_10_rate',
   o10Sal: 'f:ohp_10_salary',
+  o10SalTo: 'f:ohp_10_salary_to',
   o11Ti: 'f:ohp_11_ti',
   o11Amount: 'f:ohp_11_amount',
   o11Sal: 'f:ohp_11_salary',
+  o11SalTo: 'f:ohp_11_salary_to',
   eiMaxPay: 'f:ei_stop',
   eiPremiumMax: 'n:ei_max_premium',
   cppMax: 'n:cpp_max',
@@ -290,15 +300,15 @@ export const ontarioRatesPage: RatesPageText = {
           ['on428'],
         ),
         words(
-          'From {ohp1To} to about {ontStartSalary} the rate stays {fedFirstRate}, all of it federal tax and the pension and insurance payments. Ontario income tax starts at about {ontStartSalary}. Until then Ontario’s credits for your basic amount, pension and insurance payments, and then the LIFT Credit, cover it.',
+          'From {ohp1To} to {ontStartSalary} the rate stays {fedFirstRate}, all of it federal tax and the pension and insurance payments. Ontario income tax starts at {ontStartSalary}. Until then Ontario’s credits for your basic amount, pension and insurance payments, and then the LIFT Credit, cover it.',
           ['on428', 'on428a'],
         ),
         words(
-          'From about {ontStartSalary} the rate is {ontStartRate}, then {liftRate} from about {liftStartSalary}. The Ontario LIFT Credit lowers your Ontario tax, up to {liftMax}. It shrinks by 5 cents for every dollar of adjusted net income above {liftThreshold}, and that is about {liftStartSalary} of salary. It does not lower the Ontario Health Premium.',
+          'From {ontStartSalary} the rate is {ontStartRate}, then {liftRate} from {liftStartSalary}. The Ontario LIFT Credit lowers your Ontario tax, up to {liftMax}. It shrinks by 5 cents for every dollar of adjusted net income above {liftThreshold}, and that is about {liftStartSalary} of salary. It does not lower the Ontario Health Premium.',
           ['on428a'],
         ),
         words(
-          'From about {ohp2From} to {ohp2To} the rate is {ohp2Rate}: a second step in the Ontario Health Premium, 6 cents for every dollar of taxable income, up to {ohp2Max} in all.',
+          'From {ohp2From} to {ohp2To} the rate is {ohp2Rate}: a second step in the Ontario Health Premium, 6 cents for every dollar of taxable income, up to {ohp2Max} in all.',
           ['on428'],
         ),
         words(
@@ -306,7 +316,7 @@ export const ontarioRatesPage: RatesPageText = {
           ['on428a'],
         ),
         words(
-          'A short spike to {ohp3Rate} from about {ohp3From} to {ohp3To}: a step in the Ontario Health Premium, 25 cents for every dollar of taxable income, up to {ohp3Max} in all, while the LIFT Credit is still shrinking.',
+          'A short spike to {ohp3Rate} from {ohp3From} to {ohp3To}: a step in the Ontario Health Premium, 25 cents for every dollar of taxable income, up to {ohp3Max} in all, while the LIFT Credit is still shrinking.',
           ['on428', 'on428a'],
         ),
       ],
@@ -327,7 +337,7 @@ export const ontarioRatesPage: RatesPageText = {
           ['t2204'],
         ),
         words(
-          'A spike to {ohp4Rate} from about {ohp4From} to {ohp4To}, another Ontario Health Premium step, up to {ohp4Max} in all.',
+          'A spike to {ohp4Rate} from {ohp4From} to {ohp4To}, another Ontario Health Premium step, up to {ohp4Max} in all.',
           ['on428'],
         ),
         words(
@@ -335,7 +345,7 @@ export const ontarioRatesPage: RatesPageText = {
           ['schedule8'],
         ),
         words(
-          'Ontario’s surtax adds 20 cents for every dollar of your Ontario tax above {surtax1}. This is the tax after your credits, before the LIFT Credit and the health premium. It starts at a salary of about {surtax1Salary}, and the rate rises to {surtax1Rate}.',
+          'Ontario’s surtax adds 20 cents for every dollar of your Ontario tax above {surtax1}. This is the tax after your credits, before the LIFT Credit and the health premium. It starts at a salary of {surtax1Salary}, and the rate rises to {surtax1Rate}.',
           ['on428'],
         ),
       ],
@@ -348,7 +358,7 @@ export const ontarioRatesPage: RatesPageText = {
           ['on428'],
         ),
         words(
-          'A second surtax step adds a further 36 cents for every dollar of your Ontario tax above {surtax2}, so 56 cents in all. It starts at a salary of about {surtax2Salary}, and the rate rises to {surtax2Rate}.',
+          'A second surtax step adds a further 36 cents for every dollar of your Ontario tax above {surtax2}, so 56 cents in all. It starts at a salary of {surtax2Salary}, and the rate rises to {surtax2Rate}.',
           ['on428'],
         ),
         words(
@@ -360,11 +370,11 @@ export const ontarioRatesPage: RatesPageText = {
           ['on428'],
         ),
         words(
-          'From {fedBracket4Salary} the rate is {fedBracket4Rate}: the federal rate rises to {fedBracket4}. The federal basic personal amount also begins to shrink, which adds about {bpaTaperPoint} to the rate.',
+          'From {fedBracket4Salary} the rate is {fedBracket4Rate}: the federal rate rises to {fedBracket4}. The federal basic personal amount also begins to shrink, which adds about {bpaTaperPoint} point to the rate.',
           ['t1'],
         ),
         words(
-          'A spike to {ohp5Rate} from about {ohp5From} to {ohp5To}: the last step in the Ontario Health Premium, up to {ohp5Max} in all.',
+          'A spike to {ohp5Rate} from {ohp5From} to {ohp5To}: the last step in the Ontario Health Premium, up to {ohp5Max} in all.',
           ['on428'],
         ),
         words(
@@ -399,7 +409,7 @@ export const ontarioRatesPage: RatesPageText = {
       ...cells(brackets('fed')),
       after: {
         ...note(
-          'The lowest federal rate is {fedLowest} for the whole of 2026. The federal basic personal amount is {fedBpa}, and shrinks to {fedBpaMin} between a net income of {fedBpaStart} and {fedBpaEnd}. The Canada employment amount is {cea}.',
+          'The lowest federal rate is {fedLowest} for the whole of 2026. In 2025 it was {fedLowestRatePrior}. The federal basic personal amount is {fedBpa}, and shrinks to {fedBpaMin} between a net income of {fedBpaStart} and {fedBpaEnd}. The Canada employment amount is {cea}.',
           tablePool,
         ),
       },
@@ -435,37 +445,37 @@ export const ontarioRatesPage: RatesPageText = {
       caption: 'Ontario Health Premium, 2026',
       head: ['Taxable income', 'Premium', 'Salary equivalent'],
       ...cells([
-        ['up to {o2Ti}', '$0', 'up to {o1Sal}'],
+        ['up to {o2Ti}', '$0', 'up to {o2SalTo}'],
         [
           '{o2Ti} to {o3Ti}',
           '{o2Rate} of the part above {o2Ti}, up to {o3Amount}',
-          '{o1Sal} to {o3Sal}',
+          '{o2Sal} to {o3SalTo}',
         ],
-        ['{o3Ti} to {o4Ti}', '{o3Amount}', 'up to {o4Sal}'],
+        ['{o3Ti} to {o4Ti}', '{o3Amount}', 'up to {o4SalTo}'],
         [
           '{o4Ti} to {o5Ti}',
           '{o4Plus} plus {o4Rate} of the part above {o4Ti}, up to {o5Amount}',
-          '{o4Sal} to {o5Sal}',
+          '{o4Sal} to {o5SalTo}',
         ],
-        ['{o5Ti} to {o6Ti}', '{o5Amount}', 'up to {o6Sal}'],
+        ['{o5Ti} to {o6Ti}', '{o5Amount}', 'up to {o6SalTo}'],
         [
           '{o6Ti} to {o7Ti}',
           '{o6Plus} plus {o6Rate} of the part above {o6Ti}, up to {o7Amount}',
-          '{o6Sal} to {o7Sal}',
+          '{o6Sal} to {o7SalTo}',
         ],
-        ['{o7Ti} to {o8Ti}', '{o7Amount}', 'up to {o8Sal}'],
+        ['{o7Ti} to {o8Ti}', '{o7Amount}', 'up to {o8SalTo}'],
         [
           '{o8Ti} to {o9Ti}',
           '{o8Plus} plus {o8Rate} of the part above {o8Ti}, up to {o9Amount}',
-          '{o8Sal} to {o9Sal}',
+          '{o8Sal} to {o9SalTo}',
         ],
-        ['{o9Ti} to {o10Ti}', '{o9Amount}', 'up to {o10Sal}'],
+        ['{o9Ti} to {o10Ti}', '{o9Amount}', 'up to {o10SalTo}'],
         [
           '{o10Ti} to {o11Ti}',
           '{o10Plus} plus {o10Rate} of the part above {o10Ti}, up to {o11Amount}',
-          '{o10Sal} to {o11Sal}',
+          '{o10Sal} to {o11SalTo}',
         ],
-        ['over {o11Ti}', '{o11Amount}', 'over {o11Sal}'],
+        ['over {o11Ti}', '{o11Amount}', 'over {o11SalTo}'],
       ]),
     },
     {

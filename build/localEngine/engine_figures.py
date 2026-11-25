@@ -34,7 +34,7 @@ from __future__ import annotations
 
 import json
 import sys
-from decimal import ROUND_HALF_UP, Decimal
+from decimal import ROUND_CEILING, ROUND_FLOOR, ROUND_HALF_UP, Decimal
 from contextlib import contextmanager
 from functools import lru_cache
 from importlib.metadata import version
@@ -146,11 +146,6 @@ def _params(year: int, package: str, family: str) -> dict:
     return yaml.safe_load(text)
 
 
-def _half_up(value: Decimal) -> Decimal:
-    """Whole dollars, halves up."""
-    return value.quantize(Decimal("1"), rounding=ROUND_HALF_UP)
-
-
 def _pension_deduction(year: int) -> dict[str, Decimal]:
     """The enhanced Canada Pension Plan deducted from salary before it is taxable income (T4127: 1% of earnings
     above the basic exemption up to the earnings limit, plus the second tier): taxable income is `factor` x
@@ -174,13 +169,32 @@ def _pension_deduction(year: int) -> dict[str, Decimal]:
     }
 
 
-def _salary_of_taxable(year: int, taxable: Decimal) -> Decimal:
-    """The salary at which taxable income (which is also net income) reaches `taxable`, whole dollars."""
+def _exact_salary_of_taxable(year: int, taxable: Decimal) -> Decimal:
+    """The salary at which taxable income (which is also net income) reaches `taxable`, exactly (it may have cents).
+
+    Taxable income is the salary less the pension deduction, which has three regimes: a share of the pay above the
+    exemption up to the limit, then the first tier's maximum plus a share of the pay up to the second limit, then
+    the two maximums together."""
     d = _pension_deduction(year)
-    below_limit = max(Decimal(0), (taxable - d["constant"]) / d["factor"])
-    if below_limit <= d["limit"]:
-        return _half_up(below_limit)
-    return _half_up(taxable + d["cut"])
+    first = max(Decimal(0), (taxable - d["constant"]) / d["factor"])
+    if first <= d["limit"]:
+        return first
+    second = (taxable - d["constant_2"]) / d["factor_2"]
+    if second <= d["second_limit"]:
+        return second
+    return taxable + d["cut"]
+
+
+def _salary_of_taxable(year: int, taxable: Decimal) -> Decimal:
+    """The first whole salary at or above the one where taxable income reaches `taxable`: where a band that starts at
+    that threshold starts in salary ("from")."""
+    return _exact_salary_of_taxable(year, taxable).to_integral_value(rounding=ROUND_CEILING)
+
+
+def _salary_to_taxable(year: int, taxable: Decimal) -> Decimal:
+    """The last whole salary at or below the one where taxable income reaches `taxable`: where a band that ends at
+    that threshold ends in salary ("up to")."""
+    return _exact_salary_of_taxable(year, taxable).to_integral_value(rounding=ROUND_FLOOR)
 
 
 def _rates_page_facts(year: int, code: str) -> dict[str, str]:
@@ -214,6 +228,14 @@ def _rates_page_facts(year: int, code: str) -> dict[str, str]:
     facts["fed_bpa_taper_end"] = str(Decimal(bpa["threshold"]) + Decimal(bpa["range"]))
     facts["cea"] = _params(year, "ca", "canada_employment_amount")["amount"]
     facts["fed_lowest_rate"] = facts["fed_bracket_1_rate"]
+    # The first bracket's rate in the year before (a mid-year cut made it a blend that year).
+    facts["fed_lowest_rate_prior"] = _params(year - 1, "ca", "brackets")["brackets"][0]["rate"]
+    # What the shrinking basic personal amount adds to the marginal rate, in percentage points, to one decimal.
+    facts["fed_bpa_taper_points"] = str(
+        (
+            Decimal(bpa["supplement"]) / Decimal(bpa["range"]) * Decimal(facts["fed_bracket_1_rate"]) * 100
+        ).quantize(Decimal("0.1"), rounding=ROUND_HALF_UP)
+    )
     facts["ont_bpa"] = _params(year, "ca_on", "basic_personal_amount")["amount"]
     facts["lift_max"] = _params(year, "ca_on", "lift_maximum")["amount"]
     facts["lift_end_ani"] = str(
@@ -239,6 +261,7 @@ def _rates_page_facts(year: int, code: str) -> dict[str, str]:
         over = Decimal(row["over"])
         facts[f"ohp_{number}_ti"] = str(over)
         facts[f"ohp_{number}_salary"] = str(_salary_of_taxable(year, over))
+        facts[f"ohp_{number}_salary_to"] = str(_salary_to_taxable(year, over))
         if "amount" in row:
             facts[f"ohp_{number}_amount"] = row["amount"]
         else:

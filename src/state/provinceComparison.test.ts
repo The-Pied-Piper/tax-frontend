@@ -137,7 +137,7 @@ describe('comparisonRows', () => {
       ['ca-mb', '0.2586'],
       ['ca-sk', '0.2476'],
       ['ca-on', '0.2316'],
-      ['ca-ab', '0.2270'],
+      ['ca-ab', '0.227'],
       ['ca-bc', '0.2236'],
     ]);
     expect(rows.every((row) => row.unit.as_percentage === true)).toBe(true);
@@ -188,5 +188,20 @@ describe('comparisonRows', () => {
       ['20.00', '100.0'],
       ['-50.00', '0.0'],
     ]);
+  });
+});
+
+describe('comparisonRows with the sweep’s seven-place rates', () => {
+  it('rounds an average rate once to four places, so the bars read the same as the page', () => {
+    const [on] = sampleSweeps;
+    if (!on) throw new Error('no sweep');
+    const sweep = {
+      ...on,
+      points: [
+        ['1000.00', '1000.00', '0.00', '0.00', '0.3436053', '0.5'],
+      ] as typeof on.points,
+    };
+    const [row] = comparisonRows([sweep], 0, 'averageRate');
+    expect(row?.value).toBe('0.3436');
   });
 });
