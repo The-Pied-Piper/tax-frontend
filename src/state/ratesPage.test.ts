@@ -96,6 +96,25 @@ describe('ratesPageView', () => {
     expect(compareAmounts(gap, '1000')).toBeLessThan(0);
   });
 
+  it('types no dollar figure or cents figure in a note or a table cell', () => {
+    const text = ratesPageText['ca-on'];
+    const words = [
+      ...(text?.intro ?? []).map((note) => note.text),
+      ...(text?.howToRead ?? []).map((note) => note.text),
+      ...(text?.groups ?? []).flatMap((group) =>
+        group.notes.map((note) => note.text),
+      ),
+      ...(text?.tables ?? []).flatMap((table) => [
+        table.before?.text ?? '',
+        table.after?.text ?? '',
+        ...table.rows.flat(),
+      ]),
+    ];
+    for (const line of words) {
+      expect(line).not.toMatch(/\$\d|\d cents/);
+    }
+  });
+
   it('keeps the tab title under 64 characters and the description under 160', () => {
     const text = ratesPageText['ca-on'];
     expect(text?.title.length).toBeLessThan(64);

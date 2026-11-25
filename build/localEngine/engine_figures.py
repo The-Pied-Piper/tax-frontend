@@ -35,7 +35,7 @@ from __future__ import annotations
 
 import json
 import sys
-from decimal import ROUND_CEILING, ROUND_FLOOR, ROUND_HALF_UP, Decimal
+from decimal import ROUND_CEILING, ROUND_HALF_UP, Decimal
 from contextlib import contextmanager
 from functools import lru_cache
 from importlib.metadata import version
@@ -193,9 +193,9 @@ def _salary_of_taxable(year: int, taxable: Decimal) -> Decimal:
 
 
 def _salary_to_taxable(year: int, taxable: Decimal) -> Decimal:
-    """The last whole salary at or below the one where taxable income reaches `taxable`: where a band that ends at
-    that threshold ends in salary ("up to")."""
-    return _exact_salary_of_taxable(year, taxable).to_integral_value(rounding=ROUND_FLOOR)
+    """The last whole salary before the band that starts at `taxable` ("from" is the first whole salary at or above the
+    exact one, as the engine's edges read it, so "up to" is the whole salary before it)."""
+    return _salary_of_taxable(year, taxable) - 1
 
 
 def _rates_page_facts(year: int, code: str) -> dict[str, str]:
@@ -261,10 +261,7 @@ def _rates_page_facts(year: int, code: str) -> dict[str, str]:
     for number, row in enumerate(_params(year, "ca_on", "health_premium_rows")["rows"], start=1):
         over = Decimal(row["over"])
         facts[f"ohp_{number}_ti"] = str(over)
-        # The band above a threshold starts at the first whole salary strictly above it.
-        facts[f"ohp_{number}_salary"] = str(
-            _exact_salary_of_taxable(year, over).to_integral_value(rounding=ROUND_FLOOR) + 1
-        )
+        facts[f"ohp_{number}_salary"] = str(_salary_of_taxable(year, over))
         facts[f"ohp_{number}_salary_to"] = str(_salary_to_taxable(year, over))
         if "amount" in row:
             facts[f"ohp_{number}_amount"] = row["amount"]
@@ -341,7 +338,15 @@ class Figures:
         last = max(
             salary for salary in range(2001, 2101) if ei[salary] - ei[salary - 1] > Decimal("0.99")
         )
-        return {"ei_band_end": str(last), "ei_band_top": str(ei[last].quantize(CENTS))}
+        top = ei[last]
+        if code != "CA-QC":
+            # The band runs until the salary over the exemption is the whole premium at the rate (T2204): the
+            # premium p satisfies p = rate x (exemption + p), so p = rate x exemption / (1 - rate); the salary
+            # is exemption + p, which falls between whole dollars, so the engine's last whole dollar is below it.
+            rate = Decimal(_params(year, "ca", "ei_premium")["rate"])
+            exemption = Decimal(_params(year, "ca", "t2204_exemption")["amount"])
+            top = rate * exemption / (1 - rate)
+        return {"ei_band_end": str(last), "ei_band_top": str(top.quantize(CENTS))}
 
     def _ei(self, code: str, year: int, salary: int) -> Decimal:
         return self._figure(self._result(code, year, salary), EI_FIGURE)

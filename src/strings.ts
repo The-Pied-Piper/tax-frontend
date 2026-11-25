@@ -132,7 +132,7 @@ export const strings = {
     salaryHeader: 'Salary',
     marginalHeader: 'Marginal rate',
     averageHeader: 'Average rate',
-    causedBy: 'Caused by',
+    causedBy: 'Caused by:',
     howToRead: 'How to read these salaries',
     notesHeading: 'What moves the rate, by salary',
     bracketsHeading: 'Brackets by salary',

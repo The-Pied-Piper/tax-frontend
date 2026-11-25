@@ -260,7 +260,7 @@ const brackets = (kind: 'fed' | 'ont') =>
 export const ontarioRatesPage: RatesPageText = {
   title: 'Ontario marginal and average tax rate by salary, 2026',
   description:
-    'See how much of each extra dollar and of your whole salary goes to tax in Ontario in 2026, from $0 to $500,000, and what causes every step.',
+    'See how much of each extra dollar and of your whole salary goes to tax in Ontario in 2026, and what causes every step.',
   heading: 'Ontario marginal and average tax rate by salary, 2026',
   intro: [
     words(
@@ -499,8 +499,8 @@ export const ontarioRatesPage: RatesPageText = {
         ['Most pay counted for Employment Insurance', '{eiMaxPay}'],
         ['Most Employment Insurance a year', '{eiPremiumMax}'],
         [
-          'The $2,000 rule',
-          'Nothing is counted up to {eiStart}. Then $1 for every {oneDollar} of salary, until {eiFullAmount} at {eiFullSalary}.',
+          'The {eiStart} rule',
+          'Nothing is counted up to {eiStart}. Then {oneDollar} for every {oneDollar} of salary, until {eiFullAmount} at about {eiFullSalary}.',
         ],
         ['Canada Pension Plan starts above', '{cppStart}'],
         [

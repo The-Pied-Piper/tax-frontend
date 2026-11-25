@@ -3,7 +3,7 @@ import type { ProvinceSweep } from './hubCharts';
 import { isFullSweep, noteWords } from './hubNotes';
 import { ontarioRatesPage } from './ratesPageText/ca-on';
 import type { CauseForm, RatesPageText } from './ratesPageTypes';
-import type { FooterProvinceSlug } from './siteLinks';
+import { FOOTER_PROVINCE_SLUGS, type FooterProvinceSlug } from './siteLinks';
 import { strings } from '../strings';
 
 /** The text of the rates page of each province that has one. Adding a province is one file in `ratesPageText/` and one entry here. */
@@ -14,7 +14,7 @@ export const ratesPageText: Partial<Record<FooterProvinceSlug, RatesPageText>> =
 
 /** The provinces that have a rates page, in the footer's order. */
 export function ratesProvinces(): FooterProvinceSlug[] {
-  return (Object.keys(ratesPageText) as FooterProvinceSlug[]).filter(
+  return FOOTER_PROVINCE_SLUGS.filter(
     (slug) => ratesPageText[slug] !== undefined,
   );
 }

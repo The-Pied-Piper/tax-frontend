@@ -141,7 +141,7 @@ function ContentBlockView({
                         {note.words}
                         {note.causes.length > 0 && (
                           <span className={styles.causes}>
-                            {strings.ratesPage.causedBy}:{' '}
+                            {strings.ratesPage.causedBy}{' '}
                             {note.causes.map((cause, at) => (
                               <span key={cause.label}>
                                 {at > 0 && ', '}
