@@ -373,7 +373,7 @@ export const strings = {
       wording: {
         answer: {
           takenOff:
-            'Income tax, Quebec Pension Plan, Employment Insurance, Quebec Parental Insurance Plan premiums and the drug insurance premium added together.',
+            'Income tax after the Québec abatement, Québec Pension Plan, Employment Insurance, Québec Parental Insurance Plan premiums and the drug insurance premium added together.',
           averageRate:
             'Income tax, Quebec Pension Plan, Employment Insurance, parental insurance and drug insurance premiums, divided by your salary.',
           marginalRate:
@@ -407,6 +407,10 @@ export const strings = {
         name: 'Employment Insurance',
         help: 'Your Employment Insurance premium at the lower Quebec rate, taken off your pay to cover benefits if you lose your job. None is counted if your pay is below a set amount.',
       },
+      federalTax: {
+        name: 'Federal income tax after the Québec abatement',
+        help: 'Federal income tax after the federal credits that apply to you, less the Québec abatement, a credit worked out as a share of that tax, for people who live in Québec.',
+      },
       quebecTax: {
         name: 'Quebec income tax',
         help: 'Income tax owed to Quebec on your Quebec return, after the Quebec credits that apply to you.',
@@ -417,11 +421,11 @@ export const strings = {
       },
       totalTax: {
         name: 'Total income tax',
-        help: 'Federal and Quebec income tax added together.',
+        help: 'Federal income tax after the abatement and Québec income tax added together.',
       },
       totalTakenOff: {
         name: 'Total taken off',
-        help: 'Income tax, Quebec Pension Plan, Employment Insurance, Quebec Parental Insurance Plan premiums and the drug insurance premium added together. Your salary minus this is your estimated take-home pay.',
+        help: 'Income tax after the Québec abatement, Québec Pension Plan, Employment Insurance, Québec Parental Insurance Plan premiums and the drug insurance premium added together. Your salary minus this is your estimated take-home pay.',
       },
     },
   },

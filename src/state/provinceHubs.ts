@@ -207,7 +207,7 @@ export const provinceHubs: ProvinceHubText[] = [
     slug: 'ca-qc',
     taxReduction: false,
     words: (name) => ({
-      takeHome: `Take-home pay is your salary minus five things. The first is income tax, which comes in two parts: federal tax, and ${name} tax worked out on your ${name} return from Revenu Québec. The second is your Quebec Pension Plan, or QPP, payments, which build up your future pension. The third is Employment Insurance, or EI, which can pay you if you lose your job. Quebec workers pay a lower EI rate. The fourth is Quebec Parental Insurance Plan, or QPIP, premiums, which pay benefits when you have or adopt a child. The fifth is the Quebec prescription drug insurance premium. You pay it on your ${name} return if you have no drug plan through work, and we assume you do not. We do not count the ${name} abatement, a credit equal to 16.5% of your basic federal tax that ${name} residents get on their federal return. The forms below are where each of these is worked out.`,
+      takeHome: `Take-home pay is your salary minus five things. The first is income tax, which comes in two parts: federal tax, lowered by the Québec abatement, and ${name} tax worked out on your ${name} return from Revenu Québec. The second is your Quebec Pension Plan, or QPP, payments, which build up your future pension. The third is Employment Insurance, or EI, which can pay you if you lose your job. Quebec workers pay a lower EI rate. The fourth is Quebec Parental Insurance Plan, or QPIP, premiums, which pay benefits when you have or adopt a child. The fifth is the Quebec prescription drug insurance premium. You pay it on your ${name} return if you have no drug plan through work, and we assume you do not. We count the Québec abatement, a credit equal to 16.5% of your basic federal tax that Québec residents get on their federal return. The forms below are where each of these is worked out.`,
       charts: {
         takeHome:
           'Your salary minus income tax, Quebec Pension Plan, Employment Insurance, Quebec Parental Insurance Plan premiums and the Quebec prescription drug insurance premium.',
@@ -222,7 +222,7 @@ export const provinceHubs: ProvinceHubText[] = [
         },
         t1: {
           description:
-            'Works out your federal tax. This site counts the federal tax on line 43500 and adds the Quebec tax and premium from your Quebec return.',
+            'Works out your federal tax. This site counts the federal tax on line 43500, less the Québec abatement (line 44000), and adds the Québec tax and premium from your Québec return.',
         },
         'schedule-8': {
           // Its own id: the Canada Pension Plan page must not be linked for a Quebec filer.

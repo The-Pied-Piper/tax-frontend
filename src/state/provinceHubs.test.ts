@@ -152,7 +152,7 @@ describe.each(FOOTER_PROVINCE_SLUGS)('the hub page for %s', (slug) => {
     const words = everyString(how?.blocks).join(' ');
     expect(words).toContain(
       slug === 'ca-qc'
-        ? `income tax, which comes in two parts: federal tax, and ${name} tax`
+        ? `income tax, which comes in two parts: federal tax, lowered by the Québec abatement, and ${name} tax`
         : `income tax, which comes in two parts: federal tax and ${name} tax`,
     );
     expect(words).toContain(
@@ -311,7 +311,7 @@ describe('the Quebec hub', () => {
     expect(words).toContain('Quebec Pension Plan');
     expect(words).toContain('Quebec Parental Insurance Plan');
     expect(words).toContain('prescription drug insurance premium');
-    expect(words).toContain('Quebec abatement');
+    expect(words).toContain('We count the Québec abatement');
     const every = everyString(page.sections.map((s) => s.blocks)).join(' ');
     expect(every).not.toContain('Canada Pension Plan');
     expect(every).not.toMatch(/taxtips/i);

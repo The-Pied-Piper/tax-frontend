@@ -27,11 +27,11 @@ describe('Quebec adapter', () => {
       ['qpp2', '0.00'],
       ['ei', '860.67'],
       ['qpip', '345.80'],
-      ['federal-tax', '7523.55'],
+      ['federal-tax', '6282.16'],
       ['quebec-tax', '7641.16'],
       ['drug-premium', '755.00'],
-      ['total-tax', '15164.71'],
-      ['total-taken-off', '21382.18'],
+      ['total-tax', '13923.32'],
+      ['total-taken-off', '20140.79'],
     ]);
   });
 
@@ -50,9 +50,34 @@ describe('Quebec adapter', () => {
     expect(sumAmounts(parts.map(amount))).toBe(amount('total-taken-off'));
   });
 
-  it('counts the federal tax before the Quebec abatement', () => {
+  it('counts the federal tax after the Quebec abatement', () => {
+    // 7523.55 (line 146) less 1241.39 (line 156).
     const federal = all(r2025).find((r) => r.id === 'federal-tax');
-    expect(federal?.amount).toBe('7523.55');
+    expect(federal?.amount).toBe('6282.16');
+  });
+
+  it('shows the abatement as it is when it is nil, with the federal tax unchanged', () => {
+    const lines = (r2025.trace ?? []).map((form) => ({
+      ...form,
+      lines: form.lines.map((line) =>
+        line.label === 'refundable_quebec_abatement_line_156'
+          ? { ...line, amount: '0.00' }
+          : line,
+      ),
+    }));
+    const rows = all({ ...r2025, trace: lines });
+    expect(rows.find((r) => r.id === 'federal-tax')?.amount).toBe('7523.55');
+  });
+
+  it('falls back to the plain view when the abatement line is missing', () => {
+    const lines = (r2025.trace ?? []).map((form) => ({
+      ...form,
+      lines: form.lines.filter(
+        (line) => line.label !== 'refundable_quebec_abatement_line_156',
+      ),
+    }));
+    const result = caQcAdapter.adapt({ ...r2025, trace: lines });
+    expect(result.rows.map((r) => r.id)).not.toContain('federal-tax');
   });
 
   it('lists rows under the Quebec headings, with no Canada Pension Plan wording', () => {

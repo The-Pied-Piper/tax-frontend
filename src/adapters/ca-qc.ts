@@ -1,5 +1,6 @@
 import { displayMoney } from '../money/format';
 import { isPositive, isZero } from '../money/sign';
+import { subtractAmounts } from '../money/amounts';
 import { sumAmounts } from '../money/sum';
 import { strings } from '../strings';
 import { find, row, sameUnit, type Found, type Wanted } from './ca-federal';
@@ -8,7 +9,7 @@ import type { AdaptedResult, JurisdictionAdapter } from './types';
 
 /**
  * Exact trace labels read from the real engine answers for 2025 and 2026. Quebec has its own pension
- * plan, parental insurance and drug premium, and the federal tax shown is before the Quebec abatement
+ * plan, parental insurance and drug premium, and the federal tax shown is after the Quebec abatement
  * (the take-home basis), so it does not share `adaptCanadian`.
  */
 const LABELS = {
@@ -20,6 +21,11 @@ const LABELS = {
   federalTax: {
     form: 'ca-qc/t1_tax_and_credits',
     label: 'net_federal_tax_line_146',
+  },
+  // Line 156: 16.5% of the basic federal tax, taken off the federal tax of a Quebec resident.
+  abatement: {
+    form: 'ca-qc/t1_tax_and_credits',
+    label: 'refundable_quebec_abatement_line_156',
   },
   quebecTax: { form: 'ca-qc/tp1_tax', label: 'tp1_line_432' },
   drugPremium: {
@@ -39,16 +45,27 @@ export const caQcAdapter: JurisdictionAdapter = {
       qpip: find(response, LABELS.qpip),
       ei: find(response, LABELS.ei),
       federalTax: find(response, LABELS.federalTax),
+      abatement: find(response, LABELS.abatement),
       quebecTax: find(response, LABELS.quebecTax),
       drugPremium: find(response, LABELS.drugPremium),
     };
-    const { qpp, qpp2, qpip, ei, federalTax, quebecTax, drugPremium } = found;
+    const {
+      qpp,
+      qpp2,
+      qpip,
+      ei,
+      federalTax,
+      abatement,
+      quebecTax,
+      drugPremium,
+    } = found;
     if (
       qpp === undefined ||
       qpp2 === undefined ||
       qpip === undefined ||
       ei === undefined ||
       federalTax === undefined ||
+      abatement === undefined ||
       quebecTax === undefined ||
       drugPremium === undefined
     ) {
@@ -56,14 +73,22 @@ export const caQcAdapter: JurisdictionAdapter = {
       return fallbackResult(response);
     }
     const text = strings.adapters.caQc;
+    let federalAfterAbatement: string;
     let totalTax: string;
     let eiHelp = text.ei.help;
     // Two lines in different units cannot be added.
-    if (!sameUnit(federalTax.unit, quebecTax.unit)) {
+    if (
+      !sameUnit(federalTax.unit, abatement.unit) ||
+      !sameUnit(federalTax.unit, quebecTax.unit)
+    ) {
       return fallbackResult(response);
     }
     try {
-      totalTax = sumAmounts([federalTax.amount, quebecTax.amount]);
+      federalAfterAbatement = subtractAmounts(
+        federalTax.amount,
+        abatement.amount,
+      );
+      totalTax = sumAmounts([federalAfterAbatement, quebecTax.amount]);
       // No premium counted on a real salary: say why, since a pay slip shows one.
       if (isZero(ei.amount) && isPositive(response.salary)) {
         eiHelp = `${eiHelp} ${strings.adapters.caFederal.eiRefundedNote(displayMoney(response.salary, 'annually', responseUnit(response)))}`;
@@ -86,8 +111,8 @@ export const caQcAdapter: JurisdictionAdapter = {
         row('qpip', text.qpip, qpip, GROUPS.parentalInsurance),
         row(
           'federal-tax',
-          strings.adapters.caFederal.federalTax,
-          federalTax,
+          text.federalTax,
+          { amount: federalAfterAbatement, unit: federalTax.unit },
           GROUPS.incomeTax,
         ),
         row('quebec-tax', text.quebecTax, quebecTax, GROUPS.incomeTax),
