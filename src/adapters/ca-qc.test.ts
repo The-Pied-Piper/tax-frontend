@@ -148,18 +148,21 @@ describe('Québec adapter', () => {
     },
   );
 
-  it('falls back when federal and Québec tax are in different units', () => {
-    const mixed = {
-      ...r2025,
-      trace: (r2025.trace ?? []).map((f) => ({
-        ...f,
-        lines: f.lines.map((l) =>
-          l.label === 'tp1_line_432' ? { ...l, unit: months } : l,
-        ),
-      })),
-    } as ComputeTakeHomeCalculationResponse;
-    expect(caQcAdapter.adapt(mixed).rows).toEqual([]);
-  });
+  it.each(['tp1_line_432', 'refundable_quebec_abatement_line_156'])(
+    'falls back when federal tax and %s are in different units',
+    (label) => {
+      const mixed = {
+        ...r2025,
+        trace: (r2025.trace ?? []).map((f) => ({
+          ...f,
+          lines: f.lines.map((l) =>
+            l.label === label ? { ...l, unit: months } : l,
+          ),
+        })),
+      } as ComputeTakeHomeCalculationResponse;
+      expect(caQcAdapter.adapt(mixed).rows).toEqual([]);
+    },
+  );
 
   it('gives a row the unit of its own line', () => {
     const rows = all(r2025);
