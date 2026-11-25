@@ -69,17 +69,6 @@ describe('Quebec adapter', () => {
     expect(rows.find((r) => r.id === 'federal-tax')?.amount).toBe('7523.55');
   });
 
-  it('falls back to the plain view when the abatement line is missing', () => {
-    const lines = (r2025.trace ?? []).map((form) => ({
-      ...form,
-      lines: form.lines.filter(
-        (line) => line.label !== 'refundable_quebec_abatement_line_156',
-      ),
-    }));
-    const result = caQcAdapter.adapt({ ...r2025, trace: lines });
-    expect(result.rows.map((r) => r.id)).not.toContain('federal-tax');
-  });
-
   it('lists rows under the Quebec headings, with no Canada Pension Plan wording', () => {
     const rows = all(r2025);
     expect(rows.map((r) => [r.id, r.group])).toEqual([
@@ -124,6 +113,7 @@ describe('Quebec adapter', () => {
     'ppip_premiums_paid',
     'ei_premiums_line_89',
     'net_federal_tax_line_146',
+    'refundable_quebec_abatement_line_156',
     'tp1_line_432',
     'tp1_drug_insurance_premium_line_447',
   ])('falls back to the advanced view when %s is missing', (missing) => {
@@ -140,22 +130,23 @@ describe('Quebec adapter', () => {
     expect(result.advanced.length).toBeGreaterThan(0);
   });
 
-  it('falls back instead of throwing when the federal tax is not a money amount', () => {
-    const odd: ComputeTakeHomeCalculationResponse = {
-      ...r2025,
-      trace: (r2025.trace ?? []).map((f) => ({
-        ...f,
-        lines: f.lines.map((l) =>
-          l.label === 'net_federal_tax_line_146'
-            ? { ...l, amount: '7523.555' }
-            : l,
-        ),
-      })),
-    };
-    const result = caQcAdapter.adapt(odd);
-    expect(result.rows).toEqual([]);
-    expect(result.advanced.length).toBeGreaterThan(0);
-  });
+  it.each(['net_federal_tax_line_146', 'refundable_quebec_abatement_line_156'])(
+    'falls back instead of throwing when %s is not a money amount',
+    (label) => {
+      const odd: ComputeTakeHomeCalculationResponse = {
+        ...r2025,
+        trace: (r2025.trace ?? []).map((f) => ({
+          ...f,
+          lines: f.lines.map((l) =>
+            l.label === label ? { ...l, amount: '7523.555' } : l,
+          ),
+        })),
+      };
+      const result = caQcAdapter.adapt(odd);
+      expect(result.rows).toEqual([]);
+      expect(result.advanced.length).toBeGreaterThan(0);
+    },
+  );
 
   it('falls back when federal and Quebec tax are in different units', () => {
     const mixed = {

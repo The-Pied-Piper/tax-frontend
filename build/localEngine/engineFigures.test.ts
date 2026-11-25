@@ -76,7 +76,7 @@ describe("reading the Python step's file", () => {
     writeFileSync(
       file,
       JSON.stringify({
-        engine: '0.5.1',
+        engine: '0.5.2',
         provinces: { 'CA-ON': { pages, ...extra } },
       }),
     );
@@ -86,7 +86,7 @@ describe("reading the Python step's file", () => {
   it('returns the answers by province and salary', () => {
     const answer = engineOf(saved);
     const figures = readEngineFigures(written({ '70000': answer }));
-    expect(figures.engine).toBe('0.5.1');
+    expect(figures.engine).toBe('0.5.2');
     expect(figures.answers['CA-ON']?.['70000']).toEqual(answer);
   });
 
@@ -180,7 +180,7 @@ describe.runIf(process.env.ENGINE_FIGURES_FILE)(
       );
     });
 
-    // The chart figures (tax-engine 0.5.1, 2026): the average and marginal rate are the engine's own
+    // The chart figures (tax-engine 0.5.2, 2026): the average and marginal rate are the engine's own
     // (income tax, CPP and EI line 16, no credits paid on filing counted; at $2,000 the engine reads the
     // marginal rate below the start of the EI band).
     it.each([
