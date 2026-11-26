@@ -14,7 +14,6 @@ type Props = {
   unit?: MoneyUnit;
 };
 
-/** Plain links from a salary page to its province hub, the method and the tax form. */
 /** The salary in a compare link's address (`?salary=70000`), as the page's own money; null when it has none or there is no unit. */
 function compareSalary(compare: PageLink, unit?: MoneyUnit): string | null {
   const salary = new URLSearchParams(compare.href.split('?')[1] ?? '').get(
@@ -25,6 +24,7 @@ function compareSalary(compare: PageLink, unit?: MoneyUnit): string | null {
     : displayWholeMoney(salary, 'annually', unit);
 }
 
+/** Plain links from a salary page to its province hub, the method and the tax form. */
 export function LearnMore({ links, rates, compare = null, unit }: Props) {
   const salary = compare ? compareSalary(compare, unit) : null;
   return (

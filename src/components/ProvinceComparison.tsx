@@ -5,6 +5,7 @@ import {
   displayWholeMoney,
 } from '../money/format';
 import { PROVINCE_COMPARISON_SLOT_ID } from '../state/hubSlots';
+import { withoutZeroCents } from '../money/salaryInput';
 import { regularIndexes, type HubChartsData } from '../state/hubCharts';
 import {
   allTied,
@@ -42,7 +43,7 @@ function barHref(
   slug: string,
   salary: string | undefined,
 ): { href: string; ofSalary: boolean } {
-  const whole = salary?.replace(/\.00$/, '');
+  const whole = salary === undefined ? undefined : withoutZeroCents(salary);
   const pages = data.provinces.find(
     (sweep) => sweep.slug === slug,
   )?.salaryPages;
@@ -105,7 +106,11 @@ export function ProvinceComparison({ data, province }: Props) {
     () => '',
   );
   const named = new URLSearchParams(search).get('salary');
-  const namedAt = named === null ? -1 : salaries.indexOf(`${named}.00`);
+  // Only a whole-dollar salary names a point of the sweep, as on the rates page.
+  const namedAt =
+    named === null || !/^[1-9]\d{0,6}$/.test(named)
+      ? -1
+      : salaries.indexOf(`${named}.00`);
   const start =
     namedAt >= 0 ? namedAt : nearestSalaryIndex(salaries, DEFAULT_SALARY);
   // What the reader chose; until they choose, the salary the address names, or the default.
