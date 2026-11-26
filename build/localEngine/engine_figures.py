@@ -198,14 +198,18 @@ def _salary_to_taxable(year: int, taxable: Decimal) -> Decimal:
     return _salary_of_taxable(year, taxable) - 1
 
 
-def _bracket_facts(year: int, prefix: str, brackets: list[dict]) -> dict[str, str]:
-    """For each bracket (numbered from 1): its taxable income, its rate, and the first whole salary at that taxable income."""
+def _bracket_facts(
+    year: int, prefix: str, brackets: list[dict], salary_of=None
+) -> dict[str, str]:
+    """For each bracket (numbered from 1): its taxable income, its rate, and the salary at that taxable income: the first
+    whole salary at or above it, or the whole salary `salary_of` gives."""
+    salary_of = salary_of or _salary_of_taxable
     facts: dict[str, str] = {}
     for number, bracket in enumerate(brackets, start=1):
         taxable = Decimal(bracket["from"])
         facts[f"{prefix}_bracket_{number}_ti"] = str(taxable)
         facts[f"{prefix}_bracket_{number}_rate"] = bracket["rate"]
-        facts[f"{prefix}_bracket_{number}_salary"] = str(_salary_of_taxable(year, taxable))
+        facts[f"{prefix}_bracket_{number}_salary"] = str(salary_of(year, taxable))
     return facts
 
 
@@ -306,6 +310,30 @@ def _alberta_rates_page_facts(year: int) -> dict[str, str]:
     alberta["shift_fed_bracket_2"] = _shift(facts, "fed_bracket_2")
     alberta["shift_ab_bracket_2"] = _shift(alberta, "ab_bracket_2")
     return {**facts, **alberta}
+
+
+def _newfoundland_rates_page_facts(year: int) -> dict[str, str]:
+    """Newfoundland and Labrador's figures: the common ones and its own: its eight brackets (two dataset files), basic
+    amount and credit rate, and the low-income tax reduction. A single filer takes the basic amount (NL428 line 95) and
+    loses the rate (line 102) of the income above the threshold (line 100); the reduction is gone where the income
+    reaches the threshold plus the basic amount over the rate."""
+    facts = _common_rates_page_facts(year)
+    brackets = [
+        *_params(year, "ca_nl", "brackets_lines_2_to_8")["brackets"],
+        *_params(year, "ca_nl", "brackets_lines_9_to_15")["brackets"],
+    ]
+    newfoundland = _bracket_facts(year, "nl", brackets)
+    newfoundland["nl_bpa"] = _params(year, "ca_nl", "basic_personal_amount")["amount"]
+    newfoundland["nl_credit_rate"] = _params(year, "ca_nl", "credit_rate")["rate"]
+    maximum = _params(year, "ca_nl", "low_income_reduction_basic")["amount"]
+    threshold = _params(year, "ca_nl", "low_income_threshold")["amount"]
+    rate = _params(year, "ca_nl", "low_income_reduction_rate")["rate"]
+    newfoundland["reduction_max"] = maximum
+    newfoundland["reduction_start_salary"] = str(_salary_of_taxable(year, Decimal(threshold)))
+    newfoundland["reduction_end_ni"] = str(Decimal(threshold) + Decimal(maximum) / Decimal(rate))
+    newfoundland["shift_reduction"] = str(Decimal(newfoundland["reduction_start_salary"]) - Decimal(threshold))
+    newfoundland["shift_nl_bracket_2"] = _shift(newfoundland, "nl_bracket_2")
+    return {**facts, **newfoundland}
 
 
 def _british_columbia_rates_page_facts(year: int) -> dict[str, str]:
@@ -518,11 +546,60 @@ def _quebec_rates_page_facts(year: int) -> dict[str, str]:
     return facts
 
 
+def _nearest_salary_of_taxable(year: int, taxable: Decimal) -> Decimal:
+    """The whole salary nearest the one where taxable income reaches `taxable` (half up), for the wording "from about".
+    The engine's own edge lies between the whole salary below and the one above, so this is one of the two."""
+    return _exact_salary_of_taxable(year, taxable).quantize(Decimal(1), rounding=ROUND_HALF_UP)
+
+
+def _manitoba_rates_page_facts(year: int) -> dict[str, str]:
+    """Manitoba's figures: the common ones and its own: its three brackets (each with the salary where it starts), the
+    basic personal amount that shrinks above a net income of $200,000, and the Family Tax Benefit."""
+    facts = _common_rates_page_facts(year)
+    manitoba = _bracket_facts(
+        year,
+        "mb",
+        _params(year, "ca_mb", "brackets_lines_2_to_8")["brackets"],
+        _nearest_salary_of_taxable,
+    )
+    credit_rate = Decimal(_params(year, "ca_mb", "credit_rate")["rate"])
+    manitoba["mb_credit_rate"] = str(credit_rate)
+    bpa = Decimal(_params(year, "ca_mb", "basic_personal_amount")["amount"])
+    start = Decimal(_params(year, "ca_mb", "basic_personal_amount_threshold")["amount"])
+    manitoba["mb_bpa_max"] = str(bpa)
+    manitoba["mb_bpa_start_ni"] = str(start)
+    manitoba["mb_bpa_start_salary"] = str(_nearest_salary_of_taxable(year, start))
+    # The amount reaches nothing at a net income of $400,000, which Worksheet MB428 and T4127 print; the engine holds it
+    # in the worksheet's range, so the page declares that one figure (`d:`) and the salary where it falls is derived.
+    end = Decimal(400000)
+    manitoba["mb_bpa_end_salary"] = str(_nearest_salary_of_taxable(year, end))
+    # What the shrinking amount adds to the marginal rate, in points to two decimals: the amount lost per dollar of net
+    # income (the maximum over the range) at the credit rate.
+    manitoba["mb_bpa_taper_points"] = str(
+        (bpa / (end - start) * credit_rate * 100).quantize(Decimal("0.01"), rounding=ROUND_HALF_UP)
+    )
+    benefit = Decimal(_params(year, "ca_mb", "family_tax_benefit_basic_amount")["amount"])
+    benefit_rate = Decimal(_params(year, "ca_mb", "family_tax_benefit_rate")["rate"])
+    manitoba["ftb_max"] = str(benefit)
+    gone = benefit / benefit_rate
+    manitoba["ftb_end_ni"] = str(gone)
+    manitoba["ftb_end_salary"] = str(_nearest_salary_of_taxable(year, gone))
+    manitoba["shift_ftb"] = str(
+        Decimal(manitoba["ftb_end_salary"]) - gone.quantize(Decimal(1), rounding=ROUND_HALF_UP)
+    )
+    manitoba["shift_mb_bracket_2"] = _shift(manitoba, "mb_bracket_2")
+    # Manitoba tax lost per extra dollar of net income while the benefit shrinks, as a rate to a whole cent.
+    manitoba["ftb_tax_effect"] = str((credit_rate * benefit_rate).quantize(Decimal("0.01"), rounding=ROUND_HALF_UP))
+    return {**facts, **manitoba}
+
+
 # The rates page's figures by province code: each builder makes the whole set for its province; a province with no entry has no rates page.
 RATES_PAGE_FACTS = {
     "CA-ON": _ontario_rates_page_facts,
     "CA-AB": _alberta_rates_page_facts,
     "CA-BC": _british_columbia_rates_page_facts,
+    "CA-MB": _manitoba_rates_page_facts,
+    "CA-NL": _newfoundland_rates_page_facts,
     # Québec has its own pension plan, so it does not start from the common (Canada Pension Plan) figures.
     "CA-QC": _quebec_rates_page_facts,
 }
@@ -532,6 +609,21 @@ def _rates_page_facts(year: int, code: str) -> dict[str, str]:
     """The figures the rates page quotes besides the sweep: what the province's builder makes, or none for a province with no page."""
     builder = RATES_PAGE_FACTS.get(code)
     return {} if builder is None else builder(year)
+
+
+def _newfoundland_engine_facts(figures: "Figures", year: int, facts: dict[str, str]) -> dict[str, str]:
+    """What only the engine can say for Newfoundland and Labrador: the marginal rate just after each of the last two
+    brackets, which start past the sweep's last salary."""
+    found: dict[str, str] = {}
+    for number in (7, 8):
+        above = int(facts[f"nl_bracket_{number}_salary"]) + 1000
+        found[f"nl_bracket_{number}_marginal"] = _rate_text(figures._marginal("CA-NL", year, above))
+    return found
+
+
+# Facts a rates page needs that no dataset file holds and the sweep does not reach, so they are asked of the engine:
+# (figures, year, the dataset facts of `RATES_PAGE_FACTS`) -> facts. Dataset figures belong in `RATES_PAGE_FACTS`.
+RATES_PAGE_ENGINE_FACTS = {"CA-NL": _newfoundland_engine_facts}
 
 
 def _unit(unit: UnitDescription) -> dict:
@@ -747,6 +839,10 @@ def main(provinces_file: str, output_file: str) -> None:
             },
             **_rates_page_facts(year, code),
         }
+        engine_facts = RATES_PAGE_ENGINE_FACTS.get(code)
+        if engine_facts:
+            with unrounded_rates():
+                facts.update(engine_facts(figures, year, facts))
         provinces[code] = {
             "year": year,
             "pages": pages,
