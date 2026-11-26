@@ -53,20 +53,20 @@ type Props = {
   scaleValues?: readonly string[];
   /** False leaves the figure beside the marker out, for a card that shows it in a readout of its own. */
   markerLabel?: boolean;
-  /** Words drawn in the top corner of the plot, such as where a line leaves it. */
-  topNote?: string;
+  /** The drawing's height in its own units (its width is fixed); taller fits a narrow screen. */
+  height?: number;
 };
 
 // Beyond this many labels up the side, a phone hides every other one (in CSS).
 const PHONE_MAX_Y_LABELS = 4;
 const WIDTH = 420;
-const HEIGHT = 250;
+/** The drawing's height when the caller gives none; a phone can ask for a taller one. */
+const DEFAULT_HEIGHT = 250;
 const LEFT = 56;
 const RIGHT = 12;
 const TOP = 10;
 const BOTTOM = 44;
 const PLOT_RIGHT = WIDTH - RIGHT;
-const PLOT_BOTTOM = HEIGHT - BOTTOM;
 // The marker's figure moves to the left of the dot past 60% of the width.
 const LABEL_TOP = scalePosition('22', '0', '1', 0, 1);
 const LABEL_FLIPS_AFTER = scalePosition('3', '0', '5', 0, WIDTH);
@@ -91,8 +91,9 @@ export function LineChart({
   onActiveChange,
   scaleValues,
   markerLabel = true,
-  topNote,
+  height = DEFAULT_HEIGHT,
 }: Props) {
+  const plotBottom = height - BOTTOM;
   const svgRef = useRef<SVGSVGElement>(null);
   const clipId = useId();
 
@@ -103,7 +104,7 @@ export function LineChart({
     const x = (salary: string) =>
       scalePosition(salary, xMin, xMax, LEFT, PLOT_RIGHT);
     const y = (value: string) =>
-      scalePosition(value, axis.min, axis.max, PLOT_BOTTOM, TOP);
+      scalePosition(value, axis.min, axis.max, plotBottom, TOP);
     return {
       axis,
       x,
@@ -118,7 +119,7 @@ export function LineChart({
           .join(''),
       ),
     };
-  }, [points, series, xMin, xMax, scaleValues]);
+  }, [points, series, xMin, xMax, scaleValues, plotBottom]);
 
   const { axis, xs, y } = geometry;
   // On a phone, an axis with more than four labels shows every other one.
@@ -172,7 +173,7 @@ export function LineChart({
       <svg
         ref={svgRef}
         className={styles.svg}
-        viewBox={`0 0 ${String(WIDTH)} ${String(HEIGHT)}`}
+        viewBox={`0 0 ${String(WIDTH)} ${String(height)}`}
         role="img"
         aria-label={ariaLabel}
         tabIndex={0}
@@ -220,7 +221,7 @@ export function LineChart({
                 : labelClasses
               ).join(' ')}
               x={geometry.x(tick)}
-              y={PLOT_BOTTOM + 14}
+              y={plotBottom + 14}
               // A label at the end of the axis is right-aligned on every screen, so it is not cut off at the edge.
               textAnchor={tick === xMax ? 'end' : 'middle'}
             >
@@ -231,14 +232,14 @@ export function LineChart({
         <text
           className={[styles.tick, styles.title].join(' ')}
           x={(LEFT + PLOT_RIGHT) / 2}
-          y={HEIGHT - 4}
+          y={height - 4}
           textAnchor="middle"
         >
           {xAxisLabel}
         </text>
         <text
           className={[styles.tick, styles.title, styles.yTitle].join(' ')}
-          transform={`translate(11 ${String((TOP + PLOT_BOTTOM) / 2)}) rotate(-90)`}
+          transform={`translate(11 ${String((TOP + plotBottom) / 2)}) rotate(-90)`}
           textAnchor="middle"
         >
           {yAxisLabel}
@@ -247,15 +248,15 @@ export function LineChart({
           className={styles.axis}
           x1={LEFT}
           x2={PLOT_RIGHT}
-          y1={PLOT_BOTTOM}
-          y2={PLOT_BOTTOM}
+          y1={plotBottom}
+          y2={plotBottom}
         />
         <clipPath id={clipId}>
           <rect
             x={LEFT}
             y={TOP}
             width={PLOT_RIGHT - LEFT}
-            height={PLOT_BOTTOM - TOP}
+            height={plotBottom - TOP}
           />
         </clipPath>
         <g clipPath={`url(#${clipId})`}>
@@ -267,16 +268,6 @@ export function LineChart({
             />
           ))}
         </g>
-        {topNote !== undefined && (
-          <text
-            className={[styles.tick, styles.topNote].join(' ')}
-            x={PLOT_RIGHT - 4}
-            y={TOP + 12}
-            textAnchor="end"
-          >
-            {topNote}
-          </text>
-        )}
         {active !== undefined && activeX !== undefined && (
           <g aria-hidden="true">
             <line
@@ -284,7 +275,7 @@ export function LineChart({
               x1={activeX}
               x2={activeX}
               y1={TOP}
-              y2={PLOT_BOTTOM}
+              y2={plotBottom}
             />
             {series.map((line, index) => {
               const value = points[active]?.values[index];
@@ -321,7 +312,7 @@ export function LineChart({
           x={LEFT}
           y={TOP}
           width={PLOT_RIGHT - LEFT}
-          height={PLOT_BOTTOM - TOP}
+          height={plotBottom - TOP}
           onPointerMove={choose}
           onPointerDown={choose}
         />

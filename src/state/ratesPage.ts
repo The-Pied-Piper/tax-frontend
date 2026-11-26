@@ -6,9 +6,16 @@ import { britishColumbiaRatesPage } from './ratesPageText/ca-bc';
 import { manitobaRatesPage } from './ratesPageText/ca-mb';
 import { newfoundlandAndLabradorRatesPage } from './ratesPageText/ca-nl';
 import { ontarioRatesPage } from './ratesPageText/ca-on';
+import { saskatchewanRatesPage } from './ratesPageText/ca-sk';
 import { quebecRatesPage } from './ratesPageText/ca-qc';
 import type { CauseForm, RatesPageText } from './ratesPageTypes';
-import { FOOTER_PROVINCE_SLUGS, type FooterProvinceSlug } from './siteLinks';
+import type { Inline } from './contentPages';
+import {
+  contentPath,
+  FOOTER_PROVINCE_SLUGS,
+  METHODOLOGY_SLUG,
+  type FooterProvinceSlug,
+} from './siteLinks';
 import { strings } from '../strings';
 
 /** The text of the rates page of each province that has one. Adding a province is one file in `ratesPageText/` and one entry here. */
@@ -16,6 +23,7 @@ export const ratesPageText: Partial<Record<FooterProvinceSlug, RatesPageText>> =
   {
     'ca-on': ontarioRatesPage,
     'ca-ab': albertaRatesPage,
+    'ca-sk': saskatchewanRatesPage,
     'ca-bc': britishColumbiaRatesPage,
     'ca-mb': manitobaRatesPage,
     'ca-nl': newfoundlandAndLabradorRatesPage,
@@ -35,6 +43,7 @@ const CAUSE_PAGE: Record<CauseForm, string> = {
   on428: 'on428',
   on428a: 'on428-a',
   ab428: 'ab428',
+  sk428: 'sk428',
   bc428: 'bc428',
   mb428: 'mb428',
   mb428a: 'mb428-a',
@@ -64,6 +73,8 @@ export type RatesView = {
   howToRead: string[];
   groups: {
     heading: string;
+    /** The anchor of the range: `salary-range-1`. */
+    id: string;
     notes: { words: string; causes: CauseChip[] }[];
   }[];
   tables: {
@@ -100,8 +111,9 @@ export function ratesPageView(
   return {
     intro: text.intro.map((note) => noteWords(note, sweep)),
     howToRead: text.howToRead.map((note) => noteWords(note, sweep)),
-    groups: text.groups.map((group) => ({
+    groups: text.groups.map((group, at) => ({
       heading: group.heading,
+      id: `salary-range-${(at + 1).toString()}`,
       notes: group.notes.map((note) => ({
         words: noteWords(note, sweep),
         causes: note.forms.map(causeChip),
@@ -118,4 +130,23 @@ export function ratesPageView(
       after: table.after && noteWords(table.after, sweep),
     })),
   };
+}
+
+/**
+ * A paragraph of the basis as words and links: the phrase "credits paid to you when you file" links to the
+ * Methodology page, which says what those credits are and why they are left out. Any other paragraph is its words.
+ */
+export function creditsLinked(words: string): Inline[] {
+  const phrase = strings.ratesPage.creditsPhrase;
+  const at = words.toLowerCase().indexOf(phrase);
+  if (at < 0) return [words];
+  const end = at + phrase.length;
+  return [
+    words.slice(0, at),
+    {
+      label: words.slice(at, end),
+      href: contentPath(METHODOLOGY_SLUG),
+    },
+    words.slice(end),
+  ].filter((part) => part !== '');
 }

@@ -1,13 +1,14 @@
 import { fullHubCharts } from '../test/hubNotesData';
 import {
   causeChip,
+  creditsLinked,
   ratesPageText,
   ratesPageView,
   ratesProvinces,
 } from './ratesPage';
 import { subtractAmounts } from '../money/amounts';
 import { compareAmounts } from '../money/scale';
-import { ratesSlug } from './siteLinks';
+import { contentPath, METHODOLOGY_SLUG, ratesSlug } from './siteLinks';
 
 const sweep = () => {
   const found = fullHubCharts(['ca-on']).provinces[0];
@@ -26,6 +27,7 @@ describe('ratesPageView', () => {
       'ca-ab',
       'ca-bc',
       'ca-mb',
+      'ca-sk',
       'ca-nl',
       'ca-qc',
     ]);
@@ -59,10 +61,6 @@ describe('ratesPageView', () => {
   it('draws nothing from a sweep that is not the full one', () => {
     const partial = { ...sweep(), points: sweep().points.slice(0, 10) };
     expect(ratesPageView('ca-on', partial)).toBeNull();
-  });
-
-  it('draws nothing for a province with no wording', () => {
-    expect(ratesPageView('ca-sk', sweep())).toBeNull();
   });
 
   it('names a cause form for every note and links the forms that have a page', () => {
@@ -160,7 +158,7 @@ describe('the Alberta rates page', () => {
 
   it('opens with the figures the CRA review gives', () => {
     expect(view().intro[0]).toContain(
-      'from about 7.6% once you pay into the Canada Pension Plan (from $3,500) to 48.0% above $371,347.',
+      'from about 7.6% once you pay into the Canada Pension Plan (from $3,500) to 48% above $371,347.',
     );
     expect(view().intro[0]).toContain('to 40.3% at $500,000');
   });
@@ -184,9 +182,9 @@ describe('the Alberta rates page', () => {
   it('reads the top rate at the top bracket, and what you keep from it', () => {
     const last = view().groups[view().groups.length - 1];
     const top = last?.notes[last.notes.length - 1]?.words ?? '';
-    expect(top).toContain('straight at 48.0%');
+    expect(top).toContain('straight at 48%');
     expect(top).toContain('rate, 15%, starts at a taxable income of $370,220');
-    expect(top).toContain('you keep 52.0%');
+    expect(top).toContain('you keep 52%');
   });
 
   it('rounds each computed rate once, from the unrounded value', () => {
@@ -329,8 +327,8 @@ describe('the Québec rates page', () => {
 
   it('gives one decimal for every computed rate in the opening finding', () => {
     const view = ratesPageView('ca-qc', quebec());
-    expect(view?.intro[0]).toMatch(/about 8\.0% once/);
-    expect(view?.intro[0]).toMatch(/to 47\.0% at/);
+    expect(view?.intro[0]).toMatch(/about 8% once/);
+    expect(view?.intro[0]).toMatch(/to 47% at/);
   });
 
   it('names a cause form for every note and links the ones that have a page', () => {
@@ -715,11 +713,11 @@ describe('the British Columbia rates page', () => {
     for (const [salary, rate] of [
       ['$50,837', '27.8%'],
       ['$59,079', '34.2%'],
-      ['$101,855', '31.0%'],
+      ['$101,855', '31%'],
       ['$116,775', '32.8%'],
       ['$118,172', '38.3%'],
       ['$141,557', '40.7%'],
-      ['$182,567', '44.0%'],
+      ['$182,567', '44%'],
       ['$191,532', '46.1%'],
       ['$259,609', '49.8%'],
     ] as const) {
@@ -844,6 +842,194 @@ describe('the British Columbia rates page', () => {
 
   it('keeps the tab title under 64 characters and the description under 160', () => {
     const text = ratesPageText['ca-bc'];
+    expect(text?.title.length).toBeLessThan(64);
+    expect(text?.description.length).toBeLessThan(160);
+  });
+});
+
+describe('creditsLinked', () => {
+  const phrase = 'credits paid to you when you file';
+  const href = contentPath(METHODOLOGY_SLUG);
+
+  it('links the phrase wherever it falls in a paragraph', () => {
+    expect(creditsLinked(`Not counted: ${phrase} are left out.`)).toEqual([
+      'Not counted: ',
+      { label: phrase, href },
+      ' are left out.',
+    ]);
+  });
+
+  it('keeps the capital C of a sentence start in the link text', () => {
+    expect(
+      creditsLinked(`Credits paid to you when you file are not counted.`),
+    ).toEqual([
+      { label: 'Credits paid to you when you file', href },
+      ' are not counted.',
+    ]);
+  });
+
+  it('gives a paragraph without the phrase back as its words', () => {
+    expect(creditsLinked('Nothing to link here.')).toEqual([
+      'Nothing to link here.',
+    ]);
+  });
+
+  it('finds the phrase in the basis of every province, so a rewording cannot drop the link', () => {
+    for (const province of ratesProvinces()) {
+      const found = fullHubCharts([province]).provinces[0];
+      if (!found) continue;
+      const view = ratesPageView(province, found);
+      const basis = view?.intro.slice(1).map((words) => creditsLinked(words));
+      expect(
+        basis?.some((parts) => parts.some((part) => typeof part !== 'string')),
+        province,
+      ).toBe(true);
+    }
+  });
+});
+
+describe('the Ontario lead', () => {
+  it('names exactly three spikes, as many as the sentence lists', () => {
+    const facts = sweep().facts;
+    expect(facts['ohp_spike_count']).toBe('3');
+    expect(facts['ohp_step_count']).toBe('2');
+  });
+});
+
+describe('the Saskatchewan rates page', () => {
+  const skSweep = () => {
+    const found = fullHubCharts(['ca-sk']).provinces[0];
+    if (!found) throw new Error('no sweep');
+    return found;
+  };
+  const view = () => {
+    const found = ratesPageView('ca-sk', skSweep());
+    if (!found) throw new Error('no view');
+    return found;
+  };
+
+  it('fills every figure from the Saskatchewan sweep and leaves no brace behind', () => {
+    const found = view();
+    const everyWord = [
+      ...found.intro,
+      ...found.howToRead,
+      ...found.groups.flatMap((group) => group.notes.map((n) => n.words)),
+      ...found.tables.flatMap((table) => [
+        table.before ?? '',
+        table.after ?? '',
+        ...table.rows.flat(),
+      ]),
+    ];
+    expect(everyWord.length).toBeGreaterThan(20);
+    for (const words of everyWord) {
+      expect(words).not.toMatch(/[{}]|undefined|NaN/);
+    }
+  });
+
+  it('gives the engine’s salaries and one-decimal rates at each step', () => {
+    const notes = view().groups.flatMap((group) =>
+      group.notes.map((n) => n.words),
+    );
+    const all = notes.join('\n');
+    expect(view().intro[0]).toContain('from about 7.6%');
+    expect(view().intro[0]).toContain('to 47.5% above $259,609');
+    expect(view().intro[0]).toContain('41.4% at $500,000');
+    expect(all).toContain('From about $21,828 the rate is 30.2%');
+    expect(all).toContain('From about $55,048 the rate is 32.2%');
+    expect(all).toContain('From about $59,079 the rate is 38.6%');
+    expect(all).toContain('falls to 37.4%');
+    expect(all).toContain('35.7%');
+    expect(all).toContain('33% at $85,000');
+    expect(all).toContain('From about $118,172 the rate is 38.5%');
+    expect(all).toContain('From about $156,932 the rate is 40.5%');
+    expect(all).toContain('From about $182,567 the rate is 43.8%');
+  });
+
+  it('has the Saskatchewan and federal bracket rows, with tax starting at the engine’s salary', () => {
+    const [federal, saskatchewan] = view().tables;
+    expect(federal?.rows[1]).toEqual(['$58,523', '20.5%', '$59,079', '38.6%']);
+    expect(federal?.rows[4]).toEqual(['$258,482', '33%', '$259,609', '47.5%']);
+    expect(saskatchewan?.rows[0]).toEqual([
+      '$0',
+      '10.5%',
+      'tax starts at about $21,828',
+      '30.2%',
+    ]);
+    expect(saskatchewan?.rows[2]).toEqual([
+      '$155,805',
+      '14.5%',
+      '$156,932',
+      '40.5%',
+    ]);
+  });
+
+  it('names a cause form for every note and links the Saskatchewan form', () => {
+    for (const group of ratesPageText['ca-sk']?.groups ?? []) {
+      for (const n of group.notes)
+        expect(n.forms.length, n.text).toBeGreaterThan(0);
+    }
+    expect(causeChip('sk428').href).toBe('/forms/sk428/');
+    expect(causeChip('sk428').label).toBe('Form SK428');
+  });
+
+  it('puts each bracket salary derived from its taxable income where the engine’s own search finds the rate change', () => {
+    const { facts, edges } = skSweep();
+    const names = [
+      'fed_bracket_2_salary',
+      'fed_bracket_3_salary',
+      'fed_bracket_4_salary',
+      'fed_bracket_5_salary',
+      'sk_bracket_2_salary',
+      'sk_bracket_3_salary',
+    ];
+    for (const name of names) {
+      const salary = facts[name] ?? '';
+      // An edge is [sweep salary below, last salary at the old rate, first salary settled at the new one, rate]:
+      // the derived salary is the first whole dollar past the threshold, so it lies inside that window.
+      const near = edges.filter(
+        (edge) =>
+          compareAmounts(edge[1], salary) <= 0 &&
+          compareAmounts(salary, edge[2]) <= 0,
+      );
+      expect(near.length, name).toBe(1);
+    }
+  });
+
+  it('draws every change of the rate as a step: the next sample point after each edge is within $2 of it', () => {
+    const points = skSweep().points;
+    for (const [, moves] of skSweep().edges) {
+      const at = points.findIndex((point) => point[0] === `${moves}.00`);
+      expect(at, moves).toBeGreaterThanOrEqual(0);
+      const next = points[at + 1]?.[0] ?? '0';
+      expect(
+        compareAmounts(subtractAmounts(next, moves), '2'),
+        `${moves} then ${next}`,
+      ).toBeLessThanOrEqual(0);
+    }
+  });
+
+  it('puts the last group heading at the salary the data says the top bracket starts at', () => {
+    const groups = ratesPageText['ca-sk']?.groups ?? [];
+    const last = groups[groups.length - 1]?.heading ?? '';
+    const top = skSweep().facts['fed_bracket_5_salary'] ?? '';
+    const gap = subtractAmounts(last.replace(/\D/g, ''), top);
+    expect(compareAmounts(gap, '0')).toBeGreaterThanOrEqual(0);
+    expect(compareAmounts(gap, '1000')).toBeLessThan(0);
+  });
+
+  it('types no dollar or cents figure in a note or a table cell', () => {
+    const text = ratesPageText['ca-sk'];
+    const lines = [
+      ...(text?.intro ?? []).map((n) => n.text),
+      ...(text?.howToRead ?? []).map((n) => n.text),
+      ...(text?.groups ?? []).flatMap((g) => g.notes.map((n) => n.text)),
+      ...(text?.tables ?? []).flatMap((t) => [
+        t.before?.text ?? '',
+        t.after?.text ?? '',
+        ...t.rows.flat(),
+      ]),
+    ];
+    for (const line of lines) expect(line).not.toMatch(/\$\d|\d cents/);
     expect(text?.title.length).toBeLessThan(64);
     expect(text?.description.length).toBeLessThan(160);
   });

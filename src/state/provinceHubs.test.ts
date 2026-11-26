@@ -489,7 +489,7 @@ describe('the province comparison', () => {
     ];
     const withIt = make(true);
     const rest = withIt.sections
-      .filter((s) => !chartHeadings.includes(s.heading))
+      .filter((s) => !chartHeadings.includes(s.heading ?? ''))
       // The take-home section keeps its words and gains its permalink, its chart and the chart's heading and line.
       .map(({ heading, blocks }) => ({
         heading,

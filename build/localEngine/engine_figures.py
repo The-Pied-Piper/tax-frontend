@@ -170,6 +170,10 @@ def _pension_deduction(year: int) -> dict[str, Decimal]:
     }
 
 
+# A premium slope row narrower than this much salary is a short spike.
+_OHP_SPIKE_MAX_WIDTH = Decimal(1000)
+
+
 def _exact_salary_of_taxable(year: int, taxable: Decimal, d: dict[str, Decimal] | None = None) -> Decimal:
     """The salary at which taxable income (which is also net income) reaches `taxable`, exactly (it may have cents).
 
@@ -291,6 +295,22 @@ def _ontario_rates_page_facts(year: int) -> dict[str, str]:
         else:
             ontario[f"ohp_{number}_rate"] = row["rate"]
             ontario[f"ohp_{number}_plus"] = row["plus"]
+    # The premium's slope rows: one that rises over less than $1,000 of salary is a short spike, the rest are broader
+    # steps. The page's lead writes their counts in words.
+    rows = _params(year, "ca_on", "health_premium_rows")["rows"]
+    spikes = steps = 0
+    for at, row in enumerate(rows[:-1]):
+        if "amount" in row:
+            continue
+        width = _exact_salary_of_taxable(year, Decimal(rows[at + 1]["over"])) - _exact_salary_of_taxable(
+            year, Decimal(row["over"])
+        )
+        if width < _OHP_SPIKE_MAX_WIDTH:
+            spikes += 1
+        else:
+            steps += 1
+    ontario["ohp_spike_count"] = str(spikes)
+    ontario["ohp_step_count"] = str(steps)
     ontario["shift_ohp_1"] = str(Decimal(ontario["ohp_2_salary"]) - Decimal(ontario["ohp_2_ti"]))
     ontario["shift_ont_bracket_2"] = _shift(ontario, "ont_bracket_2")
     return {**facts, **ontario}
@@ -546,6 +566,17 @@ def _quebec_rates_page_facts(year: int) -> dict[str, str]:
     return facts
 
 
+def _saskatchewan_rates_page_facts(year: int) -> dict[str, str]:
+    """Saskatchewan's figures: the common ones and its own: its brackets, basic amount and the rate of its credits."""
+    facts = _common_rates_page_facts(year)
+    saskatchewan = _bracket_facts(year, "sk", _params(year, "ca_sk", "brackets")["brackets"])
+    saskatchewan["sk_bpa"] = _params(year, "ca_sk", "basic_personal_amount")["amount"]
+    saskatchewan["sk_credit_rate"] = _params(year, "ca_sk", "credit_rate")["rate"]
+    saskatchewan["shift_fed_bracket_2"] = _shift(facts, "fed_bracket_2")
+    saskatchewan["shift_sk_bracket_2"] = _shift(saskatchewan, "sk_bracket_2")
+    return {**facts, **saskatchewan}
+
+
 def _nearest_salary_of_taxable(year: int, taxable: Decimal) -> Decimal:
     """The whole salary nearest the one where taxable income reaches `taxable` (half up), for the wording "from about".
     The engine's own edge lies between the whole salary below and the one above, so this is one of the two."""
@@ -597,6 +628,7 @@ def _manitoba_rates_page_facts(year: int) -> dict[str, str]:
 RATES_PAGE_FACTS = {
     "CA-ON": _ontario_rates_page_facts,
     "CA-AB": _alberta_rates_page_facts,
+    "CA-SK": _saskatchewan_rates_page_facts,
     "CA-BC": _british_columbia_rates_page_facts,
     "CA-MB": _manitoba_rates_page_facts,
     "CA-NL": _newfoundland_rates_page_facts,

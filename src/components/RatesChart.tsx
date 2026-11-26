@@ -40,6 +40,26 @@ const SPARSE_TICKS = ['100000', '200000', '300000', '400000'] as const;
 /** Salaries below this are the Employment Insurance band, which must not set the scale. */
 const BAND_CEILING = '5000';
 
+/** A phone-width screen, where the drawing is taller so the lines and the salary labels have room. */
+const PHONE_QUERY = '(max-width: 560px)';
+const PHONE_HEIGHT = 400;
+
+function isPhone(): boolean {
+  return (
+    typeof window.matchMedia === 'function' &&
+    window.matchMedia(PHONE_QUERY).matches
+  );
+}
+
+function watchPhone(onChange: () => void): () => void {
+  if (typeof window.matchMedia !== 'function') return () => undefined;
+  const query = window.matchMedia(PHONE_QUERY);
+  query.addEventListener('change', onChange);
+  return () => {
+    query.removeEventListener('change', onChange);
+  };
+}
+
 /** The address is read once after hydration; nothing in it changes by itself, so there is nothing to subscribe to. */
 const noSubscription = () => () => undefined;
 
@@ -74,6 +94,8 @@ export function RatesChart({ sweep, place }: Props) {
     );
     return { at, range: needed < 0 ? RANGE_MAXIMA.length - 1 : needed };
   }, [sweep, search]);
+  // The written page is the wide drawing; a phone switches to the taller one after hydration.
+  const onPhone = useSyncExternalStore(watchPhone, isPhone, () => false);
   const [tableOpen, setTableOpen] = useState(false);
   const [rangePick, setRangePick] = useState<number | null>(null);
   const [markerPick, setMarkerPick] = useState<number | null | undefined>(
@@ -168,7 +190,7 @@ export function RatesChart({ sweep, place }: Props) {
         xMin="0"
         xMax={max}
         xTicks={ticks}
-        xTicksPhone={[max]}
+        xTicksPhone={ticks}
         xAxisLabel={t.salaryAxis}
         yAxisLabel={t.percent}
         xUnit={unit}
@@ -179,8 +201,9 @@ export function RatesChart({ sweep, place }: Props) {
         onActiveChange={setMarkerPick}
         scaleValues={scaleValues}
         markerLabel={false}
-        topNote={bandNote}
+        height={onPhone ? PHONE_HEIGHT : undefined}
       />
+      {bandNote !== undefined && <p className={styles.bandNote}>{bandNote}</p>}
       {activePoint && (
         <p className={styles.linkRow}>
           <button

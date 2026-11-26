@@ -5,6 +5,7 @@ import {
   displayMoney,
   displayRate,
   displayRateOneDecimal,
+  displayRateTenths,
   displayRateTwoDecimals,
   displayCentsOneDecimal,
   displayRoundedMoney,
@@ -133,6 +134,7 @@ describe('displayRate', () => {
     ['0.50', '50%'],
     ['0', '0%'],
     ['1', '100%'],
+    ['0.45', '45%'],
     ['0.123456', '12.3456%'],
     // Below zero: a benefit paid on filing is bigger than the tax.
     ['-0.2537', '-25.37%'],
@@ -160,11 +162,11 @@ describe('displayRateOneDecimal', () => {
     ['0.2316', '23.2%'],
     ['0.2315', '23.2%'],
     ['0.2314', '23.1%'],
-    ['0', '0.0%'],
-    ['1', '100.0%'],
+    ['0', '0%'],
+    ['1', '100%'],
     ['-0.2537', '-25.4%'],
-    ['-0.0001', '0.0%'],
-    ['-0.0004', '0.0%'],
+    ['-0.0001', '0%'],
+    ['-0.0004', '0%'],
     ['-0.0005', '-0.1%'],
     ['0.5353', '53.5%'],
     ['0.7327', '73.3%'],
@@ -176,6 +178,25 @@ describe('displayRateOneDecimal', () => {
       displayRateOneDecimal('16.42', { ...percent, as_percentage: false }),
     ).toBe('16.42%');
     expect(displayRateOneDecimal('abc', pct)).toBe('abc');
+  });
+});
+
+describe('displayRateTenths', () => {
+  const pct = { ...percent, as_percentage: true };
+  it.each([
+    ['0.38', '38.0%'],
+    ['0.3626', '36.3%'],
+    ['1', '100.0%'],
+    ['0', '0.0%'],
+    ['-0.2537', '-25.4%'],
+  ])('shows %s as %s', (amount, shown) => {
+    expect(displayRateTenths(amount, pct)).toBe(shown);
+  });
+  it('shows a unit that is not a percentage, and unreadable text, as displayRate does', () => {
+    expect(
+      displayRateTenths('16.42', { ...percent, as_percentage: false }),
+    ).toBe('16.42%');
+    expect(displayRateTenths('abc', pct)).toBe('abc');
   });
 });
 

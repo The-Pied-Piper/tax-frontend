@@ -29,6 +29,50 @@ function everyNote(): { slug: string; chart: HubChartId; note: Note }[] {
   );
 }
 
+describe('the count, whole-number and always-decimal rate specs', () => {
+  const ontario = () => sweepOf('ca-on');
+
+  it('says a small count in words and refuses one it has no word for', () => {
+    const sweep = ontario();
+    expect(figureText(parseSpec('i:ohp_spike_count'), sweep)).toBe('three');
+    expect(figureText(parseSpec('i:ohp_step_count'), sweep)).toBe('two');
+    for (const bad of ['11', '-1', '2.5', 'abc']) {
+      const odd = {
+        ...sweep,
+        facts: { ...sweep.facts, ohp_spike_count: bad },
+      };
+      expect(() => figureText(parseSpec('i:ohp_spike_count'), odd)).toThrow(
+        /cannot say the count/,
+      );
+    }
+  });
+
+  it('writes a whole-number rate bare with h: and keeps the decimal with a:', () => {
+    const sweep = ontario();
+    const changed = {
+      ...sweep,
+      points: sweep.points.map((point) =>
+        point[0] === '500000.00'
+          ? ([
+              point[0],
+              point[1],
+              point[2],
+              point[3],
+              point[4],
+              '0.38',
+            ] as typeof point)
+          : point,
+      ),
+    };
+    expect(figureText(parseSpec('h:marginal@500000'), changed)).toBe('38%');
+    expect(figureText(parseSpec('a:marginal@500000'), changed)).toBe('38.0%');
+    // A rate with a decimal is the same either way.
+    expect(figureText(parseSpec('h:marginal@500000'), sweep)).toBe(
+      figureText(parseSpec('a:marginal@500000'), sweep),
+    );
+  });
+});
+
 describe('the text of the hub charts', () => {
   it('has text for the take-home, average and marginal charts of every province', () => {
     for (const slug of SLUGS) {

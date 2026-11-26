@@ -89,7 +89,7 @@ describe('RatesChart', () => {
   it('leaves the $2,000 band out of the scale and says where it goes off the top', () => {
     render(<RatesChart sweep={sweep()} place="Ontario" />);
     expect(
-      screen.getByText('Off the top: 100.0% from $2,000 to $2,033'),
+      screen.getByText('Off the top: 100% from $2,000 to $2,033'),
     ).toBeInTheDocument();
     // The scale is set by the rates above $5,000 (the 59.1% spike is the highest at $150,000), not by 100%.
     expect(screen.getByRole('img').textContent).not.toContain('100%');
@@ -109,5 +109,40 @@ describe('RatesChart', () => {
       expect.arrayContaining(['$100k', '$200k', '$300k', '$400k', '$500k']),
     );
     expect(labels()).not.toContain('$50k');
+  });
+
+  describe('on a phone-width screen', () => {
+    const original = Object.getOwnPropertyDescriptor(window, 'matchMedia');
+    afterEach(() => {
+      if (original) Object.defineProperty(window, 'matchMedia', original);
+      else Reflect.deleteProperty(window, 'matchMedia');
+    });
+    const mock = (matches: boolean) => {
+      Object.defineProperty(window, 'matchMedia', {
+        configurable: true,
+        value: (query: string) => ({
+          matches,
+          media: query,
+          addEventListener: () => undefined,
+          removeEventListener: () => undefined,
+        }),
+      });
+    };
+
+    it('draws the taller figure', () => {
+      mock(true);
+      render(<RatesChart sweep={sweep()} place="Ontario" />);
+      expect(screen.getByRole('img')).toHaveAttribute('viewBox', '0 0 420 400');
+    });
+
+    it('draws the wide figure on a wider screen and where matchMedia is missing', () => {
+      mock(false);
+      const wide = render(<RatesChart sweep={sweep()} place="Ontario" />);
+      expect(screen.getByRole('img')).toHaveAttribute('viewBox', '0 0 420 250');
+      wide.unmount();
+      Reflect.deleteProperty(window, 'matchMedia');
+      render(<RatesChart sweep={sweep()} place="Ontario" />);
+      expect(screen.getByRole('img')).toHaveAttribute('viewBox', '0 0 420 250');
+    });
   });
 });

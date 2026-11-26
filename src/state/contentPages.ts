@@ -44,11 +44,13 @@ export type ContentBlock =
   | { kind: 'ratesChart'; province: FooterProvinceSlug };
 
 /** The parts of a rates page the text blocks draw. */
-export type RatesPart = 'intro' | 'howToRead' | 'groups' | 'tables';
+export type RatesPart =
+  'lead' | 'jump' | 'basis' | 'howToRead' | 'groups' | 'tables';
 
 /** A heading and the blocks under it. With an `id` the section has a permalink, such as `#average-rate`; with `card` it is drawn as a bordered card. */
 export type ContentSection = {
-  heading: string;
+  /** Left out, the section has no heading: the lead under the page's own heading. */
+  heading?: string;
   id?: string;
   card?: true;
   blocks: ContentBlock[];
@@ -100,6 +102,20 @@ export const contentPages: ContentPageSpec[] = [
         ],
       },
       {
+        heading: 'Credits paid to you when you file',
+        blocks: [
+          paragraph(
+            'Some credits are paid to you after you file your return, instead of lowering the tax you owe. Examples are the Canada workers benefit, the Employment Insurance refund, credits paid by your province, and in Québec the work premium and the solidarity tax credit.',
+          ),
+          paragraph(
+            'This site does not count them in your take-home pay or your rates. They arrive as a payment after you file, they depend on your family, other income and what you claim, and they are not taken from your pay.',
+          ),
+          paragraph(
+            'Credits that lower the tax itself are counted, for example tax cuts such as the Ontario LIFT Credit and the Québec abatement.',
+          ),
+        ],
+      },
+      {
         heading: 'Exact arithmetic',
         blocks: [
           paragraph(
@@ -111,7 +127,7 @@ export const contentPages: ContentPageSpec[] = [
         heading: 'How we check it',
         blocks: [
           paragraph(
-            'For each province and tax year, we run more than a hundred salaries through the engine and check the results. We pick salaries at the edge of every tax slice and at the yearly limits for the Canada Pension Plan and EI, because that is where mistakes hide.',
+            'For each province and tax year, we run more than a hundred salaries through the engine and check the results. We pick salaries at the edge of every tax slice and at the yearly limits for the pension plan and EI, because that is where mistakes hide.',
           ),
         ],
       },
