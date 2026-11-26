@@ -141,12 +141,11 @@ export const strings = {
       `Compare take-home pay and tax across provinces, ${year.toString()}`,
     title: (year: number) =>
       `Compare take-home pay and tax across provinces, ${year.toString()}`,
-    description: (count: number, year: number) =>
-      `Compare take-home pay, tax and contributions across ${count.toString()} provinces at a salary you choose. Estimates for ${year.toString()}, for a single person whose only income is a salary.`,
+    description: (year: number) =>
+      `Compare take-home pay, tax and contributions across provinces at a salary you choose. Estimates for ${year.toString()}, for a single person whose only income is a salary.`,
     breadcrumb: 'Compare provinces',
     sectionHeading: 'Compare by salary',
-    intro: (count: number) =>
-      `Pick a salary and see how ${count.toString()} provinces compare. The provinces are always listed with the lowest tax and contributions first, whichever of the three figures you compare. Every bar is this site's own estimate for a single person whose only income is a salary.`,
+    intro: `Pick a salary and see how the provinces compare. The provinces are always listed with the lowest tax and contributions first, whichever of the three figures you compare. Every bar is this site's own estimate for a single person whose only income is a salary.`,
     coverage: (list: string) =>
       `These are the provinces this site covers so far: ${list}.`,
     linksLead: 'See a province in detail:',

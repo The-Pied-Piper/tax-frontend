@@ -33,9 +33,9 @@ export function comparePage(
   return {
     slug: COMPARE_SLUG,
     title: t.title(year),
-    description: t.description(slugs.length, year),
+    description: t.description(year),
     heading: t.heading(year),
-    lede: t.intro(slugs.length),
+    lede: t.intro,
     trail: [],
     sections: [
       {

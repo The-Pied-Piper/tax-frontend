@@ -67,7 +67,7 @@ describe('the written compare page', () => {
     expect(
       page.querySelector('meta[name="description"]')?.getAttribute('content'),
     ).toBe(
-      'Compare take-home pay, tax and contributions across 6 provinces at a salary you choose. Estimates for 2026, for a single person whose only income is a salary.',
+      'Compare take-home pay, tax and contributions across provinces at a salary you choose. Estimates for 2026, for a single person whose only income is a salary.',
     );
     const slot = page.getElementById(PROVINCE_COMPARISON_SLOT_ID);
     expect(slot?.dataset.province).toBeUndefined();
