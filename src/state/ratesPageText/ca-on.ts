@@ -282,9 +282,6 @@ export const ontarioRatesPage: RatesPageText = {
     words(
       'Both rates count income tax (federal and Ontario, so tax cuts such as the Ontario LIFT Credit count), Canada Pension Plan in both tiers, and Employment Insurance as Form T2204 works it out. Credits paid to you when you file are not counted. They are for a single person whose only income is a salary.',
     ),
-    words(
-      'The 2026 forms are not out yet. These figures use the 2026 tax tables from the Canada Revenue Agency: rates, brackets, basic amounts, surtax and the Ontario Health Premium, Canada Pension Plan and Employment Insurance. The LIFT Credit amounts and the Form T2204 rules are the 2025 forms’ amounts carried forward. We will update them when the 2026 forms are final.',
-    ),
   ],
   howToRead: [
     words(
