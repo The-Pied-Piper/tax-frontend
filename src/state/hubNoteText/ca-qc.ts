@@ -76,7 +76,7 @@ export const quebec: ProvinceNotes = {
   ],
   marginalRate: [
     note(
-      'Up to {eiFloor} the rate is {zero}. At {eiFloor} QPIP starts and its whole {qpipFull} counts at once. From {eiFloor} to about {eiEnd} the rate is about {about100}, because the Employment Insurance counted rises by $1 for every $1 of salary, until it reaches {eiTop}. After that Employment Insurance and QPIP take {eiQpip} of each extra dollar.',
+      'Below {eiFloor} the rate is {zero}. At {eiFloor} QPIP starts and its whole {qpipFull} counts at once. From {eiFloor} to about {eiEnd} the rate is about {about100}, because the Employment Insurance counted rises by $1 for every $1 of salary, until it reaches {eiTop}. After that Employment Insurance and QPIP take {eiQpip} of each extra dollar.',
       pool,
     ),
     note(
