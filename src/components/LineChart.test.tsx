@@ -335,6 +335,20 @@ describe('LineChart', () => {
     expect(without.container.textContent).not.toContain('$70,000');
   });
 
+  it('keeps the two labels a line apart when both dots are at the top of the plot', () => {
+    const { container } = render(
+      chart({ activeIndex: 2, markerLabels: () => [['One'], ['Two']] }),
+    );
+    const [upper, lower] = [
+      ...container.querySelectorAll('text[class*="markerLabel"]'),
+    ];
+    // The upper block is held at 22 (baseline 15); the lower one starts a line below it, not on it: y of at least 17.
+    expect(compareAmounts(upper?.getAttribute('y') ?? '0', '22')).toBe(0);
+    expect(
+      compareAmounts(lower?.getAttribute('y') ?? '0', '17'),
+    ).toBeGreaterThanOrEqual(0);
+  });
+
   it('draws a taller figure when asked', () => {
     render(chart({ height: 400 }));
     expect(screen.getByRole('img')).toHaveAttribute('viewBox', '0 0 420 400');

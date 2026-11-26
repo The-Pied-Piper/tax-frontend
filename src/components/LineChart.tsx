@@ -78,18 +78,61 @@ const RIGHT = 12;
 const TOP = 10;
 const BOTTOM = 44;
 const PLOT_RIGHT = WIDTH - RIGHT;
-// The marker's figure moves to the left of the dot past 60% of the width.
 // The axis label is centred on the marker, but starts at it near the left edge and ends at it near the right.
 const AXIS_LABEL_STARTS_BEFORE = scalePosition('1', '0', '5', 0, WIDTH);
 const AXIS_LABEL_ENDS_AFTER = scalePosition('4', '0', '5', 0, WIDTH);
 // Its baseline is this far below the axis line: between the salary labels and the axis title.
 const AXIS_LABEL_DROP = 27;
+// The marker's figure moves to the left of the dot past 60% of the width.
 const LABEL_FLIPS_AFTER = scalePosition('3', '0', '5', 0, WIDTH);
 
 /** The line height of a multi-line marker label, in em, and its font size in drawing units. */
 const LINE_EM = 1.25;
 /** One extra line of a label is this many drawing units taller (1.25 em of 11). */
 const LINE_STEP = 14;
+
+/**
+ * Where each label beside a dot goes: its lines and the y its text starts from. With several series the topmost
+ * dot's label ends just above it and the others start just below theirs, so two close dots never share a place.
+ * Every label is kept inside the plot: a block below its dot stops short of the axis line, and the topmost
+ * dot's block stops just above it when `several`, so the blocks never run into each other or off the bottom.
+ */
+function markerBlocks(
+  blocks: readonly (readonly string[])[],
+  dots: readonly string[],
+  several: boolean,
+  plotBottom: number,
+) {
+  const top = dots.reduce(
+    (best, dot, index) => (isBeyond(dots[best] ?? dot, dot) ? index : best),
+    0,
+  );
+  const topExtra = Math.max(0, (blocks[top]?.length ?? 1) - 1) * LINE_STEP;
+  return blocks.map((block, index) => {
+    const dot = dots[index] ?? '0';
+    const extra = Math.max(0, block.length - 1) * LINE_STEP;
+    const below = several && index !== top;
+    // Highest a block may start from: the figure clears the top of the plot; a block below its dot also stays
+    // a line under the topmost block (which is held at the top of the plot when its dot is there).
+    const least = scalePosition(
+      String(below ? 22 + topExtra - 5 : 22 + extra),
+      '0',
+      '1',
+      0,
+      1,
+    );
+    // Lowest: a block below its dot stops short of the axis line; the topmost block stops just above it.
+    const most = scalePosition(
+      String(below ? plotBottom - 14 - extra : plotBottom - 10),
+      '0',
+      '1',
+      0,
+      1,
+    );
+    const lowered = several && isBeyond(dot, most) ? most : dot;
+    return { block, below, at: isBeyond(least, lowered) ? least : lowered };
+  });
+}
 
 // One chart of a hub: a figure with the lines and
 // the shared marker. Controlled and presentational: no fetch, no storage, no
@@ -154,45 +197,17 @@ export function LineChart({
   const active =
     activeIndex !== null && activeIndex in points ? activeIndex : undefined;
   const activeX = active === undefined ? undefined : xs[active];
-  // The figure sits above its dot but never above the top of the plot.
-  const dotY = y(
-    (active === undefined ? undefined : points[active]?.values[0]) ?? '0',
-  );
-  // Each label sits beside its own dot. The topmost dot's label ends just above it and the others start just
-  // below theirs, so two close dots never share a place; each is kept inside the plot.
-  const labels = (() => {
-    if (active === undefined) return [];
-    const values = points[active]?.values ?? [];
-    const lines = markerLabels
-      ? markerLabels(active)
-      : [[formatValue(values[0] ?? '0')]];
-    const dots = lines.map((_, index) => y(values[index] ?? '0'));
-    const top = dots.reduce(
-      (best, dot, index) => (isBeyond(dots[best] ?? dot, dot) ? index : best),
-      0,
-    );
-    return lines.map((block, index) => {
-      const dot = dots[index] ?? dotY;
-      const extra = Math.max(0, block.length - 1) * LINE_STEP;
-      const below = markerLabels !== undefined && index !== top;
-      // Inside the plot: a block below its dot stops short of the axis line, and the topmost dot's block stops
-      // just above it, so the two never run into each other or off the bottom.
-      const limit = scalePosition(
-        String(below ? plotBottom - 14 - extra : 22 + extra),
-        '0',
-        '1',
-        0,
-        1,
-      );
-      const floor = scalePosition(String(plotBottom - 10), '0', '1', 0, 1);
-      const dotAt =
-        markerLabels !== undefined && !below && isBeyond(dot, floor)
-          ? floor
-          : dot;
-      const outside = below ? isBeyond(dotAt, limit) : isBeyond(limit, dotAt);
-      return { block, below, at: outside ? limit : dotAt };
-    });
-  })();
+  const labels =
+    active === undefined
+      ? []
+      : markerBlocks(
+          markerLabels
+            ? markerLabels(active)
+            : [[formatValue(points[active]?.values[0] ?? '0')]],
+          (points[active]?.values ?? []).map((value) => y(value)),
+          markerLabels !== undefined,
+          plotBottom,
+        );
 
   const choose = (event: PointerEvent<SVGRectElement>) => {
     const box = svgRef.current?.getBoundingClientRect();
