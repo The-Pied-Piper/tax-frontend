@@ -61,8 +61,6 @@ const OWN: Record<Slug, (readonly [string, string])[]> = {
     ],
     ['schedule-b', 'Schedule B: Tax Relief Measures'],
     ['schedule-f', 'Schedule F: Contribution to the Health Services Fund'],
-    ['work-chart-201', 'Work Chart 201: Deduction for workers'],
-    ['work-chart-401', 'Work Chart 401: Income tax on taxable income'],
   ],
 };
 
