@@ -183,6 +183,11 @@ export function salaryPages(
         await rewriteHome(outDir, renderSiteFooter);
         const rates = ratesPages(new Set(sweeps.map((sweep) => sweep.slug)));
         const compare = comparePage(sweeps);
+        // Every page's footer links to the compare page, so a build without it would leave a broken link.
+        if (!compare)
+          throw new Error(
+            'The compare page could not be built, and every footer links to it',
+          );
         // A hub links to the rates page and the compare page this build writes, so the pages come first.
         const hubs = hubPages(
           built,
@@ -190,7 +195,7 @@ export function salaryPages(
           new Set([
             ...contentPages.map((page) => page.slug),
             ...rates.map((page) => page.slug),
-            ...(compare ? [compare.slug] : []),
+            compare.slug,
           ]),
           PROVINCES_WITHOUT_SALARY_PAGES,
           new Set(sweeps.map((sweep) => sweep.slug)),
@@ -204,7 +209,7 @@ export function salaryPages(
             ...withSalaryLinks(contentPages, built),
             ...hubs,
             ...rates,
-            ...(compare ? [compare] : []),
+            compare,
           ],
           render: (spec) =>
             renderContentPage(

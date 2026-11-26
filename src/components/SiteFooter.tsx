@@ -1,6 +1,7 @@
 import styles from './SiteFooter.module.css';
 import { strings } from '../strings';
 import {
+  COMPARE_SLUG,
   contentPath,
   FOOTER_PROVINCE_SLUGS,
   METHODOLOGY_SLUG,
@@ -13,6 +14,7 @@ export function SiteFooter() {
         <a href={contentPath(METHODOLOGY_SLUG)}>
           {strings.siteNav.methodology}
         </a>
+        <a href={contentPath(COMPARE_SLUG)}>{strings.siteNav.compare}</a>
         <span className={styles.label}>{strings.siteNav.provinces}</span>
         {FOOTER_PROVINCE_SLUGS.map((slug) => (
           <a key={slug} href={contentPath(slug)}>

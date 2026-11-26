@@ -1021,6 +1021,7 @@ describe.each(['light', 'dark'] as const)(
           .map((a) => [a.textContent, a.getAttribute('href')]),
       ).toEqual([
         ['How we calculate', '/methodology/'],
+        ['Compare provinces', '/compare-provinces/'],
         ['Ontario', '/ca-on/'],
         ['Alberta', '/ca-ab/'],
         ['British Columbia', '/ca-bc/'],
@@ -1052,6 +1053,7 @@ describe.each(['light', 'dark'] as const)(
       ].map((a) => a.getAttribute('href'));
       expect(hrefs).toEqual([
         '/methodology/',
+        '/compare-provinces/',
         '/ca-on/',
         '/ca-ab/',
         '/ca-bc/',

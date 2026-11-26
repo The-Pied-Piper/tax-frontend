@@ -33,17 +33,17 @@ describe('LearnMore rates line', () => {
         rates={null}
         unit={saved.unit}
         compare={{
-          label: 'Take-home pay by province, 2026',
+          label: 'Compare take-home pay and tax across provinces, 2026',
           href: '/compare-provinces/?salary=70000',
         }}
       />,
     );
     const link = screen.getByRole('link', {
-      name: 'Take-home pay by province, 2026',
+      name: 'Compare take-home pay and tax across provinces, 2026',
     });
     expect(link).toHaveAttribute('href', '/compare-provinces/?salary=70000');
     expect(link.closest('p')).toHaveTextContent(
-      'See how a CA$70,000 salary compares across the provinces: Take-home pay by province, 2026.',
+      'See how a CA$70,000 salary compares across the provinces: Compare take-home pay and tax across provinces, 2026.',
     );
   });
 

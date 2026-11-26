@@ -343,6 +343,7 @@ describe('renderSiteFooter (the static footer of the home page)', () => {
         .map((a) => a.getAttribute('href')),
     ).toEqual([
       '/methodology/',
+      '/compare-provinces/',
       '/ca-on/',
       '/ca-ab/',
       '/ca-bc/',

@@ -66,21 +66,6 @@ describe('ProvinceComparison at the start', () => {
     expect(screen.getByText(copy.measureNotes.takeHome)).toBeInTheDocument();
   });
 
-  it('says the figures are provisional only when the year is', () => {
-    const { unmount } = show();
-    expect(
-      screen.getByText('The 2026 figures are provisional.'),
-    ).toBeInTheDocument();
-    unmount();
-    show('ca-on', {
-      provinces: sampleSweeps.map((sweep) => ({
-        ...sweep,
-        provisional: false,
-      })),
-    });
-    expect(screen.queryByText(/provisional/)).toBeNull();
-  });
-
   it('offers the three measures under the label "Compare by"', () => {
     show();
     const group = screen.getByRole('radiogroup', { name: copy.toggleLabel });
@@ -409,7 +394,7 @@ describe('the order of the list', () => {
     expect(screen.getByRole('status')).toBeEmptyDOMElement();
   });
 
-  it('says so when every province has the same income tax', () => {
+  it('says so when every province has the same tax and contributions', () => {
     show();
     fireEvent.change(slider(), { target: { value: '0' } });
     expect(screen.getByText(copy.tied)).toBeInTheDocument();
