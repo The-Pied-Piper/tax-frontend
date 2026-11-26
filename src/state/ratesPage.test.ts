@@ -21,7 +21,7 @@ describe('ratesPageView', () => {
   });
 
   it('lists the provinces that have wording', () => {
-    expect(ratesProvinces()).toEqual(['ca-on', 'ca-ab']);
+    expect(ratesProvinces()).toEqual(['ca-on', 'ca-ab', 'ca-qc']);
   });
 
   it('fills every figure from the sweep and leaves no brace behind', () => {
@@ -272,6 +272,132 @@ describe('the Alberta rates page', () => {
 
   it('keeps the tab title under 64 characters and the description under 160', () => {
     const text = ratesPageText['ca-ab'];
+    expect(text?.title.length).toBeLessThan(64);
+    expect(text?.description.length).toBeLessThan(160);
+  });
+});
+
+describe('the Québec rates page', () => {
+  const quebec = () => {
+    const found = fullHubCharts(['ca-qc']).provinces[0];
+    if (!found) throw new Error('no sweep');
+    return found;
+  };
+  const text = ratesPageText['ca-qc'];
+
+  it('fills every figure from the sweep and leaves no brace behind', () => {
+    const view = ratesPageView('ca-qc', quebec());
+    if (!view) throw new Error('no view');
+    const everyWord = [
+      ...view.intro,
+      ...view.howToRead,
+      ...view.groups.flatMap((group) => group.notes.map((note) => note.words)),
+      ...view.tables.flatMap((table) => [
+        table.before ?? '',
+        table.after ?? '',
+        ...table.rows.flat(),
+      ]),
+    ];
+    expect(everyWord.length).toBeGreaterThan(30);
+    for (const words of everyWord) {
+      expect(words).not.toMatch(/[{}]|undefined|NaN/);
+      // The accent is on every Québec the page shows; the name is never typed without it.
+      expect(words).not.toMatch(/Quebec/);
+      expect(words).not.toMatch(/Canada Pension Plan|CPP/);
+    }
+  });
+
+  it('says what the copy thread reviewed at the steps that matter', () => {
+    const view = ratesPageView('ca-qc', quebec());
+    const notes = view?.groups.flatMap((g) => g.notes.map((n) => n.words));
+    const joined = notes?.join('\n') ?? '';
+    // Employment Insurance at Québec's rate and the full amount of the $2,000 band computed from it.
+    expect(joined).toContain('Employment Insurance at 1.30%');
+    expect(joined).toContain('until it reaches about $26.34');
+    expect(joined).toContain('at most $895.70 a year');
+    expect(joined).toContain('Employment Insurance 100 cents plus QPIP');
+    expect(view?.intro[0]).toMatch(/to 53\.3% above \$259,609/);
+    expect(view?.intro[2]).toContain('$777.50');
+  });
+
+  it('gives one decimal for every computed rate in the opening finding', () => {
+    const view = ratesPageView('ca-qc', quebec());
+    expect(view?.intro[0]).toMatch(/about 8\.0% once/);
+    expect(view?.intro[0]).toMatch(/to 47\.0% at/);
+  });
+
+  it('names a cause form for every note and links the ones that have a page', () => {
+    for (const group of text?.groups ?? []) {
+      for (const note of group.notes) {
+        expect(note.forms.length, note.text).toBeGreaterThan(0);
+      }
+    }
+    for (const form of [
+      'tp1',
+      'scheduleU',
+      'scheduleK',
+      'workChart401',
+    ] as const) {
+      expect(causeChip(form).href, form).toMatch(/^\/forms\/[a-z0-9-]+\/$/);
+    }
+    expect(causeChip('workChart201').label).toBe('Work Chart 201');
+  });
+
+  it('types no dollar figure or cents figure in a note or a table cell', () => {
+    const words = [
+      ...(text?.intro ?? []).map((note) => note.text),
+      ...(text?.howToRead ?? []).map((note) => note.text),
+      ...(text?.groups ?? []).flatMap((group) =>
+        group.notes.map((note) => note.text),
+      ),
+      ...(text?.tables ?? []).flatMap((table) => [
+        table.before?.text ?? '',
+        table.after?.text ?? '',
+        ...table.rows.flat(),
+      ]),
+    ];
+    for (const line of words) {
+      expect(line).not.toMatch(/\$\d|\d cents/);
+    }
+  });
+
+  it('puts the last group heading at the salary the data says the top bracket starts at', () => {
+    const groups = text?.groups ?? [];
+    const last = groups[groups.length - 1]?.heading ?? '';
+    const top = quebec().facts['fed_bracket_5_salary'] ?? '';
+    const gap = subtractAmounts(last.replace(/\D/g, ''), top);
+    expect(compareAmounts(gap, '0')).toBeGreaterThanOrEqual(0);
+    expect(compareAmounts(gap, '1000')).toBeLessThan(0);
+  });
+
+  it('agrees with the engine on every salary worked out from a form threshold', () => {
+    // Each salary the build works out from a taxable income (a fact) is the first whole salary of an edge the engine found by
+    // bisection, or one dollar below it where the engine reads the wrong rate at the exact threshold (74,600 and 259,609).
+    const { facts, edges } = quebec();
+    const names = [
+      'fed_bracket_2_salary',
+      'fed_bracket_3_salary',
+      'fed_bracket_4_salary',
+      'fed_bracket_5_salary',
+      'qc_bracket_2_salary',
+      'qc_bracket_3_salary',
+      'qc_bracket_4_salary',
+      'drug_start_salary',
+      'drug_step_salary',
+      'drug_max_salary',
+    ];
+    for (const name of names) {
+      const salary = facts[name] ?? '';
+      const near = edges.find(
+        (edge) =>
+          compareAmounts(subtractAmounts(edge[2], salary), '0') >= 0 &&
+          compareAmounts(subtractAmounts(edge[2], salary), '2') < 0,
+      );
+      expect(near, name).toBeDefined();
+    }
+  });
+
+  it('keeps the title under 64 characters and the description under 160', () => {
     expect(text?.title.length).toBeLessThan(64);
     expect(text?.description.length).toBeLessThan(160);
   });

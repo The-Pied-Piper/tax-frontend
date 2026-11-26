@@ -170,13 +170,13 @@ def _pension_deduction(year: int) -> dict[str, Decimal]:
     }
 
 
-def _exact_salary_of_taxable(year: int, taxable: Decimal) -> Decimal:
+def _exact_salary_of_taxable(year: int, taxable: Decimal, d: dict[str, Decimal] | None = None) -> Decimal:
     """The salary at which taxable income (which is also net income) reaches `taxable`, exactly (it may have cents).
 
     Taxable income is the salary less the pension deduction, which has three regimes: a share of the pay above the
     exemption up to the limit, then the first tier's maximum plus a share of the pay up to the second limit, then
     the two maximums together."""
-    d = _pension_deduction(year)
+    d = d or _pension_deduction(year)
     first = max(Decimal(0), (taxable - d["constant"]) / d["factor"])
     if first <= d["limit"]:
         return first
@@ -186,10 +186,10 @@ def _exact_salary_of_taxable(year: int, taxable: Decimal) -> Decimal:
     return taxable + d["cut"]
 
 
-def _salary_of_taxable(year: int, taxable: Decimal) -> Decimal:
+def _salary_of_taxable(year: int, taxable: Decimal, d: dict[str, Decimal] | None = None) -> Decimal:
     """The first whole salary at or above the one where taxable income reaches `taxable`: where a band that starts at
     that threshold starts in salary ("from")."""
-    return _exact_salary_of_taxable(year, taxable).to_integral_value(rounding=ROUND_CEILING)
+    return _exact_salary_of_taxable(year, taxable, d).to_integral_value(rounding=ROUND_CEILING)
 
 
 def _salary_to_taxable(year: int, taxable: Decimal) -> Decimal:
@@ -260,8 +260,9 @@ def _shift(facts: dict[str, str], bracket: str) -> str:
     return str(Decimal(facts[f"{bracket}_salary"]) - Decimal(facts[f"{bracket}_ti"]))
 
 
-def _ontario_rates_page_facts(year: int, facts: dict[str, str]) -> dict[str, str]:
-    """Ontario's own figures: its brackets, basic amount, LIFT Credit, surtax and health premium."""
+def _ontario_rates_page_facts(year: int) -> dict[str, str]:
+    """Ontario's figures: the common ones and its own: its brackets, basic amount, LIFT Credit, surtax and health premium."""
+    facts = _common_rates_page_facts(year)
     ontario = _bracket_facts(year, "ont", _params(year, "ca_on", "brackets")["brackets"])
     ontario["ont_bpa"] = _params(year, "ca_on", "basic_personal_amount")["amount"]
     ontario["lift_max"] = _params(year, "ca_on", "lift_maximum")["amount"]
@@ -288,12 +289,13 @@ def _ontario_rates_page_facts(year: int, facts: dict[str, str]) -> dict[str, str
             ontario[f"ohp_{number}_plus"] = row["plus"]
     ontario["shift_ohp_1"] = str(Decimal(ontario["ohp_2_salary"]) - Decimal(ontario["ohp_2_ti"]))
     ontario["shift_ont_bracket_2"] = _shift(ontario, "ont_bracket_2")
-    return ontario
+    return {**facts, **ontario}
 
 
-def _alberta_rates_page_facts(year: int, facts: dict[str, str]) -> dict[str, str]:
-    """Alberta's own figures: its six brackets (the form keeps them in two files, lines 2 to 8 and lines 9 to 15),
+def _alberta_rates_page_facts(year: int) -> dict[str, str]:
+    """Alberta's figures: the common ones and its own: its six brackets (the form keeps them in two files, lines 2 to 8 and lines 9 to 15),
     its basic amount and the rate of its credits."""
+    facts = _common_rates_page_facts(year)
     brackets = [
         *_params(year, "ca_ab", "brackets_lines_2_to_8")["brackets"],
         *_params(year, "ca_ab", "brackets_lines_9_to_15")["brackets"],
@@ -303,23 +305,198 @@ def _alberta_rates_page_facts(year: int, facts: dict[str, str]) -> dict[str, str
     alberta["ab_credit_rate"] = _params(year, "ca_ab", "credit_rate")["rate"]
     alberta["shift_fed_bracket_2"] = _shift(facts, "fed_bracket_2")
     alberta["shift_ab_bracket_2"] = _shift(alberta, "ab_bracket_2")
-    return alberta
+    return {**facts, **alberta}
 
 
-# The province-only part of the rates page's figures, by province code; a province with no entry has no rates page.
+def _quebec_shift(exact_salary: Decimal, taxable: Decimal | str) -> str:
+    """How much higher the salary is than the income at a form's threshold, to the cent."""
+    return str((exact_salary - Decimal(taxable)).quantize(CENTS))
+
+
+def _qpp_deduction(year: int) -> dict[str, Decimal]:
+    """Québec's version of `_pension_deduction`: the enhanced Québec Pension Plan taken off federal net income (Schedule U:
+    1% of earnings from the personal exemption up to the first limit, line 15, then 4% up to the second limit, line 21).
+    The maximum of the first tier is that rate on the earnings between the two (nothing prints it), and the second
+    tier's maximum is the one TP-1 line 98.2 prints."""
+    exemption = Decimal(_params(year, "ca_qc", "schedule_u_line_13_personal_qpp_exemption")["amount"])
+    limit = Decimal(_params(year, "ca_qc", "schedule_u_line_14_1_maximum_pensionable_earnings")["amount"])
+    second_limit = Decimal(_params(year, "ca_qc", "schedule_u_line_18_8_additional_maximum_pensionable_earnings")["amount"])
+    enhanced = Decimal(_params(year, "ca_qc", "schedule_u_line_15_rate")["rate"])
+    second_rate = Decimal(_params(year, "ca_qc", "schedule_u_line_21_rate")["rate"])
+    first_max = enhanced * (limit - exemption)
+    second_max = Decimal(_params(year, "ca_qc", "tp1_line_98_2_additional_qpp_contribution")["maximum"])
+    return {
+        "exemption": exemption,
+        "limit": limit,
+        "second_limit": second_limit,
+        "factor": 1 - enhanced,
+        "constant": enhanced * exemption,
+        "cut": first_max + second_max,
+        "factor_2": 1 - second_rate,
+        "constant_2": second_rate * limit - first_max,
+    }
+
+
+def _exact_salary_of_quebec_taxable(year: int, taxable: Decimal) -> Decimal:
+    """The salary at which Québec taxable income (also the net income of Schedule K) reaches `taxable`, exactly.
+
+    Québec taxable income is the salary less the enhanced Québec Pension Plan (as for federal taxable income) and less the
+    deduction for workers (Work Chart 201: a share of the pay, up to a most). It is a line that bends where the deduction
+    for workers stops growing and where each pension tier starts or stops, so it is solved between those salaries."""
+    d = _qpp_deduction(year)
+    rate = Decimal(_params(year, "ca_qc", "work_chart_201_rate")["rate"])
+    most = Decimal(_params(year, "ca_qc", "work_chart_201_maximum")["amount"])
+    stops = most / rate
+
+    def income(salary: Decimal) -> Decimal:
+        pension = (
+            max(Decimal(0), min(salary, d["limit"]) - d["exemption"]) * (1 - d["factor"])
+            + max(Decimal(0), min(salary, d["second_limit"]) - d["limit"]) * (1 - d["factor_2"])
+        )
+        return salary - min(salary * rate, most) - pension
+
+    bends = sorted({Decimal(0), d["exemption"], stops, d["limit"], d["second_limit"]})
+    for below, above in zip(bends, bends[1:]):
+        if income(below) <= taxable <= income(above):
+            slope = (income(above) - income(below)) / (above - below)
+            return below + (taxable - income(below)) / slope
+    last = bends[-1]
+    return last + (taxable - income(last))
+
+
+def _quebec_rates_page_facts(year: int) -> dict[str, str]:
+    """The figures the Québec rates page quotes besides the sweep (see `_rates_page_facts` for Ontario's): the federal and
+    Québec brackets, the basic amounts, the deduction for workers, the Québec Pension Plan, Employment Insurance and Québec
+    Parental Insurance Plan limits, the drug insurance premium, and where each threshold falls in salary. Every figure is
+    read from the engine's own 2026 dataset files; the salary of a taxable-income threshold is worked out from the two
+    deductions (Québec taxable income also loses the deduction for workers)."""
+    d = _qpp_deduction(year)
+    facts: dict[str, str] = {
+        "qpp_start": str(d["exemption"]),
+        "qpp_ympe": str(d["limit"]),
+        "yampe": str(d["second_limit"]),
+        "taxable_factor": str(d["factor"]),
+        "taxable_constant": str(d["constant"]),
+        "taxable_cut": str(d["cut"]),
+        "taxable_factor_2": str(d["factor_2"]),
+        "taxable_constant_2": str(d["constant_2"]),
+    }
+    # Federal brackets: the printed rates, the taxable income each starts at, and the salary where it starts.
+    for number, bracket in enumerate(_params(year, "ca", "brackets")["brackets"], start=1):
+        taxable = Decimal(bracket["from"])
+        facts[f"fed_bracket_{number}_ti"] = str(taxable)
+        facts[f"fed_bracket_{number}_rate"] = bracket["rate"]
+        facts[f"fed_bracket_{number}_salary"] = str(_salary_of_taxable(year, taxable, d))
+    abatement = Decimal(_params(year, "ca_qc", "quebec_abatement_rate")["rate"])
+    facts["abatement_rate"] = str(abatement)
+    # The federal rate that is left once Québec takes its abatement off the federal tax, to one decimal of a percent.
+    for number, bracket in enumerate(_params(year, "ca", "brackets")["brackets"], start=1):
+        facts[f"fed_bracket_{number}_effective"] = str(
+            (Decimal(bracket["rate"]) * (1 - abatement)).quantize(Decimal("0.001"), rounding=ROUND_HALF_UP)
+        )
+    bpa = _params(year, "ca", "basic_personal_amount")
+    facts["fed_bpa_min"] = bpa["base"]
+    facts["fed_bpa"] = str(Decimal(bpa["base"]) + Decimal(bpa["supplement"]))
+    facts["fed_bpa_taper_start"] = bpa["threshold"]
+    facts["fed_bpa_taper_end"] = str(Decimal(bpa["threshold"]) + Decimal(bpa["range"]))
+    facts["cea"] = _params(year, "ca", "canada_employment_amount")["amount"]
+    facts["fed_lowest_rate"] = facts["fed_bracket_1_rate"]
+    facts["fed_lowest_rate_prior"] = _params(year - 1, "ca", "brackets")["brackets"][0]["rate"]
+    # What the shrinking federal basic amount adds to the marginal rate after the abatement, in points, to two decimals.
+    facts["fed_bpa_taper_points"] = str(
+        (
+            Decimal(bpa["supplement"]) / Decimal(bpa["range"]) * Decimal(facts["fed_bracket_1_rate"]) * (1 - abatement) * 100
+        ).quantize(Decimal("0.01"), rounding=ROUND_HALF_UP)
+    )
+    # Québec brackets (Work Chart 401), the basic amount and the deduction for workers (Work Chart 201).
+    for number, bracket in enumerate(_params(year, "ca_qc", "brackets_work_chart_401")["brackets"], start=1):
+        taxable = Decimal(bracket["from"])
+        facts[f"qc_bracket_{number}_ti"] = str(taxable)
+        facts[f"qc_bracket_{number}_rate"] = bracket["rate"]
+        exact = _exact_salary_of_quebec_taxable(year, taxable)
+        facts[f"qc_bracket_{number}_salary"] = str(exact.to_integral_value(rounding=ROUND_CEILING))
+    facts["qc_bpa"] = _params(year, "ca_qc", "tp1_basic_personal_amount_line_350")["amount"]
+    facts["qc_credit_rate"] = _params(year, "ca_qc", "tp1_line_377_1_rate")["rate"]
+    workers_rate = Decimal(_params(year, "ca_qc", "work_chart_201_rate")["rate"])
+    workers_max = Decimal(_params(year, "ca_qc", "work_chart_201_maximum")["amount"])
+    facts["workers_rate"] = str(workers_rate)
+    facts["workers_max"] = str(workers_max)
+    facts["workers_max_salary"] = str((workers_max / workers_rate).quantize(CENTS))
+    # Québec taxable income as a line in salary, in four stretches (the same bends as `_exact_salary_of_quebec_taxable`).
+    enhanced = 1 - d["factor"]
+    facts["qc_factor_0"] = str(1 - workers_rate - enhanced)
+    facts["qc_constant_0"] = str(d["constant"])
+    facts["qc_factor"] = str(d["factor"])
+    facts["qc_constant"] = str(workers_max - d["constant"])
+    facts["qc_factor_2"] = str(d["factor_2"])
+    facts["qc_constant_2"] = str(d["constant_2"] - workers_max)
+    facts["qc_cut"] = str(d["cut"] + workers_max)
+    # Each threshold's shift: how much higher the salary is than the income at the form's threshold (to the whole dollar).
+    for number, name in ((2, "shift_fed_bracket_2"),):
+        facts[name] = _quebec_shift(_exact_salary_of_taxable(year, Decimal(facts[f"fed_bracket_{number}_ti"]), d), facts[f"fed_bracket_{number}_ti"])
+    for number in (2, 3):
+        taxable = Decimal(facts[f"qc_bracket_{number}_ti"])
+        facts[f"shift_qc_bracket_{number}"] = _quebec_shift(_exact_salary_of_quebec_taxable(year, taxable), taxable)
+    # Employment Insurance at Québec's own rate (T2204 line 11), the $2,000 rule, and the parental insurance premium.
+    ei = _params(year, "ca_qc", "ei_premium")
+    facts["ei_exemption"] = _params(year, "ca", "t2204_exemption")["amount"]
+    facts["ei_max_premium"] = ei["maximum"]
+    facts["ei_rate"] = f"{Decimal(ei['rate']):.4f}"
+    facts["ei_stop"] = ei["upper"]
+    facts["ei_full_amount"] = str(
+        (Decimal(ei["rate"]) * Decimal(facts["ei_exemption"]) / (1 - Decimal(ei["rate"]))).quantize(CENTS)
+    )
+    qpip = _params(year, "ca_qc", "ppip_premium")
+    facts["qpip_rate"] = f"{Decimal(qpip['rate']):.4f}"
+    facts["qpip_stop"] = qpip["upper"]
+    facts["qpip_max"] = qpip["maximum"]
+    # A premium below the $2,000 rule is not payable, and from it the whole premium at the rate is due at once.
+    facts["qpip_first"] = str((Decimal(qpip["rate"]) * Decimal(facts["ei_exemption"])).quantize(CENTS))
+    base = _params(year, "ca_qc", "qpp_line_11_base_contribution")
+    second = _params(year, "ca_qc", "tp1_line_98_2_additional_qpp_contribution")
+    facts["qpp_base_rate"] = f"{Decimal(base['rate']):.4f}"
+    facts["qpp_enhanced_rate"] = f"{enhanced:.4f}"
+    facts["qpp_rate"] = f"{Decimal(base['rate']) + enhanced:.4f}"
+    facts["qpp_max"] = _params(year, "ca_qc", "schedule_u_line_10_maximum")["amount"]
+    facts["qpp2_rate"] = second["rate"]
+    facts["qpp2_max"] = second["maximum"]
+    # The drug insurance premium (Schedule K): the net income it starts at, where the rate steps up, where it reaches
+    # its yearly most, and the salary at each. Net income here is the Québec taxable income.
+    start = Decimal(_params(year, "ca_qc", "schedule_k_line_41_amount")["amount"])
+    rows = _params(year, "ca_qc", "schedule_k_brackets")["brackets"]
+    first_rate, second_rate_k = Decimal(rows[0]["rate"]), Decimal(rows[1]["rate"])
+    step_at, step_tax = Decimal(rows[1]["from"]), Decimal(rows[1]["tax_at_start"])
+    most = Decimal(_params(year, "ca_qc", "schedule_k_line_87_maximum")["amount"])
+    reaches = start + step_at + (most - step_tax) / second_rate_k
+    for name, income in (("start", start), ("step", start + step_at), ("max", reaches)):
+        facts[f"drug_{name}_salary"] = str(
+            _exact_salary_of_quebec_taxable(year, income).to_integral_value(rounding=ROUND_CEILING)
+        )
+        facts[f"drug_{name}_ni"] = str(income.quantize(CENTS))
+    facts["shift_drug"] = _quebec_shift(_exact_salary_of_quebec_taxable(year, start), start)
+    facts["drug_rate_1"] = rows[0]["rate"]
+    facts["drug_rate_2"] = rows[1]["rate"]
+    facts["drug_step_amount"] = rows[1]["tax_at_start"]
+    facts["drug_max"] = str(most)
+    # What each extra dollar of salary adds to the premium: the rate times the share of salary that is net income.
+    facts["drug_cents_1"] = str((first_rate * Decimal(facts["qc_factor_0"])).quantize(Decimal("0.001"), rounding=ROUND_HALF_UP))
+    facts["drug_cents_2"] = str((second_rate_k * Decimal(facts["qc_factor"])).quantize(Decimal("0.001"), rounding=ROUND_HALF_UP))
+    return facts
+
+
+# The rates page's figures by province code: each builder makes the whole set for its province; a province with no entry has no rates page.
 RATES_PAGE_FACTS = {
     "CA-ON": _ontario_rates_page_facts,
     "CA-AB": _alberta_rates_page_facts,
+    # Québec has its own pension plan, so it does not start from the common (Canada Pension Plan) figures.
+    "CA-QC": _quebec_rates_page_facts,
 }
 
 
 def _rates_page_facts(year: int, code: str) -> dict[str, str]:
-    """The figures the rates page quotes besides the sweep: the common ones, and the province's own."""
-    province = RATES_PAGE_FACTS.get(code)
-    if province is None:
-        return {}
-    common = _common_rates_page_facts(year)
-    return {**common, **province(year, common)}
+    """The figures the rates page quotes besides the sweep: what the province's builder makes, or none for a province with no page."""
+    builder = RATES_PAGE_FACTS.get(code)
+    return {} if builder is None else builder(year)
 
 
 def _unit(unit: UnitDescription) -> dict:
@@ -384,14 +561,12 @@ class Figures:
         last = max(
             salary for salary in range(2001, 2101) if ei[salary] - ei[salary - 1] > Decimal("0.99")
         )
-        top = ei[last]
-        if code != "CA-QC":
-            # The band runs until the salary over the exemption is the whole premium at the rate (T2204): the
-            # premium p satisfies p = rate x (exemption + p), so p = rate x exemption / (1 - rate); the salary
-            # is exemption + p, which falls between whole dollars, so the engine's last whole dollar is below it.
-            rate = Decimal(_params(year, "ca", "ei_premium")["rate"])
-            exemption = Decimal(_params(year, "ca", "t2204_exemption")["amount"])
-            top = rate * exemption / (1 - rate)
+        # The band runs until the salary over the exemption is the whole premium at the rate (T2204): the premium p
+        # satisfies p = rate x (exemption + p), so p = rate x exemption / (1 - rate); the salary is exemption + p, which
+        # falls between whole dollars, so the engine's last whole dollar is below it. Québec's rate is its own.
+        rate = Decimal(_params(year, "ca_qc" if code == "CA-QC" else "ca", "ei_premium")["rate"])
+        exemption = Decimal(_params(year, "ca", "t2204_exemption")["amount"])
+        top = rate * exemption / (1 - rate)
         return {"ei_band_end": str(last), "ei_band_top": str(top.quantize(CENTS))}
 
     def _ei(self, code: str, year: int, salary: int) -> Decimal:
