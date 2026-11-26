@@ -306,10 +306,59 @@ def _alberta_rates_page_facts(year: int, facts: dict[str, str]) -> dict[str, str
     return alberta
 
 
+def _nearest_salary_of_taxable(year: int, taxable: Decimal) -> Decimal:
+    """The whole salary nearest the one where taxable income reaches `taxable` (half up), for the wording "from about".
+    The engine's own edge lies between the whole salary below and the one above, so this is one of the two."""
+    return _exact_salary_of_taxable(year, taxable).quantize(Decimal(1), rounding=ROUND_HALF_UP)
+
+
+def _manitoba_rates_page_facts(year: int, facts: dict[str, str]) -> dict[str, str]:
+    """Manitoba's own figures: its three brackets (each with the salary where it starts), the basic personal amount
+    that shrinks above a net income of $200,000, and the Family Tax Benefit."""
+    manitoba: dict[str, str] = {}
+    for number, bracket in enumerate(_params(year, "ca_mb", "brackets_lines_2_to_8")["brackets"], start=1):
+        taxable = Decimal(bracket["from"])
+        manitoba[f"mb_bracket_{number}_ti"] = str(taxable)
+        manitoba[f"mb_bracket_{number}_rate"] = bracket["rate"]
+        manitoba[f"mb_bracket_{number}_salary"] = str(_nearest_salary_of_taxable(year, taxable))
+    credit_rate = Decimal(_params(year, "ca_mb", "credit_rate")["rate"])
+    manitoba["mb_credit_rate"] = str(credit_rate)
+    bpa = Decimal(_params(year, "ca_mb", "basic_personal_amount")["amount"])
+    start = Decimal(_params(year, "ca_mb", "basic_personal_amount_threshold")["amount"])
+    manitoba["mb_bpa_max"] = str(bpa)
+    manitoba["mb_bpa_start_ni"] = str(start)
+    manitoba["mb_bpa_start_salary"] = str(_nearest_salary_of_taxable(year, start))
+    # The amount reaches nothing at a net income of $400,000, which Worksheet MB428 and T4127 print; the engine holds it
+    # in the worksheet's range, so the page declares that one figure (`d:`) and the salary where it falls is derived.
+    end = Decimal(400000)
+    manitoba["mb_bpa_end_salary"] = str(_nearest_salary_of_taxable(year, end))
+    # What the shrinking amount adds to the marginal rate, in points to two decimals: the amount lost per dollar of net
+    # income (the maximum over the range) at the credit rate.
+    manitoba["mb_bpa_taper_points"] = str(
+        (bpa / (end - start) * credit_rate * 100).quantize(Decimal("0.01"), rounding=ROUND_HALF_UP)
+    )
+    benefit = Decimal(_params(year, "ca_mb", "family_tax_benefit_basic_amount")["amount"])
+    benefit_rate = Decimal(_params(year, "ca_mb", "family_tax_benefit_rate")["rate"])
+    manitoba["ftb_max"] = str(benefit)
+    gone = benefit / benefit_rate
+    manitoba["ftb_end_ni"] = str(gone)
+    manitoba["ftb_end_salary"] = str(_nearest_salary_of_taxable(year, gone))
+    manitoba["shift_ftb"] = str(
+        Decimal(manitoba["ftb_end_salary"]) - gone.quantize(Decimal(1), rounding=ROUND_HALF_UP)
+    )
+    manitoba["shift_mb_bracket_2"] = str(
+        Decimal(manitoba["mb_bracket_2_salary"]) - Decimal(manitoba["mb_bracket_2_ti"])
+    )
+    # Manitoba tax lost per extra dollar of net income while the benefit shrinks, as a rate to a whole cent.
+    manitoba["ftb_tax_effect"] = str((credit_rate * benefit_rate).quantize(Decimal("0.01"), rounding=ROUND_HALF_UP))
+    return manitoba
+
+
 # The province-only part of the rates page's figures, by province code; a province with no entry has no rates page.
 RATES_PAGE_FACTS = {
     "CA-ON": _ontario_rates_page_facts,
     "CA-AB": _alberta_rates_page_facts,
+    "CA-MB": _manitoba_rates_page_facts,
 }
 
 
