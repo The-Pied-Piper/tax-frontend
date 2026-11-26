@@ -2,7 +2,10 @@ import type { ListJurisdictionsResponse } from '../../src/api';
 import jurisdictions from '../../src/api/fixtures/jurisdictions.json';
 import fixture70000 from '../../src/api/fixtures/compute-on-2026-70000.json';
 import type { ComputeTakeHomeCalculationResponse } from '../../src/api';
-import { sweepSalaries } from '../../src/state/hubCharts';
+import {
+  PROVINCE_EXTRA_SALARIES,
+  sweepSalaries,
+} from '../../src/state/hubCharts';
 import { provinces } from './provinces';
 import config from './provinces.json';
 import type { BuiltProvince } from './generate';
@@ -44,6 +47,19 @@ describe('the sweep steps of the Python step and of the charts', () => {
     steps.push(...extra);
     steps.sort((a, b) => a - b);
     expect(steps.map((n) => n.toString())).toEqual(sweepSalaries());
+  });
+});
+
+describe("each province's own extra sample points", () => {
+  it('are the same in provinces.json (read by the Python step) and in sweepSalaries(slug)', () => {
+    for (const province of config.provinces) {
+      const own = ('extra' in province ? province.extra : []) ?? [];
+      const listed = PROVINCE_EXTRA_SALARIES[province.slug] ?? [];
+      expect(own.map((n) => n.toString())).toEqual([...listed]);
+      expect(sweepSalaries(province.slug)).toHaveLength(
+        sweepSalaries().length + listed.length,
+      );
+    }
   });
 });
 

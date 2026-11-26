@@ -1,6 +1,7 @@
 import { formPageLink } from './formLinks';
 import type { ProvinceSweep } from './hubCharts';
 import { isFullSweep, noteWords } from './hubNotes';
+import { albertaRatesPage } from './ratesPageText/ca-ab';
 import { ontarioRatesPage } from './ratesPageText/ca-on';
 import type { CauseForm, RatesPageText } from './ratesPageTypes';
 import { FOOTER_PROVINCE_SLUGS, type FooterProvinceSlug } from './siteLinks';
@@ -10,6 +11,7 @@ import { strings } from '../strings';
 export const ratesPageText: Partial<Record<FooterProvinceSlug, RatesPageText>> =
   {
     'ca-on': ontarioRatesPage,
+    'ca-ab': albertaRatesPage,
   };
 
 /** The provinces that have a rates page, in the footer's order. */
@@ -24,6 +26,7 @@ const CAUSE_PAGE: Record<CauseForm, string> = {
   t1: 't1',
   on428: 'on428',
   on428a: 'on428-a',
+  ab428: 'ab428',
   t2204: 't2204',
   schedule8: 'schedule-8',
 };

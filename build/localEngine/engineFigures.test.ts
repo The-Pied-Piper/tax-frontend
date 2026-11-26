@@ -243,7 +243,7 @@ describe.runIf(process.env.ENGINE_FIGURES_FILE)(
       });
     });
 
-    it('holds the 327 hub-chart points of every province, $1,000 to $500,000 and the twenty-seven extra salaries', () => {
+    it('holds the hub-chart points of every province, $1,000 to $500,000, the twenty-seven extra salaries and each province own extra ones', () => {
       const raw = JSON.parse(readFileSync(file, 'utf8')) as {
         provinces: Record<
           string,
@@ -255,10 +255,12 @@ describe.runIf(process.env.ENGINE_FIGURES_FILE)(
           sweep: [],
           sweep_units: undefined,
         };
-        expect(sweep, province.code).toHaveLength(327);
+        expect(sweep, province.code).toHaveLength(
+          327 + (province.extra?.length ?? 0),
+        );
         expect(sweep[0]?.salary).toBe('1000.00');
         expect(sweep[1]?.salary).toBe('1990.00');
-        expect(sweep[326]?.salary).toBe('500000.00');
+        expect(sweep[sweep.length - 1]?.salary).toBe('500000.00');
         expect(sweep_units).toBeDefined();
       }
     });
