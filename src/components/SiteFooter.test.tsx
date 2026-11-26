@@ -2,6 +2,7 @@ import { render, screen, within } from '@testing-library/react';
 import { SiteFooter } from './SiteFooter';
 import { strings } from '../strings';
 import {
+  COMPARE_SLUG,
   contentPath,
   FOOTER_PROVINCE_SLUGS,
   METHODOLOGY_SLUG,
@@ -35,6 +36,16 @@ describe.each(['light', 'dark'] as const)(
       expect(link.tagName).toBe('A');
     });
 
+    it('links to the compare page, with a plain anchor', () => {
+      render(<SiteFooter />);
+      const link = screen.getByRole('link', {
+        name: strings.siteNav.compare,
+      });
+      expect(link).toHaveAttribute('href', contentPath(COMPARE_SLUG));
+      expect(link).toHaveAttribute('href', '/compare-provinces/');
+      expect(link.tagName).toBe('A');
+    });
+
     it('shows "Provinces:" and then the seven province links', () => {
       render(<SiteFooter />);
       const nav = screen.getByRole('navigation', {
@@ -46,6 +57,7 @@ describe.each(['light', 'dark'] as const)(
         .map((a) => [a.textContent, a.getAttribute('href')]);
       expect(hrefs).toEqual([
         ['How we calculate', '/methodology/'],
+        ['Compare provinces', '/compare-provinces/'],
         ['Ontario', '/ca-on/'],
         ['Alberta', '/ca-ab/'],
         ['British Columbia', '/ca-bc/'],

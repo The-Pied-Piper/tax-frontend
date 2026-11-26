@@ -19,6 +19,7 @@ import {
 import { plainSpec } from '../../src/test/contentPageData';
 import { notFoundPage } from '../../src/state/notFoundPage';
 import {
+  COMPARE_SLUG,
   FOOTER_PROVINCE_SLUGS,
   METHODOLOGY_SLUG,
   NOT_FOUND_FILE,
@@ -175,7 +176,7 @@ describe('crawl of the 404 page', () => {
   it('links only to files the build writes', async () => {
     const dir = outDir();
     writeFileSync(join(dir, 'index.html'), calculatorTemplate);
-    const slugs = [METHODOLOGY_SLUG, ...FOOTER_PROVINCE_SLUGS];
+    const slugs = [METHODOLOGY_SLUG, COMPARE_SLUG, ...FOOTER_PROVINCE_SLUGS];
     await generateContentPages({
       outDir: dir,
       template,

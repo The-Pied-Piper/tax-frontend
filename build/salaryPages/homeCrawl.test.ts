@@ -15,8 +15,10 @@ import {
   parse,
   sitemapLocs,
 } from '../../src/test/crawlSite';
+import { plainSpec } from '../../src/test/contentPageData';
 import { contentPages } from '../../src/state/contentPages';
 import {
+  COMPARE_SLUG,
   contentPath,
   FOOTER_PROVINCE_SLUGS,
   PROVINCES_WITHOUT_SALARY_PAGES,
@@ -85,7 +87,12 @@ async function build(
   const { written: pageFiles } = await generateContentPages({
     outDir: dir,
     template,
-    pages: [...withSalaryLinks(contentPages, built), ...hubs],
+    // A stand-in for the compare page, which every footer links to.
+    pages: [
+      ...withSalaryLinks(contentPages, built),
+      { ...plainSpec, slug: COMPARE_SLUG },
+      ...hubs,
+    ],
     render: renderContentPage,
     siteUrl: site,
   });
@@ -172,6 +179,7 @@ describe('crawl from the built home page', () => {
       expect(direct).toEqual(
         new Set([
           'methodology/index.html',
+          'compare-provinces/index.html',
           ...FOOTER_PROVINCE_SLUGS.map((slug) => `${slug}/index.html`),
         ]),
       );
@@ -235,7 +243,7 @@ describe('crawl from the built home page', () => {
     async () => {
       const { dir, written } = await build({ list: 'alberta' });
       const links = internalLinks(dir, ['index.html', ...written]);
-      expect(links.filter((l) => l.file === 'index.html')).toHaveLength(8);
+      expect(links.filter((l) => l.file === 'index.html')).toHaveLength(9);
       for (const { file, target } of links) {
         expect(existsSync(join(dir, target)), `${file} -> ${target}`).toBe(
           true,

@@ -59,14 +59,16 @@ describe('the written compare page', () => {
 
   it('has the year in its title, heading and description, and no province highlighted', () => {
     expect(page.title).toBe(
-      'Take-home pay, tax and contributions by province, 2026',
+      'Compare take-home pay and tax across provinces, 2026',
     );
     expect(page.querySelector('h1')?.textContent).toBe(
-      'Take-home pay by province, 2026',
+      'Compare take-home pay and tax across provinces, 2026',
     );
     expect(
       page.querySelector('meta[name="description"]')?.getAttribute('content'),
-    ).toContain('across 6 provinces in 2026');
+    ).toBe(
+      'Compare take-home pay, tax and contributions across 6 provinces at a salary you choose. Estimates for 2026, for a single person whose only income is a salary.',
+    );
     const slot = page.getElementById(PROVINCE_COMPARISON_SLOT_ID);
     expect(slot?.dataset.province).toBeUndefined();
     expect(slot?.querySelector('[aria-current]')).toBeNull();
@@ -78,7 +80,7 @@ describe('the written compare page', () => {
     );
   });
 
-  it('has every province at $70,000 in the page itself, lowest income tax first', () => {
+  it('has every province at $70,000 in the page itself, lowest tax and contributions first', () => {
     const slot = page.getElementById(PROVINCE_COMPARISON_SLOT_ID);
     const bars = Array.from(slot?.querySelectorAll('ol > li') ?? []).map(
       (li) => li.textContent,

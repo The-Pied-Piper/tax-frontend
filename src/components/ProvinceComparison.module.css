@@ -222,12 +222,6 @@
   font-size: 13px;
 }
 
-.comparison .provisional {
-  margin: 4px 0 0;
-  font-size: 13px;
-  color: var(--warn-fg);
-}
-
 @media (max-width: 480px) {
   .scrollHint {
     display: block;
