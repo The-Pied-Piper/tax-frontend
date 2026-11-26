@@ -365,7 +365,7 @@ def _exact_salary_of_quebec_taxable(year: int, taxable: Decimal) -> Decimal:
 
 
 def _quebec_rates_page_facts(year: int) -> dict[str, str]:
-    """The figures the Québec rates page quotes besides the sweep (see `_rates_page_facts` for Ontario's): the federal and
+    """The figures the Québec rates page quotes besides the sweep (see `_ontario_rates_page_facts` for Ontario's): the federal and
     Québec brackets, the basic amounts, the deduction for workers, the Québec Pension Plan, Employment Insurance and Québec
     Parental Insurance Plan limits, the drug insurance premium, and where each threshold falls in salary. Every figure is
     read from the engine's own 2026 dataset files; the salary of a taxable-income threshold is worked out from the two
@@ -432,8 +432,9 @@ def _quebec_rates_page_facts(year: int) -> dict[str, str]:
     facts["qc_constant_2"] = str(d["constant_2"] - workers_max)
     facts["qc_cut"] = str(d["cut"] + workers_max)
     # Each threshold's shift: how much higher the salary is than the income at the form's threshold (to the whole dollar).
-    for number, name in ((2, "shift_fed_bracket_2"),):
-        facts[name] = _quebec_shift(_exact_salary_of_taxable(year, Decimal(facts[f"fed_bracket_{number}_ti"]), d), facts[f"fed_bracket_{number}_ti"])
+    facts["shift_fed_bracket_2"] = _quebec_shift(
+        _exact_salary_of_taxable(year, Decimal(facts["fed_bracket_2_ti"]), d), facts["fed_bracket_2_ti"]
+    )
     for number in (2, 3):
         taxable = Decimal(facts[f"qc_bracket_{number}_ti"])
         facts[f"shift_qc_bracket_{number}"] = _quebec_shift(_exact_salary_of_quebec_taxable(year, taxable), taxable)
