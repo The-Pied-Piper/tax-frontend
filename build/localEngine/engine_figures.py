@@ -555,6 +555,8 @@ def _saskatchewan_rates_page_facts(year: int) -> dict[str, str]:
     saskatchewan["shift_fed_bracket_2"] = _shift(facts, "fed_bracket_2")
     saskatchewan["shift_sk_bracket_2"] = _shift(saskatchewan, "sk_bracket_2")
     return {**facts, **saskatchewan}
+
+
 def _nearest_salary_of_taxable(year: int, taxable: Decimal) -> Decimal:
     """The whole salary nearest the one where taxable income reaches `taxable` (half up), for the wording "from about".
     The engine's own edge lies between the whole salary below and the one above, so this is one of the two."""
