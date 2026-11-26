@@ -78,7 +78,7 @@ describe('the written compare page', () => {
     );
   });
 
-  it('has every province at $70,000 in the page itself, lowest income tax first', () => {
+  it('has every province at $70,000 in the page itself, lowest tax and contributions first', () => {
     const slot = page.getElementById(PROVINCE_COMPARISON_SLOT_ID);
     const bars = Array.from(slot?.querySelectorAll('ol > li') ?? []).map(
       (li) => li.textContent,

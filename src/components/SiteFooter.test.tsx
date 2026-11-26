@@ -2,6 +2,7 @@ import { render, screen, within } from '@testing-library/react';
 import { SiteFooter } from './SiteFooter';
 import { strings } from '../strings';
 import {
+  COMPARE_SLUG,
   contentPath,
   FOOTER_PROVINCE_SLUGS,
   METHODOLOGY_SLUG,
@@ -32,6 +33,16 @@ describe.each(['light', 'dark'] as const)(
       const link = screen.getByRole('link', { name: 'How we calculate' });
       expect(link).toHaveAttribute('href', contentPath(METHODOLOGY_SLUG));
       expect(link).toHaveAttribute('href', '/methodology/');
+      expect(link.tagName).toBe('A');
+    });
+
+    it('links to the compare page, with a plain anchor', () => {
+      render(<SiteFooter />);
+      const link = screen.getByRole('link', {
+        name: strings.siteNav.compare,
+      });
+      expect(link).toHaveAttribute('href', contentPath(COMPARE_SLUG));
+      expect(link).toHaveAttribute('href', '/compare-provinces/');
       expect(link.tagName).toBe('A');
     });
 
