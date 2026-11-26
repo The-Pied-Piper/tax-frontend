@@ -3,6 +3,7 @@ import {
   displayMoney,
   displayRate,
   displayRateOneDecimal,
+  displayRateTwoDecimals,
   displayWholeMoney,
 } from '../money/format';
 import {
@@ -54,7 +55,8 @@ import type { FooterProvinceSlug } from './siteLinks';
  *                       rate at salary a less the rate at salary b);
  *  - `x:name`           a figure the engine wrote, as it wrote it ("0.99"), for a factor that is neither money nor a rate;
  *  - `t:name`           a rate the engine wrote, as cents on the dollar, digits as written ("3.56 cents");
- *  - `p:name`           a rate the engine wrote, as a percent, digits as written ("20.5%").
+ *  - `p:name`           a rate the engine wrote, as a percent, digits as written ("20.5%");
+ *  - `s:name`           a rate a form prints to two decimals, as a percent with at least two ("5.60%", "12.29%").
  * Declared, because the data does not hold them:
  *  - `d:amount`         a dollar figure printed on a form or fixed by a rule (a cap, a threshold),
  *                       which nothing checks;
@@ -92,7 +94,7 @@ export type ParsedSpec =
     }
   | { kind: 'e' | 'o' | 'y' | 'd'; amount: string }
   | { kind: 'w'; column: NoteColumn; salary: string; other: string }
-  | { kind: 'f' | 'n' | 't' | 'p' | 'x'; name: string }
+  | { kind: 'f' | 'n' | 't' | 'p' | 's' | 'x'; name: string }
   | { kind: 'l'; words: string };
 
 const AMOUNT = /^-?\d+(\.\d+)?$/;
@@ -124,6 +126,7 @@ export function parseSpec(spec: string): ParsedSpec {
       kind === 'n' ||
       kind === 't' ||
       kind === 'p' ||
+      kind === 's' ||
       kind === 'x') &&
     parts.length === 2 &&
     FACT_NAME.test(first)
@@ -239,6 +242,8 @@ export function figureText(spec: ParsedSpec, sweep: ProvinceSweep): string {
       return displayCents(factOf(sweep, spec.name));
     case 'p':
       return displayRate(factOf(sweep, spec.name), rateUnit);
+    case 's':
+      return displayRateTwoDecimals(factOf(sweep, spec.name), rateUnit);
     case 'm':
     case 'r':
     case 'k':

@@ -243,6 +243,23 @@ describe.runIf(process.env.ENGINE_FIGURES_FILE)(
       });
     });
 
+    it('writes the British Columbia rates page figures: brackets as the form prints them, and the tax reduction', () => {
+      const raw = JSON.parse(readFileSync(file, 'utf8')) as {
+        provinces: Record<string, { facts: Record<string, string> }>;
+      };
+      expect(raw.provinces['CA-BC']?.facts).toMatchObject({
+        bc_bracket_1_rate: '0.0560',
+        bc_bracket_7_rate: '0.2050',
+        bc_bracket_7_ti: '265545.00',
+        bc_bracket_7_salary: '266672',
+        bc_bpa: '13216',
+        red_max: '690',
+        red_end: '44952.02',
+        red_base_salary: '25793',
+        red_rate_salary: '0.035',
+      });
+    });
+
     it('holds the 327 hub-chart points of every province, $1,000 to $500,000 and the twenty-seven extra salaries', () => {
       const raw = JSON.parse(readFileSync(file, 'utf8')) as {
         provinces: Record<

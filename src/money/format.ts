@@ -142,6 +142,19 @@ export function displayRate(amount: string, unit: MoneyUnit): string {
   return shifted === null ? amount : withUnit(shifted, unit);
 }
 
+// A rate as a percent with at least two decimals, digits moved and never rounded, as a statutory rate is printed on a
+// form: "0.056" -> "5.60%", "0.1229" -> "12.29%", "0.205" -> "20.50%". A third decimal the text has is kept.
+export function displayRateTwoDecimals(
+  amount: string,
+  unit: MoneyUnit,
+): string {
+  if (unit.as_percentage !== true) return displayRate(amount, unit);
+  const shifted = timesHundred(amount);
+  if (shifted === null) return amount;
+  const [whole = '', fraction = ''] = shifted.split('.');
+  return withUnit(`${whole}.${fraction.padEnd(2, '0')}`, unit);
+}
+
 // A rate written as cents on the dollar: "0.0857" -> "8.57 cents", "0.01" -> "1 cent".
 // Only digits are moved, never rounded; text that is not a plain decimal is returned as is.
 export function displayCents(amount: string): string {
