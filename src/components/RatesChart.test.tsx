@@ -89,7 +89,7 @@ describe('RatesChart', () => {
   it('leaves the $2,000 band out of the scale and says where it goes off the top', () => {
     render(<RatesChart sweep={sweep()} place="Ontario" />);
     expect(
-      screen.getByText('Off the top: 100.0% from $2,000 to $2,033'),
+      screen.getByText('Off the top: 100% from $2,000 to $2,033'),
     ).toBeInTheDocument();
     // The scale is set by the rates above $5,000 (the 59.1% spike is the highest at $150,000), not by 100%.
     expect(screen.getByRole('img').textContent).not.toContain('100%');

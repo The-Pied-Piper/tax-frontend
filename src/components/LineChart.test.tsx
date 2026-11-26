@@ -268,11 +268,11 @@ describe('LineChart', () => {
     ).toBeNull();
   });
 
-  it('draws a note in the top corner of the plot', () => {
-    render(chart({ topNote: 'Off the top: 100.0% from $2,000 to $2,033' }));
-    expect(
-      screen.getByText('Off the top: 100.0% from $2,000 to $2,033'),
-    ).toBeInTheDocument();
+  it('draws a taller figure when asked', () => {
+    const { container } = render(chart({ height: 400 }));
+    expect(container.querySelector('svg')?.getAttribute('viewBox')).toBe(
+      '0 0 420 400',
+    );
   });
 
   it('right-aligns the label at the end of the axis so it is not cut off', () => {

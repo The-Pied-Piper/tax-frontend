@@ -114,10 +114,10 @@ const tablePool: Record<string, string> = {
   fed5Ti: 'f:fed_bracket_5_ti',
   fed5: 'p:fed_bracket_5_rate',
   fed5Sal: 'f:fed_bracket_5_salary',
-  fed2After: 'h:marginal@60000',
-  fed3After: 'h:marginal@119000',
-  fed4After: 'h:marginal@183000',
-  fed5After: 'h:marginal@260000',
+  fed2After: 'a:marginal@60000',
+  fed3After: 'a:marginal@119000',
+  fed4After: 'a:marginal@183000',
+  fed5After: 'a:marginal@260000',
   ab1Ti: 'f:ab_bracket_1_ti',
   ab2Ti: 'f:ab_bracket_2_ti',
   ab2: 'p:ab_bracket_2_rate',
@@ -134,11 +134,11 @@ const tablePool: Record<string, string> = {
   ab6Ti: 'f:ab_bracket_6_ti',
   ab6: 'p:ab_bracket_6_rate',
   ab6Sal: 'f:ab_bracket_6_salary',
-  ab2After: 'h:marginal@62000',
-  ab3After: 'h:marginal@156000',
-  ab4After: 'h:marginal@187000',
-  ab5After: 'h:marginal@248000',
-  ab6After: 'h:marginal@375000',
+  ab2After: 'a:marginal@62000',
+  ab3After: 'a:marginal@156000',
+  ab4After: 'a:marginal@187000',
+  ab5After: 'a:marginal@248000',
+  ab6After: 'a:marginal@375000',
   fedBpa: 'f:fed_bpa',
   fedBpaMin: 'f:fed_bpa_min',
   fedBpaStart: 'f:fed_bpa_taper_start',
@@ -201,7 +201,7 @@ export const albertaRatesPage: RatesPageText = {
       'In Alberta the marginal rate is the share of your next dollar that goes to income tax, Canada Pension Plan and Employment Insurance. It climbs from about {lowMarginal} once you pay into the Canada Pension Plan (from {cppStart}) to {topMarginal} above {topStart}. The average rate climbs more slowly, to {avgAt500k} at {salary500k}. Alberta has no health premium or surtax, so once income tax starts the rate rises only where a federal or Alberta tax bracket starts. It falls where Employment Insurance or the Canada Pension Plan stops.',
     ),
     words(
-      'Both rates count income tax (federal and Alberta, line 43500 of the T1 return), Canada Pension Plan in both tiers, and Employment Insurance as Form T2204 works it out. Credits paid to you when you file are not counted. They are for a single person whose only income is a salary.',
+      'Both rates count income tax (federal and Alberta), Canada Pension Plan in both tiers, and Employment Insurance as Form T2204 works it out. Credits paid to you when you file are not counted. They are for a single person whose only income is a salary.',
     ),
     words(
       'The 2026 forms are not out yet. These figures use the 2026 tax tables from the Canada Revenue Agency: federal and Alberta rates, brackets and basic amounts, Canada Pension Plan and Employment Insurance. The Form T2204 rules and the line layout of the forms are the 2025 forms’ carried forward. We will update them when the 2026 forms are final.',
@@ -238,21 +238,21 @@ export const albertaRatesPage: RatesPageText = {
       ],
     },
     {
-      heading: '$20,000 to $60,000',
+      heading: '$20,000 to $50,000',
       notes: [
         words(
           'From about {abStartSalary} the rate is {abStartRate}: Alberta’s first tax rate, {ab1}, on top of the federal tax and the payments. Alberta tax starts when it passes Alberta’s credits: its basic personal amount and its credits for your Canada Pension Plan and Employment Insurance payments, at {abCreditRate}. Alberta has no tax reduction, premium or surtax.',
           ['ab428'],
         ),
+      ],
+    },
+    {
+      heading: '$50,000 to $100,000',
+      notes: [
         words(
           'From about {fedBracket2Salary} the rate is {fedBracket2Rate}: the federal rate rises to {fedBracket2} at a taxable income of {fedBracket2Ti}.',
           ['t1'],
         ),
-      ],
-    },
-    {
-      heading: '$60,000 to $120,000',
-      notes: [
         words(
           'From about {abBracket2Salary} the rate is {abBracket2Rate}: Alberta’s second tax rate, {abBracket2}, starts at a taxable income of {abBracket2Ti}.',
           ['ab428'],
@@ -265,15 +265,15 @@ export const albertaRatesPage: RatesPageText = {
           'The main Canada Pension Plan amount stops at {cppYmpe}. A second tier takes {cpp2Rate} of each dollar from there to {yampe}, so the rate falls to {afterCppRate}, and then to {afterCpp2Rate} at {yampe}, when that tier stops.',
           ['schedule8'],
         ),
+      ],
+    },
+    {
+      heading: '$100,000 to $260,000',
+      notes: [
         words(
           'From about {fedBracket3Salary} the rate is {fedBracket3Rate}: the federal rate rises to {fedBracket3} at a taxable income of {fedBracket3Ti}.',
           ['t1'],
         ),
-      ],
-    },
-    {
-      heading: '$120,000 to $260,000',
-      notes: [
         words(
           'From about {abBracket3Salary} the rate is {abBracket3Rate}: Alberta’s third tax rate, {abBracket3}, starts at a taxable income of {abBracket3Ti}.',
           ['ab428'],
@@ -293,7 +293,7 @@ export const albertaRatesPage: RatesPageText = {
       ],
     },
     {
-      heading: 'Above $260,000',
+      heading: 'About $260,000 and above',
       notes: [
         words(
           'From about {fedBracket5Salary} the rate is {fedBracket5Rate}: the federal rate rises to {fedBracket5}, and the federal basic personal amount has finished shrinking.',

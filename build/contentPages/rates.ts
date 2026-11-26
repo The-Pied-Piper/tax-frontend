@@ -1,7 +1,52 @@
-import type { ContentPageSpec } from '../../src/state/contentPages';
+import type {
+  ContentSection,
+  ContentPageSpec,
+} from '../../src/state/contentPages';
 import { ratesPageText, ratesProvinces } from '../../src/state/ratesPage';
-import { ratesSlug, type FooterProvinceSlug } from '../../src/state/siteLinks';
+import {
+  contentPath,
+  ratesSlug,
+  type FooterProvinceSlug,
+} from '../../src/state/siteLinks';
 import { strings } from '../../src/strings';
+
+/** The order the other provinces' links come in. */
+const LINK_ORDER: readonly FooterProvinceSlug[] = [
+  'ca-on',
+  'ca-qc',
+  'ca-bc',
+  'ca-ab',
+  'ca-sk',
+  'ca-mb',
+  'ca-nl',
+];
+
+/** A paragraph linking the rates page of every other province that has one in this build. */
+function otherProvinces(
+  province: FooterProvinceSlug,
+  live: readonly FooterProvinceSlug[],
+): ContentSection[] {
+  const links = LINK_ORDER.filter(
+    (other) => other !== province && live.includes(other),
+  ).map((other) => ({
+    label: strings.ratesPage.otherLink(strings.siteNav.provinceNames[other]),
+    href: contentPath(ratesSlug(other)),
+  }));
+  if (links.length === 0) return [];
+  return [
+    {
+      heading: strings.ratesPage.othersHeading,
+      blocks: [
+        {
+          kind: 'links',
+          label: strings.ratesPage.othersHeading,
+          layout: 'row',
+          links,
+        },
+      ],
+    },
+  ];
+}
 
 /**
  * One rates page for each province that has both its wording (`ratesPageText`) and a sweep, at `/ca-xx/tax-rates/`.
@@ -11,48 +56,56 @@ import { strings } from '../../src/strings';
  */
 export function ratesPages(chartSlugs: ReadonlySet<string>): ContentPageSpec[] {
   const t = strings.ratesPage;
-  return ratesProvinces()
-    .filter((province) => chartSlugs.has(province))
-    .map((province: FooterProvinceSlug) => {
-      const text = ratesPageText[province];
-      if (!text) throw new Error(`Rates: ${province} has no text`);
-      return {
-        slug: ratesSlug(province),
-        title: text.title,
-        description: text.description,
-        heading: text.heading,
-        trail: [
-          {
-            label: strings.siteNav.provinceNames[province],
-            slug: province,
-          },
-        ],
-        sections: [
-          {
-            heading: t.chartHeading,
-            blocks: [
-              { kind: 'ratesPart', province, part: 'intro' },
-              { kind: 'ratesChart', province },
-            ],
-          },
-          {
-            heading: t.howToRead,
-            id: 'how-to-read',
-            blocks: [{ kind: 'ratesPart', province, part: 'howToRead' }],
-          },
-          {
-            heading: t.notesHeading,
-            id: 'what-moves-the-rate',
-            blocks: [{ kind: 'ratesPart', province, part: 'groups' }],
-          },
-          {
-            heading: t.bracketsHeading,
-            id: 'brackets',
-            blocks: [{ kind: 'ratesPart', province, part: 'tables' }],
-          },
-        ],
-      };
-    });
+  const live = ratesProvinces().filter((province) => chartSlugs.has(province));
+  return live.map((province: FooterProvinceSlug) => {
+    const text = ratesPageText[province];
+    if (!text) throw new Error(`Rates: ${province} has no text`);
+    return {
+      slug: ratesSlug(province),
+      title: text.title,
+      description: text.description,
+      heading: text.heading,
+      trail: [
+        {
+          label: strings.siteNav.provinceNames[province],
+          slug: province,
+        },
+      ],
+      sections: [
+        {
+          blocks: [
+            { kind: 'ratesPart', province, part: 'lead' },
+            { kind: 'ratesPart', province, part: 'jump' },
+          ],
+        },
+        {
+          heading: t.chartHeading,
+          blocks: [{ kind: 'ratesChart', province }],
+        },
+        {
+          heading: t.countedHeading,
+          id: 'what-is-counted',
+          blocks: [{ kind: 'ratesPart', province, part: 'basis' }],
+        },
+        {
+          heading: t.notesHeading,
+          id: 'what-moves-the-rate',
+          blocks: [{ kind: 'ratesPart', province, part: 'groups' }],
+        },
+        {
+          heading: t.howToRead,
+          id: 'how-to-read',
+          blocks: [{ kind: 'ratesPart', province, part: 'howToRead' }],
+        },
+        {
+          heading: t.bracketsHeading,
+          id: 'brackets',
+          blocks: [{ kind: 'ratesPart', province, part: 'tables' }],
+        },
+        ...otherProvinces(province, live),
+      ],
+    };
+  });
 }
 
 /**

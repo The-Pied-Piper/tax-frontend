@@ -27,12 +27,14 @@ describe('ratesPages', () => {
     expect(ratesPages(new Set(['ca-sk']))).toEqual([]);
   });
 
-  it('puts the finding and chart first, then the salaries, notes and tables', () => {
+  it('puts the finding first, then the chart, what is counted, the notes, how to read the salaries and the tables', () => {
     const [page] = ratesPages(new Set(['ca-on']));
     expect(
       page?.sections.map((section) => section.blocks.map((b) => b.kind)),
     ).toEqual([
-      ['ratesPart', 'ratesChart'],
+      ['ratesPart', 'ratesPart'],
+      ['ratesChart'],
+      ['ratesPart'],
       ['ratesPart'],
       ['ratesPart'],
       ['ratesPart'],

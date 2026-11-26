@@ -4,6 +4,7 @@ import {
   displayMoney,
   displayRate,
   displayRateOneDecimal,
+  displayRateTenths,
   displayRateTwoDecimals,
   displayWholeMoney,
 } from '../money/format';
@@ -52,6 +53,8 @@ import type { FooterProvinceSlug } from './siteLinks';
  *  - `n:name`           a dollar figure the engine wrote, with its cents as written ("$33.14");
  *  - `h:column@salary`  a rate at a sweep salary to one decimal, whichever column ("7.6%", "73.3%"); the rates page uses this
  *                       in place of `r:`, which rounds the marginal rate to the half point;
+ *                       A whole number drops its ".0" ("100%"); `a:column@salary` and `b:name` keep it, for a column of rates that must not mix "38%" and "36.3%" (`b:` reads a fact);
+ *  - `i:name`           a small whole count the engine wrote, as a word ("3" is "three");
  *  - `u:column@salary`  the share kept, one minus that rate, to one decimal ("52.0%"), rounded once; the rates page uses this
  *                       in place of `k:`, which rounds to four decimals and shows "52%";
  *  - `v:name`           a rate the engine found for the province (a fact), as a percent to one decimal ("54.3%"), for a rate past
@@ -94,13 +97,13 @@ function pointAt(points: readonly SweepPoint[], salary: string): SweepPoint {
 /** A parsed spec. */
 export type ParsedSpec =
   | {
-      kind: 'm' | 'r' | 'k' | 'q' | 'c' | 'h' | 'u';
+      kind: 'm' | 'r' | 'k' | 'q' | 'c' | 'h' | 'u' | 'a';
       column: NoteColumn;
       salary: string;
     }
   | { kind: 'e' | 'o' | 'y' | 'd'; amount: string }
   | { kind: 'w' | 'g'; column: NoteColumn; salary: string; other: string }
-  | { kind: 'f' | 'n' | 't' | 'p' | 's' | 'v' | 'x'; name: string }
+  | { kind: 'f' | 'n' | 't' | 'p' | 's' | 'v' | 'b' | 'x' | 'i'; name: string }
   | { kind: 'l'; words: string };
 
 const AMOUNT = /^-?\d+(\.\d+)?$/;
@@ -134,6 +137,8 @@ export function parseSpec(spec: string): ParsedSpec {
       kind === 'p' ||
       kind === 's' ||
       kind === 'v' ||
+      kind === 'b' ||
+      kind === 'i' ||
       kind === 'x') &&
     parts.length === 2 &&
     FACT_NAME.test(first)
@@ -147,6 +152,7 @@ export function parseSpec(spec: string): ParsedSpec {
       kind === 'q' ||
       kind === 'c' ||
       kind === 'h' ||
+      kind === 'a' ||
       kind === 'u') &&
     parts.length === 2
   ) {
@@ -206,6 +212,30 @@ function factOf(sweep: ProvinceSweep, name: string): string {
   return value;
 }
 
+/** The small whole counts a note can say in words. */
+const COUNT_WORDS: Record<string, string> = {
+  '0': 'no',
+  '1': 'one',
+  '2': 'two',
+  '3': 'three',
+  '4': 'four',
+  '5': 'five',
+  '6': 'six',
+  '7': 'seven',
+  '8': 'eight',
+  '9': 'nine',
+  '10': 'ten',
+};
+
+/** A small whole count as a word: "3" is "three". Anything else is a mistake in the data and throws. */
+function countInWords(count: string): string {
+  const word = COUNT_WORDS[count];
+  if (word === undefined) {
+    throw new Error(`Hub notes: cannot say the count "${count}" in words`);
+  }
+  return word;
+}
+
 /** The text of a spec's figure. */
 export function figureText(spec: ParsedSpec, sweep: ProvinceSweep): string {
   const { points, unit, rateUnit } = sweep;
@@ -261,15 +291,21 @@ export function figureText(spec: ParsedSpec, sweep: ProvinceSweep): string {
       return displayRate(factOf(sweep, spec.name), rateUnit);
     case 'v':
       return displayRateOneDecimal(factOf(sweep, spec.name), rateUnit);
+    case 'b':
+      return displayRateTenths(factOf(sweep, spec.name), rateUnit);
+    case 'i':
+      return countInWords(factOf(sweep, spec.name));
     case 'm':
     case 'r':
     case 'k':
     case 'q':
     case 'c':
     case 'u':
+    case 'a':
     case 'h': {
       const value = columnValue(pointAt(points, spec.salary), spec.column);
       if (spec.kind === 'h') return displayRateOneDecimal(value, rateUnit);
+      if (spec.kind === 'a') return displayRateTenths(value, rateUnit);
       if (spec.kind === 'u') {
         return displayRateOneDecimal(subtractAmounts('1', value), rateUnit);
       }

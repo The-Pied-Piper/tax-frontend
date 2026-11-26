@@ -160,7 +160,7 @@ describe('the Alberta rates page', () => {
 
   it('opens with the figures the CRA review gives', () => {
     expect(view().intro[0]).toContain(
-      'from about 7.6% once you pay into the Canada Pension Plan (from $3,500) to 48.0% above $371,347.',
+      'from about 7.6% once you pay into the Canada Pension Plan (from $3,500) to 48% above $371,347.',
     );
     expect(view().intro[0]).toContain('to 40.3% at $500,000');
   });
@@ -184,9 +184,9 @@ describe('the Alberta rates page', () => {
   it('reads the top rate at the top bracket, and what you keep from it', () => {
     const last = view().groups[view().groups.length - 1];
     const top = last?.notes[last.notes.length - 1]?.words ?? '';
-    expect(top).toContain('straight at 48.0%');
+    expect(top).toContain('straight at 48%');
     expect(top).toContain('rate, 15%, starts at a taxable income of $370,220');
-    expect(top).toContain('you keep 52.0%');
+    expect(top).toContain('you keep 52%');
   });
 
   it('rounds each computed rate once, from the unrounded value', () => {
@@ -329,8 +329,8 @@ describe('the Québec rates page', () => {
 
   it('gives one decimal for every computed rate in the opening finding', () => {
     const view = ratesPageView('ca-qc', quebec());
-    expect(view?.intro[0]).toMatch(/about 8\.0% once/);
-    expect(view?.intro[0]).toMatch(/to 47\.0% at/);
+    expect(view?.intro[0]).toMatch(/about 8% once/);
+    expect(view?.intro[0]).toMatch(/to 47% at/);
   });
 
   it('names a cause form for every note and links the ones that have a page', () => {
@@ -723,7 +723,9 @@ describe('the British Columbia rates page', () => {
       ['$191,532', '46.1%'],
       ['$259,609', '49.8%'],
     ] as const) {
-      expect(all, salary).toContain(`From about ${salary} the rate is ${rate}`);
+      expect(all, salary).toContain(
+        `From about ${salary} the rate is ${rate.replace(/\.0%$/, '%')}`,
+      );
     }
   });
 

@@ -13,7 +13,7 @@ import {
   RATES_CHART_SLOT_ID,
 } from '../state/hubSlots';
 import { chartNotes } from '../state/hubNotes';
-import { ratesPageView } from '../state/ratesPage';
+import { creditsLinked, ratesPageView } from '../state/ratesPage';
 import { RatesChart } from './RatesChart';
 import { strings } from '../strings';
 import { THEME_TOGGLE_SLOT_ID } from '../state/themeSlot';
@@ -120,20 +120,50 @@ function ContentBlockView({
       const view = sweep ? ratesPageView(block.province, sweep) : null;
       if (!view) return null;
       switch (block.part) {
-        case 'intro':
+        case 'lead':
+          return <p className={styles.lead}>{view.intro[0]}</p>;
+        case 'basis':
+          return (
+            <>
+              {view.intro.slice(1).map((words) => (
+                <p key={words}>
+                  {creditsLinked(words).map((part, at) =>
+                    typeof part === 'string' ? (
+                      part
+                    ) : (
+                      <a key={at} href={part.href}>
+                        {part.label}
+                      </a>
+                    ),
+                  )}
+                </p>
+              ))}
+            </>
+          );
         case 'howToRead':
           return (
             <>
-              {view[block.part].map((words) => (
+              {view.howToRead.map((words) => (
                 <p key={words}>{words}</p>
               ))}
             </>
+          );
+        case 'jump':
+          return (
+            <p className={styles.jump}>
+              {strings.ratesPage.jumpLabel}{' '}
+              {view.groups.map((group) => (
+                <a key={group.id} href={`#${group.id}`}>
+                  {group.heading}
+                </a>
+              ))}
+            </p>
           );
         case 'groups':
           return (
             <>
               {view.groups.map((group) => (
-                <div key={group.heading}>
+                <div key={group.heading} id={group.id}>
                   <h3 className={styles.chartHeading}>{group.heading}</h3>
                   <ul className={styles.notes}>
                     {group.notes.map((note) => (
@@ -287,7 +317,7 @@ export function ContentPage({
             id={section.id}
             className={section.card ? cardSection : styles.section}
           >
-            {section.id ? (
+            {section.heading === undefined ? null : section.id ? (
               <div className={styles.headingRow}>
                 <h2>{section.heading}</h2>
                 <a

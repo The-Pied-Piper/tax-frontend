@@ -140,10 +140,10 @@ const tablePool: Record<string, string> = {
   fed5Ti: 'f:fed_bracket_5_ti',
   fed5: 'p:fed_bracket_5_rate',
   fed5Sal: 'f:fed_bracket_5_salary',
-  fed2After: 'h:marginal@60000',
-  fed3After: 'h:marginal@120000',
-  fed4After: 'h:marginal@183000',
-  fed5After: 'h:marginal@300000',
+  fed2After: 'a:marginal@60000',
+  fed3After: 'a:marginal@120000',
+  fed4After: 'a:marginal@183000',
+  fed5After: 'a:marginal@300000',
   mb1Ti: 'f:mb_bracket_1_ti',
   mb1: 'p:mb_bracket_1_rate',
   mb2Ti: 'f:mb_bracket_2_ti',
@@ -152,8 +152,8 @@ const tablePool: Record<string, string> = {
   mb3Ti: 'f:mb_bracket_3_ti',
   mb3: 'p:mb_bracket_3_rate',
   mb3Sal: 'f:mb_bracket_3_salary',
-  mb2After: 'h:marginal@50000',
-  mb3After: 'h:marginal@105000',
+  mb2After: 'a:marginal@50000',
+  mb3After: 'a:marginal@105000',
   fedBpa: 'f:fed_bpa',
   fedBpaMin: 'f:fed_bpa_min',
   fedBpaStart: 'f:fed_bpa_taper_start',
@@ -193,7 +193,7 @@ export const manitobaRatesPage: RatesPageText = {
       'In Manitoba the marginal rate is the share of your next dollar that goes to income tax, Canada Pension Plan and Employment Insurance. It climbs from about {lowMarginal} once you pay into the Canada Pension Plan (from {cppStart}) to a peak of {peakMarginal} between {peakFrom} and {peakTo}, then settles at {topMarginal}. The average rate climbs more slowly, to {avgAt500k} at {salary500k}. Manitoba has no health premium or surtax.',
     ),
     words(
-      'Both rates count income tax (federal and Manitoba, line 43500 of the T1 return, so the Manitoba Family Tax Benefit counts), Canada Pension Plan in both tiers, and Employment Insurance as Form T2204 works it out. Credits paid to you when you file are not counted: the Canada workers benefit, the Employment Insurance refund, and the Manitoba credits on Form MB479. They are for a single person whose only income is a salary.',
+      'Both rates count income tax (federal and Manitoba, so the Manitoba Family Tax Benefit counts), Canada Pension Plan in both tiers, and Employment Insurance as Form T2204 works it out. Credits paid to you when you file are not counted: the Canada workers benefit, the Employment Insurance refund, and the Manitoba credits on Form MB479. They are for a single person whose only income is a salary.',
     ),
     words(
       'The 2026 forms are not out yet. Federal, Manitoba bracket and basic amount, Canada Pension Plan and Employment Insurance figures use the 2026 tax tables from the Canada Revenue Agency. The Family Tax Benefit amounts and the Form T2204 rules are the 2025 forms’ figures carried forward. We will update them when the 2026 forms are final.',
@@ -285,7 +285,7 @@ export const manitobaRatesPage: RatesPageText = {
       ],
     },
     {
-      heading: 'Above $260,000',
+      heading: 'About $260,000 and above',
       notes: [
         words(
           'From about {fedBracket5Salary} the rate is {fedBracket5Rate}: the federal rate rises to {fedBracket5} at a taxable income of {fedBracket5Ti}, and the federal basic personal amount has finished shrinking. This is the peak.',
