@@ -168,13 +168,14 @@
   border-bottom: 1px solid var(--rule);
 }
 
-.table th:first-child,
-.table td:first-child {
+.table .salary {
   text-align: left;
 }
 
 .table thead th {
   color: var(--muted);
+  /* The salary heading spans both header rows; its words sit on the same line as the rows' headings. */
+  vertical-align: bottom;
 }
 
 .table caption {

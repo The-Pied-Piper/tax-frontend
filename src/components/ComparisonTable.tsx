@@ -48,7 +48,7 @@ export function ComparisonTable({ data }: Props) {
         <caption>{copy.caption(first.year, salaries.length)}</caption>
         <thead>
           <tr>
-            <th rowSpan={2} scope="col">
+            <th rowSpan={2} scope="col" className={styles.salary}>
               {copy.salaryHeader}
             </th>
             {columns.map(({ sweep }) => (
@@ -79,7 +79,7 @@ export function ComparisonTable({ data }: Props) {
         <tbody>
           {salaries.map((salary, row) => (
             <tr key={salary[0]}>
-              <th scope="row">
+              <th scope="row" className={styles.salary}>
                 {displayWholeMoney(salary[0], 'annually', first.unit)}
               </th>
               {columns.map(({ sweep, points }) => {
