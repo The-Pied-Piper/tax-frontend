@@ -87,14 +87,14 @@ describe('the province comparison copy', () => {
     expect(copy.salaryLabel).toBe('Salary a year');
     expect(copy.salaryValueText('$70,000')).toBe('$70,000 a year');
     expect(copy.hint).toBe(
-      'Drag the slider, or use the arrow keys, to pick a salary. The bars change as you drag. The list is re-ordered when you let go of the slider, or after each arrow-key press.',
+      'Drag the slider, or use the arrow keys, to pick a salary. The bars and the order of the list change as you drag.',
     );
     expect(copy.stepNote).toBe(
       'The slider moves in steps of $1,000 up to $250,000, and $5,000 above that.',
     );
     expect(copy.typedLabel).toBe('Or type a salary');
     expect(copy.typedNote).toBe(
-      'A salary you type is shown at the nearest point we have. A salary you type re-orders the list when you enter it.',
+      'A salary you type is shown at the nearest point we have.',
     );
     expect(copy.salaryError('$1,000', '$500,000')).toBe(
       'Enter a salary from $1,000 to $500,000.',

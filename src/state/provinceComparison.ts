@@ -104,11 +104,9 @@ export function comparisonRows(
   provinces: readonly ProvinceSweep[],
   index: number,
   measure: Measure,
-  rankIndex: number = index,
 ): ComparisonRow[] {
-  // The order is that of `rankIndex`, which a slider holds until it is released; the figures are those of `index`.
   const ranked = [...provinces].sort((a, b) =>
-    compareAmounts(taxOf(a, rankIndex), taxOf(b, rankIndex)),
+    compareAmounts(taxOf(a, index), taxOf(b, index)),
   );
   const rows = ranked.map((province) => ({
     slug: province.slug,

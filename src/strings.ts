@@ -88,7 +88,7 @@ export const strings = {
       // After the three measure notes.
       rankingNote:
         'The order is by income tax. Take-home pay and the average tax rate follow it, except that Québec has its own pension plan, Employment Insurance rate and parental insurance premium, so it can sit out of order.',
-      // Spoken once the list has been re-ordered.
+      // Spoken when the slider is let go, or after an arrow-key press or a typed salary.
       reordered: (salary: string) =>
         `Provinces re-ordered by income tax, lowest first, for a ${salary} salary.`,
       reorderedTied: (salary: string) =>
@@ -112,12 +112,11 @@ export const strings = {
         `The ${String(year)} figures are provisional.`,
       salaryLabel: 'Salary a year',
       salaryValueText: (salary: string) => `${salary} a year`,
-      hint: 'Drag the slider, or use the arrow keys, to pick a salary. The bars change as you drag. The list is re-ordered when you let go of the slider, or after each arrow-key press.',
+      hint: 'Drag the slider, or use the arrow keys, to pick a salary. The bars and the order of the list change as you drag.',
       stepNote:
         'The slider moves in steps of $1,000 up to $250,000, and $5,000 above that.',
       typedLabel: 'Or type a salary',
-      typedNote:
-        'A salary you type is shown at the nearest point we have. A salary you type re-orders the list when you enter it.',
+      typedNote: 'A salary you type is shown at the nearest point we have.',
       salaryError: (lowest: string, highest: string) =>
         `Enter a salary from ${lowest} to ${highest}.`,
       chartLabel: (measure: string, salary: string, tableToggle: string) =>

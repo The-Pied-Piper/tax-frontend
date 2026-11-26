@@ -116,11 +116,8 @@ export function ProvinceComparison({ data, province }: Props) {
   // What the reader chose; until they choose, the salary the address names, or the default.
   const [chosen, setChosen] = useState<number | null>(null);
   const index = chosen ?? start;
-  // The order of the list follows the slider only once it is let go, so the rows do not jump while it is dragged.
-  const [ranked, setRanked] = useState<number | null>(null);
-  const rankIndex = ranked ?? start;
-  // True once the list has been re-ordered by the reader, so the first view announces nothing.
-  const settled = ranked !== null;
+  // The list is re-ordered as the slider moves. Screen readers are told only once it is let go, so a drag is not read out step by step.
+  const [announced, setAnnounced] = useState<number | null>(null);
   const [measure, setMeasure] = useState<Measure>('takeHome');
   if (!current) return null;
 
@@ -131,10 +128,10 @@ export function ProvinceComparison({ data, province }: Props) {
   );
   const measureName = copy.measures[measure];
   const tableCopy = copy.table;
-  const rows = comparisonRows(data.provinces, index, measure, rankIndex);
-  const tied = allTied(data.provinces, rankIndex);
-  const settledSalary = displayWholeMoney(
-    salaries[rankIndex] ?? DEFAULT_SALARY,
+  const rows = comparisonRows(data.provinces, index, measure);
+  const tied = allTied(data.provinces, index);
+  const announcedSalary = displayWholeMoney(
+    salaries[announced ?? index] ?? DEFAULT_SALARY,
     'annually',
     current.unit,
   );
@@ -175,8 +172,8 @@ export function ProvinceComparison({ data, province }: Props) {
         unit={current.unit}
         onChange={setChosen}
         onSettle={(at) => {
-          // Only a real move re-orders the list, so passing the slider by tab or click announces nothing.
-          if (at !== rankIndex) setRanked(at);
+          // Only a real move is announced, so passing the slider by tab or click says nothing.
+          if (at !== (announced ?? start)) setAnnounced(at);
         }}
       />
       <div
@@ -228,10 +225,10 @@ export function ProvinceComparison({ data, province }: Props) {
         {tied ? copy.tied : copy.caption(salary, current.year)}
       </p>
       <p className={styles.srOnly} role="status">
-        {settled &&
+        {announced !== null &&
           (tied
-            ? copy.reorderedTied(settledSalary)
-            : copy.reordered(settledSalary))}
+            ? copy.reorderedTied(announcedSalary)
+            : copy.reordered(announcedSalary))}
       </p>
       <p className={styles.note}>{copy.measureNotes[measure]}</p>
       <p className={styles.note}>
