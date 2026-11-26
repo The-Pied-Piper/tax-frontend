@@ -317,11 +317,11 @@ describe('the Newfoundland and Labrador rates page', () => {
     expect(lead).toContain('44.4%');
   });
 
-  it('says where the reduction band is and where it would be if the amounts were not raised', () => {
+  it('says where the reduction starts and ends', () => {
     const text = everyWord().join(' ');
     expect(text).toContain('about $24,400 of salary');
     expect(text).toContain('$30,491');
-    expect(text).toContain('about $24,878 and $30,429');
+    expect(text).not.toContain('not raised');
   });
 
   it('keeps the tab title under 64 characters, the full name in the heading', () => {

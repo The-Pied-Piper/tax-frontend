@@ -45,7 +45,6 @@ from pathlib import Path
 import yaml
 
 from tax_engine import build_take_home
-from tax_engine.adapters.outbound.yaml_support import YamlNode
 from tax_engine.application.models.take_home import TakeHomeResult, UnitDescription
 from tax_engine.application.models.take_home_request import TakeHomeRequest
 from tax_engine.domain.jurisdiction_code import JurisdictionCode
@@ -347,54 +346,18 @@ def _rates_page_facts(year: int, code: str) -> dict[str, str]:
     return {**common, **province(year, common)}
 
 
-@contextmanager
-def prior_year_parameters(year: int, package: str, families: list[str]):
-    """For the block: the engine reads the listed parameter families of `package` for `year` with the amount of the
-    year before. Used where a form's amounts for the year are not printed and were raised by an index rate (the
-    Newfoundland and Labrador low-income tax reduction): the page says where its edges would be if they were not
-    raised, and that is the engine's own answer with the earlier amounts. Build the engine inside the block."""
-    original = YamlNode.load.__func__  # type: ignore[attr-defined]
-
-    def load(cls, path: Path, label: str) -> YamlNode:
-        node = original(cls, path, label)
-        if path.name == f"{year}.yaml" and path.parent.name in families and package in path.parts:
-            prior = original(cls, path.with_name(f"{year - 1}.yaml"), label)
-            value = dict(node.value)  # type: ignore[call-overload]
-            value["amount"] = prior.value["amount"]  # type: ignore[index]
-            return cls.root(value, label)
-        return node
-
-    YamlNode.load = classmethod(load)  # type: ignore[method-assign,assignment]
-    try:
-        yield
-    finally:
-        YamlNode.load = classmethod(original)  # type: ignore[method-assign,assignment]
-
-
 def _newfoundland_engine_facts(figures: "Figures", year: int, facts: dict[str, str]) -> dict[str, str]:
     """What only the engine can say for Newfoundland and Labrador: the marginal rate just after each of the last two
-    brackets, which start past the sweep's last salary, and the two edges of the reduction band if the 2026
-    reduction amounts were the 2025 form's (not raised by the index rate)."""
+    brackets, which start past the sweep's last salary."""
     found: dict[str, str] = {}
     for number in (7, 8):
         above = int(facts[f"nl_bracket_{number}_salary"]) + 1000
         found[f"nl_bracket_{number}_marginal"] = _rate_text(figures._marginal("CA-NL", year, above))
-    with prior_year_parameters(
-        year, "ca_nl", ["low_income_reduction_basic", "low_income_threshold"]
-    ):
-        earlier = Figures()
-        salaries = list(range(20000, 35001, 1000))
-        edges = earlier.edges(
-            "CA-NL", year, salaries, [earlier._marginal("CA-NL", year, salary) for salary in salaries]
-        )
-    if len(edges) != 2:
-        raise ValueError(f"CA-NL {year}: expected two edges of the reduction band, found {edges}")
-    found["alt_reduction_tax_shows"] = edges[0][2]
-    found["alt_reduction_end"] = edges[1][2]
     return found
 
 
-# The facts of a rates page only the engine can give, by province: (figures, year, the dataset facts) -> facts.
+# Facts a rates page needs that no dataset file holds and the sweep does not reach, so they are asked of the engine:
+# (figures, year, the dataset facts of `RATES_PAGE_FACTS`) -> facts. Dataset figures belong in `RATES_PAGE_FACTS`.
 RATES_PAGE_ENGINE_FACTS = {"CA-NL": _newfoundland_engine_facts}
 
 

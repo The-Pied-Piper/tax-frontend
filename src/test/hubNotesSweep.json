@@ -6646,9 +6646,7 @@
       "shift_reduction": "209",
       "shift_nl_bracket_2": "416.00",
       "nl_bracket_7_marginal": "0.543",
-      "nl_bracket_8_marginal": "0.548",
-      "alt_reduction_tax_shows": "24878",
-      "alt_reduction_end": "30429"
+      "nl_bracket_8_marginal": "0.548"
     },
     "points": [
       ["1000.00", "1000.00", "0.00", "0.00", "0", "0"],
