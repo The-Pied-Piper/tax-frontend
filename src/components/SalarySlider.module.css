@@ -102,10 +102,14 @@
   outline-offset: 2px;
 }
 
+/* Visually hidden, but read aloud with the typed box: most readers know how a slider moves. */
 .hint {
-  grid-column: 1 / -1;
-  font-size: 13px;
-  color: var(--faint);
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
 }
 
 .hint span {

@@ -41,11 +41,11 @@ export function comparePage(
       {
         heading: t.sectionHeading,
         blocks: [
+          { kind: 'provinceComparison' },
           {
             kind: 'paragraph',
             content: [t.coverage(sentenceList(names))],
           },
-          { kind: 'provinceComparison' },
         ],
       },
       {
