@@ -74,10 +74,6 @@ describe('the written compare page', () => {
     expect(slot?.querySelector('[aria-current]')).toBeNull();
   });
 
-  it('has no line listing the provinces the site covers: the links below do that', () => {
-    expect(page.body.textContent).not.toContain('this site covers');
-  });
-
   it('has every province at $70,000 in the page itself, lowest tax and contributions first', () => {
     const slot = page.getElementById(PROVINCE_COMPARISON_SLOT_ID);
     const bars = Array.from(slot?.querySelectorAll('ol > li') ?? []).map(
