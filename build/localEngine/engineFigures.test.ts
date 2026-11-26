@@ -180,15 +180,16 @@ describe.runIf(process.env.ENGINE_FIGURES_FILE)(
       );
     });
 
-    // The chart figures (tax-engine 0.5.2, 2026): the average and marginal rate are the engine's own
+    // The chart figures (tax-engine 0.5.2, 2026): the average and marginal rate are the engine's own, written to seven
+    // places (the engine rounds to four, and a display of one decimal must round once; the pages' answers stay at four)
     // (income tax, CPP and EI line 16, no credits paid on filing counted; at $2,000 the engine reads the
     // marginal rate below the start of the EI band).
     it.each([
-      ['2000.00', '0.0000', '0.0000', '2000.00'],
+      ['2000.00', '0', '0', '2000.00'],
       ['3000.00', '0.0163', '0.0163', '2951.10'],
-      ['38000.00', '0.1583', '0.3608', '31985.21'],
-      ['70000.00', '0.2316', '0.3436', '53786.25'],
-      ['201200.00', '0.3445', '0.7326', '131880.84'],
+      ['38000.00', '0.1582839', '0.3607601', '31985.21'],
+      ['70000.00', '0.231625', '0.3436053', '53786.25'],
+      ['201200.00', '0.3445286', '0.7326453', '131880.84'],
     ])(
       'gives Ontario at %s the sweep figures',
       (salary, average, marginal, takeHome) => {
@@ -230,9 +231,10 @@ describe.runIf(process.env.ENGINE_FIGURES_FILE)(
       // The health premium band, and the first spike (settled, then first moving back).
       expect(
         ontario?.edges.find((edge) => edge[0] === '20000')?.slice(0, 3),
-      ).toEqual(['20000', '20160', '20170']);
+      ).toEqual(['20000', '20166', '20167']);
+      // Exact to the dollar: the old rate holds to the second figure and the new one from the third.
       expect(ontario?.edges.map((edge) => edge[2])).toEqual(
-        expect.arrayContaining(['25220', '48450', '72700', '201130']),
+        expect.arrayContaining(['25218', '48450', '72692', '201127']),
       );
       expect(ontario?.facts).toMatchObject({
         surtax_first: '5818',
@@ -241,7 +243,7 @@ describe.runIf(process.env.ENGINE_FIGURES_FILE)(
       });
     });
 
-    it('holds the 307 hub-chart points of every province, $1,000 to $500,000 and the seven extra salaries', () => {
+    it('holds the 327 hub-chart points of every province, $1,000 to $500,000 and the twenty-seven extra salaries', () => {
       const raw = JSON.parse(readFileSync(file, 'utf8')) as {
         provinces: Record<
           string,
@@ -253,10 +255,10 @@ describe.runIf(process.env.ENGINE_FIGURES_FILE)(
           sweep: [],
           sweep_units: undefined,
         };
-        expect(sweep, province.code).toHaveLength(307);
+        expect(sweep, province.code).toHaveLength(327);
         expect(sweep[0]?.salary).toBe('1000.00');
         expect(sweep[1]?.salary).toBe('1990.00');
-        expect(sweep[306]?.salary).toBe('500000.00');
+        expect(sweep[326]?.salary).toBe('500000.00');
         expect(sweep_units).toBeDefined();
       }
     });

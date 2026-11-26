@@ -11,14 +11,34 @@ export function regularSalaries(): string[] {
   return salaries;
 }
 
-/** Salaries added to the sweep so the lines show what a regular step would miss: the $2,000 Employment Insurance band and the Ontario health premium steps near $201,000. */
+/** Salaries added to the sweep so the lines show what a regular step would miss: the $2,000 Employment Insurance band, the narrow stretch where Ontario tax has started and the LIFT credit has not yet begun to shrink, and, for each narrow Ontario health premium step, a salary just either side of both its edges (the lines join the points, so a step shows at its true place and width). */
 const EXTRA_SALARIES = [
   '1990',
   '2020',
   '2040',
+  '32570',
+  '32580',
+  '32790',
+  '32800',
+  '36320',
+  '36340',
+  '38840',
+  '38860',
+  '48440',
+  '48460',
+  '49050',
+  '49070',
+  '72680',
+  '72700',
+  '73290',
+  '73310',
   '201100',
+  '201120',
+  '201140',
   '201200',
   '201700',
+  '201720',
+  '201740',
   '201800',
 ];
 
@@ -55,9 +75,9 @@ export type SweepPoint = [
 ];
 
 /**
- * Where the marginal rate changes, as the engine found it on a $10 grid between two neighbouring sweep
- * salaries: the sweep salary below, the salary the rate first moves, the salary it has settled at its
- * new value and the marginal rate there (a fraction). A band starts where the rate has settled and ends where it first moves back. Whole dollars, as text.
+ * Where the marginal rate changes, as the engine found it, to the cent, between two neighbouring sweep
+ * salaries: the sweep salary below, the last whole salary at the old rate, the first whole salary at the
+ * new rate (a ramp settles later) and the marginal rate there (a fraction). A band starts where the rate has settled and ends where it first moves back. Whole dollars, as text.
  */
 export type SweepEdge = [
   below: string,

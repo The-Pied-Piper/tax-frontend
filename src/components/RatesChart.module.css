@@ -1,0 +1,113 @@
+/* The rates page's chart: marginal and average rate against salary, a range slider and the closed table. Colours come only from styles/tokens.css. */
+.card {
+  min-width: 0;
+}
+
+.readout {
+  min-height: 1.6em;
+  margin: 0 0 8px;
+  font-family: var(--font-mono);
+  font-size: 15px;
+}
+
+.hint {
+  margin: 0 0 8px;
+  font-size: 14px;
+  color: var(--muted);
+}
+
+.linkRow {
+  margin: 6px 0 0;
+  font-size: 14px;
+}
+
+.range {
+  display: block;
+  margin-top: 14px;
+  font-size: 14px;
+}
+
+.range input {
+  display: block;
+  width: 100%;
+  margin: 6px 0 0;
+  accent-color: var(--accent);
+}
+
+.steps {
+  display: flex;
+  justify-content: space-between;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--muted);
+}
+
+.stepsEven {
+  display: inline;
+}
+
+@media (max-width: 560px) {
+  .stepsEven {
+    visibility: hidden;
+  }
+}
+
+.details {
+  margin-top: 14px;
+}
+
+.details summary {
+  cursor: pointer;
+  color: var(--accent);
+  text-decoration: underline;
+  font-size: 15px;
+}
+
+.tableWrap {
+  max-height: 520px;
+  margin-top: 8px;
+  overflow: auto;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  font-variant-numeric: tabular-nums;
+}
+
+.table caption {
+  text-align: left;
+  color: var(--muted);
+  font-size: 14px;
+  margin-bottom: 6px;
+}
+
+.table th,
+.table td {
+  padding: 8px 6px;
+  text-align: right;
+  border-top: 1px solid var(--rule);
+}
+
+.table thead th {
+  position: sticky;
+  top: 0;
+  background: var(--surface);
+  color: var(--muted);
+  font-size: 13px;
+  border-top: 0;
+}
+
+.table th:first-child {
+  text-align: left;
+}
+
+.linkButton {
+  padding: 0;
+  border: 0;
+  background: none;
+  font: inherit;
+  color: var(--accent);
+  text-decoration: underline;
+  cursor: pointer;
+}

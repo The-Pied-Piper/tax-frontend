@@ -96,12 +96,12 @@ describe('the text of the hub charts', () => {
   it('reads Ontario as the copy thread wrote it, with the engine’s figures', () => {
     const sweep = sweepOf('ca-on');
     expect(chartNotes('ca-on', 'averageRate', sweep)[0]).toBe(
-      'Up to $2,000 the average is 0%. Employment Insurance starts just above $2,000 and counts for more as your salary rises, until the full rate applies by about $2,033. The average is about 1.6% from about $2,040.',
+      'Up to $2,000 the average is 0%. Employment Insurance starts just above $2,000 and counts for more as your salary rises, until the full rate applies by about $2,033. The average is about 1.6% from about $2,034.',
     );
     const marginal = chartNotes('ca-on', 'marginalRate', sweep).join(' ');
     // The three spikes, from the engine's edges and read to one decimal.
     expect(marginal).toContain(
-      '54.9% from $48,450 to $49,050, 59.1% from $72,700 to $73,290, and 73.3% from $201,130 to $201,720',
+      '54.9% from $48,450 to $49,055, 59.1% from $72,692 to $73,297, and 73.3% from $201,127 to $201,727',
     );
     // The surtax thresholds are the 2026 engine parameters, not the 2025 form's.
     expect(marginal).toContain(
@@ -153,8 +153,8 @@ describe('the text of the hub charts', () => {
   it('names a change of rate by a salary near it and prints the engine’s figure', () => {
     const sweep = sweepOf('ca-on');
     // A band starts where the rate has settled and ends where it first moves.
-    expect(figureText(parseSpec('e:20000'), sweep)).toBe('$20,170');
-    expect(figureText(parseSpec('o:25000'), sweep)).toBe('$25,210');
+    expect(figureText(parseSpec('e:20000'), sweep)).toBe('$20,167');
+    expect(figureText(parseSpec('o:25000'), sweep)).toBe('$25,217');
     expect(figureText(parseSpec('y:48000'), sweep)).toBe('54.9%');
   });
 
@@ -167,5 +167,28 @@ describe('the text of the hub charts', () => {
     expect(() => figureText(parseSpec('f:nothing'), sweep)).toThrow(
       /no figure/,
     );
+  });
+
+  it('reads the rates page kinds: cents as written, a rate to one decimal, a gap of two rates, a factor as written', () => {
+    const sweep = sweepOf('ca-on');
+    expect(figureText(parseSpec('n:ei_max_premium'), sweep)).toBe('$1,123.07');
+    expect(figureText(parseSpec('h:marginal@300000'), sweep)).toBe('53.5%');
+    expect(figureText(parseSpec('h:average@500000'), sweep)).toBe('45.4%');
+    // Round once from the exact rate: the sweep keeps seven places, and 0.3436053 is 34.4%.
+    expect(figureText(parseSpec('h:marginal@70000'), sweep)).toBe('34.4%');
+    expect(figureText(parseSpec('w:marginal@300000-12000'), sweep)).toBe(
+      '45.9%',
+    );
+    expect(figureText(parseSpec('x:taxable_factor'), sweep)).toBe('0.99');
+  });
+
+  it('keeps the edge of a band exact to the dollar, and the next edge apart from the one before', () => {
+    const sweep = sweepOf('ca-on');
+    // The surtax steps are whole-salary thresholds read from the engine, not a grid.
+    expect(figureText(parseSpec('e:98000'), sweep)).toBe('$98,591');
+    expect(figureText(parseSpec('o:98000'), sweep)).toBe('$98,590');
+    // Inside a span with extra points (the 48,450 step) the near edge is chosen.
+    expect(figureText(parseSpec('e:48000'), sweep)).toBe('$48,450');
+    expect(figureText(parseSpec('o:49000'), sweep)).toBe('$49,055');
   });
 });

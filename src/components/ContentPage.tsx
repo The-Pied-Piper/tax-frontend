@@ -10,12 +10,52 @@ import type { HubChartsData } from '../state/hubCharts';
 import {
   HUB_CHART_SLOT_IDS,
   PROVINCE_COMPARISON_SLOT_ID,
+  RATES_CHART_SLOT_ID,
 } from '../state/hubSlots';
 import { chartNotes } from '../state/hubNotes';
+import { ratesPageView } from '../state/ratesPage';
+import { RatesChart } from './RatesChart';
 import { strings } from '../strings';
 import { THEME_TOGGLE_SLOT_ID } from '../state/themeSlot';
 import { ProvinceComparison } from './ProvinceComparison';
 import { FoldingList } from './FoldingList';
+
+/** A table with a caption and column headings; every row has one cell per heading. */
+function ContentTable({
+  caption,
+  head,
+  rows,
+}: {
+  caption: string;
+  head: string[];
+  rows: string[][];
+}) {
+  return (
+    <div className={styles.tableWrap}>
+      <table className={styles.table}>
+        <caption>{caption}</caption>
+        <thead>
+          <tr>
+            {head.map((cell) => (
+              <th key={cell} scope="col">
+                {cell}
+              </th>
+            ))}
+          </tr>
+        </thead>
+        <tbody>
+          {rows.map((row, at) => (
+            <tr key={at}>
+              {row.map((cell, column) => (
+                <td key={column}>{cell}</td>
+              ))}
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  );
+}
 
 /** One block of a section: a paragraph, a list of forms, a group of links, a table or a hub's charts or comparison. */
 function ContentBlockView({
@@ -57,6 +97,91 @@ function ContentBlockView({
           }))}
         />
       );
+    }
+    case 'ratesChart': {
+      const sweep = hubCharts?.provinces.find(
+        (entry) => entry.slug === block.province,
+      );
+      return (
+        <div id={RATES_CHART_SLOT_ID} data-province={block.province}>
+          {sweep && (
+            <RatesChart
+              sweep={sweep}
+              place={strings.siteNav.provinceNames[block.province]}
+            />
+          )}
+        </div>
+      );
+    }
+    case 'ratesPart': {
+      const sweep = hubCharts?.provinces.find(
+        (entry) => entry.slug === block.province,
+      );
+      const view = sweep ? ratesPageView(block.province, sweep) : null;
+      if (!view) return null;
+      switch (block.part) {
+        case 'intro':
+        case 'howToRead':
+          return (
+            <>
+              {view[block.part].map((words) => (
+                <p key={words}>{words}</p>
+              ))}
+            </>
+          );
+        case 'groups':
+          return (
+            <>
+              {view.groups.map((group) => (
+                <div key={group.heading}>
+                  <h3 className={styles.chartHeading}>{group.heading}</h3>
+                  <ul className={styles.notes}>
+                    {group.notes.map((note) => (
+                      <li key={note.words}>
+                        {note.words}
+                        {note.causes.length > 0 && (
+                          <span className={styles.causes}>
+                            {strings.ratesPage.causedBy}{' '}
+                            {note.causes.map((cause, at) => (
+                              <span key={cause.label}>
+                                {at > 0 && ', '}
+                                {cause.href ? (
+                                  <a href={cause.href}>{cause.label}</a>
+                                ) : (
+                                  cause.label
+                                )}
+                              </span>
+                            ))}
+                          </span>
+                        )}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              ))}
+            </>
+          );
+        case 'tables':
+          return (
+            <>
+              {view.tables.map((table) => (
+                <div key={table.heading}>
+                  <h3 className={styles.chartHeading}>{table.heading}</h3>
+                  {table.before && <p>{table.before}</p>}
+                  {table.rows.length > 0 && (
+                    <ContentTable
+                      caption={table.caption}
+                      head={table.head}
+                      rows={table.rows}
+                    />
+                  )}
+                  {table.after && <p>{table.after}</p>}
+                </div>
+              ))}
+            </>
+          );
+      }
+      return null;
     }
     case 'subheading':
       return <h3 className={styles.chartHeading}>{block.text}</h3>;
@@ -112,29 +237,11 @@ function ContentBlockView({
       );
     case 'table':
       return (
-        <div className={styles.tableWrap}>
-          <table className={styles.table}>
-            <caption>{block.caption}</caption>
-            <thead>
-              <tr>
-                {block.head.map((cell) => (
-                  <th key={cell} scope="col">
-                    {cell}
-                  </th>
-                ))}
-              </tr>
-            </thead>
-            <tbody>
-              {block.rows.map((row, at) => (
-                <tr key={at}>
-                  {row.map((cell, column) => (
-                    <td key={column}>{cell}</td>
-                  ))}
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+        <ContentTable
+          caption={block.caption}
+          head={block.head}
+          rows={block.rows}
+        />
       );
     case 'provinceComparison':
       // The slot the browser mounts the same component into; a hub with no

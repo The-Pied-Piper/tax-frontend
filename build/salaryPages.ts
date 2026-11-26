@@ -25,6 +25,7 @@ import {
   PROVINCES_WITHOUT_SALARY_PAGES,
 } from '../src/state/siteLinks';
 import { hubChartBlocks, hubPages } from './contentPages/hubs';
+import { ratesBlocks, ratesPages } from './contentPages/rates';
 import { withSalaryLinks } from './contentPages/forms';
 import type { HubChartsData } from '../src/state/hubCharts';
 import type { SalaryPageData } from '../src/state/useTakeHome';
@@ -173,17 +174,19 @@ export function salaryPages(
           PROVINCES_WITHOUT_SALARY_PAGES,
           new Set(sweeps.map((sweep) => sweep.slug)),
         );
+        const rates = ratesPages(new Set(sweeps.map((sweep) => sweep.slug)));
+        const hubBlocks = hubChartBlocks(sweeps);
         const content = await generateContentPages({
           outDir,
           template: await readFile(contentFile, 'utf8'),
-          pages: [...withSalaryLinks(contentPages, built), ...hubs],
+          pages: [...withSalaryLinks(contentPages, built), ...hubs, ...rates],
           render: (spec) =>
             renderContentPage(
               spec,
               sweeps.length > 0 ? { provinces: sweeps } : undefined,
             ),
           siteUrl,
-          dataBlocks: hubChartBlocks(sweeps),
+          dataBlocks: new Map([...hubBlocks, ...ratesBlocks(rates, hubBlocks)]),
         });
         const notFound = await generateNotFoundPage({
           outDir,

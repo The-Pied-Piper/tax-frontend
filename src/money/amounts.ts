@@ -42,6 +42,15 @@ export function roundToHalfPoint(rate: string): string {
   return unitsText(divideHalfUp(x * 200n, scale) * 5n, 3);
 }
 
+/** A rate written as a fraction, rounded to four decimals, half up: "0.4647041" gives "0.4647", "0.3435" stays. */
+export function roundToFourDecimals(rate: string): string {
+  const {
+    units: [x = 0n],
+    digits,
+  } = parseAll([rate]);
+  return unitsText(divideHalfUp(x * 10000n, 10n ** BigInt(digits)), 4);
+}
+
 /** `numerator` over `denominator` as a fraction written to four decimals, half up: 273077.60 over 500000 gives "0.5462". The denominator must be above zero. */
 export function ratioText(numerator: string, denominator: string): string {
   const {

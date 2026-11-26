@@ -100,6 +100,43 @@ export const strings = {
       tableProvince: 'Province',
     },
   },
+  ratesPage: {
+    // What a cause form is called on a "Caused by" chip.
+    causes: {
+      t1: 'Form T1',
+      on428: 'Form ON428',
+      on428a: 'Schedule ON428-A',
+      t2204: 'Form T2204',
+      schedule8: 'Schedule 8',
+    },
+    chartHeading: 'Marginal and average rate by salary',
+    marginal: 'Marginal rate',
+    average: 'Average rate',
+    salaryAxis: 'Salary before tax',
+    percent: 'Percent',
+    hint: 'Hover or tap the chart to read a salary.',
+    readout: (salary: string, marginal: string, average: string) =>
+      `At ${salary}: marginal rate ${marginal}, average rate ${average}`,
+    linkToSalary: 'Link to this salary',
+    sliderLabel: 'Show salaries up to',
+    sliderValueText: (salary: string) => `Salaries up to ${salary}`,
+    // The words near the top of the plot where the Employment Insurance band leaves it: its rate and the salaries it runs from and to.
+    topNote: (rate: string, from: string, to: string) =>
+      `Off the top: ${rate} from ${from} to ${to}`,
+    chartLabel: (from: string, to: string) =>
+      `Line chart: marginal rate and average rate against salary, from ${from} to ${to}. The same figures are in the table below the chart.`,
+    tableShow: 'Show the figures as a table',
+    tableHide: 'Hide the table',
+    tableCaption: (place: string, year: number, count: number) =>
+      `Rates by salary, ${place}, ${year.toString()}: all ${count.toString()} figures behind the chart`,
+    salaryHeader: 'Salary',
+    marginalHeader: 'Marginal rate',
+    averageHeader: 'Average rate',
+    causedBy: 'Caused by:',
+    howToRead: 'How to read these salaries',
+    notesHeading: 'What moves the rate, by salary',
+    bracketsHeading: 'Brackets by salary',
+  },
   fold: {
     more: 'See more',
     less: 'See less',

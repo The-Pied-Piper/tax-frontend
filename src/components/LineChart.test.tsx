@@ -48,7 +48,8 @@ function chart(
 }
 
 const hitRect = (container: HTMLElement) => {
-  const rect = container.querySelector('rect');
+  // The last rectangle is the one over the plot that takes the pointer (the first is the clip).
+  const rect = [...container.querySelectorAll('rect')].pop();
   if (!rect) throw new Error('no hit rect');
   return rect;
 };
@@ -238,5 +239,48 @@ describe('LineChart', () => {
     expect(html).toContain('<path');
     expect(html).toContain('Line chart: Income tax for the year');
     expect(html).toContain('$16,531.32');
+  });
+
+  it('sets the vertical scale from scaleValues only, and cuts the lines at the top of the plot', () => {
+    const { container, rerender } = render(chart());
+    const labels = () =>
+      [...container.querySelectorAll('text')].map((t) => t.textContent);
+    expect(labels()).toContain('$200k');
+    // Only the first point sets the scale: the axis ends at the first tick above 950.
+    rerender(chart({ scaleValues: ['950.00', '900.00'] }));
+    expect(labels()).not.toContain('$200k');
+    const clip = container.querySelector('clipPath rect');
+    expect(clip).not.toBeNull();
+    expect(container.querySelector('g[clip-path]')).not.toBeNull();
+  });
+
+  it('leaves the figure beside the marker out when markerLabel is false', () => {
+    const withLabel = render(chart({ activeIndex: 1 }));
+    expect(
+      withLabel.container.querySelector(
+        'text.markerLabel, text[class*="markerLabel"]',
+      ),
+    ).not.toBeNull();
+    withLabel.unmount();
+    const without = render(chart({ activeIndex: 1, markerLabel: false }));
+    expect(
+      without.container.querySelector('text[class*="markerLabel"]'),
+    ).toBeNull();
+  });
+
+  it('draws a note in the top corner of the plot', () => {
+    render(chart({ topNote: 'Off the top: 100.0% from $2,000 to $2,033' }));
+    expect(
+      screen.getByText('Off the top: 100.0% from $2,000 to $2,033'),
+    ).toBeInTheDocument();
+  });
+
+  it('right-aligns the label at the end of the axis so it is not cut off', () => {
+    const { container } = render(chart());
+    const labels = [...container.querySelectorAll('text')];
+    const end = labels.find((t) => t.textContent === '$500k');
+    const middle = labels.find((t) => t.textContent === '$300k');
+    expect(end?.getAttribute('text-anchor')).toBe('end');
+    expect(middle?.getAttribute('text-anchor')).toBe('middle');
   });
 });

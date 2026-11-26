@@ -1,4 +1,4 @@
-import { useMemo, useRef } from 'react';
+import { useId, useMemo, useRef } from 'react';
 import type { KeyboardEvent, PointerEvent } from 'react';
 import {
   isBeyond,
@@ -46,6 +46,15 @@ type Props = {
   /** The shared marker: an index into points, or none. The card owns it. */
   activeIndex: number | null;
   onActiveChange: (index: number | null) => void;
+  /**
+   * The values that set the vertical scale, when some points should not (the narrow Employment Insurance band
+   * that rises to 100%): the lines are cut at the top of the plot instead. Defaults to every value.
+   */
+  scaleValues?: readonly string[];
+  /** False leaves the figure beside the marker out, for a card that shows it in a readout of its own. */
+  markerLabel?: boolean;
+  /** Words drawn in the top corner of the plot, such as where a line leaves it. */
+  topNote?: string;
 };
 
 // Beyond this many labels up the side, a phone hides every other one (in CSS).
@@ -80,11 +89,17 @@ export function LineChart({
   ariaLabel,
   activeIndex,
   onActiveChange,
+  scaleValues,
+  markerLabel = true,
+  topNote,
 }: Props) {
   const svgRef = useRef<SVGSVGElement>(null);
+  const clipId = useId();
 
   const geometry = useMemo(() => {
-    const axis = niceAxis(points.flatMap((point) => point.values));
+    const axis = niceAxis(
+      scaleValues ?? points.flatMap((point) => point.values),
+    );
     const x = (salary: string) =>
       scalePosition(salary, xMin, xMax, LEFT, PLOT_RIGHT);
     const y = (value: string) =>
@@ -103,7 +118,7 @@ export function LineChart({
           .join(''),
       ),
     };
-  }, [points, series, xMin, xMax]);
+  }, [points, series, xMin, xMax, scaleValues]);
 
   const { axis, xs, y } = geometry;
   // On a phone, an axis with more than four labels shows every other one.
@@ -206,7 +221,8 @@ export function LineChart({
               ).join(' ')}
               x={geometry.x(tick)}
               y={PLOT_BOTTOM + 14}
-              textAnchor="middle"
+              // A label at the end of the axis is right-aligned on every screen, so it is not cut off at the edge.
+              textAnchor={tick === xMax ? 'end' : 'middle'}
             >
               {displayTick(tick, xUnit)}
             </text>
@@ -234,13 +250,33 @@ export function LineChart({
           y1={PLOT_BOTTOM}
           y2={PLOT_BOTTOM}
         />
-        {series.map((line, index) => (
-          <path
-            key={line.id}
-            className={line.dashed === true ? styles.dashed : styles.line}
-            d={geometry.paths[index]}
+        <clipPath id={clipId}>
+          <rect
+            x={LEFT}
+            y={TOP}
+            width={PLOT_RIGHT - LEFT}
+            height={PLOT_BOTTOM - TOP}
           />
-        ))}
+        </clipPath>
+        <g clipPath={`url(#${clipId})`}>
+          {series.map((line, index) => (
+            <path
+              key={line.id}
+              className={line.dashed === true ? styles.dashed : styles.line}
+              d={geometry.paths[index]}
+            />
+          ))}
+        </g>
+        {topNote !== undefined && (
+          <text
+            className={[styles.tick, styles.topNote].join(' ')}
+            x={PLOT_RIGHT - 4}
+            y={TOP + 12}
+            textAnchor="end"
+          >
+            {topNote}
+          </text>
+        )}
         {active !== undefined && activeX !== undefined && (
           <g aria-hidden="true">
             <line
@@ -264,18 +300,20 @@ export function LineChart({
                 />
               );
             })}
-            <text
-              className={styles.markerLabel}
-              x={activeX}
-              y={markerY}
-              dx={isBeyond(activeX, LABEL_FLIPS_AFTER) ? -9 : 9}
-              dy="-0.6em"
-              textAnchor={
-                isBeyond(activeX, LABEL_FLIPS_AFTER) ? 'end' : 'start'
-              }
-            >
-              {formatValue(points[active]?.values[0] ?? '0')}
-            </text>
+            {markerLabel && (
+              <text
+                className={styles.markerLabel}
+                x={activeX}
+                y={markerY}
+                dx={isBeyond(activeX, LABEL_FLIPS_AFTER) ? -9 : 9}
+                dy="-0.6em"
+                textAnchor={
+                  isBeyond(activeX, LABEL_FLIPS_AFTER) ? 'end' : 'start'
+                }
+              >
+                {formatValue(points[active]?.values[0] ?? '0')}
+              </text>
+            )}
           </g>
         )}
         <rect

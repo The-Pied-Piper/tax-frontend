@@ -1,4 +1,5 @@
 import {
+  roundToFourDecimals,
   roundToHalfPoint,
   ratioText,
   roundToWhole,
@@ -40,5 +41,15 @@ describe('ratioText', () => {
     expect(ratioText('273077.60', '500000')).toBe('0.5462');
     expect(ratioText('1', '3')).toBe('0.3333');
     expect(() => ratioText('1', '0')).toThrow();
+  });
+});
+
+describe('roundToFourDecimals', () => {
+  it('rounds a rate to four decimals, a half going up', () => {
+    expect(roundToFourDecimals('0.4647041')).toBe('0.4647');
+    expect(roundToFourDecimals('0.46475')).toBe('0.4648');
+    expect(roundToFourDecimals('0.3435')).toBe('0.3435');
+    expect(roundToFourDecimals('0.5')).toBe('0.5');
+    expect(roundToFourDecimals('1')).toBe('1');
   });
 });

@@ -1,3 +1,4 @@
+import { roundToFourDecimals } from '../money/amounts';
 import type { MoneyUnit } from '../money/format';
 import { toPlainSalary, type Separators } from '../money/salaryInput';
 import {
@@ -69,6 +70,16 @@ export type ComparisonRow = {
   width: string;
 };
 
+/** A point's figure for a measure. The sweep keeps rates to seven places; a rate is shown once rounded to four. */
+function figureOf(
+  province: ProvinceSweep,
+  index: number,
+  measure: Measure,
+): string {
+  const value = province.points[index]?.[COLUMN[measure]] ?? '0';
+  return measure === 'averageRate' ? roundToFourDecimals(value) : value;
+}
+
 /**
  * Every province at one point of the sweep, highest figure first (provinces
  * with the same figure keep the order of the list). The longest bar is 100.
@@ -80,7 +91,7 @@ export function comparisonRows(
 ): ComparisonRow[] {
   const rows = provinces.map((province) => ({
     slug: province.slug,
-    value: province.points[index]?.[COLUMN[measure]] ?? '0',
+    value: figureOf(province, index, measure),
     unit: measure === 'averageRate' ? province.rateUnit : province.unit,
   }));
   rows.sort((a, b) => compareAmounts(b.value, a.value));
