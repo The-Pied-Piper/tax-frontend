@@ -6,7 +6,7 @@ import {
   nearestAmountIndex,
   scalePosition,
 } from '../money/scale';
-import { SWEEP_COLUMN, type ProvinceSweep } from './hubCharts';
+import { regularIndexes, SWEEP_COLUMN, type ProvinceSweep } from './hubCharts';
 
 /** What the bars show. */
 export type Measure = 'takeHome' | 'incomeTax' | 'averageRate';
@@ -70,18 +70,19 @@ export type ComparisonRow = {
   width: string;
 };
 
-/** A point's figure for a measure. The sweep keeps rates to seven places; a rate is shown once rounded to four. */
+/** A province's figure for a measure at one regular salary (`index` counts the regular salaries, so a province's own extra points do not move it). The sweep keeps rates to seven places; a rate is shown once rounded to four. */
 function figureOf(
   province: ProvinceSweep,
   index: number,
   measure: Measure,
 ): string {
-  const value = province.points[index]?.[COLUMN[measure]] ?? '0';
+  const at = regularIndexes(province.points)[index];
+  const value = province.points[at ?? -1]?.[COLUMN[measure]] ?? '0';
   return measure === 'averageRate' ? roundToFourDecimals(value) : value;
 }
 
 /**
- * Every province at one point of the sweep, highest figure first (provinces
+ * Every province at one regular salary of the sweep (the `index`th), highest figure first (provinces
  * with the same figure keep the order of the list). The longest bar is 100.
  */
 export function comparisonRows(

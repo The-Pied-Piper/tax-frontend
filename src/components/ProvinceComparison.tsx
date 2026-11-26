@@ -44,8 +44,7 @@ export function ProvinceComparison({ data, province }: Props) {
   const current = data.provinces.find((sweep) => sweep.slug === province);
   // The slider has a step for each regular salary of the sweep, not for the extra points of the charts.
   const points = data.provinces[0]?.points ?? [];
-  const pointIndexes = regularIndexes(points);
-  const salaries = pointIndexes.map((at) => points[at]?.[0] ?? '');
+  const salaries = regularIndexes(points).map((at) => points[at]?.[0] ?? '');
   const [index, setIndex] = useState(() =>
     nearestSalaryIndex(salaries, DEFAULT_SALARY),
   );
@@ -58,11 +57,7 @@ export function ProvinceComparison({ data, province }: Props) {
     current.unit,
   );
   const measureName = copy.measures[measure];
-  const rows = comparisonRows(
-    data.provinces,
-    pointIndexes[index] ?? 0,
-    measure,
-  );
+  const rows = comparisonRows(data.provinces, index, measure);
 
   return (
     <div className={styles.comparison}>

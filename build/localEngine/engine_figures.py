@@ -198,13 +198,22 @@ def _salary_to_taxable(year: int, taxable: Decimal) -> Decimal:
     return _salary_of_taxable(year, taxable) - 1
 
 
-def _rates_page_facts(year: int, code: str) -> dict[str, str]:
-    """The figures the rates page quotes besides the sweep: brackets, basic amounts, the surtax and the health
-    premium, the Canada Pension Plan and Employment Insurance limits, and where each form threshold falls in
-    salary. Every one is read from the engine's own 2026 dataset files; the salary of a taxable-income threshold
-    is worked out from the pension deduction (see `_pension_deduction`)."""
-    if code != "CA-ON":
-        return {}
+def _bracket_facts(year: int, prefix: str, brackets: list[dict]) -> dict[str, str]:
+    """For each bracket (numbered from 1): its taxable income, its rate, and the first whole salary at that taxable income."""
+    facts: dict[str, str] = {}
+    for number, bracket in enumerate(brackets, start=1):
+        taxable = Decimal(bracket["from"])
+        facts[f"{prefix}_bracket_{number}_ti"] = str(taxable)
+        facts[f"{prefix}_bracket_{number}_rate"] = bracket["rate"]
+        facts[f"{prefix}_bracket_{number}_salary"] = str(_salary_of_taxable(year, taxable))
+    return facts
+
+
+def _common_rates_page_facts(year: int) -> dict[str, str]:
+    """The figures every province's rates page quotes besides the sweep: the pension deduction, the federal brackets
+    and basic amount, and the Canada Pension Plan and Employment Insurance limits. Every one is read from the engine's
+    own 2026 dataset files; the salary of a taxable-income threshold is worked out from the pension deduction (see
+    `_pension_deduction`)."""
     d = _pension_deduction(year)
     facts: dict[str, str] = {
         "cpp_start": str(d["exemption"]),
@@ -215,13 +224,8 @@ def _rates_page_facts(year: int, code: str) -> dict[str, str]:
         "taxable_cut": str(d["cut"]),
         "taxable_factor_2": str(d["factor_2"]),
         "taxable_constant_2": str(d["constant_2"]),
+        **_bracket_facts(year, "fed", _params(year, "ca", "brackets")["brackets"]),
     }
-    for package, family, prefix in (("ca", "brackets", "fed"), ("ca_on", "brackets", "ont")):
-        for number, bracket in enumerate(_params(year, package, family)["brackets"], start=1):
-            taxable = Decimal(bracket["from"])
-            facts[f"{prefix}_bracket_{number}_ti"] = str(taxable)
-            facts[f"{prefix}_bracket_{number}_rate"] = bracket["rate"]
-            facts[f"{prefix}_bracket_{number}_salary"] = str(_salary_of_taxable(year, taxable))
     bpa = _params(year, "ca", "basic_personal_amount")
     facts["fed_bpa_min"] = bpa["base"]
     facts["fed_bpa"] = str(Decimal(bpa["base"]) + Decimal(bpa["supplement"]))
@@ -237,12 +241,6 @@ def _rates_page_facts(year: int, code: str) -> dict[str, str]:
             Decimal(bpa["supplement"]) / Decimal(bpa["range"]) * Decimal(facts["fed_bracket_1_rate"]) * 100
         ).quantize(Decimal("0.1"), rounding=ROUND_HALF_UP)
     )
-    facts["ont_bpa"] = _params(year, "ca_on", "basic_personal_amount")["amount"]
-    facts["lift_max"] = _params(year, "ca_on", "lift_maximum")["amount"]
-    facts["lift_end_ani"] = str(
-        Decimal(_params(year, "ca_on", "lift_individual_income_threshold")["amount"])
-        + Decimal(facts["lift_max"]) / Decimal(_params(year, "ca_on", "lift_single_rate")["rate"])
-    )
     facts["ei_exemption"] = _params(year, "ca", "t2204_exemption")["amount"]
     facts["ei_max_premium"] = _params(year, "ca", "ei_premium")["maximum"]
     base = _params(year, "ca", "cpp_line_11_base_contribution")
@@ -254,29 +252,74 @@ def _rates_page_facts(year: int, code: str) -> dict[str, str]:
     facts["cpp_max"] = str(Decimal(base["maximum"]) + Decimal(enhanced["maximum"]))
     facts["cpp2_rate"] = second["rate"]
     facts["cpp2_max"] = second["maximum"]
-    facts["surtax_total_rate"] = str(
+    return facts
+
+
+def _shift(facts: dict[str, str], bracket: str) -> str:
+    """How much higher the salary is than the taxable income at a bracket's threshold (what a form's figure is off by)."""
+    return str(Decimal(facts[f"{bracket}_salary"]) - Decimal(facts[f"{bracket}_ti"]))
+
+
+def _ontario_rates_page_facts(year: int, facts: dict[str, str]) -> dict[str, str]:
+    """Ontario's own figures: its brackets, basic amount, LIFT Credit, surtax and health premium."""
+    ontario = _bracket_facts(year, "ont", _params(year, "ca_on", "brackets")["brackets"])
+    ontario["ont_bpa"] = _params(year, "ca_on", "basic_personal_amount")["amount"]
+    ontario["lift_max"] = _params(year, "ca_on", "lift_maximum")["amount"]
+    ontario["lift_end_ani"] = str(
+        Decimal(_params(year, "ca_on", "lift_individual_income_threshold")["amount"])
+        + Decimal(ontario["lift_max"]) / Decimal(_params(year, "ca_on", "lift_single_rate")["rate"])
+    )
+    ontario["surtax_total_rate"] = str(
         Decimal(_params(year, "ca_on", "surtax_line_66")["tiers"][0]["rate"])
         + Decimal(_params(year, "ca_on", "surtax_line_67")["tiers"][0]["rate"])
     )
     for number, row in enumerate(_params(year, "ca_on", "health_premium_rows")["rows"], start=1):
         over = Decimal(row["over"])
-        facts[f"ohp_{number}_ti"] = str(over)
-        facts[f"ohp_{number}_salary"] = str(_salary_of_taxable(year, over))
-        facts[f"ohp_{number}_salary_to"] = str(_salary_to_taxable(year, over))
-        facts[f"ohp_{number}_salary_end"] = str(_exact_salary_of_taxable(year, over).to_integral_value(rounding=ROUND_FLOOR))
+        ontario[f"ohp_{number}_ti"] = str(over)
+        ontario[f"ohp_{number}_salary"] = str(_salary_of_taxable(year, over))
+        ontario[f"ohp_{number}_salary_to"] = str(_salary_to_taxable(year, over))
+        ontario[f"ohp_{number}_salary_end"] = str(
+            _exact_salary_of_taxable(year, over).to_integral_value(rounding=ROUND_FLOOR)
+        )
         if "amount" in row:
-            facts[f"ohp_{number}_amount"] = row["amount"]
+            ontario[f"ohp_{number}_amount"] = row["amount"]
         else:
-            facts[f"ohp_{number}_rate"] = row["rate"]
-            facts[f"ohp_{number}_plus"] = row["plus"]
-    # each salary shift: how much higher the salary is than the taxable income at a form's threshold
-    facts["shift_ohp_1"] = str(
-        Decimal(facts["ohp_2_salary"]) - Decimal(facts["ohp_2_ti"])
-    )
-    facts["shift_ont_bracket_2"] = str(
-        Decimal(facts["ont_bracket_2_salary"]) - Decimal(facts["ont_bracket_2_ti"])
-    )
-    return facts
+            ontario[f"ohp_{number}_rate"] = row["rate"]
+            ontario[f"ohp_{number}_plus"] = row["plus"]
+    ontario["shift_ohp_1"] = str(Decimal(ontario["ohp_2_salary"]) - Decimal(ontario["ohp_2_ti"]))
+    ontario["shift_ont_bracket_2"] = _shift(ontario, "ont_bracket_2")
+    return ontario
+
+
+def _alberta_rates_page_facts(year: int, facts: dict[str, str]) -> dict[str, str]:
+    """Alberta's own figures: its six brackets (the form keeps them in two files, lines 2 to 8 and lines 9 to 15),
+    its basic amount and the rate of its credits."""
+    brackets = [
+        *_params(year, "ca_ab", "brackets_lines_2_to_8")["brackets"],
+        *_params(year, "ca_ab", "brackets_lines_9_to_15")["brackets"],
+    ]
+    alberta = _bracket_facts(year, "ab", brackets)
+    alberta["ab_bpa"] = _params(year, "ca_ab", "basic_personal_amount")["amount"]
+    alberta["ab_credit_rate"] = _params(year, "ca_ab", "credit_rate")["rate"]
+    alberta["shift_fed_bracket_2"] = _shift(facts, "fed_bracket_2")
+    alberta["shift_ab_bracket_2"] = _shift(alberta, "ab_bracket_2")
+    return alberta
+
+
+# The province-only part of the rates page's figures, by province code; a province with no entry has no rates page.
+RATES_PAGE_FACTS = {
+    "CA-ON": _ontario_rates_page_facts,
+    "CA-AB": _alberta_rates_page_facts,
+}
+
+
+def _rates_page_facts(year: int, code: str) -> dict[str, str]:
+    """The figures the rates page quotes besides the sweep: the common ones, and the province's own."""
+    province = RATES_PAGE_FACTS.get(code)
+    if province is None:
+        return {}
+    common = _common_rates_page_facts(year)
+    return {**common, **province(year, common)}
 
 
 def _unit(unit: UnitDescription) -> dict:
@@ -298,10 +341,12 @@ def _salaries(province: dict) -> list[int]:
     return list(range(province["from"], province["to"] + 1, province["step"]))
 
 
-def _sweep_salaries(sweep: dict) -> list[int]:
+def _sweep_salaries(sweep: dict, province: dict) -> list[int]:
+    """The regular salaries, the extra ones every province gets, and the province's own `extra` (the edges of its own
+    rates, so its lines show each step at its true place; only that province's block carries them)."""
     fine = range(sweep["first"], sweep["fineTo"] + 1, sweep["fineStep"])
     coarse = range(sweep["fineTo"] + sweep["coarseStep"], sweep["to"] + 1, sweep["coarseStep"])
-    return sorted({*fine, *coarse, *sweep["extra"]})
+    return sorted({*fine, *coarse, *sweep["extra"], *province.get("extra", [])})
 
 
 class Figures:
@@ -447,11 +492,11 @@ class Figures:
 def main(provinces_file: str, output_file: str) -> None:
     config = json.loads(Path(provinces_file).read_text(encoding="utf-8"))
     year = config["year"]
-    sweep = _sweep_salaries(config["sweep"])
     figures = Figures()
     provinces = {}
     for province in config["provinces"]:
         code = province["code"]
+        sweep = _sweep_salaries(config["sweep"], province)
         pages = {}
         for salary in _salaries(province):
             pages[str(salary)] = figures.answer(code, year, salary, with_trace=True)

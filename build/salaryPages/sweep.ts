@@ -8,19 +8,19 @@ import type { EngineSweep } from '../localEngine/read';
  * The hub-chart sweep of every province the salary build served, from the figures the
  * Python step wrote. `provisional` is the API list's, as for the pages. Nothing is
  * returned partly: a province whose sweep is missing, does not hold exactly the salaries
- * of `sweepSalaries()` in order, or whose units are not whole fails the build.
+ * of `sweepSalaries(slug)` in order, or whose units are not whole fails the build.
  */
 export function provinceSweeps(
   sweeps: Record<string, EngineSweep>,
   built: BuiltProvince[],
   list: ListJurisdictionsResponse,
 ): ProvinceSweep[] {
-  const expected = sweepSalaries();
   return built.map(({ province }) => {
     const sweep = sweeps[province.code];
     if (!sweep) {
       throw new Error(`Salary sweep: no figures for ${province.code}`);
     }
+    const expected = sweepSalaries(province.slug);
     const provisional = provisionalOf(list, province);
     if (provisional === undefined) {
       throw new Error(
