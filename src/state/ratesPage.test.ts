@@ -253,6 +253,37 @@ describe('the British Columbia rates page', () => {
     expect(causeChip('bc428').href).toBe('/forms/bc428/');
   });
 
+  it('links the cause forms that have a page in this build', () => {
+    for (const form of ['t1', 'bc428', 't2204', 'schedule8'] as const) {
+      expect(causeChip(form).href, form).toMatch(/^\/forms\/[a-z0-9-]+\/$/);
+    }
+  });
+
+  it('puts the last group heading at the salary the data says the top federal bracket starts at', () => {
+    const groups = ratesPageText['ca-bc']?.groups ?? [];
+    const last = groups[groups.length - 1]?.heading ?? '';
+    const top = bcSweep().facts['fed_bracket_5_salary'] ?? '';
+    const gap = subtractAmounts(last.replace(/\D/g, ''), top);
+    expect(compareAmounts(gap, '0')).toBeGreaterThanOrEqual(0);
+    expect(compareAmounts(gap, '1000')).toBeLessThan(0);
+  });
+
+  it('types no dollar figure or cents figure in a note or a table cell', () => {
+    const text = ratesPageText['ca-bc'];
+    const typed = [
+      ...(text?.intro ?? []).map((note) => note.text),
+      ...(text?.howToRead ?? []).map((note) => note.text),
+      ...(text?.tables ?? []).flatMap((table) => [
+        table.before?.text ?? '',
+        table.after?.text ?? '',
+        ...table.rows.flat(),
+      ]),
+    ];
+    for (const line of typed) {
+      expect(line).not.toMatch(/\$\d|\d cents/);
+    }
+  });
+
   it('keeps the tab title under 64 characters and the description under 160', () => {
     const text = ratesPageText['ca-bc'];
     expect(text?.title.length).toBeLessThan(64);
