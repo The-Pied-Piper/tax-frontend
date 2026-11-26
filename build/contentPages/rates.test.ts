@@ -24,7 +24,7 @@ describe('ratesPages', () => {
   });
 
   it('writes no page for a province with no sweep', () => {
-    expect(ratesPages(new Set(['ca-bc']))).toEqual([]);
+    expect(ratesPages(new Set(['ca-sk']))).toEqual([]);
   });
 
   it('puts the finding and chart first, then the salaries, notes and tables', () => {

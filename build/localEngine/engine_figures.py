@@ -336,6 +336,39 @@ def _newfoundland_rates_page_facts(year: int) -> dict[str, str]:
     return {**facts, **newfoundland}
 
 
+def _british_columbia_rates_page_facts(year: int) -> dict[str, str]:
+    """British Columbia's figures: the common ones and its own: its seven brackets (the form keeps them in two files, lines 2 to 8
+    and lines 9 to 15; the rates are kept to the four digits the form prints, 5.60% not 5.6%), basic amount, credit rate and tax
+    reduction. The reduction is worked out on net income, which for a salary only is taxable income, so its two ends are
+    converted to salary the same way as a bracket's threshold."""
+    facts = _common_rates_page_facts(year)
+    rate_places = Decimal("0.0001")
+    brackets = [
+        *_params(year, "ca_bc", "brackets_lines_2_to_8")["brackets"],
+        *_params(year, "ca_bc", "brackets_lines_9_to_15")["brackets"],
+    ]
+    bc = _bracket_facts(year, "bc", brackets)
+    for number in range(1, len(brackets) + 1):
+        bc[f"bc_bracket_{number}_rate"] = str(Decimal(bc[f"bc_bracket_{number}_rate"]).quantize(rate_places))
+    bc["bc_bpa"] = _params(year, "ca_bc", "basic_personal_amount")["amount"]
+    bc["bc_credit_rate"] = str(Decimal(_params(year, "ca_bc", "credit_rate")["rate"]).quantize(rate_places))
+    reduction_max = Decimal(_params(year, "ca_bc", "tax_reduction_basic")["amount"])
+    reduction_base = Decimal(_params(year, "ca_bc", "tax_reduction_base_amount")["amount"])
+    reduction_rate = Decimal(_params(year, "ca_bc", "tax_reduction_rate")["rate"])
+    bc["red_max"] = str(reduction_max)
+    bc["red_end"] = str((reduction_base + reduction_max / reduction_rate).quantize(Decimal("0.01")))
+    bc["red_base_salary"] = str(_salary_of_taxable(year, reduction_base))
+    # What the reduction takes per dollar of salary rather than of net income, in cents to one decimal, rounded once.
+    bc["red_rate_salary"] = str(
+        (reduction_rate * Decimal(_pension_deduction(year)["factor"])).quantize(
+            Decimal("0.001"), rounding=ROUND_HALF_UP
+        )
+    )
+    bc["shift_red_base"] = str(Decimal(bc["red_base_salary"]) - reduction_base)
+    bc["shift_bc_bracket_2"] = _shift(bc, "bc_bracket_2")
+    return {**facts, **bc}
+
+
 def _quebec_shift(exact_salary: Decimal, taxable: Decimal | str) -> str:
     """How much higher the salary is than the income at a form's threshold, to the cent."""
     return str((exact_salary - Decimal(taxable)).quantize(CENTS))
@@ -564,6 +597,7 @@ def _manitoba_rates_page_facts(year: int) -> dict[str, str]:
 RATES_PAGE_FACTS = {
     "CA-ON": _ontario_rates_page_facts,
     "CA-AB": _alberta_rates_page_facts,
+    "CA-BC": _british_columbia_rates_page_facts,
     "CA-MB": _manitoba_rates_page_facts,
     "CA-NL": _newfoundland_rates_page_facts,
     # Québec has its own pension plan, so it does not start from the common (Canada Pension Plan) figures.

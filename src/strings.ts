@@ -107,6 +107,7 @@ export const strings = {
       on428: 'Form ON428',
       on428a: 'Schedule ON428-A',
       ab428: 'Form AB428',
+      bc428: 'Form BC428',
       mb428: 'Form MB428',
       mb428a: 'Schedule MB428-A',
       nl428: 'Form NL428',
