@@ -502,6 +502,19 @@ describe('the Saskatchewan rates page', () => {
     }
   });
 
+  it('draws every change of the rate as a step: the next sample point after each edge is within $2 of it', () => {
+    const points = skSweep().points;
+    for (const [, moves] of skSweep().edges) {
+      const at = points.findIndex((point) => point[0] === `${moves}.00`);
+      expect(at, moves).toBeGreaterThanOrEqual(0);
+      const next = points[at + 1]?.[0] ?? '0';
+      expect(
+        compareAmounts(subtractAmounts(next, moves), '2'),
+        `${moves} then ${next}`,
+      ).toBeLessThanOrEqual(0);
+    }
+  });
+
   it('puts the last group heading at the salary the data says the top bracket starts at', () => {
     const groups = ratesPageText['ca-sk']?.groups ?? [];
     const last = groups[groups.length - 1]?.heading ?? '';
