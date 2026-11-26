@@ -2,6 +2,7 @@ import { formPageLink } from './formLinks';
 import type { ProvinceSweep } from './hubCharts';
 import { isFullSweep, noteWords } from './hubNotes';
 import { albertaRatesPage } from './ratesPageText/ca-ab';
+import { newfoundlandAndLabradorRatesPage } from './ratesPageText/ca-nl';
 import { ontarioRatesPage } from './ratesPageText/ca-on';
 import type { CauseForm, RatesPageText } from './ratesPageTypes';
 import { FOOTER_PROVINCE_SLUGS, type FooterProvinceSlug } from './siteLinks';
@@ -10,6 +11,7 @@ import { strings } from '../strings';
 /** The text of the rates page of each province that has one. Adding a province is one file in `ratesPageText/` and one entry here. */
 export const ratesPageText: Partial<Record<FooterProvinceSlug, RatesPageText>> =
   {
+    'ca-nl': newfoundlandAndLabradorRatesPage,
     'ca-on': ontarioRatesPage,
     'ca-ab': albertaRatesPage,
   };
@@ -27,6 +29,7 @@ const CAUSE_PAGE: Record<CauseForm, string> = {
   on428: 'on428',
   on428a: 'on428-a',
   ab428: 'ab428',
+  nl428: 'nl428',
   t2204: 't2204',
   schedule8: 'schedule-8',
 };

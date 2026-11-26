@@ -21,7 +21,7 @@ describe('ratesPageView', () => {
   });
 
   it('lists the provinces that have wording', () => {
-    expect(ratesProvinces()).toEqual(['ca-on', 'ca-ab']);
+    expect(ratesProvinces()).toEqual(['ca-on', 'ca-ab', 'ca-nl']);
   });
 
   it('fills every figure from the sweep and leaves no brace behind', () => {
