@@ -310,18 +310,6 @@ export const provinceHubs: ProvinceHubText[] = [
         description:
           'A small contribution on income other than employment income, above a set amount. A salary-only filer owes nothing, so it comes to $0.',
       },
-      {
-        id: 'work-chart-201',
-        name: 'Work Chart 201: Deduction for workers',
-        description:
-          'Takes 6% of your work income off your income, up to a yearly maximum.',
-      },
-      {
-        id: 'work-chart-401',
-        name: 'Work Chart 401: Income tax on taxable income',
-        description:
-          'Applies the Québec tax rates to your taxable income, bracket by bracket.',
-      },
     ],
   },
 ];
