@@ -24,7 +24,7 @@ type Props = {
   index: number;
   unit: MoneyUnit;
   onChange: (index: number) => void;
-  /** Called with the index when the slider is let go, or a typed salary is taken: the moment a list may re-sort. */
+  /** Called with the index when the slider is let go, or a typed salary is taken: the moment a change is announced. */
   onSettle?: (index: number) => void;
 };
 
