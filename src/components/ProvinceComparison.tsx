@@ -1,5 +1,9 @@
 import { useState, useSyncExternalStore } from 'react';
-import { displayMoney, displayRate, displayWholeMoney } from '../money/format';
+import {
+  displayMoney,
+  displayRateOneDecimal,
+  displayWholeMoney,
+} from '../money/format';
 import { PROVINCE_COMPARISON_SLOT_ID } from '../state/hubSlots';
 import { regularIndexes, type HubChartsData } from '../state/hubCharts';
 import {
@@ -71,7 +75,7 @@ function BarLink({ place, to, measure, value, salary }: BarLinkProps) {
 
 function figure(row: ComparisonRow, measure: Measure): string {
   return measure === 'averageRate'
-    ? displayRate(row.value, row.unit)
+    ? displayRateOneDecimal(row.value, row.unit)
     : displayMoney(row.value, 'annually', row.unit);
 }
 
@@ -165,7 +169,10 @@ export function ProvinceComparison({ data, province }: Props) {
         index={index}
         unit={current.unit}
         onChange={setChosen}
-        onSettle={setRanked}
+        onSettle={(at) => {
+          // Only a real move re-orders the list, so passing the slider by tab or click announces nothing.
+          if (at !== rankIndex) setRanked(at);
+        }}
       />
       <div
         role="group"

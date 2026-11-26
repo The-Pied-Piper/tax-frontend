@@ -84,6 +84,9 @@ export function SalarySlider({
           onPointerUp={(event) => {
             onSettle?.(event.currentTarget.valueAsNumber);
           }}
+          onPointerCancel={(event) => {
+            onSettle?.(event.currentTarget.valueAsNumber);
+          }}
           onKeyUp={(event) => {
             onSettle?.(event.currentTarget.valueAsNumber);
           }}

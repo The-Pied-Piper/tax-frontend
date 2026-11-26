@@ -135,7 +135,7 @@ describe('comparisonRows', () => {
     const rows = comparisonRows(sampleSweeps, at70000, 'averageRate');
     expect(rows.map((row) => [row.slug, row.value])).toEqual([
       ['ca-bc', '0.2236'],
-      ['ca-ab', '0.227'],
+      ['ca-ab', '0.2270'],
       ['ca-on', '0.2316'],
       ['ca-sk', '0.2476'],
       ['ca-mb', '0.2586'],
@@ -211,7 +211,7 @@ describe('allTied', () => {
 });
 
 describe('comparisonRows with the sweep’s seven-place rates', () => {
-  it('rounds an average rate once to four places, so the bars read the same as the page', () => {
+  it('keeps an average rate as the sweep wrote it, so it is rounded once, for display', () => {
     const [on] = sampleSweeps;
     if (!on) throw new Error('no sweep');
     const sweep = {
@@ -221,6 +221,6 @@ describe('comparisonRows with the sweep’s seven-place rates', () => {
       ] as typeof on.points,
     };
     const [row] = comparisonRows([sweep], 0, 'averageRate');
-    expect(row?.value).toBe('0.3436');
+    expect(row?.value).toBe('0.3436053');
   });
 });

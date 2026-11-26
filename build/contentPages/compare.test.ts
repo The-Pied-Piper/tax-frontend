@@ -41,7 +41,7 @@ async function writePage(swept: typeof sampleSweeps) {
     pages: [page, ...hubs],
     render: (spec) => renderContentPage(spec, { provinces: swept }),
     siteUrl,
-    dataBlocks: compareBlock(hubChartBlocks(swept)),
+    dataBlocks: compareBlock(page, hubChartBlocks(swept)),
   });
   return new DOMParser().parseFromString(
     readFileSync(join(dir, COMPARE_SLUG, 'index.html'), 'utf8'),
@@ -144,9 +144,18 @@ describe('the written compare page', () => {
   });
 });
 
+describe('the compare page with no data block', () => {
+  it('fails the build when its hubs have no block', () => {
+    const page = comparePage(sampleSweeps);
+    expect(() => compareBlock(page, new Map())).toThrow(
+      'Compare: compare-provinces has no hub data block',
+    );
+  });
+});
+
 describe('the compare page with no sweep', () => {
   it('is not written at all', () => {
     expect(comparePage([])).toBeNull();
-    expect(compareBlock(new Map()).size).toBe(0);
+    expect(compareBlock(null, new Map()).size).toBe(0);
   });
 });

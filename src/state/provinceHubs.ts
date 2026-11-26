@@ -134,6 +134,25 @@ function ratesLinkSection(
   };
 }
 
+/** The section that points a hub at the compare page: one line and a link, worded with the year of the sweeps. */
+function compareLinkSection(year: number): ContentSection {
+  return {
+    heading: strings.hubCharts.comparison.heading,
+    id: 'compare-provinces',
+    card: true,
+    blocks: [
+      paragraph(
+        strings.compareLink.lead,
+        {
+          label: strings.comparePage.heading(year),
+          href: contentPath(COMPARE_SLUG),
+        },
+        strings.compareLink.rest,
+      ),
+    ],
+  };
+}
+
 /** The hub text of each province the footer lists. Adding a province is one entry here. */
 export const provinceHubs: ProvinceHubText[] = [
   {
@@ -409,23 +428,7 @@ export function hubPage(
       // The comparison of provinces lives on its own page; the hub keeps one line and a link.
       ...(!withCharts || compareYear === null || !published.has(COMPARE_SLUG)
         ? []
-        : [
-            {
-              heading: strings.hubCharts.comparison.heading,
-              id: 'compare-provinces',
-              card: true as const,
-              blocks: [
-                paragraph(
-                  strings.compareLink.lead,
-                  {
-                    label: strings.comparePage.heading(compareYear),
-                    href: contentPath(COMPARE_SLUG),
-                  },
-                  strings.compareLink.rest,
-                ),
-              ],
-            },
-          ]),
+        : [compareLinkSection(compareYear)]),
       {
         heading: 'The forms we follow',
         blocks: [

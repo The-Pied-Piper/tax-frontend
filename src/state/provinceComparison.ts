@@ -1,4 +1,3 @@
-import { roundToFourDecimals } from '../money/amounts';
 import type { MoneyUnit } from '../money/format';
 import { toPlainSalary, type Separators } from '../money/salaryInput';
 import {
@@ -78,7 +77,7 @@ function figureOf(
 ): string {
   const at = regularIndexes(province.points)[index];
   const value = province.points[at ?? -1]?.[COLUMN[measure]] ?? '0';
-  return measure === 'averageRate' ? roundToFourDecimals(value) : value;
+  return value;
 }
 
 /** True when no province has any income tax at one regular salary (the `index`th), so none ranks above another. */

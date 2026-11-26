@@ -70,12 +70,18 @@ export function comparePage(
   };
 }
 
-/** The data block of the compare page: the block a hub carries (it holds every province's sweep). */
+/**
+ * The data block of the compare page: the block a hub carries (it holds every province's sweep). No page, no block;
+ * a page whose hubs have no block fails the build.
+ */
 export function compareBlock(
+  page: ContentPageSpec | null,
   hubBlocks: ReadonlyMap<string, string>,
 ): Map<string, string> {
+  if (page === null) return new Map<string, string>();
   const block = [...hubBlocks.values()][0];
-  return block === undefined
-    ? new Map<string, string>()
-    : new Map([[COMPARE_SLUG, block]]);
+  if (block === undefined) {
+    throw new Error(`Compare: ${page.slug} has no hub data block`);
+  }
+  return new Map([[page.slug, block]]);
 }

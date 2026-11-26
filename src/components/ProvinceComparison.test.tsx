@@ -149,12 +149,12 @@ describe('the measure toggle', () => {
     show();
     fireEvent.click(measure(copy.measures.averageRate));
     expect(barTexts()).toEqual([
-      `${names['ca-bc']}22.36%`,
+      `${names['ca-bc']}22.4%`,
       `${names['ca-ab']}22.7%`,
-      `${names['ca-on']}23.16%`,
-      `${names['ca-sk']}24.76%`,
-      `${names['ca-mb']}25.86%`,
-      `${names['ca-nl']}26.14%`,
+      `${names['ca-on']}23.2%`,
+      `${names['ca-sk']}24.8%`,
+      `${names['ca-mb']}25.9%`,
+      `${names['ca-nl']}26.1%`,
     ]);
     expect(screen.getByText(copy.measureNotes.averageRate)).toBeInTheDocument();
   });
@@ -400,6 +400,14 @@ describe('the order of the list', () => {
     expect(barTexts().map((text) => text.slice(0, 5))).toEqual(first);
     fireEvent.pointerUp(slider());
     expect(barTexts().map((text) => text.slice(0, 5))).not.toEqual(first);
+  });
+
+  it('announces nothing when the slider is passed by without moving it', () => {
+    show();
+    fireEvent.pointerUp(slider());
+    fireEvent.keyUp(slider(), { key: 'Tab' });
+    fireEvent.blur(slider());
+    expect(screen.getByRole('status')).toBeEmptyDOMElement();
   });
 
   it('says so when every province has the same income tax', () => {

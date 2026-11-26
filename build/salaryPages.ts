@@ -215,7 +215,7 @@ export function salaryPages(
           dataBlocks: new Map([
             ...hubBlocks,
             ...ratesBlocks(rates, hubBlocks),
-            ...compareBlock(hubBlocks),
+            ...compareBlock(compare, hubBlocks),
           ]),
         });
         const notFound = await generateNotFoundPage({
