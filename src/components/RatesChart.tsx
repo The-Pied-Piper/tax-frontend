@@ -170,16 +170,16 @@ export function RatesChart({ sweep, place }: Props) {
 
   return (
     <div className={styles.card}>
-      {activePoint ? (
-        <p className={styles.readout} aria-live="polite">
+      <p className={styles.hint}>{t.hint}</p>
+      {activePoint && (
+        // The figures hover beside the dot; this keeps them read aloud when the marker moves.
+        <p className={styles.visuallyHidden} aria-live="polite">
           {t.readout(
             displayWholeMoney(activePoint[0], 'annually', unit),
             displayRateOneDecimal(activePoint[SWEEP_COLUMN.marginal], rateUnit),
             displayRateOneDecimal(activePoint[SWEEP_COLUMN.average], rateUnit),
           )}
         </p>
-      ) : (
-        <p className={styles.hint}>{t.hint}</p>
       )}
       <LineChart
         points={series}
@@ -200,7 +200,16 @@ export function RatesChart({ sweep, place }: Props) {
         activeIndex={active}
         onActiveChange={setMarkerPick}
         scaleValues={scaleValues}
-        markerLabel={false}
+        markerLines={(index) => {
+          const point = visible[index];
+          return point
+            ? [
+                displayWholeMoney(point[0], 'annually', unit),
+                `${t.marginal}: ${displayRateOneDecimal(point[SWEEP_COLUMN.marginal], rateUnit)}`,
+                `${t.average}: ${displayRateOneDecimal(point[SWEEP_COLUMN.average], rateUnit)}`,
+              ]
+            : [];
+        }}
         height={onPhone ? PHONE_HEIGHT : undefined}
       />
       {bandNote !== undefined && <p className={styles.bandNote}>{bandNote}</p>}

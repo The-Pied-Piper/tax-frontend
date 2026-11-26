@@ -2,6 +2,7 @@ import { fireEvent, render, screen } from '@testing-library/react';
 import { renderToString } from 'react-dom/server';
 import { LineChart, type ChartPoint } from './LineChart';
 import { displayMoney } from '../money/format';
+import { compareAmounts } from '../money/scale';
 
 const unit = {
   placement: 'before' as const,
@@ -266,6 +267,34 @@ describe('LineChart', () => {
     expect(
       without.container.querySelector('text[class*="markerLabel"]'),
     ).toBeNull();
+  });
+
+  it('writes the lines from markerLines beside the marker, one line each, instead of the single figure', () => {
+    const { container } = render(
+      chart({
+        activeIndex: 1,
+        markerLines: (index) => [`Point ${String(index)}`, 'Second', 'Third'],
+      }),
+    );
+    const label = container.querySelector('text[class*="markerLabel"]');
+    expect(label).not.toBeNull();
+    expect(
+      [...(label?.querySelectorAll('tspan') ?? [])].map((t) => t.textContent),
+    ).toEqual(['Point 1', 'Second', 'Third']);
+  });
+
+  it('keeps a multi-line label inside the drawing when the dot is at the top of the plot', () => {
+    const { container } = render(
+      chart({
+        activeIndex: 0,
+        markerLines: () => ['One', 'Two', 'Three'],
+      }),
+    );
+    const label = container.querySelector('text[class*="markerLabel"]');
+    // The first line sits (0.6 + 2 * 1.25) em = about 34 units above y; it must stay below the top edge (10).
+    expect(
+      compareAmounts(label?.getAttribute('y') ?? '0', '44'),
+    ).toBeGreaterThanOrEqual(0);
   });
 
   it('draws a taller figure when asked', () => {
