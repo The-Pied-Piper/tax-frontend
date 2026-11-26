@@ -69,14 +69,6 @@
   font: 11px var(--font-body);
 }
 
-.markerLines {
-  /* Several lines can cross the drawn lines, so each letter gets a halo in the card's colour. */
-  paint-order: stroke;
-  stroke: var(--surface);
-  stroke-width: 3px;
-  stroke-linejoin: round;
-}
-
 .hit {
   fill: transparent;
 }

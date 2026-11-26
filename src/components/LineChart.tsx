@@ -73,8 +73,12 @@ const TOP = 10;
 const BOTTOM = 44;
 const PLOT_RIGHT = WIDTH - RIGHT;
 // The marker's figure moves to the left of the dot past 60% of the width.
-const LABEL_TOP = scalePosition('22', '0', '1', 0, 1);
 const LABEL_FLIPS_AFTER = scalePosition('3', '0', '5', 0, WIDTH);
+
+/** The line height of a multi-line marker label, in em, and its font size in drawing units. */
+const LINE_EM = 1.25;
+/** One extra line of a label is this many drawing units taller (1.25 em of 11). */
+const LINE_STEP = 14;
 
 // One chart of a hub: a figure with the lines and
 // the shared marker. Controlled and presentational: no fetch, no storage, no
@@ -142,7 +146,22 @@ export function LineChart({
   const dotY = y(
     (active === undefined ? undefined : points[active]?.values[0]) ?? '0',
   );
-  const markerY = isBeyond(LABEL_TOP, dotY) ? LABEL_TOP : dotY;
+  // The label's lines: one figure, or the caller's lines (the block ends just above the dot's height).
+  const labelLines =
+    active === undefined
+      ? []
+      : markerLines
+        ? markerLines(active)
+        : [formatValue(points[active]?.values[0] ?? '0')];
+  // Never above the top of the plot; a taller block starts lower, beside the dot, so its first line stays inside.
+  const labelTop = scalePosition(
+    String(22 + Math.max(0, labelLines.length - 1) * LINE_STEP),
+    '0',
+    '1',
+    0,
+    1,
+  );
+  const labelY = isBeyond(labelTop, dotY) ? labelTop : dotY;
 
   const choose = (event: PointerEvent<SVGRectElement>) => {
     const box = svgRef.current?.getBoundingClientRect();
@@ -297,39 +316,24 @@ export function LineChart({
                 />
               );
             })}
-            {markerLabel && markerLines === undefined && (
+            {markerLabel && (
               <text
                 className={styles.markerLabel}
                 x={activeX}
-                y={markerY}
-                dx={isBeyond(activeX, LABEL_FLIPS_AFTER) ? -9 : 9}
-                dy="-0.6em"
-                textAnchor={
-                  isBeyond(activeX, LABEL_FLIPS_AFTER) ? 'end' : 'start'
-                }
-              >
-                {formatValue(points[active]?.values[0] ?? '0')}
-              </text>
-            )}
-            {markerLabel && markerLines !== undefined && (
-              <text
-                className={[styles.markerLabel, styles.markerLines].join(' ')}
-                x={activeX}
-                y={markerY}
+                y={labelY}
                 dx={isBeyond(activeX, LABEL_FLIPS_AFTER) ? -9 : 9}
                 textAnchor={
                   isBeyond(activeX, LABEL_FLIPS_AFTER) ? 'end' : 'start'
                 }
               >
-                {markerLines(active).map((line, at) => (
+                {labelLines.map((line, at) => (
                   <tspan
-                    key={line}
+                    key={`${String(at)}${line}`}
                     x={activeX}
-                    // The block ends just above the dot's height: the last line is the first one's dy of -0.6em.
                     dy={
                       at === 0
-                        ? `${String(-0.6 - (markerLines(active).length - 1) * 1.25)}em`
-                        : '1.25em'
+                        ? `${String(-0.6 - (labelLines.length - 1) * LINE_EM)}em`
+                        : `${String(LINE_EM)}em`
                     }
                   >
                     {line}

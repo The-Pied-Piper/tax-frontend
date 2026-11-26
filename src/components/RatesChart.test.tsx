@@ -81,9 +81,13 @@ describe('RatesChart', () => {
     expect(lines[0]).toBe('$70,000');
     expect(lines[1]).toMatch(/^Marginal rate: \d+(\.\d)?%$/);
     expect(lines[2]).toMatch(/^Average rate: \d+(\.\d)?%$/);
-    expect(
-      screen.getByText(/^At \$70,000: marginal rate/).closest('[aria-live]'),
-    ).not.toBeNull();
+    const announcements = document.querySelectorAll('[aria-live]');
+    expect(announcements).toHaveLength(1);
+    expect(announcements[0]?.getAttribute('aria-live')).toBe('polite');
+    expect(announcements[0]?.className).toMatch(/visuallyHidden/);
+    expect(announcements[0]?.textContent).toMatch(
+      /^At \$70,000: marginal rate/,
+    );
   });
 
   it('ignores a salary in the address that is not a point of the sweep', () => {
