@@ -54,10 +54,16 @@ type Props = {
   /** False leaves the figure beside the marker out, for a card that shows it in a readout of its own. */
   markerLabel?: boolean;
   /**
-   * Lines of text for the label beside the marker, top to bottom, when one figure is not enough (a chart of two
-   * rates). Replaces the single figure from formatValue; markerLabel false still leaves the label out.
+   * Lines of text for the label beside each series' dot at a point, one entry per series, when one figure is
+   * not enough (a chart of two rates: each rate hovers by its own dot). Replaces the single figure from
+   * formatValue; markerLabel false still leaves the labels out.
    */
-  markerLines?: (index: number) => readonly string[];
+  markerLabels?: (index: number) => readonly (readonly string[])[];
+  /**
+   * The text that hovers beside the salary axis at the marker's position (the salary of the picked point), in the
+   * same style as the labels beside the dots. Left out when not given.
+   */
+  markerAxisLabel?: (index: number) => string;
   /** The drawing's height in its own units (its width is fixed); taller fits a narrow screen. */
   height?: number;
 };
@@ -73,6 +79,11 @@ const TOP = 10;
 const BOTTOM = 44;
 const PLOT_RIGHT = WIDTH - RIGHT;
 // The marker's figure moves to the left of the dot past 60% of the width.
+// The axis label is centred on the marker, but starts at it near the left edge and ends at it near the right.
+const AXIS_LABEL_STARTS_BEFORE = scalePosition('1', '0', '5', 0, WIDTH);
+const AXIS_LABEL_ENDS_AFTER = scalePosition('4', '0', '5', 0, WIDTH);
+// Its baseline is this far below the axis line: between the salary labels and the axis title.
+const AXIS_LABEL_DROP = 27;
 const LABEL_FLIPS_AFTER = scalePosition('3', '0', '5', 0, WIDTH);
 
 /** The line height of a multi-line marker label, in em, and its font size in drawing units. */
@@ -100,7 +111,8 @@ export function LineChart({
   onActiveChange,
   scaleValues,
   markerLabel = true,
-  markerLines,
+  markerLabels,
+  markerAxisLabel,
   height = DEFAULT_HEIGHT,
 }: Props) {
   const plotBottom = height - BOTTOM;
@@ -146,22 +158,34 @@ export function LineChart({
   const dotY = y(
     (active === undefined ? undefined : points[active]?.values[0]) ?? '0',
   );
-  // The label's lines: one figure, or the caller's lines (the block ends just above the dot's height).
-  const labelLines =
-    active === undefined
-      ? []
-      : markerLines
-        ? markerLines(active)
-        : [formatValue(points[active]?.values[0] ?? '0')];
-  // Never above the top of the plot; a taller block starts lower, beside the dot, so its first line stays inside.
-  const labelTop = scalePosition(
-    String(22 + Math.max(0, labelLines.length - 1) * LINE_STEP),
-    '0',
-    '1',
-    0,
-    1,
-  );
-  const labelY = isBeyond(labelTop, dotY) ? labelTop : dotY;
+  // Each label sits beside its own dot. The topmost dot's label ends just above it and the others start just
+  // below theirs, so two close dots never share a place; each is kept inside the plot.
+  const labels = (() => {
+    if (active === undefined) return [];
+    const values = points[active]?.values ?? [];
+    const lines = markerLabels
+      ? markerLabels(active)
+      : [[formatValue(values[0] ?? '0')]];
+    const dots = lines.map((_, index) => y(values[index] ?? '0'));
+    const top = dots.reduce(
+      (best, dot, index) => (isBeyond(dots[best] ?? dot, dot) ? index : best),
+      0,
+    );
+    return lines.map((block, index) => {
+      const dot = dots[index] ?? dotY;
+      const extra = Math.max(0, block.length - 1) * LINE_STEP;
+      const below = markerLabels !== undefined && index !== top;
+      const limit = scalePosition(
+        String(below ? plotBottom - 4 - extra : 22 + extra),
+        '0',
+        '1',
+        0,
+        1,
+      );
+      const outside = below ? isBeyond(dot, limit) : isBeyond(limit, dot);
+      return { block, below, at: outside ? limit : dot };
+    });
+  })();
 
   const choose = (event: PointerEvent<SVGRectElement>) => {
     const box = svgRef.current?.getBoundingClientRect();
@@ -316,29 +340,49 @@ export function LineChart({
                 />
               );
             })}
-            {markerLabel && (
+            {markerLabel &&
+              labels.map(({ block, below, at }, label) => (
+                <text
+                  key={series[label]?.id ?? String(label)}
+                  className={styles.markerLabel}
+                  x={activeX}
+                  y={at}
+                  dx={isBeyond(activeX, LABEL_FLIPS_AFTER) ? -9 : 9}
+                  textAnchor={
+                    isBeyond(activeX, LABEL_FLIPS_AFTER) ? 'end' : 'start'
+                  }
+                >
+                  {block.map((line, row) => (
+                    <tspan
+                      key={`${String(row)}${line}`}
+                      x={activeX}
+                      dy={
+                        row > 0
+                          ? `${String(LINE_EM)}em`
+                          : below
+                            ? '1.1em'
+                            : `${String(-0.6 - (block.length - 1) * LINE_EM)}em`
+                      }
+                    >
+                      {line}
+                    </tspan>
+                  ))}
+                </text>
+              ))}
+            {markerLabel && markerAxisLabel && (
               <text
                 className={styles.markerLabel}
                 x={activeX}
-                y={labelY}
-                dx={isBeyond(activeX, LABEL_FLIPS_AFTER) ? -9 : 9}
+                y={plotBottom + AXIS_LABEL_DROP}
                 textAnchor={
-                  isBeyond(activeX, LABEL_FLIPS_AFTER) ? 'end' : 'start'
+                  isBeyond(AXIS_LABEL_STARTS_BEFORE, activeX)
+                    ? 'start'
+                    : isBeyond(activeX, AXIS_LABEL_ENDS_AFTER)
+                      ? 'end'
+                      : 'middle'
                 }
               >
-                {labelLines.map((line, at) => (
-                  <tspan
-                    key={`${String(at)}${line}`}
-                    x={activeX}
-                    dy={
-                      at === 0
-                        ? `${String(-0.6 - (labelLines.length - 1) * LINE_EM)}em`
-                        : `${String(LINE_EM)}em`
-                    }
-                  >
-                    {line}
-                  </tspan>
-                ))}
+                {markerAxisLabel(active)}
               </text>
             )}
           </g>
