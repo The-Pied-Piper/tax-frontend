@@ -81,7 +81,6 @@ export const PROVINCE_EXTRA_SALARIES: Readonly<
     '201127',
     '201128',
     '259608',
-    '259609',
     '259610',
     '401126',
     '401127',

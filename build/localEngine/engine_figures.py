@@ -198,14 +198,18 @@ def _salary_to_taxable(year: int, taxable: Decimal) -> Decimal:
     return _salary_of_taxable(year, taxable) - 1
 
 
-def _bracket_facts(year: int, prefix: str, brackets: list[dict]) -> dict[str, str]:
-    """For each bracket (numbered from 1): its taxable income, its rate, and the first whole salary at that taxable income."""
+def _bracket_facts(
+    year: int, prefix: str, brackets: list[dict], salary_of=None
+) -> dict[str, str]:
+    """For each bracket (numbered from 1): its taxable income, its rate, and the salary at that taxable income: the first
+    whole salary at or above it, or the whole salary `salary_of` gives."""
+    salary_of = salary_of or _salary_of_taxable
     facts: dict[str, str] = {}
     for number, bracket in enumerate(brackets, start=1):
         taxable = Decimal(bracket["from"])
         facts[f"{prefix}_bracket_{number}_ti"] = str(taxable)
         facts[f"{prefix}_bracket_{number}_rate"] = bracket["rate"]
-        facts[f"{prefix}_bracket_{number}_salary"] = str(_salary_of_taxable(year, taxable))
+        facts[f"{prefix}_bracket_{number}_salary"] = str(salary_of(year, taxable))
     return facts
 
 
@@ -315,12 +319,12 @@ def _nearest_salary_of_taxable(year: int, taxable: Decimal) -> Decimal:
 def _manitoba_rates_page_facts(year: int, facts: dict[str, str]) -> dict[str, str]:
     """Manitoba's own figures: its three brackets (each with the salary where it starts), the basic personal amount
     that shrinks above a net income of $200,000, and the Family Tax Benefit."""
-    manitoba: dict[str, str] = {}
-    for number, bracket in enumerate(_params(year, "ca_mb", "brackets_lines_2_to_8")["brackets"], start=1):
-        taxable = Decimal(bracket["from"])
-        manitoba[f"mb_bracket_{number}_ti"] = str(taxable)
-        manitoba[f"mb_bracket_{number}_rate"] = bracket["rate"]
-        manitoba[f"mb_bracket_{number}_salary"] = str(_nearest_salary_of_taxable(year, taxable))
+    manitoba = _bracket_facts(
+        year,
+        "mb",
+        _params(year, "ca_mb", "brackets_lines_2_to_8")["brackets"],
+        _nearest_salary_of_taxable,
+    )
     credit_rate = Decimal(_params(year, "ca_mb", "credit_rate")["rate"])
     manitoba["mb_credit_rate"] = str(credit_rate)
     bpa = Decimal(_params(year, "ca_mb", "basic_personal_amount")["amount"])
@@ -346,9 +350,7 @@ def _manitoba_rates_page_facts(year: int, facts: dict[str, str]) -> dict[str, st
     manitoba["shift_ftb"] = str(
         Decimal(manitoba["ftb_end_salary"]) - gone.quantize(Decimal(1), rounding=ROUND_HALF_UP)
     )
-    manitoba["shift_mb_bracket_2"] = str(
-        Decimal(manitoba["mb_bracket_2_salary"]) - Decimal(manitoba["mb_bracket_2_ti"])
-    )
+    manitoba["shift_mb_bracket_2"] = _shift(manitoba, "mb_bracket_2")
     # Manitoba tax lost per extra dollar of net income while the benefit shrinks, as a rate to a whole cent.
     manitoba["ftb_tax_effect"] = str((credit_rate * benefit_rate).quantize(Decimal("0.01"), rounding=ROUND_HALF_UP))
     return manitoba
