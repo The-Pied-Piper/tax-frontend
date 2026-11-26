@@ -2,7 +2,18 @@ import type { Note } from './hubNoteTypes';
 
 /** The forms a rates page note can name as its cause; each is the id of a form page. */
 export type CauseForm =
-  't1' | 'on428' | 'on428a' | 'ab428' | 'nl428' | 't2204' | 'schedule8';
+  | 't1'
+  | 'on428'
+  | 'on428a'
+  | 'ab428'
+  | 'nl428'
+  | 't2204'
+  | 'schedule8'
+  | 'tp1'
+  | 'scheduleU'
+  | 'scheduleK'
+  | 'workChart201'
+  | 'workChart401';
 
 /** One note of a rates page: its words with `{name}` where a figure goes, its figures by spec (see `hubNotes.ts`), and the forms that cause what it describes. */
 export type RatesNote = Note & { forms: CauseForm[] };
