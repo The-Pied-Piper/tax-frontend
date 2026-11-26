@@ -21,7 +21,7 @@ describe('ratesPageView', () => {
   });
 
   it('lists the provinces that have wording', () => {
-    expect(ratesProvinces()).toEqual(['ca-on']);
+    expect(ratesProvinces()).toEqual(['ca-on', 'ca-ab']);
   });
 
   it('fills every figure from the sweep and leaves no brace behind', () => {
@@ -55,7 +55,7 @@ describe('ratesPageView', () => {
   });
 
   it('draws nothing for a province with no wording', () => {
-    expect(ratesPageView('ca-ab', sweep())).toBeNull();
+    expect(ratesPageView('ca-bc', sweep())).toBeNull();
   });
 
   it('names a cause form for every note and links the forms that have a page', () => {
@@ -117,6 +117,140 @@ describe('ratesPageView', () => {
 
   it('keeps the tab title under 64 characters and the description under 160', () => {
     const text = ratesPageText['ca-on'];
+    expect(text?.title.length).toBeLessThan(64);
+    expect(text?.description.length).toBeLessThan(160);
+  });
+});
+
+describe('the Alberta rates page', () => {
+  const albertaSweep = () => {
+    const found = fullHubCharts(['ca-ab']).provinces[0];
+    if (!found) throw new Error('no sweep');
+    return found;
+  };
+  const view = () => {
+    const found = ratesPageView('ca-ab', albertaSweep());
+    if (!found) throw new Error('no view');
+    return found;
+  };
+  const everyWord = () => [
+    ...view().intro,
+    ...view().howToRead,
+    ...view().groups.flatMap((group) => group.notes.map((note) => note.words)),
+    ...view().tables.flatMap((table) => [
+      table.before ?? '',
+      table.after ?? '',
+      ...table.rows.flat(),
+    ]),
+  ];
+
+  it('fills every figure from the sweep and leaves no brace behind', () => {
+    expect(everyWord().length).toBeGreaterThan(20);
+    for (const words of everyWord()) {
+      expect(words).not.toMatch(/[{}]|undefined|NaN/);
+    }
+  });
+
+  it('opens with the figures the CRA review gives', () => {
+    expect(view().intro[0]).toContain(
+      'from about 7.6% once you pay into the Canada Pension Plan (from $3,500) to 48.0% above $371,347.',
+    );
+    expect(view().intro[0]).toContain('to 40.3% at $500,000');
+  });
+
+  it('reads the top rate at the top bracket, and what you keep from it', () => {
+    const last = view().groups[view().groups.length - 1];
+    const top = last?.notes[last.notes.length - 1]?.words ?? '';
+    expect(top).toContain('straight at 48.0%');
+    expect(top).toContain('rate, 15%, starts at a taxable income of $370,220');
+    expect(top).toContain('you keep 52.0%');
+  });
+
+  it('rounds each computed rate once, from the unrounded value', () => {
+    const words = view().groups.flatMap((group) =>
+      group.notes.map((note) => note.words),
+    );
+    // 0.343474 is 34.3%, not 34.4% from a four-place 0.3435; 0.4034898 is 40.3%.
+    expect(words.join(' ')).toContain('the rate is 34.3%');
+    expect(view().intro[0]).not.toContain('40.4%');
+  });
+
+  it('takes every bracket salary from the data and agrees with the engine edges to the dollar', () => {
+    const data = albertaSweep();
+    const salaryOf = (name: string) => data.facts[name] ?? '';
+    for (const name of [
+      'fed_bracket_2_salary',
+      'fed_bracket_3_salary',
+      'fed_bracket_4_salary',
+      'fed_bracket_5_salary',
+      'ab_bracket_2_salary',
+      'ab_bracket_3_salary',
+      'ab_bracket_4_salary',
+      'ab_bracket_5_salary',
+      'ab_bracket_6_salary',
+    ]) {
+      const salary = salaryOf(name);
+      // The edge where the rate changes: the last salary at the old rate is just below, the new rate has settled by `settled`.
+      const edge = data.edges.find(
+        (found) =>
+          compareAmounts(found[1], salary) <= 0 &&
+          compareAmounts(salary, found[2]) <= 0,
+      );
+      expect(edge, name).toBeDefined();
+    }
+  });
+
+  it('has a sample point on each side of every change of the rate', () => {
+    const salaries = new Set(albertaSweep().points.map((point) => point[0]));
+    for (const [, moves, settled] of albertaSweep().edges) {
+      expect(salaries.has(`${moves}.00`), moves).toBe(true);
+      expect(salaries.has(`${settled}.00`), settled).toBe(true);
+    }
+  });
+
+  it('puts the last group heading at the salary the federal top bracket starts at', () => {
+    const groups = ratesPageText['ca-ab']?.groups ?? [];
+    const heading = (groups[groups.length - 1]?.heading ?? '').replace(
+      /\D/g,
+      '',
+    );
+    const top = albertaSweep().facts['fed_bracket_5_salary'] ?? '';
+    const gap = subtractAmounts(heading, top);
+    expect(compareAmounts(gap, '0')).toBeGreaterThanOrEqual(0);
+    expect(compareAmounts(gap, '1000')).toBeLessThan(0);
+  });
+
+  it('names a cause form for every note, and links the Alberta form page', () => {
+    for (const group of ratesPageText['ca-ab']?.groups ?? []) {
+      for (const note of group.notes) {
+        expect(note.forms.length, note.text).toBeGreaterThan(0);
+      }
+    }
+    expect(causeChip('ab428').label).toBe('Form AB428');
+    expect(causeChip('ab428').href).toBe('/forms/ab428/');
+  });
+
+  it('types no dollar figure or cents figure in a note or a table cell', () => {
+    const text = ratesPageText['ca-ab'];
+    const typed = [
+      ...(text?.intro ?? []).map((note) => note.text),
+      ...(text?.howToRead ?? []).map((note) => note.text),
+      ...(text?.groups ?? []).flatMap((group) =>
+        group.notes.map((note) => note.text),
+      ),
+      ...(text?.tables ?? []).flatMap((table) => [
+        table.before?.text ?? '',
+        table.after?.text ?? '',
+        ...table.rows.flat(),
+      ]),
+    ];
+    for (const line of typed) {
+      expect(line).not.toMatch(/\$\d|\d cents/);
+    }
+  });
+
+  it('keeps the tab title under 64 characters and the description under 160', () => {
+    const text = ratesPageText['ca-ab'];
     expect(text?.title.length).toBeLessThan(64);
     expect(text?.description.length).toBeLessThan(160);
   });
