@@ -121,12 +121,8 @@
 .fill {
   display: block;
   height: 100%;
-  background: var(--edge);
-  border-radius: 4px 0 0 4px;
-}
-
-.mine .fill {
   background: var(--accent);
+  border-radius: 4px 0 0 4px;
 }
 
 .figure {

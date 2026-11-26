@@ -82,7 +82,7 @@ export const strings = {
       // The line after the measure notes, linked to the methodology page.
       creditsNote: 'Credits paid to you when you file are not counted.',
       caption: (salary: string, year: number) =>
-        `Bars are for a ${salary} salary in ${String(year)}, lowest income tax first. Provinces with the same income tax are listed in the usual order and share a place.`,
+        `Bars are for a ${salary} salary in ${String(year)}, lowest income tax first. Provinces with the same income tax are listed in the usual order.`,
       // In place of the caption when no province has any income tax at the chosen salary.
       tied: 'No province has any income tax at this salary, so they are not ranked.',
       // After the three measure notes.

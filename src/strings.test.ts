@@ -63,7 +63,7 @@ describe('the province comparison copy', () => {
       'Credits paid to you when you file are not counted.',
     );
     expect(copy.caption('$70,000', 2026)).toBe(
-      'Bars are for a $70,000 salary in 2026, lowest income tax first. Provinces with the same income tax are listed in the usual order and share a place.',
+      'Bars are for a $70,000 salary in 2026, lowest income tax first. Provinces with the same income tax are listed in the usual order.',
     );
     expect(copy.tied).toBe(
       'No province has any income tax at this salary, so they are not ranked.',
