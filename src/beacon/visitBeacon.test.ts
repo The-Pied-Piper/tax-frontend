@@ -26,6 +26,7 @@ describe('sendVisitBeacon', () => {
     expect(init).toMatchObject({
       credentials: 'omit',
       cache: 'no-store',
+      referrerPolicy: 'no-referrer',
       keepalive: true,
     });
   });

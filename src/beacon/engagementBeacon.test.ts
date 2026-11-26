@@ -16,6 +16,9 @@ function click(id: string, isTrusted = true) {
 function key(isTrusted = true) {
   fire('keydown', { key: 'a' }, isTrusted);
 }
+function hands(type = 'wheel') {
+  fire(type, {});
+}
 function scroll(y: number) {
   vi.stubGlobal('scrollY', y);
   fire('scroll', {});
@@ -71,6 +74,7 @@ describe('watchEngagement', () => {
     expect(fetchMock.mock.calls[0]?.[1]).toMatchObject({
       credentials: 'omit',
       cache: 'no-store',
+      referrerPolicy: 'no-referrer',
       keepalive: true,
     });
   });
@@ -89,14 +93,25 @@ describe('watchEngagement', () => {
 
   it('counts a scroll only after about one screen', () => {
     start('rates');
+    hands();
     scroll(300);
     expect(fetchMock).not.toHaveBeenCalled();
     scroll(800);
     expect(lastUrl()).toBe('/e.txt?p=rates&t=scroll');
   });
 
+  it('does not count a scroll the browser did itself, such as a restored position', () => {
+    start('rates');
+    scroll(2000);
+    expect(fetchMock).not.toHaveBeenCalled();
+    hands('wheel');
+    scroll(2100);
+    expect(lastUrl()).toBe('/e.txt?p=rates&t=scroll');
+  });
+
   it('is one request per page view: a scroll then a Calculate press sends only the scroll', () => {
     start('salary');
+    hands('touchstart');
     scroll(900);
     click('go');
     key();
