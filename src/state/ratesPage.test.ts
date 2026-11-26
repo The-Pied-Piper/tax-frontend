@@ -158,6 +158,22 @@ describe('the Alberta rates page', () => {
     expect(view().intro[0]).toContain('to 40.3% at $500,000');
   });
 
+  it('says where tax starts in the first row of each bracket table', () => {
+    const [federal, alberta] = view().tables;
+    expect(federal?.rows[0]).toEqual([
+      '$0',
+      '14%',
+      'tax starts at about $19,201',
+      '20.5%',
+    ]);
+    expect(alberta?.rows[0]).toEqual([
+      '$0',
+      '8%',
+      'tax starts at about $24,412',
+      '27.9%',
+    ]);
+  });
+
   it('reads the top rate at the top bracket, and what you keep from it', () => {
     const last = view().groups[view().groups.length - 1];
     const top = last?.notes[last.notes.length - 1]?.words ?? '';
@@ -200,11 +216,16 @@ describe('the Alberta rates page', () => {
     }
   });
 
-  it('has a sample point on each side of every change of the rate', () => {
-    const salaries = new Set(albertaSweep().points.map((point) => point[0]));
-    for (const [, moves, settled] of albertaSweep().edges) {
-      expect(salaries.has(`${moves}.00`), moves).toBe(true);
-      expect(salaries.has(`${settled}.00`), settled).toBe(true);
+  it('draws every change of the rate as a step: the next sample point after each edge is within $2 of it', () => {
+    const points = albertaSweep().points;
+    for (const [, moves] of albertaSweep().edges) {
+      const at = points.findIndex((point) => point[0] === `${moves}.00`);
+      expect(at, moves).toBeGreaterThanOrEqual(0);
+      const next = points[at + 1]?.[0] ?? '0';
+      expect(
+        compareAmounts(subtractAmounts(next, moves), '2'),
+        `${moves} then ${next}`,
+      ).toBeLessThanOrEqual(0);
     }
   });
 

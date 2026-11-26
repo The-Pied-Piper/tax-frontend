@@ -171,12 +171,17 @@ function cells(rows: string[][]): {
   return { rows, figures };
 }
 
+/** The first row says where tax starts in salary and the rate there, since its taxable income is $0. */
 const brackets = (kind: 'fed' | 'ab', count: number) =>
   Array.from({ length: count }, (_, at) => at + 1).map((n) => [
     `{${kind}${n.toString()}Ti}`,
     `{${kind}${n.toString()}}`,
-    n === 1 ? '' : `{${kind}${n.toString()}Sal}`,
-    n === 1 ? '' : `{${kind}${n.toString()}After}`,
+    n === 1
+      ? `tax starts at about {${kind === 'fed' ? 'fedStartSalary' : 'abStartSalary'}}`
+      : `{${kind}${n.toString()}Sal}`,
+    n === 1
+      ? `{${kind === 'fed' ? 'fedFirstRate' : 'abStartRate'}}`
+      : `{${kind}${n.toString()}After}`,
   ]);
 
 const bracketHead = [
