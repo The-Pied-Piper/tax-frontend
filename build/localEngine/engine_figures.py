@@ -45,8 +45,8 @@ from pathlib import Path
 import yaml
 
 from tax_engine import build_take_home
-from tax_engine.application.models.take_home import TakeHomeResult, UnitDescription
 from tax_engine.adapters.outbound.yaml_support import YamlNode
+from tax_engine.application.models.take_home import TakeHomeResult, UnitDescription
 from tax_engine.application.models.take_home_request import TakeHomeRequest
 from tax_engine.domain.jurisdiction_code import JurisdictionCode
 from tax_engine.domain.parameters.rounding import RoundTo

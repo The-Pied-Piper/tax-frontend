@@ -11,9 +11,9 @@ import { strings } from '../strings';
 /** The text of the rates page of each province that has one. Adding a province is one file in `ratesPageText/` and one entry here. */
 export const ratesPageText: Partial<Record<FooterProvinceSlug, RatesPageText>> =
   {
-    'ca-nl': newfoundlandAndLabradorRatesPage,
     'ca-on': ontarioRatesPage,
     'ca-ab': albertaRatesPage,
+    'ca-nl': newfoundlandAndLabradorRatesPage,
   };
 
 /** The provinces that have a rates page, in the footer's order. */
