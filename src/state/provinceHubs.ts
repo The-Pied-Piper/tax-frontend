@@ -8,6 +8,7 @@ import {
 } from './contentPages';
 import type { HubChartId } from './hubCharts';
 import {
+  COMPARE_SLUG,
   contentPath,
   formSlug,
   HOME_PATH,
@@ -128,6 +129,25 @@ function ratesLinkSection(
           href: contentPath(ratesSlug(province)),
         },
         strings.ratesLink.hubRest,
+      ),
+    ],
+  };
+}
+
+/** The section that points a hub at the compare page: one line and a link, worded with the year of the sweeps. */
+function compareLinkSection(year: number): ContentSection {
+  return {
+    heading: strings.hubCharts.comparison.heading,
+    id: 'compare-provinces',
+    card: true,
+    blocks: [
+      paragraph(
+        strings.compareLink.lead,
+        {
+          label: strings.comparePage.heading(year),
+          href: contentPath(COMPARE_SLUG),
+        },
+        strings.compareLink.rest,
       ),
     ],
   };
@@ -323,7 +343,8 @@ function listItem(form: HubForm, published: ReadonlySet<string>): ListItem {
  * listed without a link), `otherHubs` the links to the other provinces and
  * `withCharts` whether the hub has a sweep: its take-home chart then sits in the
  * section that explains the take-home. Two more sections follow, one for each rate chart, or, when `published`
- * holds the province's rates page, one section with a line and a link to it.
+ * holds the province's rates page, one section with a line and a link to it. `compareYear` is the year of the
+ * sweeps: when the compare page is published, the hub has one line and a link to it.
  */
 export function hubPage(
   text: ProvinceHubText,
@@ -332,6 +353,7 @@ export function hubPage(
   published: ReadonlySet<string>,
   otherHubs: ContentLink[],
   withCharts = false,
+  compareYear: number | null = null,
 ): ContentPageSpec {
   const own = text.words?.(name);
   // A hub with no salary pages must not promise salary examples.
@@ -403,17 +425,10 @@ export function hubPage(
               chartSection('averageRate', text, name),
               chartSection('marginalRate', text, name),
             ]),
-      ...(!withCharts
+      // The comparison of provinces lives on its own page; the hub keeps one line and a link.
+      ...(!withCharts || compareYear === null || !published.has(COMPARE_SLUG)
         ? []
-        : [
-            {
-              heading: strings.hubCharts.comparison.heading,
-              blocks: [
-                paragraph(strings.hubCharts.comparison.intro),
-                { kind: 'provinceComparison' as const, province: text.slug },
-              ],
-            },
-          ]),
+        : [compareLinkSection(compareYear)]),
       {
         heading: 'The forms we follow',
         blocks: [

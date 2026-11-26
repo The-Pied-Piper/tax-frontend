@@ -21,12 +21,14 @@ import { contentPages, type ContentPageSpec } from '../src/state/contentPages';
 import { notFoundPage } from '../src/state/notFoundPage';
 import { ratesProvinces } from '../src/state/ratesPage';
 import {
+  COMPARE_SLUG,
   contentSlugOfFile,
   MOVED_PAGES,
   PROVINCES_WITHOUT_SALARY_PAGES,
   ratesSlug,
 } from '../src/state/siteLinks';
 import { hubChartBlocks, hubPages } from './contentPages/hubs';
+import { compareBlock, comparePage } from './contentPages/compare';
 import { ratesBlocks, ratesPages } from './contentPages/rates';
 import { withSalaryLinks } from './contentPages/forms';
 import type { HubChartsData } from '../src/state/hubCharts';
@@ -170,6 +172,8 @@ export function salaryPages(
           published: new Set([
             ...contentPages.map((p) => p.slug),
             ...ratesSlugs,
+            // Every province whose salary pages are written has a sweep, so the compare page is written when any is.
+            ...(provinces.length > 0 ? [COMPARE_SLUG] : []),
           ]),
           template,
           render: renderSalaryApp,
@@ -178,29 +182,41 @@ export function salaryPages(
         const sweeps = provinceSweeps(figures.sweeps, built, list);
         await rewriteHome(outDir, renderSiteFooter);
         const rates = ratesPages(new Set(sweeps.map((sweep) => sweep.slug)));
-        // A hub links to the rates page this build writes, so the pages come first.
+        const compare = comparePage(sweeps);
+        // A hub links to the rates page and the compare page this build writes, so the pages come first.
         const hubs = hubPages(
           built,
           provinces,
           new Set([
             ...contentPages.map((page) => page.slug),
             ...rates.map((page) => page.slug),
+            ...(compare ? [compare.slug] : []),
           ]),
           PROVINCES_WITHOUT_SALARY_PAGES,
           new Set(sweeps.map((sweep) => sweep.slug)),
+          sweeps[0]?.year ?? null,
         );
         const hubBlocks = hubChartBlocks(sweeps);
         const content = await generateContentPages({
           outDir,
           template: await readFile(contentFile, 'utf8'),
-          pages: [...withSalaryLinks(contentPages, built), ...hubs, ...rates],
+          pages: [
+            ...withSalaryLinks(contentPages, built),
+            ...hubs,
+            ...rates,
+            ...(compare ? [compare] : []),
+          ],
           render: (spec) =>
             renderContentPage(
               spec,
               sweeps.length > 0 ? { provinces: sweeps } : undefined,
             ),
           siteUrl,
-          dataBlocks: new Map([...hubBlocks, ...ratesBlocks(rates, hubBlocks)]),
+          dataBlocks: new Map([
+            ...hubBlocks,
+            ...ratesBlocks(rates, hubBlocks),
+            ...compareBlock(compare, hubBlocks),
+          ]),
         });
         const notFound = await generateNotFoundPage({
           outDir,

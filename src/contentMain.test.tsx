@@ -1,20 +1,16 @@
 import { act } from '@testing-library/react';
 import { dataBlock } from '../build/salaryPages/pageHtml';
 import { renderContentPage } from '../build/salaryPages/prerender';
-import { hubPages } from '../build/contentPages/hubs';
-import { provinces } from '../build/salaryPages/provinces';
+import { comparePage } from '../build/contentPages/compare';
 import { PROVINCE_COMPARISON_SLOT_ID } from './state/hubSlots';
 import { HUB_CHARTS_DATA_ID } from './state/hubSlots';
 import { sampleHubCharts, sampleSweeps } from './test/comparisonData';
 
-// The content entry mounts the comparison into the slot of a pre-built hub.
+// The content entry mounts the comparison into the slot of the pre-built compare page.
 // What it mounts must equal what the build wrote there, so the page does not
 // change when the script runs.
-const swept = new Set(sampleSweeps.map((sweep) => sweep.slug));
-const hub = hubPages([], provinces, new Set(), [], swept).find(
-  (page) => page.slug === 'ca-ab',
-);
-if (!hub) throw new Error('no hub for ca-ab');
+const compare = comparePage(sampleSweeps);
+if (!compare) throw new Error('no compare page');
 
 async function loadEntry() {
   vi.resetModules();
@@ -51,16 +47,16 @@ afterEach(() => {
   document.body.innerHTML = '';
 });
 
-describe('the content entry on a province hub', () => {
+describe('the content entry on the compare page', () => {
   beforeEach(() => {
     document.body.innerHTML =
-      renderContentPage(hub, sampleHubCharts) +
+      renderContentPage(compare, sampleHubCharts) +
       dataBlock(HUB_CHARTS_DATA_ID, sampleHubCharts);
   });
 
-  it('writes the slot with the hub province and the full comparison, figures included', () => {
-    expect(slot().dataset.province).toBe('ca-ab');
-    expect(slot().querySelectorAll('table tbody tr')).toHaveLength(6);
+  it('writes the slot with no province and the full comparison, figures included', () => {
+    expect(slot().dataset.province).toBeUndefined();
+    expect(slot().querySelectorAll('table tbody tr')).toHaveLength(8);
     expect(slot().textContent).toContain('$54,348.15');
   });
 
@@ -99,9 +95,9 @@ describe('the content entry on a page with no comparison', () => {
     expect(slot().innerHTML).toBe('');
   });
 
-  it('mounts nothing when the slot has no province', async () => {
+  it('mounts nothing when the slot names a province the site does not list', async () => {
     document.body.innerHTML =
-      '<div id="province-comparison"></div>' +
+      '<div id="province-comparison" data-province="ca-xx"></div>' +
       dataBlock(HUB_CHARTS_DATA_ID, sampleHubCharts);
     await loadEntry();
     expect(slot().innerHTML).toBe('');

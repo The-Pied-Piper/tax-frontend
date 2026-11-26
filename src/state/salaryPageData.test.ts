@@ -147,6 +147,26 @@ describe('parseSalaryPageData links (#81)', () => {
     ).not.toBeNull();
   });
 
+  it('accepts a compare link, a null one, and refuses a bad one', () => {
+    const compare = {
+      label: 'Take-home pay by province',
+      href: '/compare-provinces/?salary=70000',
+    };
+    expect(parse({ ...valid, links: { ...links, compare } })).toEqual({
+      ...valid,
+      links: { ...links, compare },
+    });
+    expect(
+      parse({ ...valid, links: { ...links, compare: null } }),
+    ).not.toBeNull();
+    expect(
+      parse({
+        ...valid,
+        links: { ...links, compare: { label: 'x', href: 'https://x.test/' } },
+      }),
+    ).toBeNull();
+  });
+
   it.each([
     ['not a link', 'x'],
     ['off-site', { label: 'x', href: 'https://x.test/' }],

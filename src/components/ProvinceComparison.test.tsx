@@ -22,7 +22,7 @@ const box = () => screen.getByRole('textbox', { name: copy.typedLabel });
 const measure = (name: string) => screen.getByRole('radio', { name });
 
 describe('ProvinceComparison at the start', () => {
-  it('shows take-home pay at $70,000, highest first, every province once', () => {
+  it('shows take-home pay at $70,000, lowest income tax first, every province once', () => {
     show();
     expect(barTexts()).toEqual([
       `${names['ca-bc']}$54,348.15`,
@@ -45,16 +45,16 @@ describe('ProvinceComparison at the start', () => {
     show();
     expect(
       screen.getByRole('group', {
-        name: 'Bar chart: Take-home pay for a $70,000 salary, by province. The same figures are in the table below.',
+        name: 'Bar chart: Take-home pay for a $70,000 salary, by province. These figures, and every other salary, are in the table under “Show the figures as a table”.',
       }),
     ).toBeInTheDocument();
   });
 
-  it('says what the bars are, the year and that they run from highest to lowest', () => {
+  it('says what the bars are, the year and that they run from the lowest income tax', () => {
     show();
     expect(
       screen.getByText(
-        'Bars are for a $70,000 salary in 2026, from highest to lowest.',
+        'Bars are for a $70,000 salary in 2026, lowest income tax first. Provinces with the same income tax are listed in the usual order and share a place.',
       ),
     ).toBeInTheDocument();
     expect(screen.getByText(copy.measureNotes.takeHome)).toBeInTheDocument();
@@ -98,8 +98,8 @@ describe('the highlighted province and the links', () => {
     const current = bars().find((bar) => bar.getAttribute('aria-current'));
     expect(current).toHaveTextContent(names['ca-ab']);
     expect(within(current as HTMLElement).queryByRole('link')).toBeNull();
-    const links = screen
-      .getAllByRole('link')
+    const links = bars()
+      .flatMap((bar) => within(bar).queryAllByRole('link'))
       .map((link) => [link.textContent, link.getAttribute('href')]);
     expect(links).toEqual([
       [names['ca-bc'], '/ca-bc/'],
@@ -108,6 +108,12 @@ describe('the highlighted province and the links', () => {
       [names['ca-mb'], '/ca-mb/'],
       [names['ca-nl'], '/ca-nl/'],
     ]);
+    // The credits line is the one link besides the bars', twice: under the notes and in the fold.
+    expect(
+      screen
+        .getAllByRole('link', { name: copy.creditsNote })
+        .map((link) => link.getAttribute('href')),
+    ).toEqual(['/methodology/', '/methodology/']);
   });
 
   it('draws nothing when the hub province has no sweep', () => {
@@ -119,22 +125,22 @@ describe('the highlighted province and the links', () => {
 });
 
 describe('the measure toggle', () => {
-  it('re-sorts and re-words the bars for income tax', () => {
+  it('re-words the bars for income tax and keeps the order', () => {
     show();
     fireEvent.click(measure(copy.measures.incomeTax));
     expect(barTexts()).toEqual([
-      `${names['ca-nl']}$13,217.18`,
-      `${names['ca-mb']}$13,020.86`,
-      `${names['ca-sk']}$12,250.87`,
-      `${names['ca-on']}$11,133.93`,
-      `${names['ca-ab']}$10,812.98`,
       `${names['ca-bc']}$10,572.03`,
+      `${names['ca-ab']}$10,812.98`,
+      `${names['ca-on']}$11,133.93`,
+      `${names['ca-sk']}$12,250.87`,
+      `${names['ca-mb']}$13,020.86`,
+      `${names['ca-nl']}$13,217.18`,
     ]);
     expect(screen.getByText(copy.measureNotes.incomeTax)).toBeInTheDocument();
     expect(screen.queryByText(copy.measureNotes.takeHome)).toBeNull();
     expect(
       screen.getByRole('group', {
-        name: 'Bar chart: Income tax for a $70,000 salary, by province. The same figures are in the table below.',
+        name: 'Bar chart: Income tax for a $70,000 salary, by province. These figures, and every other salary, are in the table under “Show the figures as a table”.',
       }),
     ).toBeInTheDocument();
   });
@@ -143,12 +149,12 @@ describe('the measure toggle', () => {
     show();
     fireEvent.click(measure(copy.measures.averageRate));
     expect(barTexts()).toEqual([
-      `${names['ca-nl']}26.14%`,
-      `${names['ca-mb']}25.86%`,
-      `${names['ca-sk']}24.76%`,
-      `${names['ca-on']}23.16%`,
+      `${names['ca-bc']}22.4%`,
       `${names['ca-ab']}22.7%`,
-      `${names['ca-bc']}22.36%`,
+      `${names['ca-on']}23.2%`,
+      `${names['ca-sk']}24.8%`,
+      `${names['ca-mb']}25.9%`,
+      `${names['ca-nl']}26.1%`,
     ]);
     expect(screen.getByText(copy.measureNotes.averageRate)).toBeInTheDocument();
   });
@@ -167,9 +173,10 @@ describe('the salary controls', () => {
   it('moves every bar to the chosen salary: at $30,000 Ontario passes Alberta', () => {
     show();
     fireEvent.change(slider(), { target: { value: '2' } });
+    fireEvent.pointerUp(slider());
     expect(
       screen.getByText(
-        'Bars are for a $30,000 salary in 2026, from highest to lowest.',
+        'Bars are for a $30,000 salary in 2026, lowest income tax first. Provinces with the same income tax are listed in the usual order and share a place.',
       ),
     ).toBeInTheDocument();
     expect(barTexts()).toEqual([
@@ -190,7 +197,7 @@ describe('the salary controls', () => {
     expect(slider()).toHaveAttribute('aria-valuetext', '$150,000 a year');
     expect(
       screen.getByText(
-        'Bars are for a $150,000 salary in 2026, from highest to lowest.',
+        'Bars are for a $150,000 salary in 2026, lowest income tax first. Provinces with the same income tax are listed in the usual order and share a place.',
       ),
     ).toBeInTheDocument();
   });
@@ -238,36 +245,186 @@ describe('the bars', () => {
 });
 
 describe('the table of the figures', () => {
-  it('lists every province and the measure in a table inside a closed fold', () => {
+  const table = () => {
+    const fold = screen.getByText(copy.tableToggle).closest('details');
+    return within(fold as HTMLElement).getByRole('table');
+  };
+
+  it('sits in a closed fold, written into the markup, with the credits line linked', () => {
     show();
     const fold = screen.getByText(copy.tableToggle).closest('details');
     expect(fold).not.toHaveAttribute('open');
-    const table = within(fold as HTMLElement).getByRole('table');
+    expect(table()).toBeInTheDocument();
     expect(
-      within(table)
-        .getAllByRole('row')
-        .map((row) => row.textContent),
-    ).toEqual([
-      `${copy.tableProvince}${copy.measures.takeHome}`,
-      `${names['ca-bc']}$54,348.15`,
-      `${names['ca-ab']}$54,107.20`,
-      `${names['ca-on']}$53,786.25`,
-      `${names['ca-sk']}$52,669.31`,
-      `${names['ca-mb']}$51,899.32`,
-      `${names['ca-nl']}$51,703.00`,
-    ]);
+      within(fold as HTMLElement).getByRole('link', {
+        name: copy.creditsNote,
+      }),
+    ).toHaveAttribute('href', '/methodology/');
   });
 
-  it('follows the measure and the salary', () => {
+  it('has a row for every salary and three columns for every province', () => {
     show();
-    fireEvent.click(measure(copy.measures.averageRate));
-    const table = screen.getByRole('table');
+    const rows = within(table()).getAllByRole('row');
+    // Two heading rows, then one row for each regular salary of the sample.
+    expect(rows).toHaveLength(2 + 8);
     expect(
-      within(table).getByRole('columnheader', {
-        name: copy.measures.averageRate,
-      }),
-    ).toBeInTheDocument();
-    expect(within(table).getByText('23.16%')).toBeInTheDocument();
+      within(rows[0] as HTMLElement)
+        .getAllByRole('columnheader')
+        .map((cell) => cell.textContent),
+    ).toEqual([
+      copy.table.salaryHeader,
+      ...sampleSweeps.map((sweep) => names[sweep.slug as FooterProvinceSlug]),
+    ]);
+    expect(
+      within(rows[1] as HTMLElement)
+        .getAllByRole('columnheader')
+        .map((cell) => cell.textContent),
+    ).toEqual(
+      sampleSweeps.flatMap(() => [
+        copy.table.takeHomeHeader,
+        copy.table.incomeTaxHeader,
+        copy.table.averageRateHeader,
+      ]),
+    );
+    expect(
+      within(table()).getByRole('columnheader', { name: names['ca-ab'] }),
+    ).toHaveAttribute('colspan', '3');
+  });
+
+  it('gives each row the whole-dollar figures and one-decimal rate of every province', () => {
+    show();
+    const row = within(table())
+      .getByRole('rowheader', { name: '$70,000' })
+      .closest('tr') as HTMLElement;
+    const cells = within(row)
+      .getAllByRole('cell')
+      .map((cell) => cell.textContent);
+    // Ontario is the first province of the sample sweep.
+    expect(cells.slice(0, 3)).toEqual(['$53,786', '$11,134', '23.2%']);
+    expect(cells).toHaveLength(sampleSweeps.length * 3);
+  });
+
+  it('shows the same table whatever the measure and the salary', () => {
+    show();
+    const before = table().textContent;
+    fireEvent.click(measure(copy.measures.averageRate));
+    fireEvent.change(slider(), { target: { value: '2' } });
+    expect(table().textContent).toBe(before);
+  });
+
+  it('can be scrolled with the keyboard and says so to a screen reader', () => {
+    show();
+    const region = screen.getByRole('region', {
+      name: copy.table.scrollLabel,
+    });
+    expect(region).toHaveAttribute('tabindex', '0');
+    expect(screen.getByText(copy.table.scrollHint)).toBeInTheDocument();
+  });
+});
+
+describe('the bars link to the page of the salary shown', () => {
+  const withPages = {
+    provinces: sampleSweeps.map((sweep) => ({
+      ...sweep,
+      salaryPages: sweep.slug === 'ca-bc' ? ['70000', '30000'] : [],
+    })),
+  };
+
+  it("goes to the province's salary page where there is one, and to its hub where there is none", () => {
+    render(<ProvinceComparison data={withPages} />);
+    const hrefs = () =>
+      bars().map((bar) => within(bar).getByRole('link').getAttribute('href'));
+    expect(
+      within(bars()[0] as HTMLElement)
+        .getByRole('link')
+        .getAttribute('aria-label'),
+    ).toBe(
+      'British Columbia: Take-home pay $54,348.15 for a $70,000 salary. Open the British Columbia page for this salary.',
+    );
+    expect(
+      within(bars()[1] as HTMLElement)
+        .getByRole('link')
+        .getAttribute('aria-label'),
+    ).toBe(
+      'Alberta: Take-home pay $54,107.20 for a $70,000 salary. Open the Alberta hub page.',
+    );
+    expect(hrefs()).toEqual([
+      '/ca-bc/70000/',
+      '/ca-ab/',
+      '/ca-on/',
+      '/ca-sk/',
+      '/ca-mb/',
+      '/ca-nl/',
+    ]);
+    fireEvent.change(slider(), { target: { value: '2' } });
+    fireEvent.pointerUp(slider());
+    expect(hrefs()).toContain('/ca-bc/30000/');
+    fireEvent.change(slider(), { target: { value: '4' } });
+    fireEvent.pointerUp(slider());
+    expect(hrefs()).toContain('/ca-bc/');
+  });
+});
+
+describe('a comparison that belongs to no province', () => {
+  it('highlights none and links every bar to its hub', () => {
+    render(<ProvinceComparison data={sampleHubCharts} />);
+    expect(bars().some((bar) => bar.hasAttribute('aria-current'))).toBe(false);
+    expect(
+      bars().flatMap((bar) => within(bar).queryAllByRole('link')),
+    ).toHaveLength(sampleSweeps.length);
+  });
+});
+
+describe('the order of the list', () => {
+  it('says the list is ordered by income tax, and which province can sit out of order', () => {
+    show();
+    expect(screen.getByText(copy.rankingNote)).toBeInTheDocument();
+  });
+
+  it('announces the new order once the slider is let go, and nothing before', () => {
+    show();
+    expect(screen.getByRole('status')).toBeEmptyDOMElement();
+    fireEvent.change(slider(), { target: { value: '2' } });
+    expect(screen.getByRole('status')).toBeEmptyDOMElement();
+    fireEvent.pointerUp(slider());
+    expect(screen.getByRole('status')).toHaveTextContent(
+      copy.reordered('$30,000'),
+    );
+  });
+
+  it('does not move while the slider is dragged, only when it is let go', () => {
+    show();
+    const first = barTexts().map((text) => text.slice(0, 5));
+    // At $30,000 Ontario pays less tax than Alberta, but the list holds its order until release.
+    fireEvent.change(slider(), { target: { value: '2' } });
+    expect(barTexts().map((text) => text.slice(0, 5))).toEqual(first);
+    fireEvent.pointerUp(slider());
+    expect(barTexts().map((text) => text.slice(0, 5))).not.toEqual(first);
+  });
+
+  it('announces nothing when the slider is passed by without moving it', () => {
+    show();
+    fireEvent.pointerUp(slider());
+    fireEvent.keyUp(slider(), { key: 'Tab' });
+    fireEvent.blur(slider());
+    expect(screen.getByRole('status')).toBeEmptyDOMElement();
+  });
+
+  it('says so when every province has the same income tax', () => {
+    show();
+    fireEvent.change(slider(), { target: { value: '0' } });
+    fireEvent.pointerUp(slider());
+    expect(screen.getByText(copy.tied)).toBeInTheDocument();
+    expect(screen.getByRole('status')).toHaveTextContent(
+      copy.reorderedTied('$1,000'),
+    );
+  });
+
+  it('opens at the salary the address names', () => {
+    window.history.pushState({}, '', '/compare-provinces/?salary=30000');
+    show();
+    expect(slider()).toHaveAttribute('aria-valuetext', '$30,000 a year');
+    window.history.pushState({}, '', '/');
   });
 });
 

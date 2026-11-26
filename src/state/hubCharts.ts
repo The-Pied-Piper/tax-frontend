@@ -330,6 +330,8 @@ export type ProvinceSweep = {
   edges: SweepEdge[];
   /** Engine parameters and band figures the notes quote, by name: the Ontario surtax thresholds, a reduction's start, and so on. */
   facts: Record<string, string>;
+  /** The salaries (whole dollars as text, "70000") of the province's own salary pages, so a bar can link to the page of the salary shown. Absent where the build wrote none. */
+  salaryPages?: string[];
 };
 
 /** What a hub's data block holds: the sweep of every province the build served. */
@@ -340,6 +342,8 @@ const DECIMAL = /^-?(0|[1-9]\d*)(\.\d+)?$/;
 const MAX_FIGURE_LENGTH = 30;
 /** A slug as the site writes it. */
 const SLUG = /^[a-z0-9-]+$/;
+/** A salary page's salary: whole dollars. */
+const SALARY_PAGE = /^[1-9]\d{0,6}$/;
 /** A fact's name as the engine step writes it. */
 const SLUG_NAME = /^[a-z0-9_]+$/;
 
@@ -396,7 +400,12 @@ function isProvinceSweep(value: unknown): boolean {
     value.points.every(isPoint) &&
     Array.isArray(value.edges) &&
     value.edges.every(isEdge) &&
-    isFacts(value.facts)
+    isFacts(value.facts) &&
+    (value.salaryPages === undefined ||
+      (Array.isArray(value.salaryPages) &&
+        value.salaryPages.every(
+          (salary) => typeof salary === 'string' && SALARY_PAGE.test(salary),
+        )))
   );
 }
 

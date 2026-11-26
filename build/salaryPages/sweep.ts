@@ -15,7 +15,7 @@ export function provinceSweeps(
   built: BuiltProvince[],
   list: ListJurisdictionsResponse,
 ): ProvinceSweep[] {
-  return built.map(({ province }) => {
+  return built.map(({ province, salaries: pageSalaries }) => {
     const sweep = sweeps[province.code];
     if (!sweep) {
       throw new Error(`Salary sweep: no figures for ${province.code}`);
@@ -57,6 +57,7 @@ export function provinceSweeps(
       provisional,
       unit,
       rateUnit,
+      salaryPages: pageSalaries,
       points: sweep.points.map((point) => [
         point.salary,
         point.take_home,

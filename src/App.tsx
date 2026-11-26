@@ -135,6 +135,8 @@ export function App({ client, registry, initial, clock }: Props) {
             <LearnMore
               links={page.built.links.learnMore}
               rates={page.built.links.rates ?? null}
+              compare={page.built.links.compare ?? null}
+              unit={page.built.unit}
             />
           </>
         )}

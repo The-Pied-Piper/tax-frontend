@@ -2,6 +2,7 @@ import {
   CONTENT_TITLE_LIMIT,
   DESCRIPTION_LIMIT,
 } from '../../build/salaryPages/limits';
+import { COMPARE_SLUG } from './siteLinks';
 import { strings } from '../strings';
 import type {
   ContentBlock,
@@ -420,12 +421,60 @@ describe('the province comparison', () => {
   const make = (withComparison: boolean) =>
     hubPage(on, 'Ontario', salaryLinks, new Set(), others, withComparison);
 
-  it('adds one section with the approved heading and intro, and the hub slug', () => {
-    const found = section(make(true), strings.hubCharts.comparison.heading);
+  it('adds one card with one line and a link to the compare page, when the build writes that page', () => {
+    const page = hubPage(
+      on,
+      'Ontario',
+      salaryLinks,
+      new Set([COMPARE_SLUG]),
+      others,
+      true,
+      2026,
+    );
+    const found = section(page, strings.hubCharts.comparison.heading);
+    expect(found?.id).toBe('compare-provinces');
+    expect(found?.card).toBe(true);
     expect(found?.blocks).toEqual([
-      paragraph(strings.hubCharts.comparison.intro),
-      { kind: 'provinceComparison', province: 'ca-on' },
+      paragraph(
+        strings.compareLink.lead,
+        {
+          label: 'Take-home pay by province, 2026',
+          href: '/compare-provinces/',
+        },
+        strings.compareLink.rest,
+      ),
     ]);
+    // The comparison itself is no longer on the hub.
+    expect(
+      page.sections
+        .flatMap((s) => s.blocks)
+        .some((block) => block.kind === 'provinceComparison'),
+    ).toBe(false);
+  });
+
+  it('has no such line when the page is not written, or the hub has no sweep', () => {
+    const none = hubPage(
+      on,
+      'Ontario',
+      salaryLinks,
+      new Set(),
+      others,
+      true,
+      2026,
+    );
+    expect(section(none, strings.hubCharts.comparison.heading)).toBeUndefined();
+    const noSweep = hubPage(
+      on,
+      'Ontario',
+      salaryLinks,
+      new Set([COMPARE_SLUG]),
+      others,
+      false,
+      2026,
+    );
+    expect(
+      section(noSweep, strings.hubCharts.comparison.heading),
+    ).toBeUndefined();
   });
 
   it('is left out with the chart sections when asked not to add them, and the rest of the page is the same', () => {
@@ -505,9 +554,10 @@ describe('the province comparison', () => {
       textOf('ca-on'),
       'Ontario',
       salaryLinks,
-      new Set(['ca-on/tax-rates']),
+      new Set(['ca-on/tax-rates', COMPARE_SLUG]),
       others,
       true,
+      2026,
     );
     const t = strings.hubCharts.charts;
     expect(section(page, t.averageRate.title)).toBeUndefined();
@@ -523,7 +573,7 @@ describe('the province comparison', () => {
         strings.ratesLink.hubRest,
       ),
     ]);
-    // The take-home chart and the comparison stay on the hub.
+    // The take-home chart and the line to the compare page stay on the hub.
     expect(
       page.sections
         .flatMap((s) => s.blocks)

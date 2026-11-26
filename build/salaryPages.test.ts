@@ -177,6 +177,8 @@ describe('salaryPages closeBundle', () => {
         'ca-mb/tax-rates',
         'ca-nl/tax-rates',
         'ca-qc/tax-rates',
+        // The compare page is written whenever a province has salary pages.
+        'compare-provinces',
       ]),
     );
     expect((published as Set<string>).has('methodology')).toBe(true);
@@ -254,6 +256,7 @@ describe('salaryPages closeBundle', () => {
       '/ca-on/tax-rates/',
       '/ca-qc/',
       '/ca-sk/',
+      '/compare-provinces/',
       '/forms/ab428/',
       '/forms/bc428/',
       '/forms/bc479/',
@@ -280,7 +283,7 @@ describe('salaryPages closeBundle', () => {
 
     const sitemap = await readFile(join(root, 'dist', 'sitemap.xml'), 'utf8');
     const urls = sitemap.match(/<url>[\s\S]*?<\/url>/g) ?? [];
-    expect(urls).toHaveLength(33);
+    expect(urls).toHaveLength(34);
     for (const url of urls) {
       expect(url).toMatch(/<lastmod>\d{4}-\d{2}-\d{2}<\/lastmod>/);
     }

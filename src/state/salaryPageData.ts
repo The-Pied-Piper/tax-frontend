@@ -72,7 +72,10 @@ function isLinks(value: unknown): boolean {
     value.learnMore.every(isPageLink) &&
     (value.rates === undefined ||
       value.rates === null ||
-      isPageLink(value.rates))
+      isPageLink(value.rates)) &&
+    (value.compare === undefined ||
+      value.compare === null ||
+      isPageLink(value.compare))
   );
 }
 

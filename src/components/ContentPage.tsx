@@ -277,7 +277,8 @@ function ContentBlockView({
       // The slot the browser mounts the same component into; a hub with no
       // sweep draws nothing.
       return hubCharts?.provinces.some(
-        (sweep) => sweep.slug === block.province,
+        (sweep) =>
+          block.province === undefined || sweep.slug === block.province,
       ) ? (
         <div id={PROVINCE_COMPARISON_SLOT_ID} data-province={block.province}>
           <ProvinceComparison data={hubCharts} province={block.province} />

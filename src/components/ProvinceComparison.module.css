@@ -181,6 +181,46 @@
   color: var(--muted);
 }
 
+.table caption {
+  text-align: left;
+  color: var(--muted);
+  margin-bottom: 6px;
+}
+
+/* The table is for search engines first: plain and wide. A province's three columns are set off by a line, and the salary stays in view when it scrolls sideways. */
+.table .group3 {
+  text-align: center;
+}
+
+.table .group3,
+.table .first3 {
+  border-left: 1px solid var(--edge);
+  white-space: nowrap;
+}
+
+.table td,
+.table thead th {
+  white-space: nowrap;
+}
+
+.table tbody th {
+  position: sticky;
+  left: 0;
+  background: var(--bg);
+}
+
+.tableWrap {
+  max-height: 520px;
+  overflow: auto;
+}
+
+.scrollHint {
+  display: none;
+  margin: 8px 0 0;
+  font-size: 13px;
+  color: var(--muted);
+}
+
 .comparison .note {
   margin: 10px 0 0;
   font-size: 13px;
@@ -193,6 +233,10 @@
 }
 
 @media (max-width: 480px) {
+  .scrollHint {
+    display: block;
+  }
+
   .row,
   .mine {
     grid-template-columns: 1fr 112px;
@@ -221,4 +265,14 @@
   .phone {
     display: inline;
   }
+}
+
+/* Visually hidden, but read aloud: the announcement after the list is re-ordered. */
+.srOnly {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
 }

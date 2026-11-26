@@ -67,7 +67,13 @@ const comparisonSlot = document.getElementById(PROVINCE_COMPARISON_SLOT_ID);
 const comparisonProvince = FOOTER_PROVINCE_SLUGS.find(
   (slug) => slug === comparisonSlot?.dataset.province,
 );
-if (comparisonSlot && chartsData && comparisonProvince) {
+// The compare page has no province: its slot has no data-province and its bars highlight none.
+if (
+  comparisonSlot &&
+  chartsData &&
+  (comparisonProvince !== undefined ||
+    comparisonSlot.dataset.province === undefined)
+) {
   hydrateRoot(
     comparisonSlot,
     <StrictMode>

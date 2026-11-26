@@ -5,7 +5,7 @@ import {
   type ContentBlock,
   type ContentPageSpec,
 } from '../../src/state/contentPages';
-import { formSlug } from '../../src/state/siteLinks';
+import { COMPARE_SLUG, formSlug } from '../../src/state/siteLinks';
 import { strings } from '../../src/strings';
 import { xland } from '../../src/test/generatedSite';
 import { compute70000 } from '../../src/test/syntheticPages';
@@ -221,32 +221,50 @@ describe('hubPages', () => {
   });
 });
 
-describe('the province comparison on hubs', () => {
-  const comparisonOf = (page: ContentPageSpec) =>
+describe('the compare page line on hubs', () => {
+  const lineOf = (page: ContentPageSpec) =>
     page.sections.find(
       (s) => s.heading === strings.hubCharts.comparison.heading,
     );
+  const published = new Set([COMPARE_SLUG]);
 
-  it('goes on the hub of each swept province only, as a block with the hub slug', () => {
+  it('is on the hub of each swept province only, as one line and a link', () => {
     const pages = hubPages(
       [],
       provinces,
-      new Set(),
+      published,
       [],
       new Set(['ca-on', 'ca-ab']),
+      2026,
     );
-    expect(pages.filter((p) => comparisonOf(p)).map((p) => p.slug)).toEqual([
+    expect(pages.filter((p) => lineOf(p)).map((p) => p.slug)).toEqual([
       'ca-on',
       'ca-ab',
     ]);
-    expect(comparisonOf(hubOf(pages, 'ca-ab'))?.blocks).toEqual([
-      { kind: 'paragraph', content: [strings.hubCharts.comparison.intro] },
-      { kind: 'provinceComparison', province: 'ca-ab' },
+    expect(lineOf(hubOf(pages, 'ca-ab'))?.blocks).toEqual([
+      {
+        kind: 'paragraph',
+        content: [
+          strings.compareLink.lead,
+          {
+            label: 'Take-home pay by province, 2026',
+            href: '/compare-provinces/',
+          },
+          strings.compareLink.rest,
+        ],
+      },
     ]);
   });
 
   it('comes right after how the take-home is worked out, before the forms', () => {
-    const [page] = hubPages([], provinces, new Set(), [], new Set(['ca-on']));
+    const [page] = hubPages(
+      [],
+      provinces,
+      published,
+      [],
+      new Set(['ca-on']),
+      2026,
+    );
     expect(page?.sections.map((s) => s.heading).slice(0, 5)).toEqual([
       'How your Ontario take-home is worked out',
       strings.hubCharts.charts.averageRate.title,
@@ -256,24 +274,34 @@ describe('the province comparison on hubs', () => {
     ]);
   });
 
-  it('is on no hub when nothing was swept', () => {
-    const pages = hubPages([], provinces, new Set(), [], new Set());
-    expect(pages.some((p) => comparisonOf(p))).toBe(false);
+  it('is on no hub when nothing was swept or the page is not written', () => {
+    const none = hubPages([], provinces, published, [], new Set(), 2026);
+    expect(none.some((p) => lineOf(p))).toBe(false);
+    const unwritten = hubPages(
+      [],
+      provinces,
+      new Set(),
+      [],
+      new Set(['ca-on']),
+      2026,
+    );
+    expect(unwritten.some((p) => lineOf(p))).toBe(false);
   });
 
-  it('puts the comparison on a hub-only province that was swept', () => {
+  it('puts the line on a hub-only province that was swept', () => {
     const withoutNl = provinces.filter((p) => p.slug !== 'ca-nl');
     const pages = hubPages(
       [],
       withoutNl,
-      new Set(),
+      published,
       ['ca-nl'],
       new Set(['ca-nl']),
+      2026,
     );
-    expect(comparisonOf(hubOf(pages, 'ca-nl'))).toBeDefined();
+    expect(lineOf(hubOf(pages, 'ca-nl'))).toBeDefined();
   });
 
-  it('fails when a swept province has no hub, since the bars link to hubs', () => {
+  it('fails when a swept province has no hub, since the compare page links to hubs', () => {
     expect(() =>
       hubPages([], provinces, new Set(), [], new Set(['ca-xx'])),
     ).toThrow('Hubs: ca-xx has a sweep but no hub');
