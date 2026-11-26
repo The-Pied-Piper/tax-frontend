@@ -215,10 +215,7 @@ export function ProvinceComparison({ data, province }: Props) {
       <details className={styles.details}>
         <summary>{copy.tableToggle}</summary>
         <p className={styles.note}>
-          {tableCopy.note(
-            current.year,
-            data.provinces.some((sweep) => sweep.provisional),
-          )}{' '}
+          {tableCopy.note}{' '}
           <a href={contentPath(METHODOLOGY_SLUG)}>{copy.creditsNote}</a>
         </p>
         <p className={styles.scrollHint}>{tableCopy.scrollHint}</p>

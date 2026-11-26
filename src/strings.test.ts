@@ -42,7 +42,7 @@ describe('the province comparison copy', () => {
     expect(strings.comparePage.intro(7)).toBe(
       "Pick a salary and see how 7 provinces compare. The provinces are always listed with the lowest tax and contributions first, whichever of the three figures you compare. Every bar is this site's own estimate for a single person whose only income is a salary.",
     );
-    expect(copy.table.note(2026, false)).toContain(
+    expect(copy.table.note).toContain(
       'Tax and contributions is income tax, pension plan payments and Employment Insurance, and in Québec Québec Parental Insurance Plan premiums, added together. It is your salary minus your take-home pay. The average tax rate is that amount divided by your salary.',
     );
     expect(copy.toggleLabel).toBe('Compare by');
@@ -108,7 +108,7 @@ describe('the province comparison copy', () => {
       ...everyString(copy),
       copy.caption('$70,000', 2026),
       copy.chartLabel('Take-home pay', '$70,000', copy.tableToggle),
-      copy.table.note(2026, true),
+      copy.table.note,
       copy.table.caption(2026, 300),
       copy.salaryError('$1,000', '$500,000'),
     ];
