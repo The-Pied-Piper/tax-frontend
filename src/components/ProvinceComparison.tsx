@@ -5,7 +5,7 @@ import {
   displayWholeMoney,
 } from '../money/format';
 import { PROVINCE_COMPARISON_SLOT_ID } from '../state/hubSlots';
-import { withoutZeroCents } from '../money/salaryInput';
+import { separatorsFor, withoutZeroCents } from '../money/salaryInput';
 import { regularIndexes, type HubChartsData } from '../state/hubCharts';
 import {
   allTied,
@@ -13,6 +13,7 @@ import {
   DEFAULT_SALARY,
   MEASURES,
   nearestSalaryIndex,
+  typedSalaryIndex,
   type ComparisonRow,
   type Measure,
 } from '../state/provinceComparison';
@@ -22,13 +23,14 @@ import {
   salaryPagePath,
   type FooterProvinceSlug,
 } from '../state/siteLinks';
-import { strings } from '../strings';
+import { languageCode, strings } from '../strings';
 import styles from './ProvinceComparison.module.css';
 import { ComparisonTable } from './ComparisonTable';
 import { SalarySlider } from './SalarySlider';
 
 const LABEL_ID = `${PROVINCE_COMPARISON_SLOT_ID}-by`;
 const copy = strings.hubCharts.comparison;
+const SEPARATORS = separatorsFor(languageCode);
 /** The address is read once after hydration; nothing in it changes by itself, so there is nothing to subscribe to. */
 const noSubscription = () => () => undefined;
 const provinceNames = new Map(Object.entries(strings.siteNav.provinceNames));
@@ -106,13 +108,12 @@ export function ProvinceComparison({ data, province }: Props) {
     () => '',
   );
   const named = new URLSearchParams(search).get('salary');
-  // Only a whole-dollar salary names a point of the sweep, as on the rates page.
+  // Only a whole-dollar salary is read. It opens at the nearest step, as a typed salary does; one outside the sweep, or not a salary, opens at the default.
   const namedAt =
     named === null || !/^[1-9]\d{0,6}$/.test(named)
-      ? -1
-      : salaries.indexOf(`${named}.00`);
-  const start =
-    namedAt >= 0 ? namedAt : nearestSalaryIndex(salaries, DEFAULT_SALARY);
+      ? null
+      : typedSalaryIndex(named, salaries, SEPARATORS);
+  const start = namedAt ?? nearestSalaryIndex(salaries, DEFAULT_SALARY);
   // What the reader chose; until they choose, the salary the address names, or the default.
   const [chosen, setChosen] = useState<number | null>(null);
   const index = chosen ?? start;

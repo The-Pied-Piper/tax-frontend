@@ -1,4 +1,10 @@
-import { fireEvent, render, screen, within } from '@testing-library/react';
+import {
+  cleanup,
+  fireEvent,
+  render,
+  screen,
+  within,
+} from '@testing-library/react';
 import { MEASURES } from '../state/provinceComparison';
 import { strings } from '../strings';
 import type { FooterProvinceSlug } from '../state/siteLinks';
@@ -54,7 +60,7 @@ describe('ProvinceComparison at the start', () => {
     show();
     expect(
       screen.getByText(
-        'Bars are for a $70,000 salary in 2026, lowest income tax first. Provinces with the same income tax are listed in the usual order and share a place.',
+        'Bars are for a $70,000 salary in 2026, lowest income tax first. Provinces with the same income tax are listed in the usual order.',
       ),
     ).toBeInTheDocument();
     expect(screen.getByText(copy.measureNotes.takeHome)).toBeInTheDocument();
@@ -176,7 +182,7 @@ describe('the salary controls', () => {
     fireEvent.pointerUp(slider());
     expect(
       screen.getByText(
-        'Bars are for a $30,000 salary in 2026, lowest income tax first. Provinces with the same income tax are listed in the usual order and share a place.',
+        'Bars are for a $30,000 salary in 2026, lowest income tax first. Provinces with the same income tax are listed in the usual order.',
       ),
     ).toBeInTheDocument();
     expect(barTexts()).toEqual([
@@ -197,7 +203,7 @@ describe('the salary controls', () => {
     expect(slider()).toHaveAttribute('aria-valuetext', '$150,000 a year');
     expect(
       screen.getByText(
-        'Bars are for a $150,000 salary in 2026, lowest income tax first. Provinces with the same income tax are listed in the usual order and share a place.',
+        'Bars are for a $150,000 salary in 2026, lowest income tax first. Provinces with the same income tax are listed in the usual order.',
       ),
     ).toBeInTheDocument();
   });
@@ -434,6 +440,27 @@ describe('the order of the list', () => {
     window.history.pushState({}, '', '/compare-provinces/?salary=30000');
     show();
     expect(slider()).toHaveAttribute('aria-valuetext', '$30,000 a year');
+    window.history.pushState({}, '', '/');
+  });
+
+  it('opens at the nearest step to a salary the address names between steps', () => {
+    window.history.pushState({}, '', '/compare-provinces/?salary=36400');
+    show();
+    expect(slider()).toHaveAttribute('aria-valuetext', '$30,000 a year');
+    window.history.pushState({}, '', '/compare-provinces/?salary=64000');
+    cleanup();
+    show();
+    expect(slider()).toHaveAttribute('aria-valuetext', '$70,000 a year');
+    window.history.pushState({}, '', '/');
+  });
+
+  it('opens at the default for a salary outside the sweep or that is not a salary', () => {
+    for (const query of ['500', '9999999', '0', '70000.50', 'abc', '']) {
+      window.history.pushState({}, '', `/compare-provinces/?salary=${query}`);
+      cleanup();
+      show();
+      expect(slider()).toHaveAttribute('aria-valuetext', '$70,000 a year');
+    }
     window.history.pushState({}, '', '/');
   });
 });
