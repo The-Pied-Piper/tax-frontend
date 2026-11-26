@@ -306,10 +306,21 @@ def _alberta_rates_page_facts(year: int, facts: dict[str, str]) -> dict[str, str
     return alberta
 
 
+def _saskatchewan_rates_page_facts(year: int, facts: dict[str, str]) -> dict[str, str]:
+    """Saskatchewan's own figures: its brackets, basic amount and the rate of its credits."""
+    saskatchewan = _bracket_facts(year, "sk", _params(year, "ca_sk", "brackets")["brackets"])
+    saskatchewan["sk_bpa"] = _params(year, "ca_sk", "basic_personal_amount")["amount"]
+    saskatchewan["sk_credit_rate"] = _params(year, "ca_sk", "credit_rate")["rate"]
+    saskatchewan["shift_fed_bracket_2"] = _shift(facts, "fed_bracket_2")
+    saskatchewan["shift_sk_bracket_2"] = _shift(saskatchewan, "sk_bracket_2")
+    return saskatchewan
+
+
 # The province-only part of the rates page's figures, by province code; a province with no entry has no rates page.
 RATES_PAGE_FACTS = {
     "CA-ON": _ontario_rates_page_facts,
     "CA-AB": _alberta_rates_page_facts,
+    "CA-SK": _saskatchewan_rates_page_facts,
 }
 
 
