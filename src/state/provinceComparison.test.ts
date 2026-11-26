@@ -191,15 +191,6 @@ describe('comparisonRows', () => {
       ['20.00', '100.0'],
     ]);
   });
-
-  it('keeps the order of an earlier salary while the figures are those of the salary now chosen', () => {
-    const rows = comparisonRows(sampleSweeps, 3, 'incomeTax', 2);
-    // At $30,000 (index 2) the order is Ontario's tax before Alberta's, and the figures are still $70,000's.
-    expect(rows.map((row) => row.slug)).toEqual(
-      comparisonRows(sampleSweeps, 2, 'incomeTax').map((row) => row.slug),
-    );
-    expect(rows.find((row) => row.slug === 'ca-on')?.value).toBe('11133.93');
-  });
 });
 
 describe('allTied', () => {

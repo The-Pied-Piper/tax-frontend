@@ -392,13 +392,11 @@ describe('the order of the list', () => {
     );
   });
 
-  it('does not move while the slider is dragged, only when it is let go', () => {
+  it('re-orders the list while the slider is dragged, before it is let go', () => {
     show();
     const first = barTexts().map((text) => text.slice(0, 5));
-    // At $30,000 Ontario pays less tax than Alberta, but the list holds its order until release.
+    // At $30,000 Ontario pays less tax than Alberta, so the order changes at once.
     fireEvent.change(slider(), { target: { value: '2' } });
-    expect(barTexts().map((text) => text.slice(0, 5))).toEqual(first);
-    fireEvent.pointerUp(slider());
     expect(barTexts().map((text) => text.slice(0, 5))).not.toEqual(first);
   });
 
@@ -413,11 +411,23 @@ describe('the order of the list', () => {
   it('says so when every province has the same income tax', () => {
     show();
     fireEvent.change(slider(), { target: { value: '0' } });
+    expect(screen.getByText(copy.tied)).toBeInTheDocument();
     fireEvent.pointerUp(slider());
     expect(screen.getByText(copy.tied)).toBeInTheDocument();
     expect(screen.getByRole('status')).toHaveTextContent(
       copy.reorderedTied('$1,000'),
     );
+  });
+
+  it('keeps the announcement as it was while the slider is dragged away from where it was let go', () => {
+    show();
+    fireEvent.change(slider(), { target: { value: '0' } });
+    fireEvent.pointerUp(slider());
+    const spoken = copy.reorderedTied('$1,000');
+    expect(screen.getByRole('status')).toHaveTextContent(spoken);
+    // Dragging to a salary where provinces differ changes the list and the caption, not the spoken line.
+    fireEvent.change(slider(), { target: { value: '3' } });
+    expect(screen.getByRole('status')).toHaveTextContent(spoken);
   });
 
   it('opens at the salary the address names', () => {
