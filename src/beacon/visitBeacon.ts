@@ -4,9 +4,11 @@
 // only the kind of page, never the salary or the place, and no cookie, id or
 // fingerprint, so nothing the page adds identifies the visitor (the access log
 // still records the address and user agent of every request). `home` means the
-// app shell, `salary` a pre-built salary page. Failures are ignored.
+// app shell, `salary` a pre-built salary page; the other kinds are the pre-built
+// content pages (see pageKind.ts). Failures are ignored.
 
-export type VisitKind = 'home' | 'salary';
+export type VisitKind =
+  'home' | 'salary' | 'form' | 'hub' | 'rates' | 'compare' | 'other';
 
 export function sendVisitBeacon(kind: VisitKind): void {
   const send = () => {
