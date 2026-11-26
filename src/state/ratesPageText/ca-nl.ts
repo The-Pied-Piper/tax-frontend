@@ -228,9 +228,6 @@ export const newfoundlandAndLabradorRatesPage: RatesPageText = {
     words(
       'Both rates count income tax (federal and Newfoundland and Labrador, so the provincial low-income tax reduction counts), Canada Pension Plan in both tiers, and Employment Insurance as Form T2204 works it out. Credits paid to you when you file are not counted: the Canada workers benefit and the Employment Insurance refund. They are for a single person whose only income is a salary.',
     ),
-    words(
-      'The 2026 forms are not out yet. Federal, Canada Pension Plan and Employment Insurance figures use the 2026 tax tables from the Canada Revenue Agency. The provincial rates, brackets and basic amount come from its 2026 payroll tables. We could not find the 2026 low-income tax reduction amounts printed, so we raised the 2025 form’s amounts by the 2026 index rate of {indexRate}. The Form T2204 rules are the 2025 form’s rules. We will update them when the 2026 forms are final.',
-    ),
   ],
   howToRead: [
     words(

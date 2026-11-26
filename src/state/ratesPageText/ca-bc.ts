@@ -219,9 +219,6 @@ export const britishColumbiaRatesPage: RatesPageText = {
     words(
       'Both rates count income tax (federal and British Columbia, so the BC tax reduction counts), Canada Pension Plan in both tiers, and Employment Insurance as Form T2204 works it out. Credits paid to you when you file are not counted: the Canada workers benefit, the Employment Insurance refund, and the British Columbia sales tax, renter’s and home renovation credits. They are for a single person whose only income is a salary.',
     ),
-    words(
-      'The 2026 forms are not out yet. Federal, Canada Pension Plan and Employment Insurance figures use the 2026 tax tables from the Canada Revenue Agency. The British Columbia rates, brackets, basic amount and tax reduction come from its July 2026 payroll tables, which assume the province’s proposed changes become law. The Form T2204 rules are the 2025 form’s rules carried forward. We will update them when the 2026 forms are final.',
-    ),
   ],
   howToRead: [
     words(

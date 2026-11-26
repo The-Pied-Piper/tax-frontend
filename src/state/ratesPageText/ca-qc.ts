@@ -229,9 +229,6 @@ export const quebecRatesPage: RatesPageText = {
     words(
       'Both rates count income tax, the Québec Pension Plan (QPP) in all three parts, Employment Insurance at the Québec rate as Form T2204 works it out, and Québec Parental Insurance Plan (QPIP) premiums. Income tax here is the federal tax on your federal return (Form T1), less the Québec abatement (line 44000, a credit equal to {abatementRate} of your basic federal tax that Québec residents get on their federal return), plus the Québec tax on your Québec return (Form TP-1), plus the Québec prescription drug insurance premium (line 447, from Schedule K). The premium is not a tax, but it is paid on your Québec return, so it is counted. Other credits paid to you when you file are not counted: the work premium, the solidarity tax credit, the Canada workers benefit and the Employment Insurance refund. The figures are for a single person whose only income is a salary, who has no drug plan through work, and who does not claim the amount for a person living alone (Schedule B, line 20). Claiming it would change the rates in the middle of the chart.',
     ),
-    words(
-      'The 2026 forms are not out yet. Federal, QPP, Employment Insurance and QPIP figures use the 2026 tables from the Canada Revenue Agency and Revenu Québec, and the Québec brackets and basic amount come from Québec’s 2026 parameters. We could not find some 2026 figures printed. The drug insurance premium rates, its {drugStartNi} starting point and the Form T2204 rules are the 2025 forms’, carried forward. The yearly maximum premium of {drugMax} is a 2026 figure we could not check against a printed form (the 2025 form prints {drugMax2025}). The QPP multipliers on Schedule U and the amounts on Work Chart 401 are worked out from the printed 2026 rates and brackets. We will update them when the 2026 forms are final.',
-    ),
   ],
   howToRead: [
     words(

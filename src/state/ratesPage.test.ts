@@ -322,7 +322,6 @@ describe('the Québec rates page', () => {
     expect(joined).toContain('at most $895.70 a year');
     expect(joined).toContain('Employment Insurance 100 cents plus QPIP');
     expect(view?.intro[0]).toMatch(/to 53\.3% above \$259,609/);
-    expect(view?.intro[2]).toContain('$777.50');
   });
 
   it('gives one decimal for every computed rate in the opening finding', () => {

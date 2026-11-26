@@ -195,9 +195,6 @@ export const manitobaRatesPage: RatesPageText = {
     words(
       'Both rates count income tax (federal and Manitoba, so the Manitoba Family Tax Benefit counts), Canada Pension Plan in both tiers, and Employment Insurance as Form T2204 works it out. Credits paid to you when you file are not counted: the Canada workers benefit, the Employment Insurance refund, and the Manitoba credits on Form MB479. They are for a single person whose only income is a salary.',
     ),
-    words(
-      'The 2026 forms are not out yet. Federal, Manitoba bracket and basic amount, Canada Pension Plan and Employment Insurance figures use the 2026 tax tables from the Canada Revenue Agency. The Family Tax Benefit amounts and the Form T2204 rules are the 2025 forms’ figures carried forward. We will update them when the 2026 forms are final.',
-    ),
   ],
   howToRead: [
     words(

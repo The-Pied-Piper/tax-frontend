@@ -417,19 +417,10 @@ describe('breadcrumb and learn-more links in the static page (#150)', () => {
     }
   });
 
-  it('puts the provisional note after the answer and before the form', () => {
+  it('shows no provisional note on a 2026 page', () => {
     show(dataFor(compute70000, '70000'));
-    const note = screen.getByText(strings.notices.provisionalTitle(2026));
-    const answer = screen.getByRole('heading', {
-      name: strings.answer.heading,
-    });
-    const form = screen.getByLabelText(strings.form.place);
-    expect(
-      answer.compareDocumentPosition(note) & Node.DOCUMENT_POSITION_FOLLOWING,
-    ).toBeTruthy();
-    expect(
-      note.compareDocumentPosition(form) & Node.DOCUMENT_POSITION_FOLLOWING,
-    ).toBeTruthy();
+    expect(screen.queryByRole('note')).not.toBeInTheDocument();
+    expect(document.body.textContent).not.toMatch(/provisional/i);
   });
 
   it('puts the form before the neighbour links, so the keyboard reaches it in screen order', () => {
