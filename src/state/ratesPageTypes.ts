@@ -44,7 +44,7 @@ export type RatesPageText = {
   description: string;
   /** The h1. */
   heading: string;
-  /** The opening finding, the basis and the note that 2026 is provisional, each one paragraph. */
+  /** The opening finding and the basis, each one paragraph. */
   intro: Note[];
   howToRead: Note[];
   groups: RatesGroup[];

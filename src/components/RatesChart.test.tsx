@@ -68,6 +68,28 @@ describe('RatesChart', () => {
     );
   });
 
+  it('hovers the salary and both rates beside the dot, and still reads them aloud', () => {
+    window.history.replaceState(null, '', '/?salary=70000');
+    render(<RatesChart sweep={sweep()} place="Ontario" />);
+    const label = screen
+      .getByRole('img')
+      .querySelector('text[class*="markerLabel"]');
+    const lines = [...(label?.querySelectorAll('tspan') ?? [])].map(
+      (t) => t.textContent,
+    );
+    expect(lines).toHaveLength(3);
+    expect(lines[0]).toBe('$70,000');
+    expect(lines[1]).toMatch(/^Marginal rate: \d+(\.\d)?%$/);
+    expect(lines[2]).toMatch(/^Average rate: \d+(\.\d)?%$/);
+    const announcements = document.querySelectorAll('[aria-live]');
+    expect(announcements).toHaveLength(1);
+    expect(announcements[0]?.getAttribute('aria-live')).toBe('polite');
+    expect(announcements[0]?.className).toMatch(/visuallyHidden/);
+    expect(announcements[0]?.textContent).toMatch(
+      /^At \$70,000: marginal rate/,
+    );
+  });
+
   it('ignores a salary in the address that is not a point of the sweep', () => {
     window.history.replaceState(null, '', '/?salary=abc');
     render(<RatesChart sweep={sweep()} place="Ontario" />);
