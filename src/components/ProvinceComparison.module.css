@@ -176,6 +176,23 @@
   color: var(--muted);
   /* The salary heading spans both header rows; its words sit on the same line as the rows' headings. */
   vertical-align: bottom;
+  /* The headings stay in view while the rows scroll: both rows are one fixed height so the second sticks right under the first. */
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  height: 28px;
+  box-sizing: border-box;
+  background: var(--bg);
+  box-shadow: 0 1px 0 var(--rule);
+}
+
+.table thead tr:nth-child(2) th {
+  top: 28px;
+}
+
+.table thead .salary {
+  left: 0;
+  z-index: 3;
 }
 
 .table caption {
