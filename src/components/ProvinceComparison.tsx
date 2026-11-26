@@ -30,8 +30,8 @@ import { SalarySlider } from './SalarySlider';
 
 const LABEL_ID = `${PROVINCE_COMPARISON_SLOT_ID}-by`;
 const copy = strings.hubCharts.comparison;
-/** The address is read once after hydration; nothing in it changes by itself, so there is nothing to subscribe to. */
 const SEPARATORS = separatorsFor(languageCode);
+/** The address is read once after hydration; nothing in it changes by itself, so there is nothing to subscribe to. */
 const noSubscription = () => () => undefined;
 const provinceNames = new Map(Object.entries(strings.siteNav.provinceNames));
 
