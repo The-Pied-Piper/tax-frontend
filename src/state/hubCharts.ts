@@ -52,9 +52,11 @@ export const PROVINCE_EXTRA_SALARIES: Readonly<
   Record<string, readonly string[]>
 > = {
   'ca-ab': [
+    '1999',
     '2001',
     '2033',
     '2034',
+    '3499',
     '3500',
     '3501',
     '19200',
@@ -81,11 +83,13 @@ export const PROVINCE_EXTRA_SALARIES: Readonly<
     '247940',
     '247941',
     '259608',
+    '259609',
     '259610',
     '371347',
     '371348',
   ],
   'ca-qc': [
+    '1999',
     '2001',
     '2026',
     '2027',
@@ -124,6 +128,7 @@ export const PROVINCE_EXTRA_SALARIES: Readonly<
     '182566',
     '182567',
     '259608',
+    '259609',
     '259610',
   ],
 };
