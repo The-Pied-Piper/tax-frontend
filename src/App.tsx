@@ -7,7 +7,6 @@ import { Breakdown } from './components/Breakdown';
 import { ErrorNotice } from './components/ErrorNotice';
 import { LearnMore } from './components/LearnMore';
 import { PendingAnswer } from './components/PendingAnswer';
-import { ProvisionalNotice } from './components/ProvisionalNotice';
 import { SalaryForm } from './components/SalaryForm';
 import { SalaryLinks } from './components/SalaryLinks';
 import { SiteFooter } from './components/SiteFooter';
@@ -50,15 +49,11 @@ export function App({ client, registry, initial, clock }: Props) {
         )
       : null;
   // A pre-built salary page leads with its answer, so the first thing read, on
-  // screen and in the source, is the figure; the provisional note sits just
-  // under it and the form below. The calculator page has no answer yet, so its
-  // form and note keep their old places. The order is fixed for the life of the
-  // page, so the layout does not flip after Calculate. The heading and
-  // breadcrumb and links stay as the page was built (`page.built`); only the
-  // paragraph follows the new answer.
-  const notice = shown?.response.provisional ? (
-    <ProvisionalNotice year={shown.asked.year} />
-  ) : null;
+  // screen and in the source, is the figure, with the form just under it. The
+  // calculator page has no answer yet, so its form comes first. The order is
+  // fixed for the life of the page, so the layout does not flip after
+  // Calculate. The heading and breadcrumb and links stay as the page was built
+  // (`page.built`); only the paragraph follows the new answer.
   const answer = shown ? (
     <>
       <AnswerCard
@@ -81,7 +76,6 @@ export function App({ client, registry, initial, clock }: Props) {
         />
         <AdvancedView groups={shown.adapted.advanced} />
       </AnswerCard>
-      {answerFirst && notice}
       {text && (
         <section className="page-summary-section">
           <h2>{strings.summaryHeading}</h2>
@@ -122,7 +116,6 @@ export function App({ client, registry, initial, clock }: Props) {
         {page.failure?.kind === 'notice' && (
           <ErrorNotice message={page.failure.message} />
         )}
-        {!answerFirst && notice}
         {answerFirst && answer ? (
           <PendingAnswer pending={pending}>{answer}</PendingAnswer>
         ) : (

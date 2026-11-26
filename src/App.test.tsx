@@ -97,7 +97,7 @@ describe('App form', () => {
     expect(year).toHaveValue('2025');
     expect(
       screen.getByRole('option', {
-        name: `2026 (${strings.form.provisionalYear})`,
+        name: '2026',
       }),
     ).toBeInTheDocument();
     expect(screen.getByRole('option', { name: '2025' })).toBeInTheDocument();
@@ -542,7 +542,7 @@ describe('App answer card', () => {
     return user;
   }
 
-  it('shows the 2025 figures with no provisional notice', async () => {
+  it('shows the 2025 figures with no note', async () => {
     await calculate(fixtureClient());
     expect(screen.getAllByText('$53,468.68')).toHaveLength(2);
     expect(screen.getAllByText('$70,000.00')[0]).toBeVisible();
@@ -584,16 +584,11 @@ describe('App answer card', () => {
     ).toBeInTheDocument();
   });
 
-  it('shows the 2026 figures with the provisional notice', async () => {
+  it('shows the 2026 figures with no note', async () => {
     await calculate(fixtureClient(undefined, compute2026), '2026');
     expect(screen.getAllByText('$53,786.25')).toHaveLength(2);
     expect(screen.getByText('$16,213.75')).toBeInTheDocument();
-    expect(screen.getByRole('note')).toHaveTextContent(
-      strings.notices.provisionalTitle(2026),
-    );
-    expect(screen.getByRole('note')).toHaveTextContent(
-      strings.notices.provisionalBody(2026),
-    );
+    expect(screen.queryByRole('note')).not.toBeInTheDocument();
   });
 
   it('divides all three amounts when the pay period changes', async () => {
@@ -887,12 +882,10 @@ describe('App, Alberta page through the mock service', () => {
     ).toBeVisible();
   });
 
-  it('shows the 2026 take-home with the provisional notice', async () => {
+  it('shows the 2026 take-home with no note', async () => {
     const user = await calculateAlberta('2026');
     expect(screen.getAllByText('$54,107.20')).toHaveLength(2);
-    expect(screen.getByRole('note')).toHaveTextContent(
-      strings.notices.provisionalTitle(2026),
-    );
+    expect(screen.queryByRole('note')).not.toBeInTheDocument();
     await user.click(screen.getByText(strings.breakdown.toggle));
     expect(breakdownOf().getByText('$3,534.79')).toBeVisible();
     const details = screen
@@ -929,7 +922,7 @@ describe('App default year', () => {
     });
   });
 
-  it('shows the provisional notice after Calculate on a first load that lands on a provisional year', async () => {
+  it('shows no note after Calculate on a first load that lands on a 2026 year', async () => {
     const user = userEvent.setup();
     render(
       <App
@@ -952,12 +945,7 @@ describe('App default year', () => {
       screen.getByRole('button', { name: strings.form.calculate }),
     );
     await screen.findByRole('heading', { name: strings.answer.heading });
-    expect(screen.getByRole('note')).toHaveTextContent(
-      strings.notices.provisionalTitle(2026),
-    );
-    expect(screen.getByRole('note')).toHaveTextContent(
-      strings.notices.provisionalBody(2026),
-    );
+    expect(screen.queryByRole('note')).not.toBeInTheDocument();
   });
 });
 

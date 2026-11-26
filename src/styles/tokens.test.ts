@@ -56,7 +56,6 @@ const PAIRS: [string, string][] = [
   ['--accent', '--bg'],
   ['--btn-fg', '--btn'],
   ['--btn-fg', '--accent'],
-  ['--warn-fg', '--warn-bg'],
   ['--err-fg', '--err-bg'],
   ['--err-fg', '--surface'],
 ];
