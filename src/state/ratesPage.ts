@@ -3,6 +3,7 @@ import type { ProvinceSweep } from './hubCharts';
 import { isFullSweep, noteWords } from './hubNotes';
 import { albertaRatesPage } from './ratesPageText/ca-ab';
 import { ontarioRatesPage } from './ratesPageText/ca-on';
+import { quebecRatesPage } from './ratesPageText/ca-qc';
 import type { CauseForm, RatesPageText } from './ratesPageTypes';
 import { FOOTER_PROVINCE_SLUGS, type FooterProvinceSlug } from './siteLinks';
 import { strings } from '../strings';
@@ -12,6 +13,7 @@ export const ratesPageText: Partial<Record<FooterProvinceSlug, RatesPageText>> =
   {
     'ca-on': ontarioRatesPage,
     'ca-ab': albertaRatesPage,
+    'ca-qc': quebecRatesPage,
   };
 
 /** The provinces that have a rates page, in the footer's order. */
@@ -29,6 +31,12 @@ const CAUSE_PAGE: Record<CauseForm, string> = {
   ab428: 'ab428',
   t2204: 't2204',
   schedule8: 'schedule-8',
+  tp1: 'tp1',
+  scheduleU: 'schedule-u',
+  scheduleK: 'schedule-k',
+  // The work charts are sections of the TP-1 page.
+  workChart201: 'tp1',
+  workChart401: 'tp1',
 };
 
 /** A chip: the form's name, and its page when this build writes one. */
