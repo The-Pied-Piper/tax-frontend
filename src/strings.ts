@@ -62,37 +62,33 @@ export const strings = {
       toggleLabel: 'Compare by',
       measures: {
         takeHome: 'Take-home pay',
-        incomeTax: 'Income tax',
+        takenOff: 'Tax and contributions',
         averageRate: 'Average tax rate',
       },
       // Shorter wording for the toggle on narrow phones only, where the full label does not fit one line.
       measuresPhone: {
         takeHome: 'Take-home pay',
-        incomeTax: 'Income tax',
+        takenOff: 'Tax and payments',
         averageRate: 'Average tax rate',
       },
       measureNotes: {
         takeHome:
           'Your salary minus income tax, pension plan payments and Employment Insurance. Pension plan payments are Canada Pension Plan payments, or Québec Pension Plan payments in Québec, where Québec Parental Insurance Plan premiums and the drug insurance premium are taken off too. Tax cuts count, such as the Ontario LIFT Credit and the Québec abatement.',
-        incomeTax:
-          'The federal and provincial income tax you owe for the year, after the credits that lower it. In Ontario this includes the Ontario Health Premium. In Québec it includes the prescription drug insurance premium, which we assume you pay because you have no drug plan at work, and the federal tax is after the Québec abatement.',
-        averageRate:
-          'Income tax, pension plan payments, Employment Insurance and, in Québec, Québec Parental Insurance Plan premiums, added together and divided by your salary.',
+        takenOff:
+          'Income tax, pension plan payments and Employment Insurance added together, which is your salary minus your take-home pay. In Québec the pension plan is the Québec Pension Plan, and Québec Parental Insurance Plan premiums are added too. Income tax includes the Ontario Health Premium in Ontario. In Québec it includes the prescription drug insurance premium, which we assume you pay because you have no drug plan at work, and the federal tax is after the Québec abatement.',
+        averageRate: 'Tax and contributions divided by your salary.',
       },
       // The line after the measure notes, linked to the methodology page.
       creditsNote: 'Credits paid to you when you file are not counted.',
       caption: (salary: string, year: number) =>
-        `Bars are for a ${salary} salary in ${String(year)}, lowest income tax first. Provinces with the same income tax are listed in the usual order.`,
-      // In place of the caption when no province has any income tax at the chosen salary.
-      tied: 'No province has any income tax at this salary, so they are not ranked.',
-      // After the three measure notes.
-      rankingNote:
-        'The order is by income tax. Take-home pay and the average tax rate follow it, except that Québec has its own pension plan, Employment Insurance rate and parental insurance premium, so it can sit out of order.',
+        `Bars are for a ${salary} salary in ${String(year)}, lowest tax and contributions first. Provinces with the same amount are listed in the usual order.`,
+      // In place of the caption when no province takes any tax or contributions at the chosen salary.
+      tied: 'At this salary no province takes any tax or contributions, so the provinces are not ranked.',
       // Spoken when the slider is let go, or after an arrow-key press or a typed salary.
       reordered: (salary: string) =>
-        `Provinces re-ordered by income tax, lowest first, for a ${salary} salary.`,
+        `Provinces re-ordered by tax and contributions, lowest first, for a ${salary} salary.`,
       reorderedTied: (salary: string) =>
-        `No province has any income tax at ${salary}, so they are not ranked.`,
+        `No province takes any tax or contributions at ${salary}, so the provinces are not ranked.`,
       // The accessible name of a bar's link: to the province's page for the salary shown, or to its hub when there is no such page.
       barLinkSalaryPage: (
         place: string,
@@ -126,12 +122,12 @@ export const strings = {
       // The one table under the toggle: every salary the chart can show, three figures for each province.
       table: {
         note: (year: number, provisional: boolean) =>
-          `The table shows take-home pay, income tax and average tax rate in each province at every salary the chart can show, for a single person whose only income is a salary. Take-home pay is salary minus income tax, pension plan payments and Employment Insurance, and in Québec Québec Parental Insurance Plan premiums. Income tax includes the Ontario Health Premium in Ontario. In Québec it includes the prescription drug insurance premium, and the federal tax is after the Québec abatement. Pension plan payments, Employment Insurance and Québec Parental Insurance Plan premiums have no column of their own, but they count in the average tax rate.${provisional ? ` The ${year.toString()} figures are provisional until the ${year.toString()} forms are final.` : ''}`,
+          `The table shows take-home pay, income tax and average tax rate in each province at every salary the chart can show, for a single person whose only income is a salary. Take-home pay is salary minus income tax, pension plan payments and Employment Insurance, and in Québec Québec Parental Insurance Plan premiums. Income tax includes the Ontario Health Premium in Ontario. In Québec it includes the prescription drug insurance premium, and the federal tax is after the Québec abatement. Tax and contributions is income tax, pension plan payments and Employment Insurance, and in Québec Québec Parental Insurance Plan premiums, added together. It is your salary minus your take-home pay. The average tax rate is that amount divided by your salary.${provisional ? ` The ${year.toString()} figures are provisional until the ${year.toString()} forms are final.` : ''}`,
         caption: (year: number, count: number) =>
           `Take-home pay, income tax and average tax rate by salary and province, ${year.toString()}: all ${count.toString()} salaries behind the chart.`,
         salaryHeader: 'Salary a year',
         takeHomeHeader: 'Take-home pay',
-        incomeTaxHeader: 'Income tax',
+        takenOffHeader: 'Tax and contributions',
         averageRateHeader: 'Average tax rate',
         // Shown on narrow screens only.
         scrollHint:
@@ -151,7 +147,7 @@ export const strings = {
     breadcrumb: 'Compare provinces',
     sectionHeading: 'Compare by salary',
     intro: (count: number) =>
-      `Pick a salary and see how ${count.toString()} provinces compare. The provinces are listed with the lowest income tax first, whatever you compare by. Every bar is this site's own estimate for a single person whose only income is a salary.`,
+      `Pick a salary and see how ${count.toString()} provinces compare. The provinces are always listed with the lowest tax and contributions first, whichever of the three figures you compare. Every bar is this site's own estimate for a single person whose only income is a salary.`,
     coverage: (list: string) =>
       `These are the provinces this site covers so far: ${list}.`,
     linksLead: 'See a province in detail:',

@@ -68,7 +68,7 @@ export function ComparisonTable({ data }: Props) {
                 {copy.takeHomeHeader}
               </th>,
               <th key={`${sweep.slug}-i`} scope="col">
-                {copy.incomeTaxHeader}
+                {copy.takenOffHeader}
               </th>,
               <th key={`${sweep.slug}-a`} scope="col">
                 {copy.averageRateHeader}
@@ -94,7 +94,7 @@ export function ComparisonTable({ data }: Props) {
                   </td>,
                   <td key={`${sweep.slug}-i`}>
                     {displayRoundedMoney(
-                      point[SWEEP_COLUMN.tax],
+                      point[SWEEP_COLUMN.deductions],
                       'annually',
                       sweep.unit,
                     )}

@@ -1,5 +1,6 @@
 import { separatorsFor } from '../money/salaryInput';
 import { SAMPLE_SALARIES, sampleSweeps } from '../test/comparisonData';
+import { compareAmounts } from '../money/scale';
 import { regularSalaries } from './hubCharts';
 import {
   allTied,
@@ -17,7 +18,7 @@ const full = regularSalaries().map((salary) => `${salary}.00`);
 
 describe('the measures', () => {
   it('are take-home pay, income tax and the average rate, in that order', () => {
-    expect(MEASURES).toEqual(['takeHome', 'incomeTax', 'averageRate']);
+    expect(MEASURES).toEqual(['takeHome', 'takenOff', 'averageRate']);
   });
 });
 
@@ -119,19 +120,19 @@ describe('comparisonRows', () => {
     ]);
   });
 
-  it('puts the lowest income tax first', () => {
-    const rows = comparisonRows(sampleSweeps, at70000, 'incomeTax');
+  it('puts the least taken off first, income tax and contributions together', () => {
+    const rows = comparisonRows(sampleSweeps, at70000, 'takenOff');
     expect(rows.map((row) => [row.slug, row.value])).toEqual([
-      ['ca-bc', '10572.03'],
-      ['ca-ab', '10812.98'],
-      ['ca-on', '11133.93'],
-      ['ca-sk', '12250.87'],
-      ['ca-mb', '13020.86'],
-      ['ca-nl', '13217.18'],
+      ['ca-bc', '15651.85'],
+      ['ca-ab', '15892.80'],
+      ['ca-on', '16213.75'],
+      ['ca-sk', '17330.69'],
+      ['ca-mb', '18100.68'],
+      ['ca-nl', '18297.00'],
     ]);
   });
 
-  it('ranks the average rate by income tax too, lowest first, in the rate unit', () => {
+  it('ranks the average rate by what is taken off too, lowest first, in the rate unit', () => {
     const rows = comparisonRows(sampleSweeps, at70000, 'averageRate');
     expect(rows.map((row) => [row.slug, row.value])).toEqual([
       ['ca-bc', '0.2236'],
@@ -153,26 +154,26 @@ describe('comparisonRows', () => {
     expect(rows[5]?.width).toBe('95.1');
   });
 
-  it('keeps the order of the list for provinces with the same income tax', () => {
+  it('keeps the order of the list for provinces with the same amount taken off', () => {
     const [on, ab] = sampleSweeps;
     if (!on || !ab) throw new Error('sample sweeps');
     const same = { ...ab, slug: 'ca-xx', points: on.points };
-    const rows = comparisonRows([on, same, ab], at70000, 'incomeTax');
-    // Alberta pays less tax than Ontario at $70,000, so it comes first; the two with equal tax keep their order.
+    const rows = comparisonRows([on, same, ab], at70000, 'takenOff');
+    // Less comes off in Alberta than in Ontario at $70,000, so it comes first; the two with an equal amount keep their order.
     expect(rows.map((row) => row.slug)).toEqual(['ca-ab', 'ca-on', 'ca-xx']);
   });
 
   it('draws no bar for a figure of zero or less, and none at all when every figure is zero', () => {
     const [on, ab] = sampleSweeps;
     if (!on || !ab) throw new Error('sample sweeps');
-    // Income tax at $1,000 is nil in Ontario.
-    const rows = comparisonRows([on, ab], 0, 'incomeTax');
+    // Nothing is taken off at $1,000 in Ontario.
+    const rows = comparisonRows([on, ab], 0, 'takenOff');
     expect(rows.map((row) => row.value)).toEqual(['0.00', '0.00']);
     expect(rows.map((row) => row.width)).toEqual(['0.0', '0.0']);
     const negative = {
       ...on,
       points: [
-        ['1000.00', '1000.00', '0.00', '-50.00', '0.0000', '0.0505'],
+        ['1000.00', '1000.00', '-50.00', '0.00', '0.0000', '0.0505'],
       ] as typeof on.points,
     };
     const mixed = comparisonRows(
@@ -180,11 +181,11 @@ describe('comparisonRows', () => {
         negative,
         {
           ...ab,
-          points: [['1000.00', '1000.00', '0.00', '20.00', '0.02', '0.05']],
+          points: [['1000.00', '1000.00', '20.00', '0.00', '0.02', '0.05']],
         },
       ],
       0,
-      'incomeTax',
+      'takenOff',
     );
     expect(mixed.map((row) => [row.value, row.width])).toEqual([
       ['-50.00', '0.0'],
@@ -193,9 +194,47 @@ describe('comparisonRows', () => {
   });
 });
 
+describe('one order for every measure', () => {
+  // Index 3 of the sample points is $70,000.
+  const at70000 = 3;
+
+  it('lists the provinces in the same order whichever measure the bars show, at every salary', () => {
+    const salaries = SAMPLE_SALARIES.length;
+    for (let at = 0; at < salaries; at += 1) {
+      const orders = MEASURES.map((measure) =>
+        comparisonRows(sampleSweeps, at, measure).map((row) => row.slug),
+      );
+      expect(orders[1]).toEqual(orders[0]);
+      expect(orders[2]).toEqual(orders[0]);
+    }
+  });
+
+  it('puts the highest take-home pay first and the lowest average tax rate first', () => {
+    const inOrder = (values: string[], sign: 1 | -1) =>
+      values.every(
+        (value, at) =>
+          at === 0 || compareAmounts(values[at - 1] ?? '0', value) * sign >= 0,
+      );
+    const takeHome = comparisonRows(sampleSweeps, at70000, 'takeHome');
+    expect(
+      inOrder(
+        takeHome.map((row) => row.value),
+        1,
+      ),
+    ).toBe(true);
+    const rates = comparisonRows(sampleSweeps, at70000, 'averageRate');
+    expect(
+      inOrder(
+        rates.map((row) => row.value),
+        -1,
+      ),
+    ).toBe(true);
+  });
+});
+
 describe('allTied', () => {
-  it('is true where every province has the same income tax, false where they differ', () => {
-    // Income tax at $1,000 is nil in every sample province.
+  it('is true where nothing is taken off in any province, false where they differ', () => {
+    // Nothing is taken off at $1,000 in any sample province.
     expect(allTied(sampleSweeps, 0)).toBe(true);
     expect(allTied(sampleSweeps, 3)).toBe(false);
   });

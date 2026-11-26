@@ -237,7 +237,6 @@ export function ProvinceComparison({ data, province }: Props) {
       <p className={styles.note}>
         <a href={contentPath(METHODOLOGY_SLUG)}>{copy.creditsNote}</a>
       </p>
-      <p className={styles.note}>{copy.rankingNote}</p>
       {data.provinces.some((sweep) => sweep.provisional) && (
         <p className={styles.provisional}>{copy.provisional(current.year)}</p>
       )}
