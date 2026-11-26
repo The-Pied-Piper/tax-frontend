@@ -65,6 +65,7 @@ describe('the province list', () => {
         from: 30000,
         to: 150000,
         step: 5000,
+        extra: expect.arrayContaining([21828, 259610]) as unknown,
       },
       {
         code: 'CA-NL',

@@ -566,6 +566,17 @@ def _quebec_rates_page_facts(year: int) -> dict[str, str]:
     return facts
 
 
+def _saskatchewan_rates_page_facts(year: int) -> dict[str, str]:
+    """Saskatchewan's figures: the common ones and its own: its brackets, basic amount and the rate of its credits."""
+    facts = _common_rates_page_facts(year)
+    saskatchewan = _bracket_facts(year, "sk", _params(year, "ca_sk", "brackets")["brackets"])
+    saskatchewan["sk_bpa"] = _params(year, "ca_sk", "basic_personal_amount")["amount"]
+    saskatchewan["sk_credit_rate"] = _params(year, "ca_sk", "credit_rate")["rate"]
+    saskatchewan["shift_fed_bracket_2"] = _shift(facts, "fed_bracket_2")
+    saskatchewan["shift_sk_bracket_2"] = _shift(saskatchewan, "sk_bracket_2")
+    return {**facts, **saskatchewan}
+
+
 def _nearest_salary_of_taxable(year: int, taxable: Decimal) -> Decimal:
     """The whole salary nearest the one where taxable income reaches `taxable` (half up), for the wording "from about".
     The engine's own edge lies between the whole salary below and the one above, so this is one of the two."""
@@ -617,6 +628,7 @@ def _manitoba_rates_page_facts(year: int) -> dict[str, str]:
 RATES_PAGE_FACTS = {
     "CA-ON": _ontario_rates_page_facts,
     "CA-AB": _alberta_rates_page_facts,
+    "CA-SK": _saskatchewan_rates_page_facts,
     "CA-BC": _british_columbia_rates_page_facts,
     "CA-MB": _manitoba_rates_page_facts,
     "CA-NL": _newfoundland_rates_page_facts,
