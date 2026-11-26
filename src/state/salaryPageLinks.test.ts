@@ -2,17 +2,18 @@ import { strings } from '../strings';
 import { provinceHubs } from './provinceHubs';
 import { provinceLinks } from './salaryPageLinks';
 
-// provinceLinks(slug, provinceName, published, '70000') builds the `hub` and
+// provinceLinks(slug, provinceName, published, '70000', 2026) builds the `hub` and
 // `learnMore` fields of a pre-built salary page's links (#150).
 const methodology = { label: 'How we calculate', href: '/methodology/' };
 
-describe('provinceLinks(slug, name, published)', () => {
+describe('provinceLinks(slug, name, published, 2026)', () => {
   it('has the hub, the methodology page and the form page, in that order', () => {
     const { hub, learnMore } = provinceLinks(
       'ca-on',
       'Ontario',
       new Set(['methodology', 'forms/on428']),
       '70000',
+      2026,
     );
     expect(hub).toEqual({ label: 'Ontario', href: '/ca-on/' });
     expect(learnMore).toEqual([
@@ -32,12 +33,19 @@ describe('provinceLinks(slug, name, published)', () => {
       'Ontario',
       new Set(['forms/on428']),
       '70000',
+      2026,
     );
     expect(learnMore[2]?.label).toBe(`What is ${name ?? ''}?`);
   });
 
   it('leaves the form link out when forms/on428 is not published', () => {
-    const { learnMore } = provinceLinks('ca-on', 'Ontario', new Set(), '70000');
+    const { learnMore } = provinceLinks(
+      'ca-on',
+      'Ontario',
+      new Set(),
+      '70000',
+      2026,
+    );
     expect(learnMore.map((l) => l.href)).toEqual(['/ca-on/', '/methodology/']);
     expect(learnMore[1]).toEqual(methodology);
   });
@@ -48,6 +56,7 @@ describe('provinceLinks(slug, name, published)', () => {
       'Alberta',
       new Set(),
       '70000',
+      2026,
     );
     expect(hub.href).toBe('/ca-ab/');
     expect(learnMore).toHaveLength(2);
@@ -59,6 +68,7 @@ describe('provinceLinks(slug, name, published)', () => {
       'Alberta',
       new Set(['methodology', 'forms/on428']),
       '70000',
+      2026,
     );
     expect(learnMore.map((l) => l.href)).toEqual(['/ca-ab/', '/methodology/']);
   });
@@ -75,6 +85,7 @@ describe('provinceLinks(slug, name, published)', () => {
         name,
         new Set([`forms/${id}`]),
         '70000',
+        2026,
       );
       expect(learnMore.map((l) => l.href)).toEqual([
         `/${slug}/`,
@@ -90,6 +101,7 @@ describe('provinceLinks(slug, name, published)', () => {
       'Ontario',
       new Set(['forms/on428-a']),
       '70000',
+      2026,
     );
     expect(learnMore).toHaveLength(2);
   });
@@ -100,6 +112,7 @@ describe('provinceLinks(slug, name, published)', () => {
       'Ontario',
       new Set(['methodology', 'forms/on428']),
       '70000',
+      2026,
     );
     for (const { href } of [hub, ...learnMore]) {
       expect(href).toMatch(/^\/(?!\/)[a-z0-9/-]*\/$/);
@@ -112,6 +125,7 @@ describe('provinceLinks(slug, name, published)', () => {
       'Ontario',
       new Set(['ca-on/tax-rates']),
       '90000',
+      2026,
     );
     expect(rates).toEqual({
       label: 'Ontario tax rates by salary',
@@ -121,11 +135,16 @@ describe('provinceLinks(slug, name, published)', () => {
 
   it('leaves the rates link out when no rates page is written for the province', () => {
     expect(
-      provinceLinks('ca-on', 'Ontario', new Set(), '90000').rates,
+      provinceLinks('ca-on', 'Ontario', new Set(), '90000', 2026).rates,
     ).toBeNull();
     expect(
-      provinceLinks('ca-ab', 'Alberta', new Set(['ca-on/tax-rates']), '90000')
-        .rates,
+      provinceLinks(
+        'ca-ab',
+        'Alberta',
+        new Set(['ca-on/tax-rates']),
+        '90000',
+        2026,
+      ).rates,
     ).toBeNull();
   });
 
@@ -135,6 +154,7 @@ describe('provinceLinks(slug, name, published)', () => {
       'Xland',
       new Set(),
       '70000',
+      2026,
     );
     expect(hub).toEqual({ label: 'Xland', href: '/ca-xx/' });
     expect(learnMore[0]).toEqual({

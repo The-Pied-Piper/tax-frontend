@@ -107,6 +107,16 @@ describe('parseHubChartsData', () => {
     expect(parsed?.provinces[0]?.points).toEqual(sweep.points);
   });
 
+  it("reads the salaries of a province's own salary pages, and a sweep with none", () => {
+    const parsed = parseHubChartsData(
+      JSON.stringify({ provinces: [{ ...sweep, salaryPages: ['30000'] }] }),
+    );
+    expect(parsed?.provinces[0]?.salaryPages).toEqual(['30000']);
+    expect(
+      parseHubChartsData(JSON.stringify({ provinces: [sweep] })),
+    ).not.toBeNull();
+  });
+
   it('reads provinces that share their salaries and their year', () => {
     const other = { ...sweep, slug: 'ca-ab' };
     expect(
@@ -236,6 +246,16 @@ describe('parseHubChartsData', () => {
     [
       'two provinces with the same slug',
       JSON.stringify({ provinces: [sweep, sweep] }),
+    ],
+    [
+      'salary pages that are not whole-dollar salaries',
+      JSON.stringify({
+        provinces: [{ ...sweep, salaryPages: ['30000', '/evil'] }],
+      }),
+    ],
+    [
+      'salary pages that are not a list',
+      JSON.stringify({ provinces: [{ ...sweep, salaryPages: '30000' }] }),
     ],
     [
       'provinces of different years',

@@ -169,7 +169,13 @@ export async function generateSalaryPages(
       const page = `${province.slug}/${salary}`;
       const links = {
         ...salaryLinks(province.slug, steps, salary, takeHomes),
-        ...provinceLinks(province.slug, placeName, options.published, salary),
+        ...provinceLinks(
+          province.slug,
+          placeName,
+          options.published,
+          salary,
+          province.year,
+        ),
       };
       const data: SalaryPageData = {
         jurisdictions: list.jurisdictions,

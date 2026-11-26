@@ -33,8 +33,11 @@ describe('the province comparison copy', () => {
 
   it('is the approved wording, word for word', () => {
     expect(copy.heading).toBe('Compare provinces at one salary');
-    expect(copy.intro).toBe(
-      "Pick a salary and see how the provinces compare. Every bar is the calculator's own estimate for a single person whose only income is a salary.",
+    expect(strings.comparePage.heading(2026)).toBe(
+      'Take-home pay by province, 2026',
+    );
+    expect(strings.comparePage.title(2026)).toBe(
+      'Take-home pay and income tax by province, 2026',
     );
     expect(copy.toggleLabel).toBe('Compare by');
     expect(copy.measures).toEqual({
@@ -47,20 +50,36 @@ describe('the province comparison copy', () => {
       incomeTax: 'Income tax',
       averageRate: 'Average tax rate',
     });
-    expect(copy.measureNotes).toEqual({
-      takeHome:
-        'Your salary minus income tax, Canada Pension Plan payments and Employment Insurance. Tax cuts such as the Ontario LIFT Credit count.',
-      incomeTax:
-        'The federal and provincial income tax you owe for the year, after the credits that lower it.',
-      averageRate:
-        'Income tax, Canada Pension Plan payments and Employment Insurance, added together, divided by your salary.',
-    });
+    expect(copy.measureNotes.takeHome).toBe(
+      'Your salary minus income tax, pension plan payments and Employment Insurance. Pension plan payments are Canada Pension Plan payments, or Québec Pension Plan payments in Québec, where Québec Parental Insurance Plan premiums and the drug insurance premium are taken off too. Tax cuts count, such as the Ontario LIFT Credit and the Québec abatement.',
+    );
+    expect(copy.measureNotes.incomeTax).toBe(
+      'The federal and provincial income tax you owe for the year, after the credits that lower it. In Ontario this includes the Ontario Health Premium. In Québec it includes the prescription drug insurance premium, which we assume you pay because you have no drug plan at work, and the federal tax is after the Québec abatement.',
+    );
+    expect(copy.measureNotes.averageRate).toBe(
+      'Income tax, pension plan payments, Employment Insurance and, in Québec, Québec Parental Insurance Plan premiums, added together and divided by your salary.',
+    );
+    expect(copy.creditsNote).toBe(
+      'Credits paid to you when you file are not counted.',
+    );
     expect(copy.caption('$70,000', 2026)).toBe(
-      'Bars are for a $70,000 salary in 2026, from highest to lowest.',
+      'Bars are for a $70,000 salary in 2026, lowest income tax first. Provinces with the same income tax are listed in the usual order and share a place.',
+    );
+    expect(copy.tied).toBe(
+      'No province has any income tax at this salary, so they are not ranked.',
+    );
+    expect(copy.rankingNote).toBe(
+      'The order is by income tax. Take-home pay and the average tax rate follow it, except that Québec has its own pension plan, Employment Insurance rate and parental insurance premium, so it can sit out of order.',
+    );
+    expect(copy.reordered('$30,000')).toBe(
+      'Provinces re-ordered by income tax, lowest first, for a $30,000 salary.',
+    );
+    expect(copy.reorderedTied('$1,000')).toBe(
+      'No province has any income tax at $1,000, so they are not ranked.',
     );
     expect(copy.provisional(2026)).toBe('The 2026 figures are provisional.');
-    expect(copy.chartLabel('Take-home pay', '$70,000')).toBe(
-      'Bar chart: Take-home pay for a $70,000 salary, by province. The same figures are in the table below.',
+    expect(copy.chartLabel('Take-home pay', '$70,000', copy.tableToggle)).toBe(
+      'Bar chart: Take-home pay for a $70,000 salary, by province. These figures, and every other salary, are in the table under “Show the figures as a table”.',
     );
   });
 
@@ -68,14 +87,14 @@ describe('the province comparison copy', () => {
     expect(copy.salaryLabel).toBe('Salary a year');
     expect(copy.salaryValueText('$70,000')).toBe('$70,000 a year');
     expect(copy.hint).toBe(
-      'Drag the slider, or use the arrow keys, to pick a salary.',
+      'Drag the slider, or use the arrow keys, to pick a salary. The bars change as you drag. The list is re-ordered when you let go of the slider, or after each arrow-key press.',
     );
     expect(copy.stepNote).toBe(
       'The slider moves in steps of $1,000 up to $250,000, and $5,000 above that.',
     );
     expect(copy.typedLabel).toBe('Or type a salary');
     expect(copy.typedNote).toBe(
-      'A salary you type is shown at the nearest point we have.',
+      'A salary you type is shown at the nearest point we have. A salary you type re-orders the list when you enter it.',
     );
     expect(copy.salaryError('$1,000', '$500,000')).toBe(
       'Enter a salary from $1,000 to $500,000.',
@@ -87,7 +106,9 @@ describe('the province comparison copy', () => {
       ...everyString(copy),
       copy.caption('$70,000', 2026),
       copy.provisional(2026),
-      copy.chartLabel('Take-home pay', '$70,000'),
+      copy.chartLabel('Take-home pay', '$70,000', copy.tableToggle),
+      copy.table.note(2026, true),
+      copy.table.caption(2026, 300),
       copy.salaryError('$1,000', '$500,000'),
     ];
     for (const text of words) {

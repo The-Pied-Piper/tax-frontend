@@ -88,6 +88,8 @@ export type SalaryPageLinks = {
   learnMore: PageLink[];
   /** The province's rates page, with this page's salary in its address, or null when the build writes none. Absent in data written before it existed. */
   rates?: PageLink | null;
+  /** The compare page, with this page's salary in its address, or null when the build writes none. Absent in data written before it existed. */
+  compare?: PageLink | null;
 };
 
 /** What a pre-built salary page carries so React can start where it left off. */

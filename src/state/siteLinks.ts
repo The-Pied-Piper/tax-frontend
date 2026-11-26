@@ -7,6 +7,9 @@ const INDEX = '/index.html';
 /** The page the footer's "How we calculate" link goes to. */
 export const METHODOLOGY_SLUG = 'methodology';
 
+/** The page that compares every province at one salary: one shared address, with no year in it. */
+export const COMPARE_SLUG = 'compare-provinces';
+
 /** The folder, below the site root, that every form page lives in. */
 export const FORMS_SEGMENT = 'forms';
 

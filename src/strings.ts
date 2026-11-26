@@ -59,8 +59,6 @@ export const strings = {
     // The province comparison on a hub; amounts come from money/format.
     comparison: {
       heading: 'Compare provinces at one salary',
-      intro:
-        "Pick a salary and see how the provinces compare. Every bar is the calculator's own estimate for a single person whose only income is a salary.",
       toggleLabel: 'Compare by',
       measures: {
         takeHome: 'Take-home pay',
@@ -75,30 +73,90 @@ export const strings = {
       },
       measureNotes: {
         takeHome:
-          'Your salary minus income tax, Canada Pension Plan payments and Employment Insurance. Tax cuts such as the Ontario LIFT Credit count.',
+          'Your salary minus income tax, pension plan payments and Employment Insurance. Pension plan payments are Canada Pension Plan payments, or Québec Pension Plan payments in Québec, where Québec Parental Insurance Plan premiums and the drug insurance premium are taken off too. Tax cuts count, such as the Ontario LIFT Credit and the Québec abatement.',
         incomeTax:
-          'The federal and provincial income tax you owe for the year, after the credits that lower it.',
+          'The federal and provincial income tax you owe for the year, after the credits that lower it. In Ontario this includes the Ontario Health Premium. In Québec it includes the prescription drug insurance premium, which we assume you pay because you have no drug plan at work, and the federal tax is after the Québec abatement.',
         averageRate:
-          'Income tax, Canada Pension Plan payments and Employment Insurance, added together, divided by your salary.',
+          'Income tax, pension plan payments, Employment Insurance and, in Québec, Québec Parental Insurance Plan premiums, added together and divided by your salary.',
       },
+      // The line after the measure notes, linked to the methodology page.
+      creditsNote: 'Credits paid to you when you file are not counted.',
       caption: (salary: string, year: number) =>
-        `Bars are for a ${salary} salary in ${String(year)}, from highest to lowest.`,
+        `Bars are for a ${salary} salary in ${String(year)}, lowest income tax first. Provinces with the same income tax are listed in the usual order and share a place.`,
+      // In place of the caption when no province has any income tax at the chosen salary.
+      tied: 'No province has any income tax at this salary, so they are not ranked.',
+      // After the three measure notes.
+      rankingNote:
+        'The order is by income tax. Take-home pay and the average tax rate follow it, except that Québec has its own pension plan, Employment Insurance rate and parental insurance premium, so it can sit out of order.',
+      // Spoken once the list has been re-ordered.
+      reordered: (salary: string) =>
+        `Provinces re-ordered by income tax, lowest first, for a ${salary} salary.`,
+      reorderedTied: (salary: string) =>
+        `No province has any income tax at ${salary}, so they are not ranked.`,
+      // The accessible name of a bar's link: to the province's page for the salary shown, or to its hub when there is no such page.
+      barLinkSalaryPage: (
+        place: string,
+        measure: string,
+        value: string,
+        salary: string,
+      ) =>
+        `${place}: ${measure} ${value} for a ${salary} salary. Open the ${place} page for this salary.`,
+      barLinkHub: (
+        place: string,
+        measure: string,
+        value: string,
+        salary: string,
+      ) =>
+        `${place}: ${measure} ${value} for a ${salary} salary. Open the ${place} hub page.`,
       provisional: (year: number) =>
         `The ${String(year)} figures are provisional.`,
       salaryLabel: 'Salary a year',
       salaryValueText: (salary: string) => `${salary} a year`,
-      hint: 'Drag the slider, or use the arrow keys, to pick a salary.',
+      hint: 'Drag the slider, or use the arrow keys, to pick a salary. The bars change as you drag. The list is re-ordered when you let go of the slider, or after each arrow-key press.',
       stepNote:
         'The slider moves in steps of $1,000 up to $250,000, and $5,000 above that.',
       typedLabel: 'Or type a salary',
-      typedNote: 'A salary you type is shown at the nearest point we have.',
+      typedNote:
+        'A salary you type is shown at the nearest point we have. A salary you type re-orders the list when you enter it.',
       salaryError: (lowest: string, highest: string) =>
         `Enter a salary from ${lowest} to ${highest}.`,
-      chartLabel: (measure: string, salary: string) =>
-        `Bar chart: ${measure} for a ${salary} salary, by province. The same figures are in the table below.`,
+      chartLabel: (measure: string, salary: string, tableToggle: string) =>
+        `Bar chart: ${measure} for a ${salary} salary, by province. These figures, and every other salary, are in the table under “${tableToggle}”.`,
       tableToggle: 'Show the figures as a table',
       tableProvince: 'Province',
+      // The one table under the toggle: every salary the chart can show, three figures for each province.
+      table: {
+        note: (year: number, provisional: boolean) =>
+          `The table shows take-home pay, income tax and average tax rate in each province at every salary the chart can show, for a single person whose only income is a salary. Take-home pay is salary minus income tax, pension plan payments and Employment Insurance, and in Québec Québec Parental Insurance Plan premiums. Income tax includes the Ontario Health Premium in Ontario. In Québec it includes the prescription drug insurance premium, and the federal tax is after the Québec abatement. Pension plan payments, Employment Insurance and Québec Parental Insurance Plan premiums have no column of their own, but they count in the average tax rate.${provisional ? ` The ${year.toString()} figures are provisional until the ${year.toString()} forms are final.` : ''}`,
+        caption: (year: number, count: number) =>
+          `Take-home pay, income tax and average tax rate by salary and province, ${year.toString()}: all ${count.toString()} salaries behind the chart.`,
+        salaryHeader: 'Salary a year',
+        takeHomeHeader: 'Take-home pay',
+        incomeTaxHeader: 'Income tax',
+        averageRateHeader: 'Average tax rate',
+        // Shown on narrow screens only.
+        scrollHint:
+          'This table is wide. Scroll sideways to see every province.',
+        scrollLabel:
+          'Table of take-home pay, income tax and average tax rate by salary and province. Scroll sideways to see every province.',
+      },
     },
+  },
+  // The page that compares every province: /compare-provinces/ (copy thread, compare-provinces-copy-final.md).
+  comparePage: {
+    heading: (year: number) => `Take-home pay by province, ${year.toString()}`,
+    title: (year: number) =>
+      `Take-home pay and income tax by province, ${year.toString()}`,
+    description: (count: number, year: number) =>
+      `Compare take-home pay, income tax and average tax rate across ${count.toString()} provinces in ${year.toString()}, at a salary you choose, for a single person with only a salary.`,
+    breadcrumb: 'Compare provinces',
+    sectionHeading: 'Compare by salary',
+    intro: (count: number) =>
+      `Pick a salary and see how ${count.toString()} provinces compare. The provinces are listed with the lowest income tax first, whatever you compare by. Every bar is this site's own estimate for a single person whose only income is a salary.`,
+    coverage: (list: string) =>
+      `These are the provinces this site covers so far: ${list}.`,
+    linksLead: 'See a province in detail:',
+    linksHeading: 'Provinces',
   },
   ratesPage: {
     // What a cause form is called on a "Caused by" chip.
@@ -286,6 +344,15 @@ export const strings = {
     // A salary page's one line: the words, then the link.
     salaryLead: 'See how the rate changes with salary:',
     salaryLink: (place: string) => `${place} tax rates by salary`,
+    salaryRest: '.',
+  },
+  // The hub's one line that points at the compare page (copy thread).
+  compareLink: {
+    lead: 'Compare take-home pay, income tax and the average tax rate across the provinces we cover: ',
+    rest: '.',
+    // A salary page's one line: the words with the page's own salary, then the link to the compare page (its heading, with the year), then a full stop.
+    salaryLead: (salary: string) =>
+      `See how a ${salary} salary compares across the provinces:`,
     salaryRest: '.',
   },
   notices: {

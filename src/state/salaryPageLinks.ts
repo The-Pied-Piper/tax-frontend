@@ -1,6 +1,7 @@
 import { strings } from '../strings';
 import { provinceHubs } from './provinceHubs';
 import {
+  COMPARE_SLUG,
   contentPath,
   formSlug,
   METHODOLOGY_SLUG,
@@ -19,7 +20,8 @@ export function provinceLinks(
   provinceName: string,
   published: ReadonlySet<string>,
   salary: string,
-): Pick<SalaryPageLinks, 'hub' | 'learnMore' | 'rates'> {
+  year: number,
+): Pick<SalaryPageLinks, 'hub' | 'learnMore' | 'rates' | 'compare'> {
   const hubPath = contentPath(slug);
   const learnMore = [
     { label: strings.formPage.hub(provinceName), href: hubPath },
@@ -41,5 +43,16 @@ export function provinceLinks(
           href: `${contentPath(ratesPath)}?salary=${salary}`,
         }
       : null;
-  return { hub: { label: provinceName, href: hubPath }, learnMore, rates };
+  const compare = published.has(COMPARE_SLUG)
+    ? {
+        label: strings.comparePage.heading(year),
+        href: `${contentPath(COMPARE_SLUG)}?salary=${salary}`,
+      }
+    : null;
+  return {
+    hub: { label: provinceName, href: hubPath },
+    learnMore,
+    rates,
+    compare,
+  };
 }

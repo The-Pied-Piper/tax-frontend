@@ -2,6 +2,7 @@ import { separatorsFor } from '../money/salaryInput';
 import { SAMPLE_SALARIES, sampleSweeps } from '../test/comparisonData';
 import { regularSalaries } from './hubCharts';
 import {
+  allTied,
   comparisonRows,
   DEFAULT_SALARY,
   MEASURES,
@@ -118,27 +119,27 @@ describe('comparisonRows', () => {
     ]);
   });
 
-  it('puts the highest income tax first', () => {
+  it('puts the lowest income tax first', () => {
     const rows = comparisonRows(sampleSweeps, at70000, 'incomeTax');
     expect(rows.map((row) => [row.slug, row.value])).toEqual([
-      ['ca-nl', '13217.18'],
-      ['ca-mb', '13020.86'],
-      ['ca-sk', '12250.87'],
-      ['ca-on', '11133.93'],
-      ['ca-ab', '10812.98'],
       ['ca-bc', '10572.03'],
+      ['ca-ab', '10812.98'],
+      ['ca-on', '11133.93'],
+      ['ca-sk', '12250.87'],
+      ['ca-mb', '13020.86'],
+      ['ca-nl', '13217.18'],
     ]);
   });
 
-  it('puts the highest average rate first, in the rate unit', () => {
+  it('ranks the average rate by income tax too, lowest first, in the rate unit', () => {
     const rows = comparisonRows(sampleSweeps, at70000, 'averageRate');
     expect(rows.map((row) => [row.slug, row.value])).toEqual([
-      ['ca-nl', '0.2614'],
-      ['ca-mb', '0.2586'],
-      ['ca-sk', '0.2476'],
-      ['ca-on', '0.2316'],
-      ['ca-ab', '0.227'],
       ['ca-bc', '0.2236'],
+      ['ca-ab', '0.227'],
+      ['ca-on', '0.2316'],
+      ['ca-sk', '0.2476'],
+      ['ca-mb', '0.2586'],
+      ['ca-nl', '0.2614'],
     ]);
     expect(rows.every((row) => row.unit.as_percentage === true)).toBe(true);
     const money = comparisonRows(sampleSweeps, at70000, 'takeHome');
@@ -152,12 +153,13 @@ describe('comparisonRows', () => {
     expect(rows[5]?.width).toBe('95.1');
   });
 
-  it('keeps the order of the list for provinces with the same figure', () => {
+  it('keeps the order of the list for provinces with the same income tax', () => {
     const [on, ab] = sampleSweeps;
     if (!on || !ab) throw new Error('sample sweeps');
     const same = { ...ab, slug: 'ca-xx', points: on.points };
     const rows = comparisonRows([on, same, ab], at70000, 'incomeTax');
-    expect(rows.map((row) => row.slug)).toEqual(['ca-on', 'ca-xx', 'ca-ab']);
+    // Alberta pays less tax than Ontario at $70,000, so it comes first; the two with equal tax keep their order.
+    expect(rows.map((row) => row.slug)).toEqual(['ca-ab', 'ca-on', 'ca-xx']);
   });
 
   it('draws no bar for a figure of zero or less, and none at all when every figure is zero', () => {
@@ -185,9 +187,26 @@ describe('comparisonRows', () => {
       'incomeTax',
     );
     expect(mixed.map((row) => [row.value, row.width])).toEqual([
-      ['20.00', '100.0'],
       ['-50.00', '0.0'],
+      ['20.00', '100.0'],
     ]);
+  });
+
+  it('keeps the order of an earlier salary while the figures are those of the salary now chosen', () => {
+    const rows = comparisonRows(sampleSweeps, 3, 'incomeTax', 2);
+    // At $30,000 (index 2) the order is Ontario's tax before Alberta's, and the figures are still $70,000's.
+    expect(rows.map((row) => row.slug)).toEqual(
+      comparisonRows(sampleSweeps, 2, 'incomeTax').map((row) => row.slug),
+    );
+    expect(rows.find((row) => row.slug === 'ca-on')?.value).toBe('11133.93');
+  });
+});
+
+describe('allTied', () => {
+  it('is true where every province has the same income tax, false where they differ', () => {
+    // Income tax at $1,000 is nil in every sample province.
+    expect(allTied(sampleSweeps, 0)).toBe(true);
+    expect(allTied(sampleSweeps, 3)).toBe(false);
   });
 });
 

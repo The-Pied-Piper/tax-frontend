@@ -103,6 +103,20 @@ describe('generateSalaryPages links', () => {
     );
   });
 
+  it('links each salary page to the compare page with its own salary, when the build writes that page', async () => {
+    const dir = outDir();
+    await run(dir, {
+      published: new Set([...publishedSlugs, 'compare-provinces']),
+    });
+    expect(dataOf(dir, 'ca-on/70000/index.html').links?.compare).toEqual({
+      label: 'Take-home pay by province, 2026',
+      href: '/compare-provinces/?salary=70000',
+    });
+    expect(dataOf(dir, 'ca-on/65000/index.html').links?.compare?.href).toBe(
+      '/compare-provinces/?salary=65000',
+    );
+  });
+
   it('hands the same links to the render function as it writes in the block', async () => {
     const dir = outDir();
     const seen: SalaryPageData[] = [];

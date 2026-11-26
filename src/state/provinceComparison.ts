@@ -81,22 +81,45 @@ function figureOf(
   return measure === 'averageRate' ? roundToFourDecimals(value) : value;
 }
 
+/** True when no province has any income tax at one regular salary (the `index`th), so none ranks above another. */
+export function allTied(
+  provinces: readonly ProvinceSweep[],
+  index: number,
+): boolean {
+  return provinces.every(
+    (province) => compareAmounts(taxOf(province, index), '0') <= 0,
+  );
+}
+
+/** A province's income tax at one regular salary (the `index`th): what every view is ranked by. */
+function taxOf(province: ProvinceSweep, index: number): string {
+  return figureOf(province, index, 'incomeTax');
+}
+
 /**
- * Every province at one regular salary of the sweep (the `index`th), highest figure first (provinces
- * with the same figure keep the order of the list). The longest bar is 100.
+ * Every province at one regular salary of the sweep (the `index`th), lowest income tax first, whichever measure the
+ * bars show, so switching the measure never reorders the list (provinces with the same tax keep the order of the list).
+ * The longest bar is 100.
  */
 export function comparisonRows(
   provinces: readonly ProvinceSweep[],
   index: number,
   measure: Measure,
+  rankIndex: number = index,
 ): ComparisonRow[] {
-  const rows = provinces.map((province) => ({
+  // The order is that of `rankIndex`, which a slider holds until it is released; the figures are those of `index`.
+  const ranked = [...provinces].sort((a, b) =>
+    compareAmounts(taxOf(a, rankIndex), taxOf(b, rankIndex)),
+  );
+  const rows = ranked.map((province) => ({
     slug: province.slug,
     value: figureOf(province, index, measure),
     unit: measure === 'averageRate' ? province.rateUnit : province.unit,
   }));
-  rows.sort((a, b) => compareAmounts(b.value, a.value));
-  const longest = rows[0]?.value ?? '0';
+  const longest = rows.reduce(
+    (most, row) => (compareAmounts(row.value, most) > 0 ? row.value : most),
+    '0',
+  );
   return rows.map((row) => ({
     ...row,
     width:

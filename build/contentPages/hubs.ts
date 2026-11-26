@@ -32,6 +32,7 @@ export function hubPages(
   published: ReadonlySet<string>,
   hubOnly: readonly string[],
   chartSlugs: ReadonlySet<string> = new Set(),
+  compareYear: number | null = null,
 ): ContentPageSpec[] {
   const slugs = [...provinceList.map((province) => province.slug), ...hubOnly];
   for (const slug of chartSlugs) {
@@ -68,6 +69,7 @@ export function hubPages(
       everyPublished,
       otherHubs,
       chartSlugs.has(slug),
+      compareYear,
     );
   });
 }

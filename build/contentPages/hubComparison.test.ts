@@ -5,64 +5,78 @@ import {
   siteUrl,
   tmpDirs,
 } from '../../src/test/generatedSite';
-import { HUB_CHARTS_DATA_ID } from '../../src/state/hubSlots';
-import { PROVINCE_COMPARISON_SLOT_ID } from '../../src/state/hubSlots';
+import {
+  HUB_CHARTS_DATA_ID,
+  PROVINCE_COMPARISON_SLOT_ID,
+} from '../../src/state/hubSlots';
+import { COMPARE_SLUG } from '../../src/state/siteLinks';
 import { strings } from '../../src/strings';
 import { sampleHubCharts, sampleSweeps } from '../../src/test/comparisonData';
-import { provinces } from '../salaryPages/provinces';
 import { renderContentPage } from '../salaryPages/prerender';
+import { compareBlock, comparePage } from './compare';
 import { generateContentPages } from './generate';
-import { hubChartBlocks, hubPages } from './hubs';
+import { hubChartBlocks } from './hubs';
 
-// A written hub carries the whole comparison in its HTML, so a crawler that
-// runs no script reads every province's figures at $70,000.
-const outDir = tmpDirs('hub-comparison');
+// The compare page carries the whole comparison in its HTML, so a crawler that
+// runs no script reads every province's figures at $70,000 and the table of every salary.
+const outDir = tmpDirs('compare-page');
 const names = strings.siteNav.provinceNames;
 
-async function writeHubs(swept: typeof sampleSweeps) {
+async function writePage(swept: typeof sampleSweeps) {
   const dir = outDir();
-  const hubs = hubPages(
-    [],
-    provinces,
-    new Set(),
-    [],
-    new Set(swept.map((sweep) => sweep.slug)),
-  );
+  const page = comparePage(swept);
+  if (!page) return null;
+  // The page links to hubs, which the build writes too; list them as trail-less pages here.
+  const hubs = swept.map((sweep) => ({
+    slug: sweep.slug,
+    title: sweep.slug,
+    description: sweep.slug,
+    heading: sweep.slug,
+    trail: [],
+    sections: [],
+  }));
   await generateContentPages({
     outDir: dir,
     template: contentTemplate,
-    pages: hubs,
-    render: (spec) =>
-      renderContentPage(
-        spec,
-        swept.length === 0 ? undefined : { provinces: swept },
-      ),
+    pages: [page, ...hubs],
+    render: (spec) => renderContentPage(spec, { provinces: swept }),
     siteUrl,
-    dataBlocks: hubChartBlocks(swept),
+    dataBlocks: compareBlock(hubChartBlocks(swept)),
   });
-  return (slug: string) =>
-    new DOMParser().parseFromString(
-      readFileSync(join(dir, slug, 'index.html'), 'utf8'),
-      'text/html',
-    );
+  return new DOMParser().parseFromString(
+    readFileSync(join(dir, COMPARE_SLUG, 'index.html'), 'utf8'),
+    'text/html',
+  );
 }
 
-describe('a written hub with a sweep', () => {
+describe('the written compare page', () => {
   let page: Document;
   beforeAll(async () => {
-    page = (await writeHubs(sampleSweeps))('ca-on');
+    const written = await writePage(sampleSweeps);
+    if (!written) throw new Error('no page');
+    page = written;
   });
 
-  it('has the heading, the intro and the slot with the hub province', () => {
-    const slot = page.getElementById(PROVINCE_COMPARISON_SLOT_ID);
-    expect(slot?.dataset.province).toBe('ca-on');
+  it('has the year in its title, heading and description, and no province highlighted', () => {
+    expect(page.title).toBe('Take-home pay and income tax by province, 2026');
+    expect(page.querySelector('h1')?.textContent).toBe(
+      'Take-home pay by province, 2026',
+    );
     expect(
-      Array.from(page.querySelectorAll('h2')).map((h) => h.textContent),
-    ).toContain(strings.hubCharts.comparison.heading);
-    expect(page.body.textContent).toContain(strings.hubCharts.comparison.intro);
+      page.querySelector('meta[name="description"]')?.getAttribute('content'),
+    ).toContain('across 6 provinces in 2026');
+    const slot = page.getElementById(PROVINCE_COMPARISON_SLOT_ID);
+    expect(slot?.dataset.province).toBeUndefined();
+    expect(slot?.querySelector('[aria-current]')).toBeNull();
   });
 
-  it('has every province at $70,000 in the page itself, bars and table', () => {
+  it('says which provinces it covers, in the list order', () => {
+    expect(page.body.textContent).toContain(
+      `These are the provinces this site covers so far: ${names['ca-on']}, ${names['ca-ab']}, ${names['ca-bc']}, ${names['ca-mb']}, ${names['ca-sk']} and ${names['ca-nl']}.`,
+    );
+  });
+
+  it('has every province at $70,000 in the page itself, lowest income tax first', () => {
     const slot = page.getElementById(PROVINCE_COMPARISON_SLOT_ID);
     const bars = Array.from(slot?.querySelectorAll('ol > li') ?? []).map(
       (li) => li.textContent,
@@ -75,19 +89,52 @@ describe('a written hub with a sweep', () => {
       `${names['ca-mb']}$51,899.32`,
       `${names['ca-nl']}$51,703.00`,
     ]);
-    expect(slot?.querySelectorAll('table tbody tr')).toHaveLength(6);
-    expect(slot?.textContent).toContain(
-      'Bars are for a $70,000 salary in 2026, from highest to lowest.',
-    );
   });
 
-  it('links each other province to its own hub, a page this build wrote', () => {
+  it('has the table of every salary in the HTML, without script', () => {
+    const slot = page.getElementById(PROVINCE_COMPARISON_SLOT_ID);
+    // Two heading rows and a row for each regular salary of the sample.
+    expect(slot?.querySelectorAll('table tr')).toHaveLength(2 + 8);
+    expect(slot?.querySelector('table caption')?.textContent).toContain(
+      'all 8 salaries behind the chart',
+    );
+    const row = Array.from(slot?.querySelectorAll('tbody tr') ?? []).find(
+      (tr) => tr.querySelector('th')?.textContent === '$70,000',
+    );
+    expect(
+      Array.from(row?.querySelectorAll('td') ?? []).map((td) => td.textContent),
+    ).toHaveLength(sampleSweeps.length * 3);
+  });
+
+  it('links every province to its own hub, in the bars and in the list of provinces', () => {
     const slot = page.getElementById(PROVINCE_COMPARISON_SLOT_ID);
     expect(
-      Array.from(slot?.querySelectorAll('a') ?? []).map((a) =>
+      Array.from(slot?.querySelectorAll('ol a') ?? []).map((a) =>
         a.getAttribute('href'),
       ),
-    ).toEqual(['/ca-bc/', '/ca-ab/', '/ca-sk/', '/ca-mb/', '/ca-nl/']);
+    ).toEqual([
+      '/ca-bc/',
+      '/ca-ab/',
+      '/ca-on/',
+      '/ca-sk/',
+      '/ca-mb/',
+      '/ca-nl/',
+    ]);
+    const nav = page.querySelector(
+      `nav[aria-label="${strings.comparePage.linksHeading}"]`,
+    );
+    expect(
+      Array.from(nav?.querySelectorAll('a') ?? []).map((a) =>
+        a.getAttribute('href'),
+      ),
+    ).toEqual([
+      '/ca-on/',
+      '/ca-ab/',
+      '/ca-bc/',
+      '/ca-mb/',
+      '/ca-sk/',
+      '/ca-nl/',
+    ]);
   });
 
   it('carries the data block the comparison is mounted from, once', () => {
@@ -95,43 +142,11 @@ describe('a written hub with a sweep', () => {
     expect(blocks).toHaveLength(1);
     expect(JSON.parse(blocks[0]?.textContent ?? '')).toEqual(sampleHubCharts);
   });
-
-  it('keeps the charts data out of the visible text', () => {
-    const copy = new DOMParser().parseFromString(
-      page.documentElement.outerHTML,
-      'text/html',
-    );
-    copy.querySelectorAll('script').forEach((script) => {
-      script.remove();
-    });
-    expect(copy.body.textContent).not.toContain('"provinces"');
-  });
 });
 
-describe('a written hub with no sweep', () => {
-  it('has no comparison, no slot and no data block, and no error', async () => {
-    const read = await writeHubs([]);
-    const page = read('ca-on');
-    expect(page.getElementById(PROVINCE_COMPARISON_SLOT_ID)).toBeNull();
-    expect(page.getElementById(HUB_CHARTS_DATA_ID)).toBeNull();
-    expect(page.body.textContent).not.toContain(
-      strings.hubCharts.comparison.heading,
-    );
-  });
-});
-
-describe('a written hub of a province the sweep left out', () => {
-  it('shows no comparison and no bar for it', async () => {
-    const [, ...rest] = sampleSweeps;
-    const read = await writeHubs(rest);
-    expect(
-      read('ca-on').getElementById(PROVINCE_COMPARISON_SLOT_ID),
-    ).toBeNull();
-    const other = read('ca-ab');
-    const bars = Array.from(
-      other.querySelectorAll(`#${PROVINCE_COMPARISON_SLOT_ID} ol > li`),
-    ).map((li) => li.textContent);
-    expect(bars).toHaveLength(5);
-    expect(bars.join('')).not.toContain(names['ca-on']);
+describe('the compare page with no sweep', () => {
+  it('is not written at all', () => {
+    expect(comparePage([])).toBeNull();
+    expect(compareBlock(new Map()).size).toBe(0);
   });
 });

@@ -92,6 +92,15 @@ describe('provinceSweeps', () => {
     expect(sweep?.facts).toEqual({ surtax_first: '5818' });
   });
 
+  it("carries the salaries of the province's own salary pages, for the bars to link to", () => {
+    const [sweep] = provinceSweeps(
+      { 'CA-ON': sweepOf() },
+      [{ province: ontario, unit: saved.unit, salaries: ['30000', '35000'] }],
+      list,
+    );
+    expect(sweep?.salaryPages).toEqual(['30000', '35000']);
+  });
+
   it('sweeps only the provinces that were built', () => {
     const sweeps = provinceSweeps(
       { 'CA-ON': sweepOf(), 'CA-AB': sweepOf() },

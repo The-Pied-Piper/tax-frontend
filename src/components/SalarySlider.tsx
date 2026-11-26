@@ -24,13 +24,21 @@ type Props = {
   index: number;
   unit: MoneyUnit;
   onChange: (index: number) => void;
+  /** Called with the index when the slider is let go, or a typed salary is taken: the moment a list may re-sort. */
+  onSettle?: (index: number) => void;
 };
 
 const copy = strings.hubCharts.comparison;
 
 // A slider over the salaries of the sweep, and a box to type one. The page owns
 // the chosen index; the box keeps only what is being typed and whether it was refused.
-export function SalarySlider({ salaries, index, unit, onChange }: Props) {
+export function SalarySlider({
+  salaries,
+  index,
+  unit,
+  onChange,
+  onSettle,
+}: Props) {
   const separators = useMemo(() => separatorsFor(languageCode), []);
   const [draft, setDraft] = useState<string | null>(null);
   const [refused, setRefused] = useState(false);
@@ -49,6 +57,7 @@ export function SalarySlider({ salaries, index, unit, onChange }: Props) {
     setRefused(false);
     setDraft(null);
     onChange(at);
+    onSettle?.(at);
   }
 
   return (
@@ -71,6 +80,15 @@ export function SalarySlider({ salaries, index, unit, onChange }: Props) {
             setDraft(null);
             setRefused(false);
             onChange(event.target.valueAsNumber);
+          }}
+          onPointerUp={(event) => {
+            onSettle?.(event.currentTarget.valueAsNumber);
+          }}
+          onKeyUp={(event) => {
+            onSettle?.(event.currentTarget.valueAsNumber);
+          }}
+          onBlur={(event) => {
+            onSettle?.(event.currentTarget.valueAsNumber);
           }}
         />
         <div className={styles.ends} aria-hidden="true">
