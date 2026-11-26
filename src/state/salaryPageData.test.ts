@@ -132,6 +132,28 @@ describe('parseSalaryPageData links (#81)', () => {
     expect(parse({ ...valid, links })).toEqual({ ...valid, links });
   });
 
+  it('accepts a rates link, a null one, and data written before there was one', () => {
+    const rates = {
+      label: 'Ontario tax rates by salary',
+      href: '/ca-on/tax-rates/?salary=70000',
+    };
+    expect(parse({ ...valid, links: { ...links, rates } })).toEqual({
+      ...valid,
+      links: { ...links, rates },
+    });
+    expect(parse({ ...valid, links })).not.toBeNull();
+    expect(
+      parse({ ...valid, links: { ...links, rates: null } }),
+    ).not.toBeNull();
+  });
+
+  it.each([
+    ['not a link', 'x'],
+    ['off-site', { label: 'x', href: 'https://x.test/' }],
+  ])('is null when the rates link is bad: %s', (_why, bad) => {
+    expect(parse({ ...valid, links: { ...links, rates: bad } })).toBeNull();
+  });
+
   it('still accepts a block with no links, as written before', () => {
     expect(parse(valid)).toEqual(valid);
   });

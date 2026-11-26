@@ -86,6 +86,8 @@ export type SalaryPageLinks = {
   hub: PageLink;
   /** The "Learn more" links: the hub, the methodology page and the main form page, when they exist. */
   learnMore: PageLink[];
+  /** The province's rates page, with this page's salary in its address, or null when the build writes none. Absent in data written before it existed. */
+  rates?: PageLink | null;
 };
 
 /** What a pre-built salary page carries so React can start where it left off. */

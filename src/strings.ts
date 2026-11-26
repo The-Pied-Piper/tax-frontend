@@ -266,6 +266,18 @@ export const strings = {
     label: 'Learn more about this estimate',
     form: (name: string) => `What is ${name}?`,
   },
+  // The links to a province's rates page, worded by the copy thread (rates-page final copy, "Link lines").
+  ratesLink: {
+    // A hub's one line: the link, then the rest of the sentence.
+    hubLink: (place: string) =>
+      `Marginal and average tax rate by salary in ${place}`,
+    hubRest:
+      ': how much of each extra dollar goes to tax, and what causes every step, from $0 to $500,000.',
+    // A salary page's one line: the words, then the link.
+    salaryLead: 'See how the rate changes with salary:',
+    salaryLink: (place: string) => `${place} tax rates by salary`,
+    salaryRest: '.',
+  },
   notices: {
     provisionalTitle: (year: number) =>
       `${String(year)} figures are provisional.`,
