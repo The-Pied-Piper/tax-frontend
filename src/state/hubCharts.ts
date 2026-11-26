@@ -42,9 +42,93 @@ const EXTRA_SALARIES = [
   '201800',
 ];
 
-/** Every salary of the sweep as text, lowest first: the regular ones and the extra ones. */
-export function sweepSalaries(): string[] {
-  return [...regularSalaries(), ...EXTRA_SALARIES].sort(compareAmounts);
+/**
+ * Salaries added to one province's sweep only: a salary on each side of every change of its marginal rate (the engine's
+ * edges), so its rates page draws each step at its true place. Only that province's sweep carries them, which keeps the
+ * hub data block, which holds every province's sweep, under its size limit. The same lists are `extra` of each province in
+ * `build/salaryPages/provinces.json`, which the Python step reads (a test fails if they differ).
+ */
+export const PROVINCE_EXTRA_SALARIES: Readonly<
+  Record<string, readonly string[]>
+> = {
+  'ca-ab': [
+    '2001',
+    '2033',
+    '2034',
+    '3500',
+    '3501',
+    '19200',
+    '19201',
+    '24411',
+    '24412',
+    '59078',
+    '59079',
+    '61782',
+    '61783',
+    '68899',
+    '68900',
+    '74599',
+    '74601',
+    '84999',
+    '118172',
+    '118173',
+    '155386',
+    '155387',
+    '182567',
+    '182568',
+    '186238',
+    '186239',
+    '247940',
+    '247941',
+    '259608',
+    '259610',
+    '371347',
+    '371348',
+  ],
+  'ca-bc': [
+    '2001',
+    '2033',
+    '2034',
+    '3500',
+    '3501',
+    '19200',
+    '19201',
+    '26752',
+    '26753',
+    '45370',
+    '45371',
+    '50836',
+    '50837',
+    '59078',
+    '59079',
+    '68899',
+    '68900',
+    '74599',
+    '74601',
+    '84999',
+    '101855',
+    '101856',
+    '116775',
+    '116776',
+    '118172',
+    '118173',
+    '141557',
+    '141558',
+    '182567',
+    '182568',
+    '191532',
+    '191533',
+    '259608',
+    '259610',
+    '266672',
+    '266673',
+  ],
+};
+
+/** Every salary of a province's sweep as text, lowest first: the regular ones, the extra ones every province has, and the province's own (`slug`; none for a province with no list). */
+export function sweepSalaries(slug?: string): string[] {
+  const own = (slug && PROVINCE_EXTRA_SALARIES[slug]) || [];
+  return [...regularSalaries(), ...EXTRA_SALARIES, ...own].sort(compareAmounts);
 }
 
 /** The indexes of the points at a regular salary, in order. */
@@ -175,6 +259,11 @@ function salariesOf(sweep: ProvinceSweep): string[] {
   return sweep.points.map((point) => point[0]);
 }
 
+/** The salaries of a province's regular points: the ones every province has in common. */
+function regularSalariesOf(sweep: ProvinceSweep): string[] {
+  return regularIndexes(sweep.points).map((at) => sweep.points[at]?.[0] ?? '');
+}
+
 /** True when the salaries of the points are above zero and rise. */
 function hasRisingSalaries(sweep: ProvinceSweep): boolean {
   return salariesOf(sweep).every(
@@ -184,8 +273,8 @@ function hasRisingSalaries(sweep: ProvinceSweep): boolean {
 }
 
 /**
- * True when every province has the same salaries and year, and no slug is repeated. The comparison reads
- * every province at one position of the sweep and states one year.
+ * True when every province has the same regular salaries and year, and no slug is repeated. The comparison reads
+ * every province at one regular salary and states one year; a province's own extra points are its own.
  */
 function shareSalariesAndYear(provinces: ProvinceSweep[]): boolean {
   const [first] = provinces;
@@ -193,10 +282,11 @@ function shareSalariesAndYear(provinces: ProvinceSweep[]): boolean {
   if (new Set(provinces.map((sweep) => sweep.slug)).size !== provinces.length) {
     return false;
   }
-  const salaries = salariesOf(first).join(',');
+  const salaries = regularSalariesOf(first).join(',');
   return provinces.every(
     (sweep) =>
-      sweep.year === first.year && salariesOf(sweep).join(',') === salaries,
+      sweep.year === first.year &&
+      regularSalariesOf(sweep).join(',') === salaries,
   );
 }
 

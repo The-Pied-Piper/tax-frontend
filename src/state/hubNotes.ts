@@ -51,6 +51,8 @@ import type { FooterProvinceSlug } from './siteLinks';
  *  - `n:name`           a dollar figure the engine wrote, with its cents as written ("$33.14");
  *  - `h:column@salary`  a rate at a sweep salary to one decimal, whichever column ("7.6%", "73.3%"); the rates page uses this
  *                       in place of `r:`, which rounds the marginal rate to the half point;
+ *  - `u:column@salary`  the share kept, one minus that rate, to one decimal ("52.0%"), rounded once; the rates page uses this
+ *                       in place of `k:`, which rounds to four decimals and shows "52%";
  *  - `w:column@a-b`     the gap between a column at two sweep salaries, as a rate to one decimal ("12.9%": the marginal
  *                       rate at salary a less the rate at salary b);
  *  - `x:name`           a figure the engine wrote, as it wrote it ("0.99"), for a factor that is neither money nor a rate;
@@ -88,7 +90,7 @@ function pointAt(points: readonly SweepPoint[], salary: string): SweepPoint {
 /** A parsed spec. */
 export type ParsedSpec =
   | {
-      kind: 'm' | 'r' | 'k' | 'q' | 'c' | 'h';
+      kind: 'm' | 'r' | 'k' | 'q' | 'c' | 'h' | 'u';
       column: NoteColumn;
       salary: string;
     }
@@ -139,7 +141,8 @@ export function parseSpec(spec: string): ParsedSpec {
       kind === 'k' ||
       kind === 'q' ||
       kind === 'c' ||
-      kind === 'h') &&
+      kind === 'h' ||
+      kind === 'u') &&
     parts.length === 2
   ) {
     const [column = '', salary = ''] = first.split('@');
@@ -249,9 +252,13 @@ export function figureText(spec: ParsedSpec, sweep: ProvinceSweep): string {
     case 'k':
     case 'q':
     case 'c':
+    case 'u':
     case 'h': {
       const value = columnValue(pointAt(points, spec.salary), spec.column);
       if (spec.kind === 'h') return displayRateOneDecimal(value, rateUnit);
+      if (spec.kind === 'u') {
+        return displayRateOneDecimal(subtractAmounts('1', value), rateUnit);
+      }
       if (spec.kind === 'm') {
         return displayWholeMoney(roundToWhole(value), 'annually', unit);
       }
@@ -298,7 +305,7 @@ export function noteWords(note: Note, sweep: ProvinceSweep): string {
 
 /** True when the sweep holds every salary of `sweepSalaries()`, which the notes read figures at. The build refuses any other, so only partial test data fails this. */
 export function isFullSweep(sweep: ProvinceSweep): boolean {
-  const expected = sweepSalaries();
+  const expected = sweepSalaries(sweep.slug);
   return (
     sweep.points.length === expected.length &&
     sweep.points.every((point, at) => point[0] === `${expected[at] ?? ''}.00`)

@@ -107,6 +107,7 @@ export const strings = {
       bc428: 'Form BC428',
       on428: 'Form ON428',
       on428a: 'Schedule ON428-A',
+      ab428: 'Form AB428',
       t2204: 'Form T2204',
       schedule8: 'Schedule 8',
     },
@@ -266,6 +267,18 @@ export const strings = {
   learnMore: {
     label: 'Learn more about this estimate',
     form: (name: string) => `What is ${name}?`,
+  },
+  // The links to a province's rates page, worded by the copy thread (rates-page final copy, "Link lines").
+  ratesLink: {
+    // A hub's one line: the link, then the rest of the sentence.
+    hubLink: (place: string) =>
+      `Marginal and average tax rate by salary in ${place}`,
+    hubRest:
+      ': how much of each extra dollar goes to tax, and what causes every step, from $0 to $500,000.',
+    // A salary page's one line: the words, then the link.
+    salaryLead: 'See how the rate changes with salary:',
+    salaryLink: (place: string) => `${place} tax rates by salary`,
+    salaryRest: '.',
   },
   notices: {
     provisionalTitle: (year: number) =>

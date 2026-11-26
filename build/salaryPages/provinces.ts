@@ -12,6 +12,8 @@ export type Province = {
   from: number;
   to: number;
   step: number;
+  /** Salaries added to this province's sweep only (see `PROVINCE_EXTRA_SALARIES`). */
+  extra?: number[];
 };
 
 /** One entry per province (build/salaryPages/provinces.json, which the Python step reads too, with the hub-chart salary steps). A province the API does not return fails a build with a site URL and is skipped without one. */
