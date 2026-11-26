@@ -69,13 +69,13 @@ describe('the content entry on the compare page', () => {
   it('makes the mounted comparison interactive', async () => {
     await loadEntry();
     const toggle = slot().querySelector<HTMLInputElement>(
-      'input[type=radio][value=incomeTax]',
+      'input[type=radio][value=takenOff]',
     );
     expect(toggle).not.toBeNull();
     act(() => {
       toggle?.click();
     });
-    expect(slot().textContent).toContain('$13,217.18');
+    expect(slot().textContent).toContain('$18,297.00');
   });
 });
 

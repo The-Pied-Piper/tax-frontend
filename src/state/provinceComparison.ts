@@ -8,19 +8,19 @@ import {
 import { regularIndexes, SWEEP_COLUMN, type ProvinceSweep } from './hubCharts';
 
 /** What the bars show. */
-export type Measure = 'takeHome' | 'incomeTax' | 'averageRate';
+export type Measure = 'takeHome' | 'takenOff' | 'averageRate';
 
 /** The measures in the order of the toggle. */
 export const MEASURES: readonly Measure[] = [
   'takeHome',
-  'incomeTax',
+  'takenOff',
   'averageRate',
 ];
 
 // Each measure's place in a sweep point.
 const COLUMN = {
   takeHome: SWEEP_COLUMN.takeHome,
-  incomeTax: SWEEP_COLUMN.tax,
+  takenOff: SWEEP_COLUMN.deductions,
   averageRate: SWEEP_COLUMN.average,
 } as const;
 
@@ -80,24 +80,26 @@ function figureOf(
   return value;
 }
 
-/** True when no province has any income tax at one regular salary (the `index`th), so none ranks above another. */
+/** True when no province takes anything off at one regular salary (the `index`th): no income tax and no contributions, so none ranks above another. */
 export function allTied(
   provinces: readonly ProvinceSweep[],
   index: number,
 ): boolean {
   return provinces.every(
-    (province) => compareAmounts(taxOf(province, index), '0') <= 0,
+    (province) => compareAmounts(takenOffOf(province, index), '0') <= 0,
   );
 }
 
-/** A province's income tax at one regular salary (the `index`th): what every view is ranked by. */
-function taxOf(province: ProvinceSweep, index: number): string {
-  return figureOf(province, index, 'incomeTax');
+/** What comes off the salary in a province at one regular salary (the `index`th): income tax and contributions together, salary minus take-home. Every view is ranked by it, which puts take-home pay and the average tax rate in the same order. */
+function takenOffOf(province: ProvinceSweep, index: number): string {
+  return figureOf(province, index, 'takenOff');
 }
 
 /**
- * Every province at one regular salary of the sweep (the `index`th), lowest income tax first, whichever measure the
- * bars show, so switching the measure never reorders the list (provinces with the same tax keep the order of the list).
+ * Every province at one regular salary of the sweep (the `index`th), with the least taken off the salary first (income
+ * tax and contributions together), whichever measure the bars show. That is the order of take-home pay, highest first,
+ * and of the average tax rate, lowest first, so switching the measure never reorders the list (provinces with the same
+ * amount taken off keep the order of the list).
  * The longest bar is 100.
  */
 export function comparisonRows(
@@ -106,7 +108,7 @@ export function comparisonRows(
   measure: Measure,
 ): ComparisonRow[] {
   const ranked = [...provinces].sort((a, b) =>
-    compareAmounts(taxOf(a, index), taxOf(b, index)),
+    compareAmounts(takenOffOf(a, index), takenOffOf(b, index)),
   );
   const rows = ranked.map((province) => ({
     slug: province.slug,

@@ -28,7 +28,7 @@ const box = () => screen.getByRole('textbox', { name: copy.typedLabel });
 const measure = (name: string) => screen.getByRole('radio', { name });
 
 describe('ProvinceComparison at the start', () => {
-  it('shows take-home pay at $70,000, lowest income tax first, every province once', () => {
+  it('shows take-home pay at $70,000, lowest tax and contributions first, every province once', () => {
     show();
     expect(barTexts()).toEqual([
       `${names['ca-bc']}$54,348.15`,
@@ -56,11 +56,11 @@ describe('ProvinceComparison at the start', () => {
     ).toBeInTheDocument();
   });
 
-  it('says what the bars are, the year and that they run from the lowest income tax', () => {
+  it('says what the bars are, the year and that they run from the lowest tax and contributions', () => {
     show();
     expect(
       screen.getByText(
-        'Bars are for a $70,000 salary in 2026, lowest income tax first. Provinces with the same income tax are listed in the usual order.',
+        'Bars are for a $70,000 salary in 2026, lowest tax and contributions first. Provinces with the same amount are listed in the usual order.',
       ),
     ).toBeInTheDocument();
     expect(screen.getByText(copy.measureNotes.takeHome)).toBeInTheDocument();
@@ -88,7 +88,7 @@ describe('ProvinceComparison at the start', () => {
       within(group)
         .getAllByRole('radio')
         .map((radio) => radio.getAttribute('value')),
-    ).toEqual(['takeHome', 'incomeTax', 'averageRate']);
+    ).toEqual(['takeHome', 'takenOff', 'averageRate']);
     // Screen readers get the full wording; the phone wording is visual only and hidden from them.
     for (const option of MEASURES) {
       const label = measure(copy.measures[option]).parentElement;
@@ -131,22 +131,22 @@ describe('the highlighted province and the links', () => {
 });
 
 describe('the measure toggle', () => {
-  it('re-words the bars for income tax and keeps the order', () => {
+  it('re-words the bars for tax and contributions and keeps the order', () => {
     show();
-    fireEvent.click(measure(copy.measures.incomeTax));
+    fireEvent.click(measure(copy.measures.takenOff));
     expect(barTexts()).toEqual([
-      `${names['ca-bc']}$10,572.03`,
-      `${names['ca-ab']}$10,812.98`,
-      `${names['ca-on']}$11,133.93`,
-      `${names['ca-sk']}$12,250.87`,
-      `${names['ca-mb']}$13,020.86`,
-      `${names['ca-nl']}$13,217.18`,
+      `${names['ca-bc']}$15,651.85`,
+      `${names['ca-ab']}$15,892.80`,
+      `${names['ca-on']}$16,213.75`,
+      `${names['ca-sk']}$17,330.69`,
+      `${names['ca-mb']}$18,100.68`,
+      `${names['ca-nl']}$18,297.00`,
     ]);
-    expect(screen.getByText(copy.measureNotes.incomeTax)).toBeInTheDocument();
+    expect(screen.getByText(copy.measureNotes.takenOff)).toBeInTheDocument();
     expect(screen.queryByText(copy.measureNotes.takeHome)).toBeNull();
     expect(
       screen.getByRole('group', {
-        name: 'Bar chart: Income tax for a $70,000 salary, by province. These figures, and every other salary, are in the table under “Show the figures as a table”.',
+        name: 'Bar chart: Tax and contributions for a $70,000 salary, by province. These figures, and every other salary, are in the table under “Show the figures as a table”.',
       }),
     ).toBeInTheDocument();
   });
@@ -168,10 +168,10 @@ describe('the measure toggle', () => {
   it('keeps the salary when the measure changes, and the measure when the salary changes', () => {
     show();
     fireEvent.change(slider(), { target: { value: '2' } });
-    fireEvent.click(measure(copy.measures.incomeTax));
+    fireEvent.click(measure(copy.measures.takenOff));
     expect(slider()).toHaveAttribute('aria-valuetext', '$30,000 a year');
     fireEvent.change(slider(), { target: { value: '4' } });
-    expect(measure(copy.measures.incomeTax)).toBeChecked();
+    expect(measure(copy.measures.takenOff)).toBeChecked();
   });
 });
 
@@ -182,7 +182,7 @@ describe('the salary controls', () => {
     fireEvent.pointerUp(slider());
     expect(
       screen.getByText(
-        'Bars are for a $30,000 salary in 2026, lowest income tax first. Provinces with the same income tax are listed in the usual order.',
+        'Bars are for a $30,000 salary in 2026, lowest tax and contributions first. Provinces with the same amount are listed in the usual order.',
       ),
     ).toBeInTheDocument();
     expect(barTexts()).toEqual([
@@ -203,7 +203,7 @@ describe('the salary controls', () => {
     expect(slider()).toHaveAttribute('aria-valuetext', '$150,000 a year');
     expect(
       screen.getByText(
-        'Bars are for a $150,000 salary in 2026, lowest income tax first. Provinces with the same income tax are listed in the usual order.',
+        'Bars are for a $150,000 salary in 2026, lowest tax and contributions first. Provinces with the same amount are listed in the usual order.',
       ),
     ).toBeInTheDocument();
   });
@@ -288,7 +288,7 @@ describe('the table of the figures', () => {
     ).toEqual(
       sampleSweeps.flatMap(() => [
         copy.table.takeHomeHeader,
-        copy.table.incomeTaxHeader,
+        copy.table.takenOffHeader,
         copy.table.averageRateHeader,
       ]),
     );
@@ -306,7 +306,7 @@ describe('the table of the figures', () => {
       .getAllByRole('cell')
       .map((cell) => cell.textContent);
     // Ontario is the first province of the sample sweep.
-    expect(cells.slice(0, 3)).toEqual(['$53,786', '$11,134', '23.2%']);
+    expect(cells.slice(0, 3)).toEqual(['$53,786', '$16,214', '23.2%']);
     expect(cells).toHaveLength(sampleSweeps.length * 3);
   });
 
@@ -382,11 +382,6 @@ describe('a comparison that belongs to no province', () => {
 });
 
 describe('the order of the list', () => {
-  it('says the list is ordered by income tax, and which province can sit out of order', () => {
-    show();
-    expect(screen.getByText(copy.rankingNote)).toBeInTheDocument();
-  });
-
   it('announces the new order once the slider is let go, and nothing before', () => {
     show();
     expect(screen.getByRole('status')).toBeEmptyDOMElement();
@@ -470,7 +465,7 @@ describe('what the card does not do', () => {
     const fetcher = vi.spyOn(globalThis, 'fetch');
     const setItem = vi.spyOn(Storage.prototype, 'setItem');
     show();
-    fireEvent.click(measure(copy.measures.incomeTax));
+    fireEvent.click(measure(copy.measures.takenOff));
     fireEvent.change(slider(), { target: { value: '1' } });
     expect(fetcher).not.toHaveBeenCalled();
     expect(setItem).not.toHaveBeenCalled();

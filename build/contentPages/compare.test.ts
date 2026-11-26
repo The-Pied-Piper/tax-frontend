@@ -58,7 +58,9 @@ describe('the written compare page', () => {
   });
 
   it('has the year in its title, heading and description, and no province highlighted', () => {
-    expect(page.title).toBe('Take-home pay and income tax by province, 2026');
+    expect(page.title).toBe(
+      'Take-home pay, tax and contributions by province, 2026',
+    );
     expect(page.querySelector('h1')?.textContent).toBe(
       'Take-home pay by province, 2026',
     );

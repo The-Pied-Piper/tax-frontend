@@ -37,45 +37,48 @@ describe('the province comparison copy', () => {
       'Take-home pay by province, 2026',
     );
     expect(strings.comparePage.title(2026)).toBe(
-      'Take-home pay and income tax by province, 2026',
+      'Take-home pay, tax and contributions by province, 2026',
+    );
+    expect(strings.comparePage.intro(7)).toBe(
+      "Pick a salary and see how 7 provinces compare. The provinces are always listed with the lowest tax and contributions first, whichever of the three figures you compare. Every bar is this site's own estimate for a single person whose only income is a salary.",
+    );
+    expect(copy.table.note(2026, false)).toContain(
+      'Tax and contributions is income tax, pension plan payments and Employment Insurance, and in Québec Québec Parental Insurance Plan premiums, added together. It is your salary minus your take-home pay. The average tax rate is that amount divided by your salary.',
     );
     expect(copy.toggleLabel).toBe('Compare by');
     expect(copy.measures).toEqual({
       takeHome: 'Take-home pay',
-      incomeTax: 'Income tax',
+      takenOff: 'Tax and contributions',
       averageRate: 'Average tax rate',
     });
     expect(copy.measuresPhone).toEqual({
       takeHome: 'Take-home pay',
-      incomeTax: 'Income tax',
+      takenOff: 'Tax and payments',
       averageRate: 'Average tax rate',
     });
     expect(copy.measureNotes.takeHome).toBe(
       'Your salary minus income tax, pension plan payments and Employment Insurance. Pension plan payments are Canada Pension Plan payments, or Québec Pension Plan payments in Québec, where Québec Parental Insurance Plan premiums and the drug insurance premium are taken off too. Tax cuts count, such as the Ontario LIFT Credit and the Québec abatement.',
     );
-    expect(copy.measureNotes.incomeTax).toBe(
-      'The federal and provincial income tax you owe for the year, after the credits that lower it. In Ontario this includes the Ontario Health Premium. In Québec it includes the prescription drug insurance premium, which we assume you pay because you have no drug plan at work, and the federal tax is after the Québec abatement.',
+    expect(copy.measureNotes.takenOff).toBe(
+      'Income tax, pension plan payments and Employment Insurance added together, which is your salary minus your take-home pay. In Québec the pension plan is the Québec Pension Plan, and Québec Parental Insurance Plan premiums are added too. Income tax includes the Ontario Health Premium in Ontario. In Québec it includes the prescription drug insurance premium, which we assume you pay because you have no drug plan at work, and the federal tax is after the Québec abatement.',
     );
     expect(copy.measureNotes.averageRate).toBe(
-      'Income tax, pension plan payments, Employment Insurance and, in Québec, Québec Parental Insurance Plan premiums, added together and divided by your salary.',
+      'Tax and contributions divided by your salary.',
     );
     expect(copy.creditsNote).toBe(
       'Credits paid to you when you file are not counted.',
     );
     expect(copy.caption('$70,000', 2026)).toBe(
-      'Bars are for a $70,000 salary in 2026, lowest income tax first. Provinces with the same income tax are listed in the usual order.',
+      'Bars are for a $70,000 salary in 2026, lowest tax and contributions first. Provinces with the same amount are listed in the usual order.',
     );
     expect(copy.tied).toBe(
-      'No province has any income tax at this salary, so they are not ranked.',
-    );
-    expect(copy.rankingNote).toBe(
-      'The order is by income tax. Take-home pay and the average tax rate follow it, except that Québec has its own pension plan, Employment Insurance rate and parental insurance premium, so it can sit out of order.',
+      'At this salary no province takes any tax or contributions, so the provinces are not ranked.',
     );
     expect(copy.reordered('$30,000')).toBe(
-      'Provinces re-ordered by income tax, lowest first, for a $30,000 salary.',
+      'Provinces re-ordered by tax and contributions, lowest first, for a $30,000 salary.',
     );
     expect(copy.reorderedTied('$1,000')).toBe(
-      'No province has any income tax at $1,000, so they are not ranked.',
+      'No province takes any tax or contributions at $1,000, so the provinces are not ranked.',
     );
     expect(copy.provisional(2026)).toBe('The 2026 figures are provisional.');
     expect(copy.chartLabel('Take-home pay', '$70,000', copy.tableToggle)).toBe(
