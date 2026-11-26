@@ -337,16 +337,23 @@ describe('LineChart', () => {
 
   it('keeps the two labels a line apart when both dots are at the top of the plot', () => {
     const { container } = render(
-      chart({ activeIndex: 2, markerLabels: () => [['One'], ['Two']] }),
+      chart({
+        // Both values are at the top of the scale, so both dots are at the top of the plot.
+        points: [
+          { salary: '1000', values: ['0.00', '0.00'] },
+          { salary: '500000', values: ['200000.00', '199000.00'] },
+        ],
+        activeIndex: 1,
+        markerLabels: () => [['One'], ['Two']],
+      }),
     );
     const [upper, lower] = [
       ...container.querySelectorAll('text[class*="markerLabel"]'),
     ];
-    // The upper block is held at 22 (baseline 15); the lower one starts a line below it, not on it: y of at least 17.
+    // The upper block is held at 22 (its baseline is above the plot's first gridline); the lower one starts a
+    // line under it, not on it.
     expect(compareAmounts(upper?.getAttribute('y') ?? '0', '22')).toBe(0);
-    expect(
-      compareAmounts(lower?.getAttribute('y') ?? '0', '17'),
-    ).toBeGreaterThanOrEqual(0);
+    expect(compareAmounts(lower?.getAttribute('y') ?? '0', '17')).toBe(0);
   });
 
   it('draws a taller figure when asked', () => {
