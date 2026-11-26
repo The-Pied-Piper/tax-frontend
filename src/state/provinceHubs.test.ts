@@ -438,7 +438,7 @@ describe('the province comparison', () => {
       paragraph(
         strings.compareLink.lead,
         {
-          label: 'Take-home pay by province, 2026',
+          label: 'Compare take-home pay and tax across provinces, 2026',
           href: '/compare-provinces/',
         },
         strings.compareLink.rest,

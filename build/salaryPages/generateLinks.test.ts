@@ -109,7 +109,7 @@ describe('generateSalaryPages links', () => {
       published: new Set([...publishedSlugs, 'compare-provinces']),
     });
     expect(dataOf(dir, 'ca-on/70000/index.html').links?.compare).toEqual({
-      label: 'Take-home pay by province, 2026',
+      label: 'Compare take-home pay and tax across provinces, 2026',
       href: '/compare-provinces/?salary=70000',
     });
     expect(dataOf(dir, 'ca-on/65000/index.html').links?.compare?.href).toBe(

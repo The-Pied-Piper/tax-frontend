@@ -12,6 +12,7 @@ export const strings = {
     breadcrumb: 'Breadcrumb',
     home: 'Home',
     methodology: 'How we calculate',
+    compare: 'Compare provinces',
     provinces: 'Provinces:',
     provinceNames: {
       'ca-on': 'Ontario',
@@ -104,8 +105,6 @@ export const strings = {
         salary: string,
       ) =>
         `${place}: ${measure} ${value} for a ${salary} salary. Open the ${place} hub page.`,
-      provisional: (year: number) =>
-        `The ${String(year)} figures are provisional.`,
       salaryLabel: 'Salary a year',
       salaryValueText: (salary: string) => `${salary} a year`,
       hint: 'Drag the slider, or use the arrow keys, to pick a salary. The bars and the order of the list change as you drag.',
@@ -139,11 +138,12 @@ export const strings = {
   },
   // The page that compares every province: /compare-provinces/ (copy thread, compare-provinces-copy-final.md).
   comparePage: {
-    heading: (year: number) => `Take-home pay by province, ${year.toString()}`,
+    heading: (year: number) =>
+      `Compare take-home pay and tax across provinces, ${year.toString()}`,
     title: (year: number) =>
-      `Take-home pay, tax and contributions by province, ${year.toString()}`,
+      `Compare take-home pay and tax across provinces, ${year.toString()}`,
     description: (count: number, year: number) =>
-      `Compare take-home pay, tax and contributions, and average tax rate across ${count.toString()} provinces in ${year.toString()}, at a salary you choose, for a single person with only a salary.`,
+      `Compare take-home pay, tax and contributions across ${count.toString()} provinces at a salary you choose. Estimates for ${year.toString()}, for a single person whose only income is a salary.`,
     breadcrumb: 'Compare provinces',
     sectionHeading: 'Compare by salary',
     intro: (count: number) =>

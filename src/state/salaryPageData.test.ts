@@ -149,7 +149,7 @@ describe('parseSalaryPageData links (#81)', () => {
 
   it('accepts a compare link, a null one, and refuses a bad one', () => {
     const compare = {
-      label: 'Take-home pay by province',
+      label: 'Compare provinces',
       href: '/compare-provinces/?salary=70000',
     };
     expect(parse({ ...valid, links: { ...links, compare } })).toEqual({
