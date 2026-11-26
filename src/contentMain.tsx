@@ -1,9 +1,12 @@
 import { StrictMode } from 'react';
 import { createRoot, hydrateRoot } from 'react-dom/client';
+import { watchEngagement } from './beacon/engagementBeacon';
+import { sendVisitBeacon } from './beacon/visitBeacon';
 import { ProvinceComparison } from './components/ProvinceComparison';
 import { RatesChart } from './components/RatesChart';
 import { SalaryChart } from './components/SalaryChart';
 import { ThemeToggle } from './components/ThemeToggle';
+import { contentPageKind } from './state/pageKind';
 import { HUB_CHART_IDS, parseHubChartsData } from './state/hubCharts';
 import {
   HUB_CHARTS_DATA_ID,
@@ -29,8 +32,15 @@ import './components/RatesChart.module.css';
 import './components/SalaryChart.module.css';
 import './components/SiteFooter.module.css';
 
+// The same two beacons as the calculator pages, so these pages are counted too:
+// that the page ran JavaScript, and the first thing a person does on it. Started
+// first, so nothing later on the page can stop them.
+const kind = contentPageKind(window.location.pathname);
+sendVisitBeacon(kind);
+watchEngagement(kind);
+
 // A pre-built content page has a slot for the Light/Dark switch: mount the
-// switch there. No calculator, no visit beacon.
+// switch there. No calculator.
 const toggleSlot = document.getElementById(THEME_TOGGLE_SLOT_ID);
 if (toggleSlot) {
   createRoot(toggleSlot).render(

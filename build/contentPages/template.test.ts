@@ -1,7 +1,7 @@
 import { existsSync, readFileSync } from 'node:fs';
 
 // The content pages' template is the calculator's page with a different
-// script: it must not pull the calculator in, and must not send the beacon.
+// script: it must not pull the calculator in.
 function parse(file: string) {
   return new DOMParser().parseFromString(
     readFileSync(file, 'utf8'),
@@ -60,9 +60,13 @@ describe('content.html', () => {
 describe('the content entry', () => {
   const source = readFileSync('src/contentMain.tsx', 'utf8');
 
-  it('does not import the calculator or the visit beacon', () => {
-    expect(source).not.toMatch(/from '\.\/(App|api|adapters|beacon|mocks)/);
-    expect(source).not.toContain('sendVisitBeacon');
+  it('does not import the calculator', () => {
+    expect(source).not.toMatch(/from '\.\/(App|api|adapters|mocks)/);
+  });
+
+  it('starts the visit and engagement beacons, and nothing else from the beacon folder', () => {
+    expect(source).toContain('sendVisitBeacon(kind)');
+    expect(source).toContain('watchEngagement(kind)');
   });
 
   it('loads the stylesheet of every component a content page is built from', () => {

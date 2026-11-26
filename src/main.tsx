@@ -1,6 +1,7 @@
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import { App } from './App';
+import { watchEngagement } from './beacon/engagementBeacon';
 import { sendVisitBeacon, type VisitKind } from './beacon/visitBeacon';
 import {
   parseSalaryPageData,
@@ -33,7 +34,10 @@ async function start(root: HTMLElement): Promise<VisitKind> {
   return initial ? 'salary' : 'home';
 }
 
-// The calculator and the pre-built salary pages. The visit beacon is its own
-// module, sent once the page is up; content pages (src/contentMain.tsx) load
-// neither the calculator nor the beacon.
-void start(root).then(sendVisitBeacon);
+// The calculator and the pre-built salary pages. The visit beacon and the
+// engagement beacon are their own modules, started once the page is up; content
+// pages (src/contentMain.tsx) start the same two without the calculator.
+void start(root).then((kind) => {
+  sendVisitBeacon(kind);
+  watchEngagement(kind);
+});
