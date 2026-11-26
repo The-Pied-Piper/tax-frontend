@@ -70,6 +70,7 @@ export const PROVINCE_EXTRA_SALARIES: Readonly<
     '68899',
     '68900',
     '74599',
+    '74600',
     '74601',
     '84999',
     '118171',
