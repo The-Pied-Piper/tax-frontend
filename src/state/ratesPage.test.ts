@@ -1,13 +1,14 @@
 import { fullHubCharts } from '../test/hubNotesData';
 import {
   causeChip,
+  creditsLinked,
   ratesPageText,
   ratesPageView,
   ratesProvinces,
 } from './ratesPage';
 import { subtractAmounts } from '../money/amounts';
 import { compareAmounts } from '../money/scale';
-import { ratesSlug } from './siteLinks';
+import { contentPath, METHODOLOGY_SLUG, ratesSlug } from './siteLinks';
 
 const sweep = () => {
   const found = fullHubCharts(['ca-on']).provinces[0];
@@ -715,17 +716,15 @@ describe('the British Columbia rates page', () => {
     for (const [salary, rate] of [
       ['$50,837', '27.8%'],
       ['$59,079', '34.2%'],
-      ['$101,855', '31.0%'],
+      ['$101,855', '31%'],
       ['$116,775', '32.8%'],
       ['$118,172', '38.3%'],
       ['$141,557', '40.7%'],
-      ['$182,567', '44.0%'],
+      ['$182,567', '44%'],
       ['$191,532', '46.1%'],
       ['$259,609', '49.8%'],
     ] as const) {
-      expect(all, salary).toContain(
-        `From about ${salary} the rate is ${rate.replace(/\.0%$/, '%')}`,
-      );
+      expect(all, salary).toContain(`From about ${salary} the rate is ${rate}`);
     }
   });
 
@@ -848,5 +847,54 @@ describe('the British Columbia rates page', () => {
     const text = ratesPageText['ca-bc'];
     expect(text?.title.length).toBeLessThan(64);
     expect(text?.description.length).toBeLessThan(160);
+  });
+});
+
+describe('creditsLinked', () => {
+  const phrase = 'credits paid to you when you file';
+  const href = contentPath(METHODOLOGY_SLUG);
+
+  it('links the phrase wherever it falls in a paragraph', () => {
+    expect(creditsLinked(`Not counted: ${phrase} are left out.`)).toEqual([
+      'Not counted: ',
+      { label: phrase, href },
+      ' are left out.',
+    ]);
+  });
+
+  it('keeps the capital C of a sentence start in the link text', () => {
+    expect(
+      creditsLinked(`Credits paid to you when you file are not counted.`),
+    ).toEqual([
+      { label: 'Credits paid to you when you file', href },
+      ' are not counted.',
+    ]);
+  });
+
+  it('gives a paragraph without the phrase back as its words', () => {
+    expect(creditsLinked('Nothing to link here.')).toEqual([
+      'Nothing to link here.',
+    ]);
+  });
+
+  it('finds the phrase in the basis of every province, so a rewording cannot drop the link', () => {
+    for (const province of ratesProvinces()) {
+      const found = fullHubCharts([province]).provinces[0];
+      if (!found) continue;
+      const view = ratesPageView(province, found);
+      const basis = view?.intro.slice(1).map((words) => creditsLinked(words));
+      expect(
+        basis?.some((parts) => parts.some((part) => typeof part !== 'string')),
+        province,
+      ).toBe(true);
+    }
+  });
+});
+
+describe('the Ontario lead', () => {
+  it('names exactly three spikes, as many as the sentence lists', () => {
+    const facts = sweep().facts;
+    expect(facts['ohp_spike_count']).toBe('3');
+    expect(facts['ohp_step_count']).toBe('2');
   });
 });

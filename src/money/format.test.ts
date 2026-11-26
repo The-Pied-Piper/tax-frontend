@@ -5,6 +5,7 @@ import {
   displayMoney,
   displayRate,
   displayRateOneDecimal,
+  displayRateTenths,
   displayRateTwoDecimals,
   displayCentsOneDecimal,
   displayRoundedMoney,
@@ -177,6 +178,25 @@ describe('displayRateOneDecimal', () => {
       displayRateOneDecimal('16.42', { ...percent, as_percentage: false }),
     ).toBe('16.42%');
     expect(displayRateOneDecimal('abc', pct)).toBe('abc');
+  });
+});
+
+describe('displayRateTenths', () => {
+  const pct = { ...percent, as_percentage: true };
+  it.each([
+    ['0.38', '38.0%'],
+    ['0.3626', '36.3%'],
+    ['1', '100.0%'],
+    ['0', '0.0%'],
+    ['-0.2537', '-25.4%'],
+  ])('shows %s as %s', (amount, shown) => {
+    expect(displayRateTenths(amount, pct)).toBe(shown);
+  });
+  it('shows a unit that is not a percentage, and unreadable text, as displayRate does', () => {
+    expect(
+      displayRateTenths('16.42', { ...percent, as_percentage: false }),
+    ).toBe('16.42%');
+    expect(displayRateTenths('abc', pct)).toBe('abc');
   });
 });
 

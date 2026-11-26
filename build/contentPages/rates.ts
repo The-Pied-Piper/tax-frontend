@@ -11,7 +11,7 @@ import {
 import { strings } from '../../src/strings';
 
 /** The order the other provinces' links come in. */
-const LINK_ORDER: readonly FooterProvinceSlug[] = [
+export const LINK_ORDER: readonly FooterProvinceSlug[] = [
   'ca-on',
   'ca-qc',
   'ca-bc',

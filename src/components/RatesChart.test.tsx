@@ -110,4 +110,39 @@ describe('RatesChart', () => {
     );
     expect(labels()).not.toContain('$50k');
   });
+
+  describe('on a phone-width screen', () => {
+    const original = Object.getOwnPropertyDescriptor(window, 'matchMedia');
+    afterEach(() => {
+      if (original) Object.defineProperty(window, 'matchMedia', original);
+      else Reflect.deleteProperty(window, 'matchMedia');
+    });
+    const mock = (matches: boolean) => {
+      Object.defineProperty(window, 'matchMedia', {
+        configurable: true,
+        value: (query: string) => ({
+          matches,
+          media: query,
+          addEventListener: () => undefined,
+          removeEventListener: () => undefined,
+        }),
+      });
+    };
+
+    it('draws the taller figure', () => {
+      mock(true);
+      render(<RatesChart sweep={sweep()} place="Ontario" />);
+      expect(screen.getByRole('img')).toHaveAttribute('viewBox', '0 0 420 400');
+    });
+
+    it('draws the wide figure on a wider screen and where matchMedia is missing', () => {
+      mock(false);
+      const wide = render(<RatesChart sweep={sweep()} place="Ontario" />);
+      expect(screen.getByRole('img')).toHaveAttribute('viewBox', '0 0 420 250');
+      wide.unmount();
+      Reflect.deleteProperty(window, 'matchMedia');
+      render(<RatesChart sweep={sweep()} place="Ontario" />);
+      expect(screen.getByRole('img')).toHaveAttribute('viewBox', '0 0 420 250');
+    });
+  });
 });

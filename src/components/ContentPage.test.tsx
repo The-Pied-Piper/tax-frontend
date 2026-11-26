@@ -7,6 +7,7 @@ import { blocksSpec, plainSpec, sampleSpec } from '../test/contentPageData';
 import { sampleHubCharts } from '../test/comparisonData';
 import { fullHubCharts } from '../test/hubNotesData';
 import { PROVINCE_COMPARISON_SLOT_ID } from '../state/hubSlots';
+import { ratesPages } from '../../build/contentPages/rates';
 
 afterEach(() => {
   delete document.documentElement.dataset.theme;
@@ -399,5 +400,64 @@ describe('ContentPage lists of forms', () => {
     };
     const { container } = render(<ContentPage {...short} />);
     expect(container.querySelector('details')).toBeNull();
+  });
+});
+
+describe('the parts of a rates page', () => {
+  const ratesSpec = () => {
+    const [page] = ratesPages(new Set(['ca-on']));
+    if (!page) throw new Error('no rates page');
+    return page;
+  };
+  const renderPage = () =>
+    render(
+      <ContentPage {...ratesSpec()} hubCharts={fullHubCharts(['ca-on'])} />,
+    );
+
+  it('writes the lead with no heading above it, before the chart heading', () => {
+    renderPage();
+    const lead = screen.getByText(/Ontario Health Premium rises/);
+    expect(lead.closest('section')?.querySelector('h2')).toBeNull();
+    expect(screen.getAllByRole('heading', { level: 2 })[0]).toHaveTextContent(
+      'Your tax rates at every salary',
+    );
+  });
+
+  it('links each salary range with an anchor that the group carries', () => {
+    const { container } = renderPage();
+    const hrefs = [
+      ...container.querySelectorAll<HTMLAnchorElement>(
+        'a[href^="#salary-range-"]',
+      ),
+    ].map((a) => a.getAttribute('href') ?? '');
+    expect(hrefs).toEqual([
+      '#salary-range-1',
+      '#salary-range-2',
+      '#salary-range-3',
+      '#salary-range-4',
+      '#salary-range-5',
+    ]);
+    for (const href of hrefs) {
+      expect(container.querySelector(href)).not.toBeNull();
+    }
+  });
+
+  it('links "credits paid to you when you file" in the basis to the Methodology page', () => {
+    renderPage();
+    expect(
+      screen.getByRole('link', { name: /credits paid to you when you file/i }),
+    ).toHaveAttribute('href', '/methodology/');
+  });
+
+  it('links the other provinces, in a row', () => {
+    const [on, , nl] = ratesPages(new Set(['ca-on', 'ca-ab', 'ca-nl']));
+    if (!on || !nl) throw new Error('no pages');
+    render(<ContentPage {...on} hubCharts={fullHubCharts(['ca-on'])} />);
+    expect(
+      screen.getByRole('link', { name: 'Alberta tax rates by salary' }),
+    ).toHaveAttribute('href', '/ca-ab/tax-rates/');
+    expect(
+      screen.queryByRole('link', { name: 'Ontario tax rates by salary' }),
+    ).toBeNull();
   });
 });

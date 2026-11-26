@@ -269,10 +269,8 @@ describe('LineChart', () => {
   });
 
   it('draws a taller figure when asked', () => {
-    const { container } = render(chart({ height: 400 }));
-    expect(container.querySelector('svg')?.getAttribute('viewBox')).toBe(
-      '0 0 420 400',
-    );
+    render(chart({ height: 400 }));
+    expect(screen.getByRole('img')).toHaveAttribute('viewBox', '0 0 420 400');
   });
 
   it('right-aligns the label at the end of the axis so it is not cut off', () => {

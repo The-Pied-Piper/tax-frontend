@@ -40,8 +40,9 @@ describe('contentPages', () => {
         );
         expect(step.label.length).toBeGreaterThan(0);
       }
-      for (const section of page.sections) {
-        expect((section.heading ?? 'the lead').length).toBeGreaterThan(0);
+      for (const [at, section] of page.sections.entries()) {
+        // Only the first section of a page (a rates page's lead) may have no heading.
+        if (at > 0) expect(section.heading?.length).toBeGreaterThan(0);
         expect(section.blocks.length).toBeGreaterThan(0);
       }
     }

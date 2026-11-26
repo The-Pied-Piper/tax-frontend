@@ -164,8 +164,9 @@ function tenthsOfPercent(amount: string): string | null {
 }
 
 // A rate shown to one decimal, rounded half away from zero: "0.2316" -> "23.2%",
-// "-0.2537" -> "-25.4%". A whole number drops the ".0": "1" -> "100%", "0" -> "0%". Like displayRate for a unit that is not a percentage,
-// and for text it cannot read.
+// "-0.2537" -> "-25.4%".
+// A whole number drops the ".0": "1" -> "100%", "0" -> "0%".
+// Like displayRate for a unit that is not a percentage, and for text it cannot read.
 export function displayRateOneDecimal(amount: string, unit: MoneyUnit): string {
   const text = tenthsOfPercent(amount);
   if (unit.as_percentage !== true || text === null)

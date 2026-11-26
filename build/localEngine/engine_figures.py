@@ -170,6 +170,10 @@ def _pension_deduction(year: int) -> dict[str, Decimal]:
     }
 
 
+# A premium slope row narrower than this much salary is a short spike.
+_OHP_SPIKE_MAX_WIDTH = Decimal(1000)
+
+
 def _exact_salary_of_taxable(year: int, taxable: Decimal, d: dict[str, Decimal] | None = None) -> Decimal:
     """The salary at which taxable income (which is also net income) reaches `taxable`, exactly (it may have cents).
 
@@ -301,7 +305,7 @@ def _ontario_rates_page_facts(year: int) -> dict[str, str]:
         width = _exact_salary_of_taxable(year, Decimal(rows[at + 1]["over"])) - _exact_salary_of_taxable(
             year, Decimal(row["over"])
         )
-        if width < 1000:
+        if width < _OHP_SPIKE_MAX_WIDTH:
             spikes += 1
         else:
             steps += 1
