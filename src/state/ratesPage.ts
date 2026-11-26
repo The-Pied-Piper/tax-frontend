@@ -1,8 +1,8 @@
 import { formPageLink } from './formLinks';
 import type { ProvinceSweep } from './hubCharts';
 import { isFullSweep, noteWords } from './hubNotes';
-import { ontarioRatesPage } from './ratesPageText/ca-on';
 import { albertaRatesPage } from './ratesPageText/ca-ab';
+import { ontarioRatesPage } from './ratesPageText/ca-on';
 import { britishColumbiaRatesPage } from './ratesPageText/ca-bc';
 import type { CauseForm, RatesPageText } from './ratesPageTypes';
 import { FOOTER_PROVINCE_SLUGS, type FooterProvinceSlug } from './siteLinks';

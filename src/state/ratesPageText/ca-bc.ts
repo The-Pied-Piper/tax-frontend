@@ -109,7 +109,6 @@ function words(text: string, forms: CauseForm[] = []): RatesNote {
 
 /** The figures of the tables: the notes' figures and the ones only a table cell needs. */
 const tablePool: Record<string, string> = {
-  ...pool,
   fed1: 'p:fed_bracket_1_rate',
   fed1Ti: 'f:fed_bracket_1_ti',
   fed2Ti: 'f:fed_bracket_2_ti',
