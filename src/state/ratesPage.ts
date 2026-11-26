@@ -6,6 +6,7 @@ import { britishColumbiaRatesPage } from './ratesPageText/ca-bc';
 import { manitobaRatesPage } from './ratesPageText/ca-mb';
 import { newfoundlandAndLabradorRatesPage } from './ratesPageText/ca-nl';
 import { ontarioRatesPage } from './ratesPageText/ca-on';
+import { saskatchewanRatesPage } from './ratesPageText/ca-sk';
 import { quebecRatesPage } from './ratesPageText/ca-qc';
 import type { CauseForm, RatesPageText } from './ratesPageTypes';
 import { FOOTER_PROVINCE_SLUGS, type FooterProvinceSlug } from './siteLinks';
@@ -16,6 +17,7 @@ export const ratesPageText: Partial<Record<FooterProvinceSlug, RatesPageText>> =
   {
     'ca-on': ontarioRatesPage,
     'ca-ab': albertaRatesPage,
+    'ca-sk': saskatchewanRatesPage,
     'ca-bc': britishColumbiaRatesPage,
     'ca-mb': manitobaRatesPage,
     'ca-nl': newfoundlandAndLabradorRatesPage,
@@ -35,6 +37,7 @@ const CAUSE_PAGE: Record<CauseForm, string> = {
   on428: 'on428',
   on428a: 'on428-a',
   ab428: 'ab428',
+  sk428: 'sk428',
   bc428: 'bc428',
   mb428: 'mb428',
   mb428a: 'mb428-a',
