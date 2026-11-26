@@ -96,10 +96,10 @@ const tablePool: Record<string, string> = {
   fed5Ti: 'f:fed_bracket_5_ti',
   fed5: 'p:fed_bracket_5_rate',
   fed5Sal: 'f:fed_bracket_5_salary',
-  fed2After: 'h:marginal@60000',
-  fed3After: 'h:marginal@119000',
-  fed4After: 'h:marginal@183000',
-  fed5After: 'h:marginal@300000',
+  fed2After: 'a:marginal@60000',
+  fed3After: 'a:marginal@119000',
+  fed4After: 'a:marginal@183000',
+  fed5After: 'a:marginal@300000',
   sk1Ti: 'f:sk_bracket_1_ti',
   sk1: 'p:sk_bracket_1_rate',
   sk2Ti: 'f:sk_bracket_2_ti',
@@ -108,8 +108,10 @@ const tablePool: Record<string, string> = {
   sk3Ti: 'f:sk_bracket_3_ti',
   sk3: 'p:sk_bracket_3_rate',
   sk3Sal: 'f:sk_bracket_3_salary',
-  sk2After: 'h:marginal@56000',
-  sk3After: 'h:marginal@157000',
+  sk2After: 'a:marginal@56000',
+  sk3After: 'a:marginal@157000',
+  fedFirstAfter: 'a:marginal@20000',
+  skStartAfter: 'a:marginal@22000',
   fedLowest: 'p:fed_bracket_1_rate',
   fedLowestRatePrior: 'p:fed_lowest_rate_prior',
   fedBpa: 'f:fed_bpa',
@@ -176,7 +178,7 @@ export const saskatchewanRatesPage: RatesPageText = {
       'In Saskatchewan the marginal rate is the share of your next dollar that goes to income tax, Canada Pension Plan and Employment Insurance. It climbs from about {lowMarginal} once you pay into the Canada Pension Plan (from {cppStart}) to {topMarginal} above {topStart}. The average rate climbs more slowly, to {avgAt500k} at {salary500k}. Saskatchewan has no health premium or surtax, so the rate rises only where a tax bracket starts. It falls where Employment Insurance or the Canada Pension Plan stops.',
     ),
     words(
-      'Both rates count income tax (federal and Saskatchewan, line 43500 of the T1 return), Canada Pension Plan in both tiers, and Employment Insurance as Form T2204 works it out. Credits paid to you when you file are not counted. They are for a single person whose only income is a salary.',
+      'Both rates count income tax (federal and Saskatchewan), Canada Pension Plan in both tiers, and Employment Insurance as Form T2204 works it out. Credits paid to you when you file are not counted. They are for a single person whose only income is a salary.',
     ),
     words(
       'The 2026 forms are not out yet. These figures use the 2026 tax tables from the Canada Revenue Agency: rates, brackets, basic amounts, Canada Pension Plan and Employment Insurance. The Form T2204 rules and the line layout of the forms are the 2025 forms’ carried forward. We will update them when the 2026 forms are final.',
@@ -264,7 +266,7 @@ export const saskatchewanRatesPage: RatesPageText = {
       ],
     },
     {
-      heading: 'Above $260,000',
+      heading: 'About $260,000 and above',
       notes: [
         words(
           'From about {topStart} the line is straight: of every extra dollar, {topMarginal} goes to tax. The federal top rate, {fedTop}, starts then, and the federal basic personal amount has finished shrinking. At {salary500k} the average rate is {avgAt500k}.',
@@ -286,7 +288,7 @@ export const saskatchewanRatesPage: RatesPageText = {
         'Salary where it starts',
         'Marginal rate after',
       ],
-      ...cells(brackets('fed', 5, '{fedFirstRate}')),
+      ...cells(brackets('fed', 5, '{fedFirstAfter}')),
       after: words(
         'The marginal rate after the {fedBracket3} bracket is almost the same as after the {fedBracket2} bracket, a little below it. Between the two, Employment Insurance and both Canada Pension Plan tiers stop, which takes off about as much as the higher federal rate adds. The lowest federal rate is {fedLowest} for the whole of 2026. In 2025 it was {fedLowestRatePrior}. The federal basic personal amount is {fedBpa}, and shrinks to {fedBpaMin} between a net income of {fedBpaStart} and {fedBpaEnd}. The Canada employment amount is {cea}.',
       ),
@@ -300,7 +302,7 @@ export const saskatchewanRatesPage: RatesPageText = {
         'Salary where it starts',
         'Marginal rate after',
       ],
-      ...cells(brackets('sk', 3, '{skStartRate}')),
+      ...cells(brackets('sk', 3, '{skStartAfter}')),
       after: words(
         'Saskatchewan’s basic personal amount is {skBpa}, the same at every income, and the credit rate is {skCreditRate}. Saskatchewan tax starts at a salary of about {skStartSalary}, a little above that amount, for two reasons. The credits for your Canada Pension Plan and Employment Insurance payments are added to the basic amount, and your taxable income is a little less than your salary.',
       ),

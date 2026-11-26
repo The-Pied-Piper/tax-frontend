@@ -1,13 +1,14 @@
 import { fullHubCharts } from '../test/hubNotesData';
 import {
   causeChip,
+  creditsLinked,
   ratesPageText,
   ratesPageView,
   ratesProvinces,
 } from './ratesPage';
 import { subtractAmounts } from '../money/amounts';
 import { compareAmounts } from '../money/scale';
-import { ratesSlug } from './siteLinks';
+import { contentPath, METHODOLOGY_SLUG, ratesSlug } from './siteLinks';
 
 const sweep = () => {
   const found = fullHubCharts(['ca-on']).provinces[0];
@@ -157,7 +158,7 @@ describe('the Alberta rates page', () => {
 
   it('opens with the figures the CRA review gives', () => {
     expect(view().intro[0]).toContain(
-      'from about 7.6% once you pay into the Canada Pension Plan (from $3,500) to 48.0% above $371,347.',
+      'from about 7.6% once you pay into the Canada Pension Plan (from $3,500) to 48% above $371,347.',
     );
     expect(view().intro[0]).toContain('to 40.3% at $500,000');
   });
@@ -181,9 +182,9 @@ describe('the Alberta rates page', () => {
   it('reads the top rate at the top bracket, and what you keep from it', () => {
     const last = view().groups[view().groups.length - 1];
     const top = last?.notes[last.notes.length - 1]?.words ?? '';
-    expect(top).toContain('straight at 48.0%');
+    expect(top).toContain('straight at 48%');
     expect(top).toContain('rate, 15%, starts at a taxable income of $370,220');
-    expect(top).toContain('you keep 52.0%');
+    expect(top).toContain('you keep 52%');
   });
 
   it('rounds each computed rate once, from the unrounded value', () => {
@@ -326,8 +327,8 @@ describe('the Québec rates page', () => {
 
   it('gives one decimal for every computed rate in the opening finding', () => {
     const view = ratesPageView('ca-qc', quebec());
-    expect(view?.intro[0]).toMatch(/about 8\.0% once/);
-    expect(view?.intro[0]).toMatch(/to 47\.0% at/);
+    expect(view?.intro[0]).toMatch(/about 8% once/);
+    expect(view?.intro[0]).toMatch(/to 47% at/);
   });
 
   it('names a cause form for every note and links the ones that have a page', () => {
@@ -712,11 +713,11 @@ describe('the British Columbia rates page', () => {
     for (const [salary, rate] of [
       ['$50,837', '27.8%'],
       ['$59,079', '34.2%'],
-      ['$101,855', '31.0%'],
+      ['$101,855', '31%'],
       ['$116,775', '32.8%'],
       ['$118,172', '38.3%'],
       ['$141,557', '40.7%'],
-      ['$182,567', '44.0%'],
+      ['$182,567', '44%'],
       ['$191,532', '46.1%'],
       ['$259,609', '49.8%'],
     ] as const) {
@@ -846,6 +847,55 @@ describe('the British Columbia rates page', () => {
   });
 });
 
+describe('creditsLinked', () => {
+  const phrase = 'credits paid to you when you file';
+  const href = contentPath(METHODOLOGY_SLUG);
+
+  it('links the phrase wherever it falls in a paragraph', () => {
+    expect(creditsLinked(`Not counted: ${phrase} are left out.`)).toEqual([
+      'Not counted: ',
+      { label: phrase, href },
+      ' are left out.',
+    ]);
+  });
+
+  it('keeps the capital C of a sentence start in the link text', () => {
+    expect(
+      creditsLinked(`Credits paid to you when you file are not counted.`),
+    ).toEqual([
+      { label: 'Credits paid to you when you file', href },
+      ' are not counted.',
+    ]);
+  });
+
+  it('gives a paragraph without the phrase back as its words', () => {
+    expect(creditsLinked('Nothing to link here.')).toEqual([
+      'Nothing to link here.',
+    ]);
+  });
+
+  it('finds the phrase in the basis of every province, so a rewording cannot drop the link', () => {
+    for (const province of ratesProvinces()) {
+      const found = fullHubCharts([province]).provinces[0];
+      if (!found) continue;
+      const view = ratesPageView(province, found);
+      const basis = view?.intro.slice(1).map((words) => creditsLinked(words));
+      expect(
+        basis?.some((parts) => parts.some((part) => typeof part !== 'string')),
+        province,
+      ).toBe(true);
+    }
+  });
+});
+
+describe('the Ontario lead', () => {
+  it('names exactly three spikes, as many as the sentence lists', () => {
+    const facts = sweep().facts;
+    expect(facts['ohp_spike_count']).toBe('3');
+    expect(facts['ohp_step_count']).toBe('2');
+  });
+});
+
 describe('the Saskatchewan rates page', () => {
   const skSweep = () => {
     const found = fullHubCharts(['ca-sk']).provinces[0];
@@ -889,7 +939,7 @@ describe('the Saskatchewan rates page', () => {
     expect(all).toContain('From about $59,079 the rate is 38.6%');
     expect(all).toContain('falls to 37.4%');
     expect(all).toContain('35.7%');
-    expect(all).toContain('33.0% at $85,000');
+    expect(all).toContain('33% at $85,000');
     expect(all).toContain('From about $118,172 the rate is 38.5%');
     expect(all).toContain('From about $156,932 the rate is 40.5%');
     expect(all).toContain('From about $182,567 the rate is 43.8%');

@@ -40,8 +40,9 @@ describe('contentPages', () => {
         );
         expect(step.label.length).toBeGreaterThan(0);
       }
-      for (const section of page.sections) {
-        expect(section.heading.length).toBeGreaterThan(0);
+      for (const [at, section] of page.sections.entries()) {
+        // Only the first section of a page (a rates page's lead) may have no heading.
+        if (at > 0) expect(section.heading?.length).toBeGreaterThan(0);
         expect(section.blocks.length).toBeGreaterThan(0);
       }
     }
@@ -81,6 +82,14 @@ describe('the methodology page', () => {
         ],
       ],
       [
+        'Credits paid to you when you file',
+        [
+          'Some credits are paid to you after you file your return, instead of lowering the tax you owe. Examples are the Canada workers benefit, the Employment Insurance refund, credits paid by your province, and in Québec the work premium and the solidarity tax credit.',
+          'This site does not count them in your take-home pay or your rates. They arrive as a payment after you file, they depend on your family, other income and what you claim, and they are not taken from your pay.',
+          'Credits that lower the tax itself are counted, for example tax cuts such as the Ontario LIFT Credit and the Québec abatement.',
+        ],
+      ],
+      [
         'Exact arithmetic',
         [
           'Computers often store money in a way that can be off by a tiny fraction of a cent. Our engine does not. It does its math with exact numbers. It rounds only where a form says to round, and it rounds the way the form says. It never rounds early to make things easier, so the cents you see are the cents the forms give.',
@@ -89,7 +98,7 @@ describe('the methodology page', () => {
       [
         'How we check it',
         [
-          'For each province and tax year, we run more than a hundred salaries through the engine and check the results. We pick salaries at the edge of every tax slice and at the yearly limits for the Canada Pension Plan and EI, because that is where mistakes hide.',
+          'For each province and tax year, we run more than a hundred salaries through the engine and check the results. We pick salaries at the edge of every tax slice and at the yearly limits for the pension plan and EI, because that is where mistakes hide.',
         ],
       ],
       [

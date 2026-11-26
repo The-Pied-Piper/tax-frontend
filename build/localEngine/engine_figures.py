@@ -170,6 +170,10 @@ def _pension_deduction(year: int) -> dict[str, Decimal]:
     }
 
 
+# A premium slope row narrower than this much salary is a short spike.
+_OHP_SPIKE_MAX_WIDTH = Decimal(1000)
+
+
 def _exact_salary_of_taxable(year: int, taxable: Decimal, d: dict[str, Decimal] | None = None) -> Decimal:
     """The salary at which taxable income (which is also net income) reaches `taxable`, exactly (it may have cents).
 
@@ -291,6 +295,22 @@ def _ontario_rates_page_facts(year: int) -> dict[str, str]:
         else:
             ontario[f"ohp_{number}_rate"] = row["rate"]
             ontario[f"ohp_{number}_plus"] = row["plus"]
+    # The premium's slope rows: one that rises over less than $1,000 of salary is a short spike, the rest are broader
+    # steps. The page's lead writes their counts in words.
+    rows = _params(year, "ca_on", "health_premium_rows")["rows"]
+    spikes = steps = 0
+    for at, row in enumerate(rows[:-1]):
+        if "amount" in row:
+            continue
+        width = _exact_salary_of_taxable(year, Decimal(rows[at + 1]["over"])) - _exact_salary_of_taxable(
+            year, Decimal(row["over"])
+        )
+        if width < _OHP_SPIKE_MAX_WIDTH:
+            spikes += 1
+        else:
+            steps += 1
+    ontario["ohp_spike_count"] = str(spikes)
+    ontario["ohp_step_count"] = str(steps)
     ontario["shift_ohp_1"] = str(Decimal(ontario["ohp_2_salary"]) - Decimal(ontario["ohp_2_ti"]))
     ontario["shift_ont_bracket_2"] = _shift(ontario, "ont_bracket_2")
     return {**facts, **ontario}

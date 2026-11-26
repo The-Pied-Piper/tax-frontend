@@ -208,3 +208,18 @@
   font-size: 13px;
   color: var(--muted);
 }
+
+/* The opening finding of a rates page, under the heading. */
+.lead {
+  font-size: 18px;
+}
+
+/* The row of links to a rates page's salary ranges. */
+.jump {
+  color: var(--muted);
+  font-size: 15px;
+}
+
+.jump a {
+  margin-right: 12px;
+}

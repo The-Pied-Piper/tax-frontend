@@ -113,14 +113,14 @@ From $259,609 up, the line is straight: you keep 46.7% of every extra dollar. At
 averageRate
 Up to $2,000 the average is 0%. At $2,000 QPIP starts, and the average is 0.4%. Employment Insurance counts from just above $2,000.
 The average is 5.8% at $10,000, 7.3% at $20,000 and 18.1% at $30,000. It passes 23.9% at $50,000, 28.2% at $70,000 and 31.2% at $100,000.
-It climbs more slowly than the marginal rate, because each higher rate applies only to the dollars above its bracket. At $500,000 the average is 47.0%, while the top marginal rate is 53.3%.
+It climbs more slowly than the marginal rate, because each higher rate applies only to the dollars above its bracket. At $500,000 the average is 47%, while the top marginal rate is 53.3%.
 
 marginalRate
 Below $2,000 the rate is 0%. At $2,000 QPIP starts and its whole $8.60 counts at once. From $2,000 to about $2,026 the rate is about 100%, because the Employment Insurance counted rises by $1 for every $1 of salary, until it reaches $26. After that Employment Insurance and QPIP take 1.73 cents of each extra dollar.
-From $3,500 the rate is 8.0%: Québec Pension Plan, Employment Insurance and QPIP, with no income tax yet. The QPP payment starts above $3,500.
+From $3,500 the rate is 8%: Québec Pension Plan, Employment Insurance and QPIP, with no income tax yet. The QPP payment starts above $3,500.
 It is 18.8% from $19,281, when federal income tax starts, and 31.8% from $20,341, when Québec income tax starts.
 From $21,350 to $29,882 the rate is 39.1%, then 40.4% from $24,167 and 44.3% from $26,571. Two things cause this. The drug insurance premium grows by 7.84 cents for every dollar of income, then 11.76 cents, until it reaches its maximum at $29,882. And the deduction for workers stops growing at $24,167. Then the rate falls to 32.6%.
-It stays 32.6% until $56,324. It is 37.6% from $56,324 (Québec’s second bracket) and 43.0% from $59,079 (the federal 20.5% bracket).
+It stays 32.6% until $56,324. It is 37.6% from $56,324 (Québec’s second bracket) and 43% from $59,079 (the federal 20.5% bracket).
 Then it falls as payments stop: Employment Insurance at $68,900, the main QPP amount at $74,600 (a second QPP tier takes 4 cents of each dollar from there to $85,000), and QPIP at $103,000.
 After that it only climbs: 41.1% from $111,257 (Québec’s third bracket), 45.7% from $118,172 (the federal 26% bracket), 47.5% from $134,822 (Québec’s top bracket), 50.2% from $182,567 (the federal 29% bracket), and 53.3% from $259,609, where the line is straight."
 `;
