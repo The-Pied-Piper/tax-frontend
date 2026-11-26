@@ -276,6 +276,7 @@ export const strings = {
     // A salary page's one line: the words, then the link.
     salaryLead: 'See how the rate changes with salary:',
     salaryLink: (place: string) => `${place} tax rates by salary`,
+    salaryRest: '.',
   },
   notices: {
     provisionalTitle: (year: number) =>

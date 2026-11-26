@@ -20,6 +20,7 @@ export function LearnMore({ links, rates }: Props) {
           <a className={styles.link} href={rates.href}>
             {rates.label}
           </a>
+          {strings.ratesLink.salaryRest}
         </p>
       )}
       <ul className={styles.list}>

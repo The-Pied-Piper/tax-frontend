@@ -20,7 +20,7 @@ describe('LearnMore rates line', () => {
     });
     expect(link).toHaveAttribute('href', '/ca-on/tax-rates/?salary=70000');
     expect(link.closest('p')).toHaveTextContent(
-      `${strings.ratesLink.salaryLead} Ontario tax rates by salary`,
+      `${strings.ratesLink.salaryLead} Ontario tax rates by salary.`,
     );
   });
 
