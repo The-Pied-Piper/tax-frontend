@@ -138,9 +138,6 @@ export const contentPages: ContentPageSpec[] = [
             'It estimates take-home pay for a single person whose only income is a salary.',
           ),
           paragraph(
-            'The 2026 figures are provisional. That means they use the rates published so far, and we replace them when the final rates come out. The calculator tells you whenever you pick a provisional year.',
-          ),
-          paragraph(
             'It is an estimate, not tax advice. What you actually take home depends on your own situation and on how much tax your employer takes off each paycheque.',
           ),
         ],

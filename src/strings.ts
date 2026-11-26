@@ -251,7 +251,6 @@ export const strings = {
   form: {
     place: 'Where do you work?',
     year: 'Tax year',
-    provisionalYear: 'provisional',
     salary: 'Yearly salary (before tax)',
     salaryHint: (whole: string, cents: string) =>
       `For example ${whole} or ${cents}`,
@@ -356,12 +355,6 @@ export const strings = {
     salaryLead: (salary: string) =>
       `See how a ${salary} salary compares across the provinces:`,
     salaryRest: '.',
-  },
-  notices: {
-    provisionalTitle: (year: number) =>
-      `${String(year)} figures are provisional.`,
-    provisionalBody: (year: number) =>
-      `The government has not finished publishing the ${String(year)} rates. We used the figures available today and will update them when they are final.`,
   },
   breakdown: {
     toggle: 'Show how this was worked out',

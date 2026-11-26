@@ -145,9 +145,7 @@ export function SalaryForm({
         >
           {years.map((y) => (
             <option key={y.year} value={y.year}>
-              {y.provisional
-                ? `${y.year.toString()} (${strings.form.provisionalYear})`
-                : y.year}
+              {y.year}
             </option>
           ))}
         </select>
