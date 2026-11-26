@@ -74,24 +74,8 @@ describe('the written compare page', () => {
     expect(slot?.querySelector('[aria-current]')).toBeNull();
   });
 
-  it('says which provinces it covers, in the list order', () => {
-    expect(page.body.textContent).toContain(
-      `These are the provinces this site covers so far: ${names['ca-on']}, ${names['ca-ab']}, ${names['ca-bc']}, ${names['ca-mb']}, ${names['ca-sk']} and ${names['ca-nl']}.`,
-    );
-  });
-
-  it('puts the covered-provinces line after the comparison, so the bars come first on a phone', () => {
-    const slot = page.getElementById(PROVINCE_COMPARISON_SLOT_ID);
-    const line = Array.from(page.querySelectorAll('p')).find((p) =>
-      p.textContent.includes('the provinces this site covers'),
-    );
-    expect(slot).not.toBeNull();
-    expect(line).toBeDefined();
-    expect(
-      slot && line
-        ? slot.compareDocumentPosition(line) & Node.DOCUMENT_POSITION_FOLLOWING
-        : 0,
-    ).toBeTruthy();
+  it('has no line listing the provinces the site covers: the links below do that', () => {
+    expect(page.body.textContent).not.toContain('this site covers');
   });
 
   it('has every province at $70,000 in the page itself, lowest tax and contributions first', () => {

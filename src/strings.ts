@@ -146,8 +146,6 @@ export const strings = {
     breadcrumb: 'Compare provinces',
     sectionHeading: 'Compare by salary',
     intro: `Pick a salary and see how the provinces compare. The provinces are always listed with the lowest tax and contributions first, whichever of the three figures you compare. Every bar is this site's own estimate for a single person whose only income is a salary.`,
-    coverage: (list: string) =>
-      `These are the provinces this site covers so far: ${list}.`,
     linksLead: 'See a province in detail:',
     linksHeading: 'Provinces',
   },
