@@ -120,7 +120,7 @@ export function marginalLowNotes(
 ): Note[] {
   return [
     note(
-      'Up to {eiFloor} the rate is {zero}. From {eiFloor} to about {eiEnd} the rate is {all}, because the Employment Insurance counted rises by $1 for every $1 of salary, until it reaches about {eiTop}. After that it takes {eiCents} of each extra dollar.',
+      'Below {eiFloor} the rate is {zero}. From {eiFloor} to about {eiEnd} the rate is {all}, because the Employment Insurance counted rises by $1 for every $1 of salary, until it reaches about {eiTop}. After that it takes {eiCents} of each extra dollar.',
       POOL,
     ),
     ...between,
