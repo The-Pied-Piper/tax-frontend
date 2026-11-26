@@ -13,6 +13,11 @@
   color: var(--muted);
 }
 
+.rates {
+  margin: 0;
+  font-size: 14px;
+}
+
 .list {
   display: flex;
   flex-wrap: wrap;

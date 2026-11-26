@@ -500,6 +500,57 @@ describe('the province comparison', () => {
     ]);
   });
 
+  it('replaces the two rate charts with one line and a link when the build writes the rates page', () => {
+    const page = hubPage(
+      textOf('ca-on'),
+      'Ontario',
+      salaryLinks,
+      new Set(['ca-on/tax-rates']),
+      others,
+      true,
+    );
+    const t = strings.hubCharts.charts;
+    expect(section(page, t.averageRate.title)).toBeUndefined();
+    expect(section(page, t.marginalRate.title)).toBeUndefined();
+    const found = section(page, strings.ratesPage.chartHeading);
+    expect(found?.id).toBe('tax-rates');
+    expect(found?.blocks).toEqual([
+      paragraph(
+        {
+          label: 'Marginal and average tax rate by salary in Ontario',
+          href: '/ca-on/tax-rates/',
+        },
+        strings.ratesLink.hubRest,
+      ),
+    ]);
+    // The take-home chart and the comparison stay on the hub.
+    expect(
+      page.sections
+        .flatMap((s) => s.blocks)
+        .filter((b) => b.kind === 'salaryChart'),
+    ).toEqual([{ kind: 'salaryChart', province: 'ca-on', chart: 'takeHome' }]);
+    expect(
+      page.sections.some(
+        (s) => s.heading === strings.hubCharts.comparison.heading,
+      ),
+    ).toBe(true);
+  });
+
+  it("keeps the rate charts when the rates page is another province's", () => {
+    const page = hubPage(
+      textOf('ca-on'),
+      'Ontario',
+      salaryLinks,
+      new Set(['ca-ab/tax-rates']),
+      others,
+      true,
+    );
+    expect(
+      section(page, strings.hubCharts.charts.marginalRate.title),
+    ).toBeDefined();
+    expect(section(page, strings.ratesPage.chartHeading)).toBeUndefined();
+  });
+
   it('keeps the take-home section as it was, with no permalink, on a hub with no charts', () => {
     expect(
       section(make(false), 'How your Ontario take-home is worked out')?.id,

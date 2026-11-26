@@ -166,7 +166,10 @@ describe('salaryPages closeBundle', () => {
     generateCalls.published.length = 0;
     await runCloseBundle(salaryPages(API, 'https://example.com'));
     const [published] = generateCalls.published;
-    expect(published).toEqual(new Set(contentPages.map((page) => page.slug)));
+    // The rates pages of the listed provinces are written too, so salary pages link to them.
+    expect(published).toEqual(
+      new Set([...contentPages.map((page) => page.slug), 'ca-on/tax-rates']),
+    );
     expect((published as Set<string>).has('methodology')).toBe(true);
     expect((published as Set<string>).has('forms/on428')).toBe(true);
   });

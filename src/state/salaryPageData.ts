@@ -69,7 +69,10 @@ function isLinks(value: unknown): boolean {
     value.others.every(isLink) &&
     isPageLink(value.hub) &&
     Array.isArray(value.learnMore) &&
-    value.learnMore.every(isPageLink)
+    value.learnMore.every(isPageLink) &&
+    (value.rates === undefined ||
+      value.rates === null ||
+      isPageLink(value.rates))
   );
 }
 

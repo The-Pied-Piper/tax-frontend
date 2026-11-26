@@ -19,10 +19,12 @@ import { pageDates } from './salaryPages/lastmod';
 import { rewriteSitemap } from './salaryPages/sitemap';
 import { contentPages, type ContentPageSpec } from '../src/state/contentPages';
 import { notFoundPage } from '../src/state/notFoundPage';
+import { ratesProvinces } from '../src/state/ratesPage';
 import {
   contentSlugOfFile,
   MOVED_PAGES,
   PROVINCES_WITHOUT_SALARY_PAGES,
+  ratesSlug,
 } from '../src/state/siteLinks';
 import { hubChartBlocks, hubPages } from './contentPages/hubs';
 import { ratesBlocks, ratesPages } from './contentPages/rates';
@@ -154,27 +156,39 @@ export function salaryPages(
         const { renderSalaryApp, renderSiteFooter, renderContentPage } =
           await loadRenderer(tempDir);
         const template = await readFile(join(outDir, 'index.html'), 'utf8');
+        // A salary page links to its province's rates page. Every province whose salary pages are written has a
+        // sweep (`provinceSweeps` fails the build otherwise), so each rates page of a listed province is written.
+        const ratesSlugs = ratesProvinces().map((province) =>
+          ratesSlug(province),
+        );
         const { written, skipped, built } = await generateSalaryPages({
           answers: figures.answers,
           list,
           baseUrl,
           provinces,
           outDir,
-          published: new Set(contentPages.map((p) => p.slug)),
+          published: new Set([
+            ...contentPages.map((p) => p.slug),
+            ...ratesSlugs,
+          ]),
           template,
           render: renderSalaryApp,
           siteUrl,
         });
         const sweeps = provinceSweeps(figures.sweeps, built, list);
         await rewriteHome(outDir, renderSiteFooter);
+        const rates = ratesPages(new Set(sweeps.map((sweep) => sweep.slug)));
+        // A hub links to the rates page this build writes, so the pages come first.
         const hubs = hubPages(
           built,
           provinces,
-          new Set(contentPages.map((page) => page.slug)),
+          new Set([
+            ...contentPages.map((page) => page.slug),
+            ...rates.map((page) => page.slug),
+          ]),
           PROVINCES_WITHOUT_SALARY_PAGES,
           new Set(sweeps.map((sweep) => sweep.slug)),
         );
-        const rates = ratesPages(new Set(sweeps.map((sweep) => sweep.slug)));
         const hubBlocks = hubChartBlocks(sweeps);
         const content = await generateContentPages({
           outDir,

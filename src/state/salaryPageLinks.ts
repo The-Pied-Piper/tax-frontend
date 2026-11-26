@@ -1,18 +1,26 @@
 import { strings } from '../strings';
 import { provinceHubs } from './provinceHubs';
-import { contentPath, formSlug, METHODOLOGY_SLUG } from './siteLinks';
+import {
+  contentPath,
+  formSlug,
+  METHODOLOGY_SLUG,
+  ratesSlug,
+  FOOTER_PROVINCE_SLUGS,
+} from './siteLinks';
 import type { SalaryPageLinks } from './useTakeHome';
 
 /**
  * The province hub and the "Learn more" links of a pre-built salary page: the
- * hub, the methodology page and the province's main form page. A form page is
- * linked only when `published` (the slugs of the pages in the build) has it.
+ * hub, the methodology page and the province's main form page, and the link to the
+ * province's rates page with this page's salary in its address. A page is linked
+ * only when `published` (the slugs of the pages in the build) has it.
  */
 export function provinceLinks(
   slug: string,
   provinceName: string,
   published: ReadonlySet<string>,
-): Pick<SalaryPageLinks, 'hub' | 'learnMore'> {
+  salary: string,
+): Pick<SalaryPageLinks, 'hub' | 'learnMore' | 'rates'> {
   const hubPath = contentPath(slug);
   const learnMore = [
     { label: strings.formPage.hub(provinceName), href: hubPath },
@@ -25,5 +33,13 @@ export function provinceLinks(
       href: contentPath(formSlug(form.id)),
     });
   }
-  return { hub: { label: provinceName, href: hubPath }, learnMore };
+  const province = FOOTER_PROVINCE_SLUGS.find((known) => known === slug);
+  const rates =
+    province !== undefined && published.has(ratesSlug(province))
+      ? {
+          label: strings.ratesLink.salaryLink(provinceName),
+          href: `${contentPath(ratesSlug(province))}?salary=${salary}`,
+        }
+      : null;
+  return { hub: { label: provinceName, href: hubPath }, learnMore, rates };
 }

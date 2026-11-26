@@ -132,7 +132,10 @@ export function App({ client, registry, initial, clock }: Props) {
         {page.built?.links && (
           <>
             <SalaryLinks links={page.built.links} unit={page.built.unit} />
-            <LearnMore links={page.built.links.learnMore} />
+            <LearnMore
+              links={page.built.links.learnMore}
+              rates={page.built.links.rates ?? null}
+            />
           </>
         )}
         <StarLink />
