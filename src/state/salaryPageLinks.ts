@@ -5,7 +5,6 @@ import {
   formSlug,
   METHODOLOGY_SLUG,
   ratesSlug,
-  FOOTER_PROVINCE_SLUGS,
 } from './siteLinks';
 import type { SalaryPageLinks } from './useTakeHome';
 
@@ -26,19 +25,20 @@ export function provinceLinks(
     { label: strings.formPage.hub(provinceName), href: hubPath },
     { label: strings.siteNav.methodology, href: contentPath(METHODOLOGY_SLUG) },
   ];
-  const form = provinceHubs.find((hub) => hub.slug === slug)?.own[0];
+  const hubText = provinceHubs.find((hub) => hub.slug === slug);
+  const form = hubText?.own[0];
   if (form && published.has(formSlug(form.id))) {
     learnMore.push({
       label: strings.learnMore.form(form.name),
       href: contentPath(formSlug(form.id)),
     });
   }
-  const province = FOOTER_PROVINCE_SLUGS.find((known) => known === slug);
+  const ratesPath = hubText && ratesSlug(hubText.slug);
   const rates =
-    province !== undefined && published.has(ratesSlug(province))
+    ratesPath !== undefined && published.has(ratesPath)
       ? {
           label: strings.ratesLink.salaryLink(provinceName),
-          href: `${contentPath(ratesSlug(province))}?salary=${salary}`,
+          href: `${contentPath(ratesPath)}?salary=${salary}`,
         }
       : null;
   return { hub: { label: provinceName, href: hubPath }, learnMore, rates };
