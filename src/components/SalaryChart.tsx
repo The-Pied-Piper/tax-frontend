@@ -98,13 +98,18 @@ function Chart({ sweep, chart }: { sweep: ProvinceSweep; chart: HubChartId }) {
         )}
         xUnit={unit}
         yUnit={rate ? rateUnit : unit}
-        formatValue={(value) =>
-          t.hover(
-            salaryAt,
-            rate
-              ? displayRateOneDecimal(value, rateUnit)
-              : displayRoundedMoney(value, 'annually', unit),
-          )
+        formatValue={(value) => {
+          const figure = rate
+            ? displayRateOneDecimal(value, rateUnit)
+            : displayRoundedMoney(value, 'annually', unit);
+          // The take-home chart hovers its salary beside the salary axis; the others still carry it in the label.
+          return chart === 'takeHome' ? figure : t.hover(salaryAt, figure);
+        }}
+        markerAxisLabel={
+          chart === 'takeHome'
+            ? (index) =>
+                displayWholeMoney(points[index]?.[0] ?? first, 'annually', unit)
+            : undefined
         }
         ariaLabel={t.chartLabel(words.title, from, to)}
         activeIndex={active}
