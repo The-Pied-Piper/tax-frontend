@@ -1,7 +1,7 @@
 import { useState, useSyncExternalStore } from 'react';
 import {
   displayMoney,
-  displayRateTenths,
+  displayRateOneDecimal,
   displayWholeMoney,
 } from '../money/format';
 import { PROVINCE_COMPARISON_SLOT_ID } from '../state/hubSlots';
@@ -76,7 +76,7 @@ function BarLink({ place, to, measure, value, salary }: BarLinkProps) {
 
 function figure(row: ComparisonRow, measure: Measure): string {
   return measure === 'averageRate'
-    ? displayRateTenths(row.value, row.unit)
+    ? displayRateOneDecimal(row.value, row.unit)
     : displayMoney(row.value, 'annually', row.unit);
 }
 

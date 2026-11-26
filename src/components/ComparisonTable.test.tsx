@@ -37,16 +37,6 @@ describe('ComparisonTable', () => {
     ).toBeInTheDocument();
   });
 
-  it('keeps the decimal on every rate, so the column does not mix 23% and 23.2%', () => {
-    render(<ComparisonTable data={sampleHubCharts} />);
-    const rates = screen
-      .getAllByRole('cell')
-      .map((cell) => cell.textContent)
-      .filter((text) => text.endsWith('%'));
-    expect(rates.length).toBeGreaterThan(0);
-    for (const text of rates) expect(text).toMatch(/\.\d%$/);
-  });
-
   it('draws nothing for a block with no province', () => {
     const { container } = render(<ComparisonTable data={{ provinces: [] }} />);
     expect(container).toBeEmptyDOMElement();

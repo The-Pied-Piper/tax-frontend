@@ -1,5 +1,5 @@
 import {
-  displayRateTenths,
+  displayRateOneDecimal,
   displayRoundedMoney,
   displayWholeMoney,
 } from '../money/format';
@@ -100,7 +100,7 @@ export function ComparisonTable({ data }: Props) {
                     )}
                   </td>,
                   <td key={`${sweep.slug}-a`}>
-                    {displayRateTenths(
+                    {displayRateOneDecimal(
                       point[SWEEP_COLUMN.average],
                       sweep.rateUnit,
                     )}
