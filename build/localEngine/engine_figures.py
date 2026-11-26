@@ -308,6 +308,30 @@ def _alberta_rates_page_facts(year: int) -> dict[str, str]:
     return {**facts, **alberta}
 
 
+def _newfoundland_rates_page_facts(year: int) -> dict[str, str]:
+    """Newfoundland and Labrador's figures: the common ones and its own: its eight brackets (two dataset files), basic
+    amount and credit rate, and the low-income tax reduction. A single filer takes the basic amount (NL428 line 95) and
+    loses the rate (line 102) of the income above the threshold (line 100); the reduction is gone where the income
+    reaches the threshold plus the basic amount over the rate."""
+    facts = _common_rates_page_facts(year)
+    brackets = [
+        *_params(year, "ca_nl", "brackets_lines_2_to_8")["brackets"],
+        *_params(year, "ca_nl", "brackets_lines_9_to_15")["brackets"],
+    ]
+    newfoundland = _bracket_facts(year, "nl", brackets)
+    newfoundland["nl_bpa"] = _params(year, "ca_nl", "basic_personal_amount")["amount"]
+    newfoundland["nl_credit_rate"] = _params(year, "ca_nl", "credit_rate")["rate"]
+    maximum = _params(year, "ca_nl", "low_income_reduction_basic")["amount"]
+    threshold = _params(year, "ca_nl", "low_income_threshold")["amount"]
+    rate = _params(year, "ca_nl", "low_income_reduction_rate")["rate"]
+    newfoundland["reduction_max"] = maximum
+    newfoundland["reduction_start_salary"] = str(_salary_of_taxable(year, Decimal(threshold)))
+    newfoundland["reduction_end_ni"] = str(Decimal(threshold) + Decimal(maximum) / Decimal(rate))
+    newfoundland["shift_reduction"] = str(Decimal(newfoundland["reduction_start_salary"]) - Decimal(threshold))
+    newfoundland["shift_nl_bracket_2"] = _shift(newfoundland, "nl_bracket_2")
+    return {**facts, **newfoundland}
+
+
 def _quebec_shift(exact_salary: Decimal, taxable: Decimal | str) -> str:
     """How much higher the salary is than the income at a form's threshold, to the cent."""
     return str((exact_salary - Decimal(taxable)).quantize(CENTS))
@@ -489,6 +513,7 @@ def _quebec_rates_page_facts(year: int) -> dict[str, str]:
 RATES_PAGE_FACTS = {
     "CA-ON": _ontario_rates_page_facts,
     "CA-AB": _alberta_rates_page_facts,
+    "CA-NL": _newfoundland_rates_page_facts,
     # Québec has its own pension plan, so it does not start from the common (Canada Pension Plan) figures.
     "CA-QC": _quebec_rates_page_facts,
 }
@@ -498,6 +523,21 @@ def _rates_page_facts(year: int, code: str) -> dict[str, str]:
     """The figures the rates page quotes besides the sweep: what the province's builder makes, or none for a province with no page."""
     builder = RATES_PAGE_FACTS.get(code)
     return {} if builder is None else builder(year)
+
+
+def _newfoundland_engine_facts(figures: "Figures", year: int, facts: dict[str, str]) -> dict[str, str]:
+    """What only the engine can say for Newfoundland and Labrador: the marginal rate just after each of the last two
+    brackets, which start past the sweep's last salary."""
+    found: dict[str, str] = {}
+    for number in (7, 8):
+        above = int(facts[f"nl_bracket_{number}_salary"]) + 1000
+        found[f"nl_bracket_{number}_marginal"] = _rate_text(figures._marginal("CA-NL", year, above))
+    return found
+
+
+# Facts a rates page needs that no dataset file holds and the sweep does not reach, so they are asked of the engine:
+# (figures, year, the dataset facts of `RATES_PAGE_FACTS`) -> facts. Dataset figures belong in `RATES_PAGE_FACTS`.
+RATES_PAGE_ENGINE_FACTS = {"CA-NL": _newfoundland_engine_facts}
 
 
 def _unit(unit: UnitDescription) -> dict:
@@ -713,6 +753,10 @@ def main(provinces_file: str, output_file: str) -> None:
             },
             **_rates_page_facts(year, code),
         }
+        engine_facts = RATES_PAGE_ENGINE_FACTS.get(code)
+        if engine_facts:
+            with unrounded_rates():
+                facts.update(engine_facts(figures, year, facts))
         provinces[code] = {
             "year": year,
             "pages": pages,

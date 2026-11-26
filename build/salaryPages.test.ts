@@ -172,6 +172,7 @@ describe('salaryPages closeBundle', () => {
         ...contentPages.map((page) => page.slug),
         'ca-on/tax-rates',
         'ca-ab/tax-rates',
+        'ca-nl/tax-rates',
         'ca-qc/tax-rates',
       ]),
     );
