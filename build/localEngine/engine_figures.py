@@ -308,11 +308,12 @@ def _alberta_rates_page_facts(year: int) -> dict[str, str]:
     return {**facts, **alberta}
 
 
-def _newfoundland_rates_page_facts(year: int, facts: dict[str, str]) -> dict[str, str]:
-    """Newfoundland and Labrador's own figures: its eight brackets (two dataset files), basic amount and credit rate,
-    and the low-income tax reduction. A single filer takes the basic amount (NL428 line 95) and loses the rate (line
-    102) of the income above the threshold (line 100); the reduction is gone where the income reaches the threshold
-    plus the basic amount over the rate."""
+def _newfoundland_rates_page_facts(year: int) -> dict[str, str]:
+    """Newfoundland and Labrador's figures: the common ones and its own: its eight brackets (two dataset files), basic
+    amount and credit rate, and the low-income tax reduction. A single filer takes the basic amount (NL428 line 95) and
+    loses the rate (line 102) of the income above the threshold (line 100); the reduction is gone where the income
+    reaches the threshold plus the basic amount over the rate."""
+    facts = _common_rates_page_facts(year)
     brackets = [
         *_params(year, "ca_nl", "brackets_lines_2_to_8")["brackets"],
         *_params(year, "ca_nl", "brackets_lines_9_to_15")["brackets"],
@@ -328,7 +329,7 @@ def _newfoundland_rates_page_facts(year: int, facts: dict[str, str]) -> dict[str
     newfoundland["reduction_end_ni"] = str(Decimal(threshold) + Decimal(maximum) / Decimal(rate))
     newfoundland["shift_reduction"] = str(Decimal(newfoundland["reduction_start_salary"]) - Decimal(threshold))
     newfoundland["shift_nl_bracket_2"] = _shift(newfoundland, "nl_bracket_2")
-    return newfoundland
+    return {**facts, **newfoundland}
 
 
 def _quebec_shift(exact_salary: Decimal, taxable: Decimal | str) -> str:
@@ -509,7 +510,6 @@ def _quebec_rates_page_facts(year: int) -> dict[str, str]:
 
 
 # The rates page's figures by province code: each builder makes the whole set for its province; a province with no entry has no rates page.
-# The province-only part of the rates page's figures, by province code; a province with no entry has no rates page.
 RATES_PAGE_FACTS = {
     "CA-ON": _ontario_rates_page_facts,
     "CA-AB": _alberta_rates_page_facts,
