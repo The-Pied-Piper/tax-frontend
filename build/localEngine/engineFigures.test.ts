@@ -260,6 +260,28 @@ describe.runIf(process.env.ENGINE_FIGURES_FILE)(
       });
     });
 
+    it('writes the Québec facts from its own datasets: its Employment Insurance rate, the full amount of the $2,000 band, and the salaries of Québec taxable income', () => {
+      const raw = JSON.parse(readFileSync(file, 'utf8')) as {
+        provinces: Record<string, { facts: Record<string, string> }>;
+      };
+      const facts = raw.provinces['CA-QC']?.facts;
+      expect(facts).toMatchObject({
+        ei_rate: '0.0130',
+        ei_stop: '68900',
+        ei_band_end: '2026',
+        ei_full_amount: '26.34',
+        qpip_first: '8.60',
+        qpp_rate: '0.0630',
+        taxable_factor_2: '0.96',
+        taxable_constant_2: '2273.00',
+        qc_constant_2: '823.00',
+        qc_cut: '2577.00',
+        fed_bracket_5_salary: '259609',
+        qc_bracket_2_salary: '56324',
+        drug_max_salary: '29882',
+      });
+    });
+
     it('holds the hub-chart points of every province, $1,000 to $500,000, the twenty-seven extra salaries and each province own extra ones', () => {
       const raw = JSON.parse(readFileSync(file, 'utf8')) as {
         provinces: Record<

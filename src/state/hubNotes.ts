@@ -1,5 +1,6 @@
 import {
   displayCents,
+  displayCentsOneDecimal,
   displayMoney,
   displayRate,
   displayRateOneDecimal,
@@ -55,10 +56,11 @@ import type { FooterProvinceSlug } from './siteLinks';
  *                       in place of `k:`, which rounds to four decimals and shows "52%";
  *  - `w:column@a-b`     the gap between a column at two sweep salaries, as a rate to one decimal ("12.9%": the marginal
  *                       rate at salary a less the rate at salary b);
+ *  - `g:column@a-b`     the same gap as cents on the dollar, to one decimal ("10.8 cents");
+ *  - `s:name`           a rate the engine wrote, as a printed percent with two decimals ("1.30%", "0.43%"), for the rates a form prints so;
  *  - `x:name`           a figure the engine wrote, as it wrote it ("0.99"), for a factor that is neither money nor a rate;
  *  - `t:name`           a rate the engine wrote, as cents on the dollar, digits as written ("3.56 cents");
- *  - `p:name`           a rate the engine wrote, as a percent, digits as written ("20.5%");
- *  - `s:name`           a rate a form prints to two decimals, as a percent with at least two ("5.60%", "12.29%").
+ *  - `p:name`           a rate the engine wrote, as a percent, digits as written ("20.5%").
  * Declared, because the data does not hold them:
  *  - `d:amount`         a dollar figure printed on a form or fixed by a rule (a cap, a threshold),
  *                       which nothing checks;
@@ -95,7 +97,7 @@ export type ParsedSpec =
       salary: string;
     }
   | { kind: 'e' | 'o' | 'y' | 'd'; amount: string }
-  | { kind: 'w'; column: NoteColumn; salary: string; other: string }
+  | { kind: 'w' | 'g'; column: NoteColumn; salary: string; other: string }
   | { kind: 'f' | 'n' | 't' | 'p' | 's' | 'x'; name: string }
   | { kind: 'l'; words: string };
 
@@ -116,7 +118,7 @@ export function parseSpec(spec: string): ParsedSpec {
   ) {
     return { kind, amount: first };
   }
-  if (kind === 'w' && parts.length === 2) {
+  if ((kind === 'w' || kind === 'g') && parts.length === 2) {
     const [column = '', pair = ''] = first.split('@');
     const [salary = '', other = ''] = pair.split('-');
     if (isColumn(column) && AMOUNT.test(salary) && AMOUNT.test(other)) {
@@ -237,6 +239,15 @@ export function figureText(spec: ParsedSpec, sweep: ProvinceSweep): string {
         ),
         rateUnit,
       );
+    case 'g':
+      return displayCentsOneDecimal(
+        subtractAmounts(
+          columnValue(pointAt(points, spec.salary), spec.column),
+          columnValue(pointAt(points, spec.other), spec.column),
+        ),
+      );
+    case 's':
+      return displayRateTwoDecimals(factOf(sweep, spec.name), rateUnit);
     case 'x':
       return factOf(sweep, spec.name);
     case 'n':
@@ -245,8 +256,6 @@ export function figureText(spec: ParsedSpec, sweep: ProvinceSweep): string {
       return displayCents(factOf(sweep, spec.name));
     case 'p':
       return displayRate(factOf(sweep, spec.name), rateUnit);
-    case 's':
-      return displayRateTwoDecimals(factOf(sweep, spec.name), rateUnit);
     case 'm':
     case 'r':
     case 'k':

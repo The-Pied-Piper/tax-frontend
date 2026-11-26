@@ -6,6 +6,7 @@ import {
   displayRate,
   displayRateOneDecimal,
   displayRateTwoDecimals,
+  displayCentsOneDecimal,
   displayRoundedMoney,
   displayWholeMoney,
   groupThousands,
@@ -178,27 +179,6 @@ describe('displayRateOneDecimal', () => {
   });
 });
 
-describe('displayRateTwoDecimals', () => {
-  const pct = { ...percent, as_percentage: true };
-  it.each([
-    ['0.056', '5.60%'],
-    ['0.0560', '5.60%'],
-    ['0.077', '7.70%'],
-    ['0.1229', '12.29%'],
-    ['0.205', '20.50%'],
-    ['0.12295', '12.295%'],
-    ['0', '0.00%'],
-  ])('shows %s as %s', (amount, shown) => {
-    expect(displayRateTwoDecimals(amount, pct)).toBe(shown);
-  });
-  it('shows a unit that is not a percentage, and unreadable text, as displayRate does', () => {
-    expect(
-      displayRateTwoDecimals('5.6', { ...percent, as_percentage: false }),
-    ).toBe('5.6%');
-    expect(displayRateTwoDecimals('abc', pct)).toBe('abc');
-  });
-});
-
 describe('displayRoundedMoney', () => {
   const dollar: Unit = { ...cad, singular: '$', plural: '$' };
   it.each([
@@ -302,5 +282,39 @@ describe('displayCents', () => {
     expect(displayCents('0.01')).toBe('1 cent');
     expect(displayCents('-0.1942')).toBe('-19.42 cents');
     expect(displayCents('n/a')).toBe('n/a');
+  });
+});
+
+describe('displayRateTwoDecimals', () => {
+  const pct = { ...percent, as_percentage: true };
+  it.each([
+    ['0.013', '1.30%'],
+    ['0.0130', '1.30%'],
+    ['0.0043', '0.43%'],
+    ['0.063', '6.30%'],
+    ['0.01', '1.00%'],
+    ['0.0163', '1.63%'],
+  ])('shows %s as %s', (amount, shown) => {
+    expect(displayRateTwoDecimals(amount, pct)).toBe(shown);
+  });
+  it('falls back to displayRate for more digits, text and units that are not percentages', () => {
+    expect(displayRateTwoDecimals('0.25755', pct)).toBe('25.755%');
+    expect(displayRateTwoDecimals('abc', pct)).toBe('abc');
+    expect(
+      displayRateTwoDecimals('0.013', { ...percent, as_percentage: false }),
+    ).toBe('0.013%');
+  });
+});
+
+describe('displayCentsOneDecimal', () => {
+  it.each([
+    ['0.1075129', '10.8 cents'],
+    ['0.0729', '7.3 cents'],
+    ['0.1', '10.0 cents'],
+  ])('shows %s as %s', (amount, shown) => {
+    expect(displayCentsOneDecimal(amount)).toBe(shown);
+  });
+  it('shows text it cannot read as sent', () => {
+    expect(displayCentsOneDecimal('abc')).toBe('abc');
   });
 });

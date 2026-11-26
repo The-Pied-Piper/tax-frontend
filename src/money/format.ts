@@ -142,19 +142,6 @@ export function displayRate(amount: string, unit: MoneyUnit): string {
   return shifted === null ? amount : withUnit(shifted, unit);
 }
 
-// A rate as a percent with at least two decimals, digits moved and never rounded, as a statutory rate is printed on a
-// form: "0.056" -> "5.60%", "0.1229" -> "12.29%", "0.205" -> "20.50%". A third decimal the text has is kept.
-export function displayRateTwoDecimals(
-  amount: string,
-  unit: MoneyUnit,
-): string {
-  if (unit.as_percentage !== true) return displayRate(amount, unit);
-  const shifted = timesHundred(amount);
-  if (shifted === null) return amount;
-  const [whole = '', fraction = ''] = shifted.split('.');
-  return withUnit(`${whole}.${fraction.padEnd(2, '0')}`, unit);
-}
-
 // A rate written as cents on the dollar: "0.0857" -> "8.57 cents", "0.01" -> "1 cent".
 // Only digits are moved, never rounded; text that is not a plain decimal is returned as is.
 export function displayCents(amount: string): string {
@@ -163,19 +150,52 @@ export function displayCents(amount: string): string {
   return `${shifted} ${shifted === '1' ? 'cent' : 'cents'}`;
 }
 
-// A rate shown to one decimal, rounded half away from zero: "0.2316" -> "23.2%",
-// "-0.2537" -> "-25.4%". Like displayRate for a unit that is not a percentage,
-// and for text it cannot read.
-export function displayRateOneDecimal(amount: string, unit: MoneyUnit): string {
+/** A rate as tenths of a percent, rounded half away from zero ("0.2316" is "23.2"); null for text it cannot read. */
+function tenthsOfPercent(amount: string): string | null {
   const match = /^(-?)(0|[1-9]\d*)(?:\.(\d+))?$/.exec(amount);
-  if (unit.as_percentage !== true || !match) return displayRate(amount, unit);
+  if (!match) return null;
   const [, minus = '', whole = '', fraction = ''] = match;
   // A fraction is a percent times 100, so tenths of a percent are the fraction times 1000.
   const scale = 10n ** BigInt(fraction.length);
   const tenths =
     (BigInt(`${whole}${fraction}`) * 1000n * 2n + scale) / (scale * 2n);
   const text = `${(tenths / 10n).toString()}.${(tenths % 10n).toString()}`;
-  return withUnit(minus !== '' && tenths !== 0n ? `-${text}` : text, unit);
+  return minus !== '' && tenths !== 0n ? `-${text}` : text;
+}
+
+// A rate shown to one decimal, rounded half away from zero: "0.2316" -> "23.2%",
+// "-0.2537" -> "-25.4%". Like displayRate for a unit that is not a percentage,
+// and for text it cannot read.
+export function displayRateOneDecimal(amount: string, unit: MoneyUnit): string {
+  const text = tenthsOfPercent(amount);
+  if (unit.as_percentage !== true || text === null)
+    return displayRate(amount, unit);
+  return withUnit(text, unit);
+}
+
+// A rate written as cents on the dollar to one decimal, rounded half away from zero:
+// "0.1075" -> "10.8 cents". Text that is not a plain decimal is returned as is.
+export function displayCentsOneDecimal(amount: string): string {
+  const text = tenthsOfPercent(amount);
+  return text === null ? amount : `${text} cents`;
+}
+
+// A rate as a printed percent with two decimals, digits as written: "0.013" -> "1.30%",
+// "0.0043" -> "0.43%". A rate with more digits than that, or text that is not a plain
+// decimal, is shown by `displayRate`.
+export function displayRateTwoDecimals(
+  amount: string,
+  unit: MoneyUnit,
+): string {
+  const match = /^(0|[1-9]\d*)(?:\.(\d{1,4}))?$/.exec(amount);
+  if (unit.as_percentage !== true || !match) return displayRate(amount, unit);
+  const [, whole = '', fraction = ''] = match;
+  const padded = fraction.padEnd(4, '0');
+  const percent = `${whole === '0' ? '' : whole}${padded.slice(0, 2)}`.replace(
+    /^0+(?=\d)/,
+    '',
+  );
+  return withUnit(`${percent}.${padded.slice(2)}`, unit);
 }
 
 // Short label for an axis tick, from a round value the chart chose. A rate

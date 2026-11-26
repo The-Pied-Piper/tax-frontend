@@ -164,9 +164,7 @@ describe.runIf(process.env.ENGINE_FIGURES_FILE)(
       );
       expect(sweeps.map((s) => s.slug)).toEqual(provinces.map((p) => p.slug));
       for (const sweep of sweeps) {
-        expect(sweep.points, sweep.slug).toHaveLength(
-          sweepSalaries(sweep.slug).length,
-        );
+        expect(sweep.points).toHaveLength(sweepSalaries(sweep.slug).length);
       }
       expect(hubChartBlocks(sweeps).size).toBe(provinces.length);
     });

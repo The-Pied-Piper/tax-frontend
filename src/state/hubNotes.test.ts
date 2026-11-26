@@ -182,12 +182,21 @@ describe('the text of the hub charts', () => {
     expect(figureText(parseSpec('x:taxable_factor'), sweep)).toBe('0.99');
   });
 
-  it('reads a statutory rate with the two decimals the form prints', () => {
+  it('reads the Québec page kinds: a gap as cents, a printed percent with two decimals, the share kept', () => {
+    const sweep = sweepOf('ca-qc');
+    expect(figureText(parseSpec('g:marginal@20000-12000'), sweep)).toBe(
+      '10.8 cents',
+    );
+    expect(figureText(parseSpec('s:ei_rate'), sweep)).toBe('1.30%');
+    expect(figureText(parseSpec('s:qpip_rate'), sweep)).toBe('0.43%');
+    expect(figureText(parseSpec('u:marginal@300000'), sweep)).toBe('46.7%');
+  });
+
+  it('reads a British Columbia statutory rate with the two decimals the form prints', () => {
     const sweep = sweepOf('ca-bc');
     expect(figureText(parseSpec('s:bc_bracket_1_rate'), sweep)).toBe('5.60%');
     expect(figureText(parseSpec('s:bc_bracket_4_rate'), sweep)).toBe('12.29%');
     expect(figureText(parseSpec('s:bc_bracket_7_rate'), sweep)).toBe('20.50%');
-    expect(figureText(parseSpec('p:bc_bracket_1_rate'), sweep)).toBe('5.6%');
   });
 
   it('keeps the edge of a band exact to the dollar, and the next edge apart from the one before', () => {

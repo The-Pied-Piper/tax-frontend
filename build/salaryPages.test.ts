@@ -173,6 +173,7 @@ describe('salaryPages closeBundle', () => {
         'ca-on/tax-rates',
         'ca-ab/tax-rates',
         'ca-bc/tax-rates',
+        'ca-qc/tax-rates',
       ]),
     );
     expect((published as Set<string>).has('methodology')).toBe(true);
