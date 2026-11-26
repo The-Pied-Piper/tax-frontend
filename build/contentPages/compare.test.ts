@@ -67,31 +67,11 @@ describe('the written compare page', () => {
     expect(
       page.querySelector('meta[name="description"]')?.getAttribute('content'),
     ).toBe(
-      'Compare take-home pay, tax and contributions across 6 provinces at a salary you choose. Estimates for 2026, for a single person whose only income is a salary.',
+      'Compare take-home pay, tax and contributions across provinces at a salary you choose. Estimates for 2026, for a single person whose only income is a salary.',
     );
     const slot = page.getElementById(PROVINCE_COMPARISON_SLOT_ID);
     expect(slot?.dataset.province).toBeUndefined();
     expect(slot?.querySelector('[aria-current]')).toBeNull();
-  });
-
-  it('says which provinces it covers, in the list order', () => {
-    expect(page.body.textContent).toContain(
-      `These are the provinces this site covers so far: ${names['ca-on']}, ${names['ca-ab']}, ${names['ca-bc']}, ${names['ca-mb']}, ${names['ca-sk']} and ${names['ca-nl']}.`,
-    );
-  });
-
-  it('puts the covered-provinces line after the comparison, so the bars come first on a phone', () => {
-    const slot = page.getElementById(PROVINCE_COMPARISON_SLOT_ID);
-    const line = Array.from(page.querySelectorAll('p')).find((p) =>
-      p.textContent.includes('the provinces this site covers'),
-    );
-    expect(slot).not.toBeNull();
-    expect(line).toBeDefined();
-    expect(
-      slot && line
-        ? slot.compareDocumentPosition(line) & Node.DOCUMENT_POSITION_FOLLOWING
-        : 0,
-    ).toBeTruthy();
   });
 
   it('has every province at $70,000 in the page itself, lowest tax and contributions first', () => {

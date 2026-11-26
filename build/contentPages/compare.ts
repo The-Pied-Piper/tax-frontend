@@ -8,12 +8,6 @@ import {
 } from '../../src/state/siteLinks';
 import { strings } from '../../src/strings';
 
-/** "Ontario, Alberta and Québec": the names joined the way a sentence would. */
-function sentenceList(names: readonly string[]): string {
-  if (names.length < 2) return names.join('');
-  return `${names.slice(0, -1).join(', ')} and ${names[names.length - 1] ?? ''}`;
-}
-
 /**
  * The page that compares every province: `/compare-provinces/`. One page for all provinces, not one for
  * each, so it highlights none. Its bars, and the table of every salary, read the sweeps in the page's own
@@ -29,24 +23,17 @@ export function comparePage(
   const slugs = FOOTER_PROVINCE_SLUGS.filter((slug) =>
     sweeps.some((sweep) => sweep.slug === slug),
   );
-  const names = slugs.map((slug) => strings.siteNav.provinceNames[slug]);
   return {
     slug: COMPARE_SLUG,
     title: t.title(year),
-    description: t.description(slugs.length, year),
+    description: t.description(year),
     heading: t.heading(year),
-    lede: t.intro(slugs.length),
+    lede: t.intro,
     trail: [],
     sections: [
       {
         heading: t.sectionHeading,
-        blocks: [
-          { kind: 'provinceComparison' },
-          {
-            kind: 'paragraph',
-            content: [t.coverage(sentenceList(names))],
-          },
-        ],
+        blocks: [{ kind: 'provinceComparison' }],
       },
       {
         heading: t.linksHeading,
