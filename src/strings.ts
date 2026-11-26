@@ -12,6 +12,7 @@ export const strings = {
     breadcrumb: 'Breadcrumb',
     home: 'Home',
     methodology: 'How we calculate',
+    compare: 'Take-home pay by province',
     provinces: 'Provinces:',
     provinceNames: {
       'ca-on': 'Ontario',
@@ -104,8 +105,6 @@ export const strings = {
         salary: string,
       ) =>
         `${place}: ${measure} ${value} for a ${salary} salary. Open the ${place} hub page.`,
-      provisional: (year: number) =>
-        `The ${String(year)} figures are provisional.`,
       salaryLabel: 'Salary a year',
       salaryValueText: (salary: string) => `${salary} a year`,
       hint: 'Drag the slider, or use the arrow keys, to pick a salary. The bars and the order of the list change as you drag.',

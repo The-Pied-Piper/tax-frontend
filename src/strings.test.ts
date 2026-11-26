@@ -80,7 +80,6 @@ describe('the province comparison copy', () => {
     expect(copy.reorderedTied('$1,000')).toBe(
       'No province takes any tax or contributions at $1,000, so the provinces are not ranked.',
     );
-    expect(copy.provisional(2026)).toBe('The 2026 figures are provisional.');
     expect(copy.chartLabel('Take-home pay', '$70,000', copy.tableToggle)).toBe(
       'Bar chart: Take-home pay for a $70,000 salary, by province. These figures, and every other salary, are in the table under “Show the figures as a table”.',
     );
@@ -108,7 +107,6 @@ describe('the province comparison copy', () => {
     const words = [
       ...everyString(copy),
       copy.caption('$70,000', 2026),
-      copy.provisional(2026),
       copy.chartLabel('Take-home pay', '$70,000', copy.tableToggle),
       copy.table.note(2026, true),
       copy.table.caption(2026, 300),

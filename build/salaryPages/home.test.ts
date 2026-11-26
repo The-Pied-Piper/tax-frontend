@@ -41,6 +41,7 @@ describe('rewriteHome (dist/index.html)', () => {
     }
     expect(hrefs(page)).toEqual([
       '/methodology/',
+      '/compare-provinces/',
       '/ca-on/',
       '/ca-ab/',
       '/ca-bc/',

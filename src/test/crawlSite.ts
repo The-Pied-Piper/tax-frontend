@@ -4,6 +4,7 @@ import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { siteUrl as site } from './generatedSite';
 import {
+  COMPARE_SLUG,
   contentFile,
   FOOTER_PROVINCE_SLUGS,
   FORMS_SEGMENT,
@@ -41,11 +42,12 @@ export function navHrefs(dir: string, file: string): (string | null)[] {
 
 /**
  * The pages the footer links to. A full build writes every one of them (the
- * methodology page and the three hubs); a folder built from fewer pieces may
+ * methodology page, the compare page and the hubs); a folder built from fewer pieces may
  * lack some, and the tests of those skip these files.
  */
 export const FOOTER_TARGETS: string[] = [
   contentFile(METHODOLOGY_SLUG),
+  contentFile(COMPARE_SLUG),
   ...FOOTER_PROVINCE_SLUGS.map((slug) => contentFile(slug)),
 ];
 

@@ -39,6 +39,7 @@ describe('crawl of a built one-entry content page folder', () => {
   it('names the footer targets', () => {
     expect(FOOTER_TARGETS).toEqual([
       'methodology/index.html',
+      'compare-provinces/index.html',
       'ca-on/index.html',
       'ca-ab/index.html',
       'ca-bc/index.html',

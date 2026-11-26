@@ -66,19 +66,9 @@ describe('ProvinceComparison at the start', () => {
     expect(screen.getByText(copy.measureNotes.takeHome)).toBeInTheDocument();
   });
 
-  it('says the figures are provisional only when the year is', () => {
-    const { unmount } = show();
-    expect(
-      screen.getByText('The 2026 figures are provisional.'),
-    ).toBeInTheDocument();
-    unmount();
-    show('ca-on', {
-      provinces: sampleSweeps.map((sweep) => ({
-        ...sweep,
-        provisional: false,
-      })),
-    });
-    expect(screen.queryByText(/provisional/)).toBeNull();
+  it('has no separate provisional line under the notes', () => {
+    show();
+    expect(screen.queryByText('The 2026 figures are provisional.')).toBeNull();
   });
 
   it('offers the three measures under the label "Compare by"', () => {
