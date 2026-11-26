@@ -197,7 +197,7 @@ const bracketHead = [
 export const britishColumbiaRatesPage: RatesPageText = {
   title: 'British Columbia marginal and average tax rate by salary, 2026',
   description:
-    'See how much of each extra dollar and of your whole salary goes to tax in British Columbia in 2026, and what causes every step.',
+    'See how much of each extra dollar and of your whole salary goes to tax in British Columbia in 2026, from $0 to $500,000, and what causes every step.',
   heading: 'British Columbia marginal and average tax rate by salary, 2026',
   intro: [
     words(
