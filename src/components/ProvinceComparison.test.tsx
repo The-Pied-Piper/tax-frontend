@@ -419,6 +419,17 @@ describe('the order of the list', () => {
     );
   });
 
+  it('keeps the announcement as it was while the slider is dragged away from where it was let go', () => {
+    show();
+    fireEvent.change(slider(), { target: { value: '0' } });
+    fireEvent.pointerUp(slider());
+    const spoken = copy.reorderedTied('$1,000');
+    expect(screen.getByRole('status')).toHaveTextContent(spoken);
+    // Dragging to a salary where provinces differ changes the list and the caption, not the spoken line.
+    fireEvent.change(slider(), { target: { value: '3' } });
+    expect(screen.getByRole('status')).toHaveTextContent(spoken);
+  });
+
   it('opens at the salary the address names', () => {
     window.history.pushState({}, '', '/compare-provinces/?salary=30000');
     show();

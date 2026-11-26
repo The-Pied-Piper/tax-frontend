@@ -130,6 +130,8 @@ export function ProvinceComparison({ data, province }: Props) {
   const tableCopy = copy.table;
   const rows = comparisonRows(data.provinces, index, measure);
   const tied = allTied(data.provinces, index);
+  // The announcement follows the salary the slider was let go at, not the one it is being dragged to.
+  const announcedTied = allTied(data.provinces, announced ?? index);
   const announcedSalary = displayWholeMoney(
     salaries[announced ?? index] ?? DEFAULT_SALARY,
     'annually',
@@ -226,7 +228,7 @@ export function ProvinceComparison({ data, province }: Props) {
       </p>
       <p className={styles.srOnly} role="status">
         {announced !== null &&
-          (tied
+          (announcedTied
             ? copy.reorderedTied(announcedSalary)
             : copy.reordered(announcedSalary))}
       </p>
