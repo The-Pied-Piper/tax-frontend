@@ -1,3 +1,6 @@
+import type { PageKind } from '../state/pageKind';
+import { sendBeacon } from './sendBeacon';
+
 // One tiny request so a visitor whose browser runs JavaScript leaves a mark in
 // the site's access logs; a crawler that only reads the HTML never does. The
 // request goes to a one-byte file on our own site (public/b.txt). It carries
@@ -8,21 +11,11 @@
 // app shell, `salary` a pre-built salary page; the other kinds are the pre-built
 // content pages (see state/pageKind.ts). Failures are ignored.
 
-export type VisitKind =
-  'home' | 'salary' | 'form' | 'hub' | 'rates' | 'compare' | 'other';
+export type VisitKind = PageKind;
 
 export function sendVisitBeacon(kind: VisitKind): void {
   const send = () => {
-    try {
-      fetch(`/b.txt?p=${kind}`, {
-        keepalive: true,
-        credentials: 'omit',
-        referrerPolicy: 'no-referrer',
-        cache: 'no-store',
-      }).catch(() => undefined);
-    } catch {
-      // A blocked beacon must never affect the page.
-    }
+    sendBeacon(`/b.txt?p=${kind}`);
   };
   // After the page has loaded, off the rendering path.
   const later = () => {

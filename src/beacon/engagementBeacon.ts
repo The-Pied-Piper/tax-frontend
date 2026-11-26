@@ -1,3 +1,4 @@
+import { sendBeacon } from './sendBeacon';
 import type { VisitKind } from './visitBeacon';
 
 // One tiny request the first time a person does something on the page, so we
@@ -7,7 +8,7 @@ import type { VisitKind } from './visitBeacon';
 // one-byte file on our own site (public/e.txt) and carries only the kind of page
 // and which action it was: `calculate` (a mouse or tap press on the submit
 // button; pressing Enter to submit counts as `key`), `click` (any other click or
-// tap), `key` (a key press) or `scroll` (a scroll of about one screen). No salary,
+// tap), `key` (a key press, not a lone modifier or a browser shortcut) or `scroll` (a scroll of about one screen). No salary,
 // place, cookie, id or fingerprint, and no Referer, so the address of the page is
 // not sent either. Only events the browser itself made count (`isTrusted`), so a
 // script that dispatches fake events does not; a real browser driven by
@@ -16,6 +17,15 @@ import type { VisitKind } from './visitBeacon';
 // already scrolled (reload, back, a #fragment) is not counted. Failures are ignored.
 
 export type EngagementTrigger = 'calculate' | 'click' | 'key' | 'scroll';
+
+const MODIFIER_KEYS: ReadonlySet<string> = new Set([
+  'Shift',
+  'Control',
+  'Alt',
+  'Meta',
+  'AltGraph',
+  'CapsLock',
+]);
 
 function clickTrigger(event: MouseEvent): EngagementTrigger {
   const target = event.target;
@@ -43,22 +53,19 @@ export function watchEngagement(kind: VisitKind): () => void {
     if (done) return;
     done = true;
     stop();
-    try {
-      fetch(`/e.txt?p=${kind}&t=${trigger}`, {
-        keepalive: true,
-        credentials: 'omit',
-        referrerPolicy: 'no-referrer',
-        cache: 'no-store',
-      }).catch(() => undefined);
-    } catch {
-      // A blocked beacon must never affect the page.
-    }
+    sendBeacon(`/e.txt?p=${kind}&t=${trigger}`);
   };
   function onClick(event: MouseEvent) {
     if (event.isTrusted) send(clickTrigger(event));
   }
   function onKey(event: KeyboardEvent) {
-    if (event.isTrusted) send('key');
+    // Not a lone modifier, and not a browser shortcut (reload, back, find):
+    // those say nothing about the page.
+    if (!event.isTrusted || MODIFIER_KEYS.has(event.key)) return;
+    if (event.ctrlKey || event.metaKey || event.altKey || event.key === 'F5') {
+      return;
+    }
+    send('key');
   }
   function onInput(event: Event) {
     if (event.isTrusted) handsOn = true;

@@ -13,8 +13,8 @@ function fire(type: string, event: Record<string, unknown>, isTrusted = true) {
 function click(id: string, isTrusted = true) {
   fire('click', { target: document.getElementById(id) }, isTrusted);
 }
-function key(isTrusted = true) {
-  fire('keydown', { key: 'a' }, isTrusted);
+function key(isTrusted = true, extra: Record<string, unknown> = {}) {
+  fire('keydown', { key: 'a', ...extra }, isTrusted);
 }
 function hands(type = 'wheel') {
   fire(type, {});
@@ -87,6 +87,16 @@ describe('watchEngagement', () => {
 
   it('tags a key press', () => {
     start('form');
+    key();
+    expect(lastUrl()).toBe('/e.txt?p=form&t=key');
+  });
+
+  it('does not count a lone modifier or a browser shortcut as a key press', () => {
+    start('form');
+    key(true, { key: 'Shift' });
+    key(true, { key: 'r', ctrlKey: true });
+    key(true, { key: 'F5' });
+    expect(fetchMock).not.toHaveBeenCalled();
     key();
     expect(lastUrl()).toBe('/e.txt?p=form&t=key');
   });
