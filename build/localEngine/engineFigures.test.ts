@@ -76,7 +76,7 @@ describe("reading the Python step's file", () => {
     writeFileSync(
       file,
       JSON.stringify({
-        engine: '0.5.2',
+        engine: '0.5.3',
         provinces: { 'CA-ON': { pages, ...extra } },
       }),
     );
@@ -86,7 +86,7 @@ describe("reading the Python step's file", () => {
   it('returns the answers by province and salary', () => {
     const answer = engineOf(saved);
     const figures = readEngineFigures(written({ '70000': answer }));
-    expect(figures.engine).toBe('0.5.2');
+    expect(figures.engine).toBe('0.5.3');
     expect(figures.answers['CA-ON']?.['70000']).toEqual(answer);
   });
 
@@ -180,12 +180,12 @@ describe.runIf(process.env.ENGINE_FIGURES_FILE)(
       );
     });
 
-    // The chart figures (tax-engine 0.5.2, 2026): the average and marginal rate are the engine's own, written to seven
+    // The chart figures (tax-engine 0.5.3, 2026): the average and marginal rate are the engine's own, written to seven
     // places (the engine rounds to four, and a display of one decimal must round once; the pages' answers stay at four)
     // (income tax, CPP and EI line 16, no credits paid on filing counted; at $2,000 the engine reads the
-    // marginal rate below the start of the EI band).
+    // marginal rate at the start of the EI band, where EI takes the next dollar).
     it.each([
-      ['2000.00', '0', '0', '2000.00'],
+      ['2000.00', '0', '1', '2000.00'],
       ['3000.00', '0.0163', '0.0163', '2951.10'],
       ['38000.00', '0.1582839', '0.3607601', '31985.21'],
       ['70000.00', '0.231625', '0.3436053', '53786.25'],
@@ -240,6 +240,28 @@ describe.runIf(process.env.ENGINE_FIGURES_FILE)(
         surtax_first: '5818',
         surtax_second: '7446',
         ei_band_end: '2033',
+      });
+    });
+
+    it('writes the Québec facts from its own datasets: its Employment Insurance rate, the full amount of the $2,000 band, and the salaries of Québec taxable income', () => {
+      const raw = JSON.parse(readFileSync(file, 'utf8')) as {
+        provinces: Record<string, { facts: Record<string, string> }>;
+      };
+      const facts = raw.provinces['CA-QC']?.facts;
+      expect(facts).toMatchObject({
+        ei_rate: '0.0130',
+        ei_stop: '68900',
+        ei_band_end: '2026',
+        ei_full_amount: '26.34',
+        qpip_first: '8.60',
+        qpp_rate: '0.0630',
+        taxable_factor_2: '0.96',
+        taxable_constant_2: '2273.00',
+        qc_constant_2: '823.00',
+        qc_cut: '2577.00',
+        fed_bracket_5_salary: '259609',
+        qc_bracket_2_salary: '56324',
+        drug_max_salary: '29882',
       });
     });
 
