@@ -20,9 +20,13 @@ export const ontarioLearnMore = [
 ];
 
 /** The new link fields an Ontario page carries, to spread into a links object. */
-export const ontarioTargets: Pick<SalaryPageLinks, 'hub' | 'learnMore'> = {
+export const ontarioTargets: Pick<
+  SalaryPageLinks,
+  'hub' | 'learnMore' | 'rates'
+> = {
   hub: ontarioHub,
   learnMore: ontarioLearnMore,
+  rates: null,
 };
 
 /** Links with no neighbours, for tests that only need a valid links object. */
@@ -35,8 +39,12 @@ export const bareLinks: SalaryPageLinks = {
 };
 
 /** The hub step and "Learn more" links of an Alberta page when no Alberta form page is published. */
-export const albertaTargets: Pick<SalaryPageLinks, 'hub' | 'learnMore'> = {
+export const albertaTargets: Pick<
+  SalaryPageLinks,
+  'hub' | 'learnMore' | 'rates'
+> = {
   hub: { label: 'Alberta', href: '/ca-ab/' },
+  rates: null,
   learnMore: [
     { label: 'Alberta forms and salary pages', href: '/ca-ab/' },
     { label: 'How we calculate', href: '/methodology/' },

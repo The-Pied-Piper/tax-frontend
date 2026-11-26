@@ -89,6 +89,20 @@ describe('generateSalaryPages links', () => {
     });
   });
 
+  it("links each salary page to its province's rates page with its own salary, when the build writes that page", async () => {
+    const dir = outDir();
+    await run(dir, {
+      published: new Set([...publishedSlugs, 'ca-on/tax-rates']),
+    });
+    expect(dataOf(dir, 'ca-on/70000/index.html').links?.rates).toEqual({
+      label: 'Ontario tax rates by salary',
+      href: '/ca-on/tax-rates/?salary=70000',
+    });
+    expect(dataOf(dir, 'ca-on/65000/index.html').links?.rates?.href).toBe(
+      '/ca-on/tax-rates/?salary=65000',
+    );
+  });
+
   it('hands the same links to the render function as it writes in the block', async () => {
     const dir = outDir();
     const seen: SalaryPageData[] = [];

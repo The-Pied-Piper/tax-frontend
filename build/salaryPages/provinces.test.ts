@@ -1,3 +1,4 @@
+import { sweepSalaries } from '../../src/state/hubCharts';
 import {
   FOOTER_PROVINCE_SLUGS,
   PROVINCES_WITHOUT_SALARY_PAGES,
@@ -136,5 +137,16 @@ describe('salaries', () => {
     expect(() => salaries({ ...base, step: 0 })).toThrow();
     expect(() => salaries({ ...base, step: -5000 })).toThrow();
     expect(() => salaries({ ...base, from: 30000 })).toThrow();
+  });
+});
+
+describe('salary pages and the rates page', () => {
+  it('has a sweep point for every salary page, so the rates page link with ?salary= lands on a point', () => {
+    const swept = new Set(sweepSalaries());
+    for (const province of provinces) {
+      for (const salary of salaries(province)) {
+        expect(swept.has(salary.toString())).toBe(true);
+      }
+    }
   });
 });

@@ -12,6 +12,7 @@ import {
   formSlug,
   HOME_PATH,
   METHODOLOGY_SLUG,
+  ratesSlug,
   type FooterProvinceSlug,
 } from './siteLinks';
 import { strings } from '../strings';
@@ -107,6 +108,27 @@ function chartSection(
       paragraph(oneLine),
       { kind: 'salaryChart', province, chart },
       { kind: 'chartNotes', province, chart },
+    ],
+  };
+}
+
+/** The section that replaces the two rate charts on a hub whose province has a rates page: one line and a link. */
+function ratesLinkSection(
+  province: FooterProvinceSlug,
+  name: string,
+): ContentSection {
+  return {
+    heading: strings.ratesPage.chartHeading,
+    id: 'tax-rates',
+    card: true,
+    blocks: [
+      paragraph(
+        {
+          label: strings.ratesLink.hubLink(name),
+          href: contentPath(ratesSlug(province)),
+        },
+        strings.ratesLink.hubRest,
+      ),
     ],
   };
 }
@@ -300,7 +322,8 @@ function listItem(form: HubForm, published: ReadonlySet<string>): ListItem {
  * name, `published` the slugs of the pages that exist (a form with no page is
  * listed without a link), `otherHubs` the links to the other provinces and
  * `withCharts` whether the hub has a sweep: its take-home chart then sits in the
- * section that explains the take-home, and three more sections follow, one for each chart.
+ * section that explains the take-home. Two more sections follow, one for each rate chart, or, when `published`
+ * holds the province's rates page, one section with a line and a link to it.
  */
 export function hubPage(
   text: ProvinceHubText,
@@ -371,12 +394,15 @@ export function hubPage(
             : []),
         ],
       },
-      ...(withCharts
-        ? [
-            chartSection('averageRate', text, name),
-            chartSection('marginalRate', text, name),
-          ]
-        : []),
+      // The rate charts live on the rates page when the build writes one; the hub keeps one line and a link.
+      ...(!withCharts
+        ? []
+        : published.has(ratesSlug(text.slug))
+          ? [ratesLinkSection(text.slug, name)]
+          : [
+              chartSection('averageRate', text, name),
+              chartSection('marginalRate', text, name),
+            ]),
       ...(!withCharts
         ? []
         : [
