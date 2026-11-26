@@ -582,4 +582,3 @@ describe('the British Columbia rates page', () => {
     expect(text?.description.length).toBeLessThan(160);
   });
 });
-
