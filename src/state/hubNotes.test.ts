@@ -192,6 +192,13 @@ describe('the text of the hub charts', () => {
     expect(figureText(parseSpec('u:marginal@300000'), sweep)).toBe('46.7%');
   });
 
+  it('reads a British Columbia statutory rate with the two decimals the form prints', () => {
+    const sweep = sweepOf('ca-bc');
+    expect(figureText(parseSpec('s:bc_bracket_1_rate'), sweep)).toBe('5.60%');
+    expect(figureText(parseSpec('s:bc_bracket_4_rate'), sweep)).toBe('12.29%');
+    expect(figureText(parseSpec('s:bc_bracket_7_rate'), sweep)).toBe('20.50%');
+  });
+
   it('keeps the edge of a band exact to the dollar, and the next edge apart from the one before', () => {
     const sweep = sweepOf('ca-on');
     // The surtax steps are whole-salary thresholds read from the engine, not a grid.

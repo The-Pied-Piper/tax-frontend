@@ -21,7 +21,15 @@ describe('ratesPageView', () => {
   });
 
   it('lists the provinces that have wording', () => {
-    expect(ratesProvinces()).toEqual(['ca-on', 'ca-ab', 'ca-sk', 'ca-qc']);
+    expect(ratesProvinces()).toEqual([
+      'ca-on',
+      'ca-ab',
+      'ca-bc',
+      'ca-mb',
+      'ca-sk',
+      'ca-nl',
+      'ca-qc',
+    ]);
   });
 
   it('fills every figure from the sweep and leaves no brace behind', () => {
@@ -52,10 +60,6 @@ describe('ratesPageView', () => {
   it('draws nothing from a sweep that is not the full one', () => {
     const partial = { ...sweep(), points: sweep().points.slice(0, 10) };
     expect(ratesPageView('ca-on', partial)).toBeNull();
-  });
-
-  it('draws nothing for a province with no wording', () => {
-    expect(ratesPageView('ca-bc', sweep())).toBeNull();
   });
 
   it('names a cause form for every note and links the forms that have a page', () => {
@@ -398,6 +402,445 @@ describe('the Québec rates page', () => {
   });
 
   it('keeps the title under 64 characters and the description under 160', () => {
+    expect(text?.title.length).toBeLessThan(64);
+    expect(text?.description.length).toBeLessThan(160);
+  });
+});
+
+describe('the Newfoundland and Labrador rates page', () => {
+  const newfoundlandSweep = () => {
+    const found = fullHubCharts(['ca-nl']).provinces[0];
+    if (!found) throw new Error('no sweep');
+    return found;
+  };
+
+  const view = () => {
+    const found = ratesPageView('ca-nl', newfoundlandSweep());
+    if (!found) throw new Error('no view');
+    return found;
+  };
+
+  const everyWord = () => [
+    ...view().intro,
+    ...view().howToRead,
+    ...view().groups.flatMap((group) => group.notes.map((note) => note.words)),
+    ...view().tables.flatMap((table) => [
+      table.before ?? '',
+      table.after ?? '',
+      ...table.rows.flat(),
+    ]),
+  ];
+
+  it('fills every figure from the sweep and leaves no brace behind', () => {
+    expect(everyWord().length).toBeGreaterThan(20);
+    for (const words of everyWord()) {
+      expect(words).not.toMatch(/[{}]|undefined|NaN/);
+    }
+  });
+
+  it('gives one decimal for every rate in the opening finding', () => {
+    const [lead] = view().intro;
+    expect(lead).toMatch(/\d+\.\d%/);
+    expect(lead).not.toMatch(/\d+\.\d\d%/);
+    expect(lead).toContain('7.6%');
+    expect(lead).toContain('53.8%');
+    expect(lead).toContain('44.4%');
+  });
+
+  it('says where the reduction starts and ends', () => {
+    const text = everyWord().join(' ');
+    expect(text).toContain('about $24,400 of salary');
+    expect(text).toContain('$30,491');
+    expect(text).not.toContain('not raised');
+  });
+
+  it('keeps the tab title under 64 characters, the full name in the heading', () => {
+    const text = ratesPageText['ca-nl'];
+    expect(text?.title).toBe(
+      'Newfoundland and Labrador marginal and average tax rate, 2026',
+    );
+    expect(text?.heading).toBe(
+      'Newfoundland and Labrador marginal and average tax rate by salary, 2026',
+    );
+    expect(text?.title.length).toBeLessThan(64);
+    expect(text?.description.length).toBeLessThan(160);
+  });
+
+  it('types no dollar figure or cents figure in a note or a table cell', () => {
+    const text = ratesPageText['ca-nl'];
+    const words = [
+      ...(text?.intro ?? []).map((note) => note.text),
+      ...(text?.howToRead ?? []).map((note) => note.text),
+      ...(text?.groups ?? []).flatMap((group) =>
+        group.notes.map((note) => note.text),
+      ),
+      ...(text?.tables ?? []).flatMap((table) => [
+        table.before?.text ?? '',
+        table.after?.text ?? '',
+        ...table.rows.flat(),
+      ]),
+    ];
+    for (const line of words) {
+      expect(line).not.toMatch(/\$\d|\d cents/);
+    }
+  });
+
+  it('puts the last group heading just above the federal top bracket salary', () => {
+    const groups = ratesPageText['ca-nl']?.groups ?? [];
+    const last = groups[groups.length - 1]?.heading ?? '';
+    const top = newfoundlandSweep().facts['fed_bracket_5_salary'] ?? '';
+    const gap = subtractAmounts(last.replace(/\D/g, ''), top);
+    expect(compareAmounts(gap, '0')).toBeGreaterThanOrEqual(0);
+    expect(compareAmounts(gap, '1000')).toBeLessThan(0);
+  });
+
+  it('names a cause form for every note and links NL428', () => {
+    for (const group of ratesPageText['ca-nl']?.groups ?? []) {
+      for (const note of group.notes) {
+        expect(note.forms.length, note.text).toBeGreaterThan(0);
+      }
+    }
+    expect(causeChip('nl428').label).toBe('Form NL428');
+    expect(causeChip('nl428').href).toBe('/forms/nl428/');
+  });
+
+  it('agrees with the engine: each bracket salary is within a dollar of the engine edge that moves the rate', () => {
+    const { facts, edges } = newfoundlandSweep();
+    for (const name of [
+      'fed_bracket_2_salary',
+      'fed_bracket_3_salary',
+      'fed_bracket_4_salary',
+      'fed_bracket_5_salary',
+      'nl_bracket_2_salary',
+      'nl_bracket_3_salary',
+      'nl_bracket_4_salary',
+      'nl_bracket_5_salary',
+      'nl_bracket_6_salary',
+    ]) {
+      const salary = facts[name] ?? '';
+      const within = (edgeSalary: string) => {
+        const gap = subtractAmounts(edgeSalary, salary);
+        return compareAmounts(gap.replace('-', ''), '1') <= 0;
+      };
+      const near = edges.some((edge) => within(edge[1]) || within(edge[2]));
+      expect(near, name).toBe(true);
+    }
+  });
+
+  it('lists eight provincial brackets, the last two past the chart', () => {
+    const table = view().tables.find((t) => t.caption.includes('Newfoundland'));
+    expect(table?.rows).toHaveLength(8);
+    const [seventh, eighth] = table?.rows.slice(6) ?? [];
+    expect(seventh?.[2]).toBe('$571,765 (past this chart)');
+    expect(seventh?.[3]).toBe('54.3%');
+    expect(eighth?.[2]).toBe('$1,142,402 (past this chart)');
+    expect(eighth?.[3]).toBe('54.8%');
+  });
+});
+
+const mbSweep = () => {
+  const found = fullHubCharts(['ca-mb']).provinces[0];
+  if (!found) throw new Error('no sweep');
+  return found;
+};
+
+const mbView = () => {
+  const found = ratesPageView('ca-mb', mbSweep());
+  if (!found) throw new Error('no view');
+  return found;
+};
+
+describe('the Manitoba rates page', () => {
+  it('fills every figure and leaves no brace behind', () => {
+    const page = mbView();
+    const everyWord = [
+      ...page.intro,
+      ...page.howToRead,
+      ...page.groups.flatMap((group) => group.notes.map((note) => note.words)),
+      ...page.tables.flatMap((table) => [
+        table.before ?? '',
+        table.after ?? '',
+        ...table.rows.flat(),
+      ]),
+    ];
+    expect(everyWord.length).toBeGreaterThan(20);
+    for (const words of everyWord) {
+      expect(words).not.toMatch(/[{}]|undefined|NaN/);
+    }
+  });
+
+  it('reads the peak and the top rate from the data: the peak is the highest marginal rate of the sweep, the top is the rate at the last salary', () => {
+    const { points } = mbSweep();
+    let highest = '0';
+    for (const point of points) {
+      // The $2,000 Employment Insurance band (100%) is a band of its own, left off the scale of the chart.
+      if (compareAmounts(point[0], '3000') < 0) continue;
+      if (compareAmounts(point[5], highest) > 0) highest = point[5];
+    }
+    // 51.3% is the highest rate (0.5125 to one decimal), 50.4% the rate from the end of the basic amount's shrinking up.
+    expect(highest.startsWith('0.5125')).toBe(true);
+    const intro = mbView().intro[0] ?? '';
+    expect(intro).toContain('a peak of 51.3% between $259,609 and $401,127');
+    expect(intro).toContain('then settles at 50.4%');
+    expect(points[points.length - 1]?.[5]).toBe('0.504');
+    expect(mbView().groups[4]?.notes[1]?.words).toContain('you keep 49.6%');
+  });
+
+  it('keeps every salary taken from a form threshold inside the engine edge it belongs to', () => {
+    const { facts, edges } = mbSweep();
+    const thresholds = [
+      'mb_bracket_2_salary',
+      'mb_bracket_3_salary',
+      'mb_bpa_start_salary',
+      'mb_bpa_end_salary',
+      'ftb_end_salary',
+      'fed_bracket_2_salary',
+      'fed_bracket_3_salary',
+      'fed_bracket_4_salary',
+      'fed_bracket_5_salary',
+      'cpp_ympe',
+      'yampe',
+      'ei_stop',
+    ];
+    for (const name of thresholds) {
+      const salary = facts[name] ?? '';
+      // The engine's edge: the last salary at the old rate (`moves`) to the first at the new one (`settled`); a derived
+      // salary may sit on either side by a dollar (a threshold between two whole salaries).
+      const near = edges.some(
+        ([, moves, settled]) =>
+          compareAmounts(salary, subtractAmounts(moves, '1')) >= 0 &&
+          compareAmounts(salary, subtractAmounts(settled, '-1')) <= 0,
+      );
+      expect(near, `${name} ${salary}`).toBe(true);
+    }
+  });
+
+  it('puts the start of Manitoba tax and of federal tax at the engine’s edges', () => {
+    const [mbStart, fedStart] = ['mbStartSalary', 'fedStartSalary'].map(
+      (name) => {
+        const spec = ratesPageText['ca-mb']?.groups
+          .flatMap((group) => group.notes)
+          .find((note) => note.figures?.[name] !== undefined)?.figures?.[name];
+        return spec;
+      },
+    );
+    expect(mbStart).toBe('o:17000');
+    expect(fedStart).toBe('o:19000');
+    const text = mbView()
+      .groups[0]?.notes.map((note) => note.words)
+      .join(' ');
+    expect(text).toContain('From about $17,402 the rate is 18.5%');
+    expect(text).toContain('From about $19,200 the rate is 31.5%');
+  });
+
+  it('names a cause form for every note and a Manitoba page for the forms that are its own', () => {
+    for (const group of ratesPageText['ca-mb']?.groups ?? []) {
+      for (const note of group.notes) {
+        expect(note.forms.length, note.text).toBeGreaterThan(0);
+      }
+    }
+    const chips = mbView().groups.flatMap((group) =>
+      group.notes.flatMap((note) => note.causes),
+    );
+    expect(chips.some((chip) => chip.label === 'Form MB428')).toBe(true);
+    expect(chips.some((chip) => chip.href === '/forms/mb428-a/')).toBe(true);
+  });
+
+  it('types no dollar figure or cents figure in a note or a table cell', () => {
+    const text = ratesPageText['ca-mb'];
+    const words = [
+      ...(text?.intro ?? []).map((note) => note.text),
+      ...(text?.howToRead ?? []).map((note) => note.text),
+      ...(text?.groups ?? []).flatMap((group) =>
+        group.notes.map((note) => note.text),
+      ),
+      ...(text?.tables ?? []).flatMap((table) => [
+        table.before?.text ?? '',
+        table.after?.text ?? '',
+        ...table.rows.flat(),
+      ]),
+    ];
+    for (const line of words) expect(line).not.toMatch(/\$\d|\d cents/);
+    expect(text?.title.length).toBeLessThan(64);
+    expect(text?.description.length).toBeLessThan(160);
+  });
+});
+
+describe('the British Columbia rates page', () => {
+  const bcSweep = () => {
+    const found = fullHubCharts(['ca-bc']).provinces[0];
+    if (!found) throw new Error('no sweep');
+    return found;
+  };
+
+  const words = () => {
+    const view = ratesPageView('ca-bc', bcSweep());
+    if (!view) throw new Error('no view');
+    return [
+      ...view.intro,
+      ...view.howToRead,
+      ...view.groups.flatMap((group) => group.notes.map((note) => note.words)),
+      ...view.tables.flatMap((table) => [
+        table.before ?? '',
+        table.after ?? '',
+        ...table.rows.flat(),
+      ]),
+    ];
+  };
+
+  it('fills every figure from the sweep and leaves no brace behind', () => {
+    expect(words().length).toBeGreaterThan(30);
+    for (const line of words()) {
+      expect(line).not.toMatch(/[{}]|undefined|NaN/);
+    }
+  });
+
+  it('reads the reviewed figures: the straight line, the reduction and every edge', () => {
+    const all = words().join('\n');
+    // The finding at the top: where the line turns straight, to the dollar, is not rounded to $270,000.
+    expect(all).toContain('to 53.5% above $266,672');
+    expect(all).toContain('from $26,753 to $45,371 while the BC tax reduction');
+    expect(all).toContain('to 43.9% at $500,000');
+    expect(all).toContain(
+      'about $25,793 of salary, by 3.56% of every dollar of net income above that, about 3.5 cents of each extra dollar of salary',
+    );
+    expect(all).toContain('about $223 higher at a net income of $25,570');
+    expect(all).toContain('about $474 higher at a taxable income of $50,363');
+    expect(all).toContain(
+      '(a net income of $44,952), and the rate falls to 25.7%',
+    );
+    for (const [salary, rate] of [
+      ['$50,837', '27.8%'],
+      ['$59,079', '34.2%'],
+      ['$101,855', '31.0%'],
+      ['$116,775', '32.8%'],
+      ['$118,172', '38.3%'],
+      ['$141,557', '40.7%'],
+      ['$182,567', '44.0%'],
+      ['$191,532', '46.1%'],
+      ['$259,609', '49.8%'],
+    ] as const) {
+      expect(all, salary).toContain(`From about ${salary} the rate is ${rate}`);
+    }
+  });
+
+  it('prints the statutory rates with the digits the form prints', () => {
+    const all = words().join('\n');
+    for (const rate of [
+      '5.60%',
+      '7.70%',
+      '10.50%',
+      '12.29%',
+      '14.70%',
+      '16.80%',
+      '20.50%',
+    ]) {
+      expect(all, rate).toContain(rate);
+    }
+  });
+
+  it('gives one decimal for every computed rate in the opening finding', () => {
+    const view = ratesPageView('ca-bc', bcSweep());
+    expect(view?.intro[0]).toMatch(/\d+\.\d%/);
+    expect(view?.intro[0]).not.toMatch(/\d+\.\d\d%/);
+  });
+
+  it('puts the BC tax reduction table and seven British Columbia brackets on the page', () => {
+    const view = ratesPageView('ca-bc', bcSweep());
+    const brackets = view?.tables.find((table) =>
+      table.heading.startsWith('British Columbia brackets'),
+    );
+    expect(brackets?.rows).toHaveLength(7);
+    expect(brackets?.rows[0]).toEqual([
+      '$0',
+      '5.60%',
+      'tax starts at about $26,753',
+      '29.2%, then 25.7% from $45,371',
+    ]);
+    expect(
+      view?.tables.some((table) =>
+        table.heading.startsWith('BC tax reduction'),
+      ),
+    ).toBe(true);
+  });
+
+  it('puts every derived bracket salary inside the engine edge it falls on', () => {
+    // The salary of a form threshold is worked out from the pension deduction; the engine's own edges (found by
+    // bisection) must hold it: the old rate holds to `moves`, and the new one has settled by `settled`.
+    const { facts, edges } = bcSweep();
+    const names = [
+      ...[2, 3, 4, 5, 6, 7].map((n) => `bc_bracket_${n.toString()}_salary`),
+      ...[2, 3, 4, 5].map((n) => `fed_bracket_${n.toString()}_salary`),
+    ];
+    for (const name of names) {
+      const salary = facts[name] ?? '';
+      const edge = edges.find(
+        (found) =>
+          compareAmounts(found[1], salary) <= 0 &&
+          compareAmounts(salary, found[2]) <= 0,
+      );
+      expect(edge, name).toBeDefined();
+    }
+  });
+
+  it('names a cause form for every note, links the BC428 page, and keeps the notes free of typed figures', () => {
+    const text = ratesPageText['ca-bc'];
+    for (const group of text?.groups ?? []) {
+      for (const note of group.notes) {
+        expect(note.forms.length, note.text).toBeGreaterThan(0);
+        expect(note.text).not.toMatch(/\$\d|\d cents/);
+      }
+    }
+    expect(causeChip('bc428').label).toBe('Form BC428');
+    expect(causeChip('bc428').href).toBe('/forms/bc428/');
+  });
+
+  it('draws every change of the rate as a step: the next sample point after each edge is within $2 of it', () => {
+    const { points, edges } = bcSweep();
+    for (const [, moves] of edges) {
+      const at = points.findIndex((point) => point[0] === `${moves}.00`);
+      expect(at, moves).toBeGreaterThanOrEqual(0);
+      const next = points[at + 1]?.[0] ?? '0';
+      expect(
+        compareAmounts(subtractAmounts(next, moves), '2'),
+        `${moves} then ${next}`,
+      ).toBeLessThanOrEqual(0);
+    }
+  });
+
+  it('links the cause forms that have a page in this build', () => {
+    for (const form of ['t1', 'bc428', 't2204', 'schedule8'] as const) {
+      expect(causeChip(form).href, form).toMatch(/^\/forms\/[a-z0-9-]+\/$/);
+    }
+  });
+
+  it('puts the last group heading at the salary the data says the top federal bracket starts at', () => {
+    const groups = ratesPageText['ca-bc']?.groups ?? [];
+    const last = groups[groups.length - 1]?.heading ?? '';
+    const top = bcSweep().facts['fed_bracket_5_salary'] ?? '';
+    const gap = subtractAmounts(last.replace(/\D/g, ''), top);
+    expect(compareAmounts(gap, '0')).toBeGreaterThanOrEqual(0);
+    expect(compareAmounts(gap, '1000')).toBeLessThan(0);
+  });
+
+  it('types no dollar figure or cents figure in a note or a table cell', () => {
+    const text = ratesPageText['ca-bc'];
+    const typed = [
+      ...(text?.intro ?? []).map((note) => note.text),
+      ...(text?.howToRead ?? []).map((note) => note.text),
+      ...(text?.tables ?? []).flatMap((table) => [
+        table.before?.text ?? '',
+        table.after?.text ?? '',
+        ...table.rows.flat(),
+      ]),
+    ];
+    for (const line of typed) {
+      expect(line).not.toMatch(/\$\d|\d cents/);
+    }
+  });
+
+  it('keeps the tab title under 64 characters and the description under 160', () => {
+    const text = ratesPageText['ca-bc'];
     expect(text?.title.length).toBeLessThan(64);
     expect(text?.description.length).toBeLessThan(160);
   });

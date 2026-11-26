@@ -54,6 +54,8 @@ import type { FooterProvinceSlug } from './siteLinks';
  *                       in place of `r:`, which rounds the marginal rate to the half point;
  *  - `u:column@salary`  the share kept, one minus that rate, to one decimal ("52.0%"), rounded once; the rates page uses this
  *                       in place of `k:`, which rounds to four decimals and shows "52%";
+ *  - `v:name`           a rate the engine found for the province (a fact), as a percent to one decimal ("54.3%"), for a rate past
+ *                       the sweep's last salary;
  *  - `w:column@a-b`     the gap between a column at two sweep salaries, as a rate to one decimal ("12.9%": the marginal
  *                       rate at salary a less the rate at salary b);
  *  - `g:column@a-b`     the same gap as cents on the dollar, to one decimal ("10.8 cents");
@@ -98,7 +100,7 @@ export type ParsedSpec =
     }
   | { kind: 'e' | 'o' | 'y' | 'd'; amount: string }
   | { kind: 'w' | 'g'; column: NoteColumn; salary: string; other: string }
-  | { kind: 'f' | 'n' | 't' | 'p' | 's' | 'x'; name: string }
+  | { kind: 'f' | 'n' | 't' | 'p' | 's' | 'v' | 'x'; name: string }
   | { kind: 'l'; words: string };
 
 const AMOUNT = /^-?\d+(\.\d+)?$/;
@@ -131,6 +133,7 @@ export function parseSpec(spec: string): ParsedSpec {
       kind === 't' ||
       kind === 'p' ||
       kind === 's' ||
+      kind === 'v' ||
       kind === 'x') &&
     parts.length === 2 &&
     FACT_NAME.test(first)
@@ -256,6 +259,8 @@ export function figureText(spec: ParsedSpec, sweep: ProvinceSweep): string {
       return displayCents(factOf(sweep, spec.name));
     case 'p':
       return displayRate(factOf(sweep, spec.name), rateUnit);
+    case 'v':
+      return displayRateOneDecimal(factOf(sweep, spec.name), rateUnit);
     case 'm':
     case 'r':
     case 'k':

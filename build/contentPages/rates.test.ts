@@ -4,11 +4,17 @@ import { ratesBlocks, ratesPages } from './rates';
 
 describe('ratesPages', () => {
   it('writes one page at the province hub address plus tax-rates, under the hub', () => {
-    const [page, alberta, ...rest] = ratesPages(new Set(['ca-on', 'ca-ab']));
+    const [page, alberta, newfoundland, ...rest] = ratesPages(
+      new Set(['ca-on', 'ca-ab', 'ca-nl']),
+    );
     expect(rest).toEqual([]);
     expect(alberta?.slug).toBe('ca-ab/tax-rates');
     expect(alberta?.heading).toBe(
       'Alberta marginal and average tax rate by salary, 2026',
+    );
+    expect(newfoundland?.slug).toBe('ca-nl/tax-rates');
+    expect(newfoundland?.heading).toBe(
+      'Newfoundland and Labrador marginal and average tax rate by salary, 2026',
     );
     expect(page?.slug).toBe('ca-on/tax-rates');
     expect(page?.heading).toBe(
@@ -18,7 +24,9 @@ describe('ratesPages', () => {
   });
 
   it('writes no page for a province with no sweep', () => {
-    expect(ratesPages(new Set(['ca-bc']))).toEqual([]);
+    expect(ratesPages(new Set(['ca-on'])).map((page) => page.slug)).toEqual([
+      'ca-on/tax-rates',
+    ]);
   });
 
   it('puts the finding and chart first, then the salaries, notes and tables', () => {
