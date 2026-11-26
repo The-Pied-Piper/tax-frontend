@@ -49,12 +49,11 @@ export function App({ client, registry, initial, clock }: Props) {
         )
       : null;
   // A pre-built salary page leads with its answer, so the first thing read, on
-  // screen and in the source, is the figure; the form sits just
-  // under it. The calculator page has no answer yet, so its form keeps its
-  // old place. The order is fixed for the life of the
-  // page, so the layout does not flip after Calculate. The heading and
-  // breadcrumb and links stay as the page was built (`page.built`); only the
-  // paragraph follows the new answer.
+  // screen and in the source, is the figure, with the form just under it. The
+  // calculator page has no answer yet, so its form comes first. The order is
+  // fixed for the life of the page, so the layout does not flip after
+  // Calculate. The heading and breadcrumb and links stay as the page was built
+  // (`page.built`); only the paragraph follows the new answer.
   const answer = shown ? (
     <>
       <AnswerCard
