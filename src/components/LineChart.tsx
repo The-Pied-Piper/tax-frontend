@@ -175,15 +175,22 @@ export function LineChart({
       const dot = dots[index] ?? dotY;
       const extra = Math.max(0, block.length - 1) * LINE_STEP;
       const below = markerLabels !== undefined && index !== top;
+      // Inside the plot: a block below its dot stops short of the axis line, and the topmost dot's block stops
+      // just above it, so the two never run into each other or off the bottom.
       const limit = scalePosition(
-        String(below ? plotBottom - 4 - extra : 22 + extra),
+        String(below ? plotBottom - 14 - extra : 22 + extra),
         '0',
         '1',
         0,
         1,
       );
-      const outside = below ? isBeyond(dot, limit) : isBeyond(limit, dot);
-      return { block, below, at: outside ? limit : dot };
+      const floor = scalePosition(String(plotBottom - 10), '0', '1', 0, 1);
+      const dotAt =
+        markerLabels !== undefined && !below && isBeyond(dot, floor)
+          ? floor
+          : dot;
+      const outside = below ? isBeyond(dotAt, limit) : isBeyond(limit, dotAt);
+      return { block, below, at: outside ? limit : dotAt };
     });
   })();
 

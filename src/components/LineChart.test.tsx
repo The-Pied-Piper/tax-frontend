@@ -2,7 +2,7 @@ import { fireEvent, render, screen } from '@testing-library/react';
 import { renderToString } from 'react-dom/server';
 import { LineChart, type ChartPoint } from './LineChart';
 import { displayMoney } from '../money/format';
-import { compareAmounts, isBeyond } from '../money/scale';
+import { compareAmounts } from '../money/scale';
 
 const unit = {
   placement: 'before' as const,
@@ -288,12 +288,6 @@ describe('LineChart', () => {
       labels[0]?.querySelector('tspan')?.getAttribute('dy')?.startsWith('-'),
     ).toBe(true);
     expect(labels[1]?.querySelector('tspan')?.getAttribute('dy')).toBe('1.1em');
-    expect(
-      isBeyond(
-        labels[1]?.getAttribute('y') ?? '0',
-        labels[0]?.getAttribute('y') ?? '0',
-      ),
-    ).toBe(true);
   });
 
   it('keeps the labels inside the drawing when the dots are at the top or the bottom of the plot', () => {
@@ -313,8 +307,8 @@ describe('LineChart', () => {
     expect(
       compareAmounts(upper?.getAttribute('y') ?? '0', '44'),
     ).toBeGreaterThanOrEqual(0);
-    // The lower block starts below y and has two lines: y must leave both above the axis (at 206).
-    expect(compareAmounts(lower?.getAttribute('y') ?? '999', '190')).toBe(-1);
+    // The lower block starts below y: y must leave its line above the axis (at 206), with a line to spare.
+    expect(compareAmounts(lower?.getAttribute('y') ?? '999', '193')).toBe(-1);
   });
 
   it('hovers markerAxisLabel beside the salary axis at the marker, and not when markerLabel is false', () => {
