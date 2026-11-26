@@ -168,8 +168,7 @@
   border-bottom: 1px solid var(--rule);
 }
 
-.table th:first-child,
-.table td:first-child {
+.table .salary {
   text-align: left;
 }
 
