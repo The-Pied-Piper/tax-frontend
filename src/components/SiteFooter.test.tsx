@@ -57,7 +57,7 @@ describe.each(['light', 'dark'] as const)(
         .map((a) => [a.textContent, a.getAttribute('href')]);
       expect(hrefs).toEqual([
         ['How we calculate', '/methodology/'],
-        ['Take-home pay by province', '/compare-provinces/'],
+        ['Compare provinces', '/compare-provinces/'],
         ['Ontario', '/ca-on/'],
         ['Alberta', '/ca-ab/'],
         ['British Columbia', '/ca-bc/'],

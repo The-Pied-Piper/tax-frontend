@@ -34,10 +34,10 @@ describe('the province comparison copy', () => {
   it('is the approved wording, word for word', () => {
     expect(copy.heading).toBe('Compare provinces at one salary');
     expect(strings.comparePage.heading(2026)).toBe(
-      'Take-home pay by province, 2026',
+      'Compare take-home pay and tax across provinces, 2026',
     );
     expect(strings.comparePage.title(2026)).toBe(
-      'Take-home pay, tax and contributions by province, 2026',
+      'Compare take-home pay and tax across provinces, 2026',
     );
     expect(strings.comparePage.intro(7)).toBe(
       "Pick a salary and see how 7 provinces compare. The provinces are always listed with the lowest tax and contributions first, whichever of the three figures you compare. Every bar is this site's own estimate for a single person whose only income is a salary.",
