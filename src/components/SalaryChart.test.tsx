@@ -88,8 +88,14 @@ describe('SalaryChart', () => {
 
   it('divides money by 12 under Per month in the money chart, and leaves rates alone', () => {
     hub();
+    // The take-home chart's dot label is the figure alone (its salary hovers by the axis); the others read "$70,000: …".
     const row = (chart: HubChartId) =>
-      section(chart).getByText(/^\$70,000: /).textContent;
+      chart === 'takeHome'
+        ? section(chart)
+            .getByRole('img')
+            .querySelector('text:first-of-type[class*="markerLabel"]')
+            ?.textContent
+        : section(chart).getByText(/^\$70,000: /).textContent;
     const before = HUB_CHART_IDS.map(row);
     fireEvent.click(
       section('takeHome').getByRole('button', { name: t.perMonth }),
@@ -126,7 +132,12 @@ describe('SalaryChart', () => {
     }
     const label = (chart: HubChartId) =>
       section(chart).getByText(/^\$3,000: /).textContent;
-    expect(label('takeHome')).toBe('$3,000: $2,951');
+    // The take-home chart hovers the figure by its dot and the salary beside the axis.
+    const takeHome = section('takeHome').getByRole('img');
+    const hovering = [
+      ...takeHome.querySelectorAll('text[class*="markerLabel"]'),
+    ].map((t) => t.textContent);
+    expect(hovering).toEqual(['$2,951', '$3,000']);
     expect(label('averageRate')).toBe('$3,000: 1.6%');
     expect(label('marginalRate')).toBe('$3,000: 1.6%');
   });

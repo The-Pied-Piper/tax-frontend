@@ -269,32 +269,91 @@ describe('LineChart', () => {
     ).toBeNull();
   });
 
-  it('writes the lines from markerLines beside the marker, one line each, instead of the single figure', () => {
+  it('writes one label beside each series dot from markerLabels, the higher dot above and the other below', () => {
     const { container } = render(
       chart({
         activeIndex: 1,
-        markerLines: (index) => [`Point ${String(index)}`, 'Second', 'Third'],
+        markerLabels: () => [['First 1', 'more'], ['Second 2']],
       }),
     );
-    const label = container.querySelector('text[class*="markerLabel"]');
-    expect(label).not.toBeNull();
+    const labels = [
+      ...container.querySelectorAll('text[class*="markerLabel"]'),
+    ];
+    expect(labels.map((l) => l.textContent)).toEqual([
+      'First 1more',
+      'Second 2',
+    ]);
+    // The first series is the higher dot: its block ends above its dot (negative first dy), the other starts below.
     expect(
-      [...(label?.querySelectorAll('tspan') ?? [])].map((t) => t.textContent),
-    ).toEqual(['Point 1', 'Second', 'Third']);
+      labels[0]?.querySelector('tspan')?.getAttribute('dy')?.startsWith('-'),
+    ).toBe(true);
+    expect(labels[1]?.querySelector('tspan')?.getAttribute('dy')).toBe('1.1em');
   });
 
-  it('keeps a multi-line label inside the drawing when the dot is at the top of the plot', () => {
+  it('keeps the labels inside the drawing when the dots are at the top or the bottom of the plot', () => {
     const { container } = render(
       chart({
         activeIndex: 0,
-        markerLines: () => ['One', 'Two', 'Three'],
+        markerLabels: () => [
+          ['One', 'Two', 'Three'],
+          ['Four', 'Five'],
+        ],
       }),
     );
-    const label = container.querySelector('text[class*="markerLabel"]');
-    // The first line sits (0.6 + 2 * 1.25) em = about 34 units above y; it must stay below the top edge (10).
+    const [upper, lower] = [
+      ...container.querySelectorAll('text[class*="markerLabel"]'),
+    ];
+    // The upper block's first line sits about 34 units above y: y must leave it below the top edge (10).
     expect(
-      compareAmounts(label?.getAttribute('y') ?? '0', '44'),
+      compareAmounts(upper?.getAttribute('y') ?? '0', '44'),
     ).toBeGreaterThanOrEqual(0);
+    // The lower block starts below y: y must leave its line above the axis (at 206), with a line to spare.
+    expect(compareAmounts(lower?.getAttribute('y') ?? '999', '193')).toBe(-1);
+  });
+
+  it('hovers markerAxisLabel beside the salary axis at the marker, and not when markerLabel is false', () => {
+    const shown = render(
+      chart({ activeIndex: 1, markerAxisLabel: () => '$70,000' }),
+    );
+    const label = [...shown.container.querySelectorAll('text')].find(
+      (t) => t.textContent === '$70,000',
+    );
+    expect(label).toBeDefined();
+    // Below the axis line (206) and level with the marker's x (the same x as the cross line).
+    expect(compareAmounts(label?.getAttribute('y') ?? '0', '206')).toBe(1);
+    expect(label?.getAttribute('x')).toBe(
+      shown.container.querySelector('line[class*="cross"]')?.getAttribute('x1'),
+    );
+    shown.unmount();
+    const without = render(
+      chart({
+        activeIndex: 1,
+        markerLabel: false,
+        markerAxisLabel: () => '$70,000',
+      }),
+    );
+    expect(without.container.textContent).not.toContain('$70,000');
+  });
+
+  it('keeps the two labels a line apart when both dots are at the top of the plot', () => {
+    const { container } = render(
+      chart({
+        // Both values are at the top of the scale, so both dots are at the top of the plot.
+        points: [
+          { salary: '1000', values: ['0.00', '0.00'] },
+          { salary: '500000', values: ['200000.00', '199000.00'] },
+        ],
+        activeIndex: 1,
+        markerLabels: () => [['One'], ['Two']],
+      }),
+    );
+    const [upper, lower] = [
+      ...container.querySelectorAll('text[class*="markerLabel"]'),
+    ];
+    // The upper block is held at 22 (its baseline is above the plot's first gridline); the lower one starts a
+    // line under it, not on it.
+    expect(compareAmounts(upper?.getAttribute('y') ?? '0', '22')).toBe(0);
+    expect(compareAmounts(lower?.getAttribute('y') ?? '0', '17')).toBe(0);
   });
 
   it('draws a taller figure when asked', () => {

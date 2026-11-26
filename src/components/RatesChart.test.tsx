@@ -68,19 +68,16 @@ describe('RatesChart', () => {
     );
   });
 
-  it('hovers the salary and both rates beside the dot, and still reads them aloud', () => {
+  it('hovers each rate beside its own dot, the salary beside the axis, and still reads them aloud', () => {
     window.history.replaceState(null, '', '/?salary=70000');
     render(<RatesChart sweep={sweep()} place="Ontario" />);
-    const label = screen
-      .getByRole('img')
-      .querySelector('text[class*="markerLabel"]');
-    const lines = [...(label?.querySelectorAll('tspan') ?? [])].map(
-      (t) => t.textContent,
-    );
-    expect(lines).toHaveLength(3);
-    expect(lines[0]).toBe('$70,000');
-    expect(lines[1]).toMatch(/^Marginal rate: \d+(\.\d)?%$/);
-    expect(lines[2]).toMatch(/^Average rate: \d+(\.\d)?%$/);
+    const labels = [
+      ...screen.getByRole('img').querySelectorAll('text[class*="markerLabel"]'),
+    ].map((label) => label.textContent);
+    expect(labels).toHaveLength(3);
+    expect(labels[0]).toMatch(/^Marginal rate: \d+(\.\d)?%$/);
+    expect(labels[1]).toMatch(/^Average rate: \d+(\.\d)?%$/);
+    expect(labels[2]).toBe('$70,000');
     const announcements = document.querySelectorAll('[aria-live]');
     expect(announcements).toHaveLength(1);
     expect(announcements[0]?.getAttribute('aria-live')).toBe('polite');

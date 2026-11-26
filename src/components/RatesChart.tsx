@@ -200,13 +200,19 @@ export function RatesChart({ sweep, place }: Props) {
         activeIndex={active}
         onActiveChange={setMarkerPick}
         scaleValues={scaleValues}
-        markerLines={(index) => {
+        markerAxisLabel={(index) =>
+          displayWholeMoney(visible[index]?.[0] ?? '0', 'annually', unit)
+        }
+        markerLabels={(index) => {
           const point = visible[index];
           return point
             ? [
-                displayWholeMoney(point[0], 'annually', unit),
-                `${t.marginal}: ${displayRateOneDecimal(point[SWEEP_COLUMN.marginal], rateUnit)}`,
-                `${t.average}: ${displayRateOneDecimal(point[SWEEP_COLUMN.average], rateUnit)}`,
+                [
+                  `${t.marginal}: ${displayRateOneDecimal(point[SWEEP_COLUMN.marginal], rateUnit)}`,
+                ],
+                [
+                  `${t.average}: ${displayRateOneDecimal(point[SWEEP_COLUMN.average], rateUnit)}`,
+                ],
               ]
             : [];
         }}
