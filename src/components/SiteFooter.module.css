@@ -1,11 +1,18 @@
 /* Site links above the disclaimer. Colours come only from styles/tokens.css. */
+/* The site pages are one line and the provinces start on a line of their own. */
 .nav {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin: 0 0 10px;
+  font-size: 13px;
+}
+
+.row {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
   gap: 6px 14px;
-  margin: 0 0 10px;
-  font-size: 13px;
 }
 
 .nav a {
