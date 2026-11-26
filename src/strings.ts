@@ -104,10 +104,10 @@ export const strings = {
     // What a cause form is called on a "Caused by" chip.
     causes: {
       t1: 'Form T1',
-      bc428: 'Form BC428',
       on428: 'Form ON428',
       on428a: 'Schedule ON428-A',
       ab428: 'Form AB428',
+      bc428: 'Form BC428',
       t2204: 'Form T2204',
       schedule8: 'Schedule 8',
     },

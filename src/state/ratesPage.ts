@@ -1,9 +1,9 @@
 import { formPageLink } from './formLinks';
 import type { ProvinceSweep } from './hubCharts';
 import { isFullSweep, noteWords } from './hubNotes';
-import { britishColumbiaRatesPage } from './ratesPageText/ca-bc';
-import { albertaRatesPage } from './ratesPageText/ca-ab';
 import { ontarioRatesPage } from './ratesPageText/ca-on';
+import { albertaRatesPage } from './ratesPageText/ca-ab';
+import { britishColumbiaRatesPage } from './ratesPageText/ca-bc';
 import type { CauseForm, RatesPageText } from './ratesPageTypes';
 import { FOOTER_PROVINCE_SLUGS, type FooterProvinceSlug } from './siteLinks';
 import { strings } from '../strings';
@@ -11,9 +11,9 @@ import { strings } from '../strings';
 /** The text of the rates page of each province that has one. Adding a province is one file in `ratesPageText/` and one entry here. */
 export const ratesPageText: Partial<Record<FooterProvinceSlug, RatesPageText>> =
   {
-    'ca-bc': britishColumbiaRatesPage,
     'ca-on': ontarioRatesPage,
     'ca-ab': albertaRatesPage,
+    'ca-bc': britishColumbiaRatesPage,
   };
 
 /** The provinces that have a rates page, in the footer's order. */
@@ -26,10 +26,10 @@ export function ratesProvinces(): FooterProvinceSlug[] {
 /** The form page each cause form is, by the page's id. */
 const CAUSE_PAGE: Record<CauseForm, string> = {
   t1: 't1',
-  bc428: 'bc428',
   on428: 'on428',
   on428a: 'on428-a',
   ab428: 'ab428',
+  bc428: 'bc428',
   t2204: 't2204',
   schedule8: 'schedule-8',
 };

@@ -180,12 +180,26 @@ function cells(rows: string[][]): {
   for (const cell of rows.flat()) {
     for (const match of cell.matchAll(/\{([a-zA-Z0-9]+)\}/g)) {
       const name = match[1] ?? '';
-      const spec = tablePool[name];
+      const spec = tablePool[name] ?? pool[name];
       if (spec !== undefined) figures[name] = spec;
     }
   }
   return { rows, figures };
 }
+
+const brackets = (kind: 'fed' | 'bc', count: number) =>
+  Array.from({ length: count }, (_, at) => at + 1).map((n) => [
+    `{${kind}${n.toString()}Ti}`,
+    `{${kind}${n.toString()}}`,
+    n === 1
+      ? `tax starts at about {${kind === 'fed' ? 'fedStartSalary' : 'bcStartSalary'}}`
+      : `{${kind}${n.toString()}Sal}`,
+    n === 1
+      ? kind === 'fed'
+        ? '{fedFirstRate}'
+        : '{bcStartRate}, then {afterRedRate} from {redEndSalary}'
+      : `{${kind}${n.toString()}After}`,
+  ]);
 
 const bracketHead = [
   'Taxable income from',
@@ -330,20 +344,7 @@ export const britishColumbiaRatesPage: RatesPageText = {
       ),
       caption: 'Federal brackets, 2026',
       head: bracketHead,
-      ...cells([
-        [
-          '{fed1Ti}',
-          '{fed1}',
-          'tax starts at about {fedStartSalary}',
-          '{fedFirstRate}',
-        ],
-        ...[2, 3, 4, 5].map((n) => [
-          `{fed${n.toString()}Ti}`,
-          `{fed${n.toString()}}`,
-          `{fed${n.toString()}Sal}`,
-          `{fed${n.toString()}After}`,
-        ]),
-      ]),
+      ...cells(brackets('fed', 5)),
       after: {
         ...note(
           'The lowest federal rate is {fedLowest} for the whole of 2026. In 2025 it was {fedLowestRatePrior}. The federal basic personal amount is {fedBpa}, and shrinks to {fedBpaMin} between a net income of {fedBpaStart} and {fedBpaEnd}. The Canada employment amount is {cea}.',
@@ -355,20 +356,7 @@ export const britishColumbiaRatesPage: RatesPageText = {
       heading: 'British Columbia brackets, 2026 (Form BC428)',
       caption: 'British Columbia brackets, 2026',
       head: bracketHead,
-      ...cells([
-        [
-          '{bc1Ti}',
-          '{bc1}',
-          'tax starts at about {bcStartSalary}',
-          '{bcStartRate}, then {afterRedRate} from {redEndSalary}',
-        ],
-        ...[2, 3, 4, 5, 6, 7].map((n) => [
-          `{bc${n.toString()}Ti}`,
-          `{bc${n.toString()}}`,
-          `{bc${n.toString()}Sal}`,
-          `{bc${n.toString()}After}`,
-        ]),
-      ]),
+      ...cells(brackets('bc', 7)),
       after: note(
         'British Columbia’s basic personal amount is {bcBpa}, and the credit rate is the lowest tax rate, {bcCreditRate}.',
         tablePool,

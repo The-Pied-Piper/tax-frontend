@@ -4,8 +4,14 @@ import { ratesBlocks, ratesPages } from './rates';
 
 describe('ratesPages', () => {
   it('writes one page at the province hub address plus tax-rates, under the hub', () => {
-    const [page, alberta, ...rest] = ratesPages(new Set(['ca-on', 'ca-ab']));
+    const [page, alberta, columbia, ...rest] = ratesPages(
+      new Set(['ca-on', 'ca-ab', 'ca-bc']),
+    );
     expect(rest).toEqual([]);
+    expect(columbia?.slug).toBe('ca-bc/tax-rates');
+    expect(columbia?.heading).toBe(
+      'British Columbia marginal and average tax rate by salary, 2026',
+    );
     expect(alberta?.slug).toBe('ca-ab/tax-rates');
     expect(alberta?.heading).toBe(
       'Alberta marginal and average tax rate by salary, 2026',
