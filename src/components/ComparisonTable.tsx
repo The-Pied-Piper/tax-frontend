@@ -19,7 +19,7 @@ type Props = {
   data: HubChartsData;
 };
 
-// Every salary the chart can show, one row each, with take-home pay, income tax and the average
+// Every salary the chart can show, one row each, with take-home pay, tax and contributions, and the average
 // tax rate of every province in the row. It is plain table markup, written into the page's HTML,
 // so a reader without script (and a search engine) has all of it. Every figure is the API's text,
 // rounded once for display by money/format; nothing is computed here.

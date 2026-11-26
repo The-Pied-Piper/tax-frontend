@@ -17,7 +17,7 @@ const french = separatorsFor('fr');
 const full = regularSalaries().map((salary) => `${salary}.00`);
 
 describe('the measures', () => {
-  it('are take-home pay, income tax and the average rate, in that order', () => {
+  it('are take-home pay, tax and contributions and the average rate, in that order', () => {
     expect(MEASURES).toEqual(['takeHome', 'takenOff', 'averageRate']);
   });
 });

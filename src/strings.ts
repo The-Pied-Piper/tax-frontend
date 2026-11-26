@@ -122,9 +122,9 @@ export const strings = {
       // The one table under the toggle: every salary the chart can show, three figures for each province.
       table: {
         note: (year: number, provisional: boolean) =>
-          `The table shows take-home pay, income tax and average tax rate in each province at every salary the chart can show, for a single person whose only income is a salary. Take-home pay is salary minus income tax, pension plan payments and Employment Insurance, and in Québec Québec Parental Insurance Plan premiums. Income tax includes the Ontario Health Premium in Ontario. In Québec it includes the prescription drug insurance premium, and the federal tax is after the Québec abatement. Tax and contributions is income tax, pension plan payments and Employment Insurance, and in Québec Québec Parental Insurance Plan premiums, added together. It is your salary minus your take-home pay. The average tax rate is that amount divided by your salary.${provisional ? ` The ${year.toString()} figures are provisional until the ${year.toString()} forms are final.` : ''}`,
+          `The table shows take-home pay, tax and contributions, and average tax rate in each province at every salary the chart can show, for a single person whose only income is a salary. Take-home pay is salary minus income tax, pension plan payments and Employment Insurance, and in Québec Québec Parental Insurance Plan premiums. Income tax includes the Ontario Health Premium in Ontario. In Québec it includes the prescription drug insurance premium, and the federal tax is after the Québec abatement. Tax and contributions is income tax, pension plan payments and Employment Insurance, and in Québec Québec Parental Insurance Plan premiums, added together. It is your salary minus your take-home pay. The average tax rate is that amount divided by your salary.${provisional ? ` The ${year.toString()} figures are provisional until the ${year.toString()} forms are final.` : ''}`,
         caption: (year: number, count: number) =>
-          `Take-home pay, income tax and average tax rate by salary and province, ${year.toString()}: all ${count.toString()} salaries behind the chart.`,
+          `Take-home pay, tax and contributions, and average tax rate by salary and province, ${year.toString()}: all ${count.toString()} salaries behind the chart.`,
         salaryHeader: 'Salary a year',
         takeHomeHeader: 'Take-home pay',
         takenOffHeader: 'Tax and contributions',
@@ -133,7 +133,7 @@ export const strings = {
         scrollHint:
           'This table is wide. Scroll sideways to see every province.',
         scrollLabel:
-          'Table of take-home pay, income tax and average tax rate by salary and province. Scroll sideways to see every province.',
+          'Table of take-home pay, tax and contributions, and average tax rate by salary and province. Scroll sideways to see every province.',
       },
     },
   },
@@ -141,9 +141,9 @@ export const strings = {
   comparePage: {
     heading: (year: number) => `Take-home pay by province, ${year.toString()}`,
     title: (year: number) =>
-      `Take-home pay and income tax by province, ${year.toString()}`,
+      `Take-home pay, tax and contributions by province, ${year.toString()}`,
     description: (count: number, year: number) =>
-      `Compare take-home pay, income tax and average tax rate across ${count.toString()} provinces in ${year.toString()}, at a salary you choose, for a single person with only a salary.`,
+      `Compare take-home pay, tax and contributions, and average tax rate across ${count.toString()} provinces in ${year.toString()}, at a salary you choose, for a single person with only a salary.`,
     breadcrumb: 'Compare provinces',
     sectionHeading: 'Compare by salary',
     intro: (count: number) =>
@@ -350,7 +350,7 @@ export const strings = {
   },
   // The hub's one line that points at the compare page (copy thread).
   compareLink: {
-    lead: 'Compare take-home pay, income tax and the average tax rate across the provinces we cover: ',
+    lead: 'Compare take-home pay, tax and contributions, and the average tax rate across the provinces we cover: ',
     rest: '.',
     // A salary page's one line: the words with the page's own salary, then the link to the compare page (its heading, with the year), then a full stop.
     salaryLead: (salary: string) =>
