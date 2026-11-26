@@ -268,6 +268,20 @@ describe('LineChart', () => {
     ).toBeNull();
   });
 
+  it('writes the lines from markerLines beside the marker, one line each, instead of the single figure', () => {
+    const { container } = render(
+      chart({
+        activeIndex: 1,
+        markerLines: (index) => [`Point ${String(index)}`, 'Second', 'Third'],
+      }),
+    );
+    const label = container.querySelector('text[class*="markerLabel"]');
+    expect(label).not.toBeNull();
+    expect(
+      [...(label?.querySelectorAll('tspan') ?? [])].map((t) => t.textContent),
+    ).toEqual(['Point 1', 'Second', 'Third']);
+  });
+
   it('draws a taller figure when asked', () => {
     render(chart({ height: 400 }));
     expect(screen.getByRole('img')).toHaveAttribute('viewBox', '0 0 420 400');

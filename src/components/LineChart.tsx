@@ -53,6 +53,11 @@ type Props = {
   scaleValues?: readonly string[];
   /** False leaves the figure beside the marker out, for a card that shows it in a readout of its own. */
   markerLabel?: boolean;
+  /**
+   * Lines of text for the label beside the marker, top to bottom, when one figure is not enough (a chart of two
+   * rates). Replaces the single figure from formatValue; markerLabel false still leaves the label out.
+   */
+  markerLines?: (index: number) => readonly string[];
   /** The drawing's height in its own units (its width is fixed); taller fits a narrow screen. */
   height?: number;
 };
@@ -91,6 +96,7 @@ export function LineChart({
   onActiveChange,
   scaleValues,
   markerLabel = true,
+  markerLines,
   height = DEFAULT_HEIGHT,
 }: Props) {
   const plotBottom = height - BOTTOM;
@@ -291,7 +297,7 @@ export function LineChart({
                 />
               );
             })}
-            {markerLabel && (
+            {markerLabel && markerLines === undefined && (
               <text
                 className={styles.markerLabel}
                 x={activeX}
@@ -303,6 +309,32 @@ export function LineChart({
                 }
               >
                 {formatValue(points[active]?.values[0] ?? '0')}
+              </text>
+            )}
+            {markerLabel && markerLines !== undefined && (
+              <text
+                className={[styles.markerLabel, styles.markerLines].join(' ')}
+                x={activeX}
+                y={markerY}
+                dx={isBeyond(activeX, LABEL_FLIPS_AFTER) ? -9 : 9}
+                textAnchor={
+                  isBeyond(activeX, LABEL_FLIPS_AFTER) ? 'end' : 'start'
+                }
+              >
+                {markerLines(active).map((line, at) => (
+                  <tspan
+                    key={line}
+                    x={activeX}
+                    // The block ends just above the dot's height: the last line is the first one's dy of -0.6em.
+                    dy={
+                      at === 0
+                        ? `${String(-0.6 - (markerLines(active).length - 1) * 1.25)}em`
+                        : '1.25em'
+                    }
+                  >
+                    {line}
+                  </tspan>
+                ))}
               </text>
             )}
           </g>
