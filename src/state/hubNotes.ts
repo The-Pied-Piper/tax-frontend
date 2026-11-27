@@ -52,7 +52,8 @@ import type { FooterProvinceSlug } from './siteLinks';
  *                       parameter of its 2026 dataset (a surtax threshold) or a band it found;
  *  - `n:name`           a dollar figure the engine wrote, with its cents as written ("$33.14");
  *  - `h:column@salary`  a rate at a sweep salary to one decimal, whichever column ("7.6%", "73.3%"); the rates page uses this
- *                       in place of `r:`, which rounds the marginal rate to the half point;
+ *                       in place of `r:`, which rounds the marginal rate to the half point, and so do Nova Scotia's hub notes
+ *                       (its copy gives one decimal, such as "20.7%", where `r:` would show "20.5%");
  *                       A whole number drops its ".0" ("100%"); `a:column@salary` and `b:name` keep it, for a column of rates that must not mix "38%" and "36.3%" (`b:` reads a fact);
  *  - `i:name`           a small whole count the engine wrote, as a word ("3" is "three");
  *  - `u:column@salary`  the share kept, one minus that rate, to one decimal ("52.0%"), rounded once; the rates page uses this

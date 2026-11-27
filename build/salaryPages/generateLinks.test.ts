@@ -163,6 +163,7 @@ describe('generateSalaryPages links', () => {
       'CA-MB',
       'CA-SK',
       'CA-NL',
+      'CA-NS',
       'CA-QC',
       'CA-NB',
       'CA-XX',
