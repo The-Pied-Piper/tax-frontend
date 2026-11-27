@@ -86,6 +86,7 @@ describe('the written compare page', () => {
       `${names['ca-sk']}$52,669.31`,
       `${names['ca-mb']}$51,899.32`,
       `${names['ca-nl']}$51,703.00`,
+      `${names['ca-pe']}$51,383.90`,
       `${names['ca-ns']}$50,496.28`,
     ]);
   });
@@ -118,6 +119,7 @@ describe('the written compare page', () => {
       '/ca-sk/',
       '/ca-mb/',
       '/ca-nl/',
+      '/ca-pe/',
       '/ca-ns/',
     ]);
     const nav = page.querySelector(
@@ -135,6 +137,7 @@ describe('the written compare page', () => {
       '/ca-sk/',
       '/ca-nl/',
       '/ca-ns/',
+      '/ca-pe/',
     ]);
   });
 
