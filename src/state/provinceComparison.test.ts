@@ -115,6 +115,7 @@ describe('comparisonRows', () => {
       ['ca-ab', '54107.20'],
       ['ca-on', '53786.25'],
       ['ca-sk', '52669.31'],
+      ['ca-nb', '52041.82'],
       ['ca-mb', '51899.32'],
       ['ca-nl', '51703.00'],
       ['ca-pe', '51383.90'],
@@ -129,6 +130,7 @@ describe('comparisonRows', () => {
       ['ca-ab', '15892.80'],
       ['ca-on', '16213.75'],
       ['ca-sk', '17330.69'],
+      ['ca-nb', '17958.18'],
       ['ca-mb', '18100.68'],
       ['ca-nl', '18297.00'],
       ['ca-pe', '18616.10'],
@@ -143,6 +145,7 @@ describe('comparisonRows', () => {
       ['ca-ab', '0.2270'],
       ['ca-on', '0.2316'],
       ['ca-sk', '0.2476'],
+      ['ca-nb', '0.2565'],
       ['ca-mb', '0.2586'],
       ['ca-nl', '0.2614'],
       ['ca-pe', '0.2659'],
@@ -157,7 +160,7 @@ describe('comparisonRows', () => {
     const rows = comparisonRows(sampleSweeps, at70000, 'takeHome');
     expect(rows[0]?.width).toBe('100.0');
     // 51703.00 / 54348.15 = 95.13 %
-    expect(rows[5]?.width).toBe('95.1');
+    expect(rows[6]?.width).toBe('95.1');
   });
 
   it('keeps the order of the list for provinces with the same amount taken off', () => {

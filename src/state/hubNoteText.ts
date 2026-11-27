@@ -3,6 +3,7 @@ import type { ProvinceNotes } from './hubNoteTypes';
 import { alberta } from './hubNoteText/ca-ab';
 import { britishColumbia } from './hubNoteText/ca-bc';
 import { manitoba } from './hubNoteText/ca-mb';
+import { newBrunswick } from './hubNoteText/ca-nb';
 import { newfoundlandAndLabrador } from './hubNoteText/ca-nl';
 import { novaScotia } from './hubNoteText/ca-ns';
 import { ontario } from './hubNoteText/ca-on';
@@ -18,6 +19,7 @@ export const hubNoteText: Partial<Record<FooterProvinceSlug, ProvinceNotes>> = {
   'ca-mb': manitoba,
   'ca-sk': saskatchewan,
   'ca-nl': newfoundlandAndLabrador,
+  'ca-nb': newBrunswick,
   'ca-ns': novaScotia,
   'ca-pe': princeEdwardIsland,
   'ca-qc': quebec,

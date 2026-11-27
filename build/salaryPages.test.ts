@@ -176,6 +176,7 @@ describe('salaryPages closeBundle', () => {
         'ca-bc/tax-rates',
         'ca-mb/tax-rates',
         'ca-nl/tax-rates',
+        'ca-nb/tax-rates',
         'ca-ns/tax-rates',
         'ca-pe/tax-rates',
         'ca-qc/tax-rates',
