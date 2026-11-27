@@ -372,8 +372,8 @@ def _new_brunswick_rates_page_facts(year: int) -> dict[str, str]:
     """New Brunswick's figures: the common ones and its own: its four brackets, basic amount and credit rate, and the
     low-income tax reduction. A single filer takes the basic reduction (NB428 line 77) and loses the rate (line 84) of
     the income above the base amount (line 82); the form gives it only to a net income under the single limit printed
-    above line 70. The reduction's two ends and the second bracket are converted from taxable income to salary exactly
-    (to the cent), so a shift is the exact gap the page says "about" of."""
+    above line 70. The reduction's start and the second bracket are converted from taxable income to salary exactly
+    (`_exact_shift`), so a shift is the exact gap the page says "about" of."""
     facts = _common_rates_page_facts(year)
     new_brunswick = _bracket_facts(year, "nb", _params(year, "ca_nb", "brackets")["brackets"])
     new_brunswick["nb_bpa"] = _params(year, "ca_nb", "basic_personal_amount")["amount"]
@@ -383,11 +383,8 @@ def _new_brunswick_rates_page_facts(year: int) -> dict[str, str]:
     new_brunswick["reduction_max"] = _params(year, "ca_nb", "low_income_reduction_basic")["amount"]
     new_brunswick["reduction_end_ni"] = _params(year, "ca_nb", "low_income_reduction_single_income_limit")["amount"]
     new_brunswick["reduction_start_salary"] = str(exact_start.quantize(Decimal(1), rounding=ROUND_HALF_UP))
-    new_brunswick["shift_reduction"] = str(exact_start - base)
-    new_brunswick["shift_nb_bracket_2"] = str(
-        _exact_salary_of_taxable(year, Decimal(new_brunswick["nb_bracket_2_ti"]))
-        - Decimal(new_brunswick["nb_bracket_2_ti"])
-    )
+    new_brunswick["shift_reduction"] = str(_exact_shift(year, base))
+    new_brunswick["shift_nb_bracket_2"] = str(_exact_shift(year, Decimal(new_brunswick["nb_bracket_2_ti"])))
     return {**facts, **new_brunswick}
 
 

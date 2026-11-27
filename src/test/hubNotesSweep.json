@@ -12556,6 +12556,8 @@
       "ei_rate": "0.0163",
       "ei_stop": "68900.00",
       "federal_second_rate": "0.205",
+      "reduction_start": "21920",
+      "reduction_rate": "0.03",
       "cpp_start": "3500.00",
       "cpp_ympe": "74600.00",
       "yampe": "85000.00",
@@ -12610,12 +12612,10 @@
       "nb_bpa": "13664",
       "nb_credit_rate": "0.094",
       "reduction_max": "802",
-      "reduction_start": "21920",
-      "reduction_rate": "0.03",
       "reduction_end_ni": "48653",
       "reduction_start_salary": "22106",
-      "shift_reduction": "186.06060606060606060606061",
-      "shift_nb_bracket_2": "493.26262626262626262626263",
+      "shift_reduction": "186",
+      "shift_nb_bracket_2": "493",
       "nb_tax_part": "0.0868748"
     },
     "points": [
