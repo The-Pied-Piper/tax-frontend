@@ -632,6 +632,15 @@ describe('the Nova Scotia rates page', () => {
     }
   });
 
+  it('puts the last group heading just above the federal top bracket salary', () => {
+    const groups = ratesPageText['ca-ns']?.groups ?? [];
+    const last = groups[groups.length - 1]?.heading ?? '';
+    const top = novaScotiaSweep().facts['fed_bracket_5_salary'] ?? '';
+    const gap = subtractAmounts(last.replace(/\D/g, ''), top);
+    expect(compareAmounts(gap, '0')).toBeGreaterThanOrEqual(0);
+    expect(compareAmounts(gap, '1000')).toBeLessThan(0);
+  });
+
   it('names a cause form for every note and links NS428', () => {
     for (const group of ratesPageText['ca-ns']?.groups ?? []) {
       for (const note of group.notes) {
