@@ -72,13 +72,15 @@ describe('SalaryLinks', () => {
     });
     expect(previous).toHaveAttribute('href', '/ca-on/65000/');
     expect(previous).toHaveAccessibleName(
-      expect.stringContaining(money('65000')),
+      new RegExp(money('65000').replace('$', '\\$')),
     );
     const next = within(nav).getByRole('link', {
       name: strings.salaryLinks.next(money('75000'), kept('57611.80')),
     });
     expect(next).toHaveAttribute('href', '/ca-on/75000/');
-    expect(next).toHaveAccessibleName(expect.stringContaining(money('75000')));
+    expect(next).toHaveAccessibleName(
+      new RegExp(money('75000').replace('$', '\\$')),
+    );
   });
 
   it('links back to the calculator', () => {

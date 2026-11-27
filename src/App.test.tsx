@@ -44,7 +44,9 @@ describe('App form', () => {
     const user = userEvent.setup();
     render(<App client={fixtureClient()} />);
     const form = await screen.findByLabelText(strings.form.place);
-    await waitFor(() => expect(form).toBeEnabled());
+    await waitFor(() => {
+      expect(form).toBeEnabled();
+    });
     await user.type(screen.getByLabelText(strings.form.salary), '70000');
     await user.click(
       screen.getByRole('button', { name: strings.form.calculate }),
@@ -416,9 +418,9 @@ describe('App form', () => {
       computeTakeHomeCalculation: () => Promise.reject(new Error('unused')),
     };
     render(<App client={client} />);
-    await waitFor(() =>
-      expect(screen.getByText(strings.form.placesFailed)).toBeInTheDocument(),
-    );
+    await waitFor(() => {
+      expect(screen.getByText(strings.form.placesFailed)).toBeInTheDocument();
+    });
   });
 
   it('shows the place code when its name is blank', async () => {
