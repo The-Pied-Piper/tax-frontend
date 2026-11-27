@@ -233,7 +233,7 @@ describe('ContentPage blocks', () => {
     const slot = container.querySelector(`#${PROVINCE_COMPARISON_SLOT_ID}`);
     expect(slot).toHaveAttribute('data-province', 'ca-on');
     expect(within(slot as HTMLElement).getAllByRole('listitem')).toHaveLength(
-      6,
+      7,
     );
   });
 

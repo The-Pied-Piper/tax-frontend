@@ -29,6 +29,7 @@ describe('ratesPageView', () => {
       'ca-mb',
       'ca-sk',
       'ca-nl',
+      'ca-ns',
       'ca-pe',
       'ca-qc',
     ]);
@@ -536,6 +537,141 @@ describe('the Newfoundland and Labrador rates page', () => {
     expect(seventh?.[3]).toBe('54.3%');
     expect(eighth?.[2]).toBe('$1,142,402 (past this chart)');
     expect(eighth?.[3]).toBe('54.8%');
+  });
+});
+
+describe('the Nova Scotia rates page', () => {
+  const novaScotiaSweep = () => {
+    const found = fullHubCharts(['ca-ns']).provinces[0];
+    if (!found) throw new Error('no sweep');
+    return found;
+  };
+
+  const view = () => {
+    const found = ratesPageView('ca-ns', novaScotiaSweep());
+    if (!found) throw new Error('no view');
+    return found;
+  };
+
+  const everyWord = () => [
+    ...view().intro,
+    ...view().howToRead,
+    ...view().groups.flatMap((group) => group.notes.map((note) => note.words)),
+    ...view().tables.flatMap((table) => [
+      table.before ?? '',
+      table.after ?? '',
+      ...table.rows.flat(),
+    ]),
+  ];
+
+  it('fills every figure from the sweep and leaves no brace behind', () => {
+    expect(everyWord().length).toBeGreaterThan(20);
+    for (const words of everyWord()) {
+      expect(words).not.toMatch(/[{}]|undefined|NaN/);
+    }
+  });
+
+  it('gives one decimal for every rate in the opening finding', () => {
+    const [lead] = view().intro;
+    expect(lead).toContain('7.6%');
+    expect(lead).toContain('54%');
+    expect(lead).toContain('$15,901 to $21,177');
+    expect(lead).toContain('47.1%');
+    expect(lead).not.toMatch(/\d+\.\d\d%/);
+  });
+
+  it('says where the reduction starts, where provincial tax shows and where it ends', () => {
+    const text = everyWord().join(' ');
+    expect(text).toContain('about $15,116 of salary');
+    expect(text).toContain('about 8.1% for Nova Scotia tax');
+    expect(text).toContain('about $116 higher at an income of $15,000');
+    expect(text).toContain('an adjusted family income of $21,000');
+    expect(text).toContain('about $21,177 of salary');
+  });
+
+  it('writes the three rates of the first provincial row and the five brackets', () => {
+    const table = view().tables.find((t) => t.caption.includes('Nova Scotia'));
+    expect(table?.rows).toHaveLength(5);
+    expect(table?.rows[0]).toEqual([
+      '$0',
+      '8.79%',
+      'tax starts at about $15,901',
+      '20.7%, then 33.6% from $19,201, then 28.6% from $21,177',
+    ]);
+    expect(table?.rows[1]).toEqual(['$30,995', '14.95%', '$31,273', '34.7%']);
+    expect(table?.rows[4]).toEqual(['$157,124', '21%', '$158,251', '47.0%']);
+  });
+
+  it('keeps the tab title under 64 characters, the full name in the heading', () => {
+    const text = ratesPageText['ca-ns'];
+    expect(text?.title).toBe(
+      'Nova Scotia marginal and average tax rate by salary, 2026',
+    );
+    expect(text?.heading).toBe(
+      'Nova Scotia marginal and average tax rate by salary, 2026',
+    );
+    expect(text?.title.length).toBeLessThan(64);
+    expect(text?.description.length).toBeLessThan(160);
+  });
+
+  it('types no dollar figure or cents figure in a note or a table cell', () => {
+    const text = ratesPageText['ca-ns'];
+    const words = [
+      ...(text?.intro ?? []).map((note) => note.text),
+      ...(text?.howToRead ?? []).map((note) => note.text),
+      ...(text?.groups ?? []).flatMap((group) =>
+        group.notes.map((note) => note.text),
+      ),
+      ...(text?.tables ?? []).flatMap((table) => [
+        table.before?.text ?? '',
+        table.after?.text ?? '',
+        ...table.rows.flat(),
+      ]),
+    ];
+    for (const line of words) {
+      expect(line).not.toMatch(/\$\d|\d cents/);
+    }
+  });
+
+  it('puts the last group heading just above the federal top bracket salary', () => {
+    const groups = ratesPageText['ca-ns']?.groups ?? [];
+    const last = groups[groups.length - 1]?.heading ?? '';
+    const top = novaScotiaSweep().facts['fed_bracket_5_salary'] ?? '';
+    const gap = subtractAmounts(last.replace(/\D/g, ''), top);
+    expect(compareAmounts(gap, '0')).toBeGreaterThanOrEqual(0);
+    expect(compareAmounts(gap, '1000')).toBeLessThan(0);
+  });
+
+  it('names a cause form for every note and links NS428', () => {
+    for (const group of ratesPageText['ca-ns']?.groups ?? []) {
+      for (const note of group.notes) {
+        expect(note.forms.length, note.text).toBeGreaterThan(0);
+      }
+    }
+    expect(causeChip('ns428').label).toBe('Form NS428');
+    expect(causeChip('ns428').href).toBe('/forms/ns428/');
+  });
+
+  it('agrees with the engine: each bracket salary is within a dollar of the engine edge that moves the rate', () => {
+    const { facts, edges } = novaScotiaSweep();
+    for (const name of [
+      'fed_bracket_2_salary',
+      'fed_bracket_3_salary',
+      'fed_bracket_4_salary',
+      'fed_bracket_5_salary',
+      'ns_bracket_2_salary',
+      'ns_bracket_3_salary',
+      'ns_bracket_4_salary',
+      'ns_bracket_5_salary',
+    ]) {
+      const salary = facts[name] ?? '';
+      const within = (edgeSalary: string) => {
+        const gap = subtractAmounts(edgeSalary, salary);
+        return compareAmounts(gap.replace('-', ''), '1') <= 0;
+      };
+      const near = edges.some((edge) => within(edge[1]) || within(edge[2]));
+      expect(near, name).toBe(true);
+    }
   });
 });
 

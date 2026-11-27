@@ -160,6 +160,7 @@ describe('hubPages', () => {
       '/ca-bc/',
       '/ca-mb/',
       '/ca-sk/',
+      '/ca-ns/',
       '/ca-pe/',
       '/ca-qc/',
     ]);
@@ -206,6 +207,7 @@ describe('hubPages', () => {
       '/ca-mb/',
       '/ca-sk/',
       '/ca-nl/',
+      '/ca-ns/',
       '/ca-pe/',
       '/ca-qc/',
     ]);
@@ -355,8 +357,19 @@ describe('hubChartBlocks', () => {
   });
 
   it('keeps ten full provinces under the size cap', () => {
-    const all = provinces.map((p) => sweepOf(p.slug));
-    const block = hubChartBlocks(all).get('ca-on') ?? '';
+    const ten = [
+      'ca-on',
+      'ca-ab',
+      'ca-bc',
+      'ca-mb',
+      'ca-sk',
+      'ca-nl',
+      'ca-nb',
+      'ca-ns',
+      'ca-pe',
+      'ca-qc',
+    ].map((slug) => sweepOf(slug, 370));
+    const block = hubChartBlocks(ten).get('ca-on') ?? '';
     expect(block.length).toBeLessThan(MAX_HUB_CHARTS_CHARS);
   });
 

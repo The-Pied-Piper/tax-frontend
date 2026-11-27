@@ -116,6 +116,10 @@ FACTS = {
         "reduction_start": ("ca_nl", "low_income_threshold", "amount"),
         "reduction_rate": ("ca_nl", "low_income_reduction_rate", "rate"),
     },
+    "CA-NS": {
+        "reduction_start": ("ca_ns", "low_income_reduction_base_amount", "amount"),
+        "reduction_rate": ("ca_ns", "low_income_reduction_rate", "rate"),
+    },
     "CA-PE": {
         "reduction_start": ("ca_pe", "low_income_reduction_base_amount", "amount"),
         "reduction_rate": ("ca_pe", "low_income_reduction_rate", "rate"),
@@ -393,6 +397,36 @@ def _british_columbia_rates_page_facts(year: int) -> dict[str, str]:
     return {**facts, **bc}
 
 
+def _nova_scotia_rates_page_facts(year: int) -> dict[str, str]:
+    """Nova Scotia's figures: the common ones and its own: its five brackets, basic amount and credit rate, and the
+    low-income tax reduction. A single filer takes the basic reduction (NS428 line 71) and loses the rate (line 82) of
+    the income above the base amount (line 80); it is gone where the income reaches the base plus the basic reduction
+    over the rate. Provincial tax shows once the tax after credits passes what is left of the reduction, so the salary
+    where it shows is not a dataset figure: the engine's own edge gives it (spec `e:`). `ns_tax_part` is the share of
+    an extra dollar of salary that goes to Nova Scotia tax while the credits for the pension and insurance payments
+    grow with it: the lowest rate less that rate on the Canada Pension Plan and Employment Insurance payments."""
+    facts = _common_rates_page_facts(year)
+    nova_scotia = _bracket_facts(year, "ns", _params(year, "ca_ns", "brackets")["brackets"])
+    nova_scotia["ns_bpa"] = _params(year, "ca_ns", "basic_personal_amount")["amount"]
+    nova_scotia["ns_credit_rate"] = _params(year, "ca_ns", "credit_rate")["rate"]
+    maximum = _params(year, "ca_ns", "low_income_reduction_basic")["amount"]
+    base = _params(year, "ca_ns", "low_income_reduction_base_amount")["amount"]
+    rate = _params(year, "ca_ns", "low_income_reduction_rate")["rate"]
+    nova_scotia["reduction_max"] = maximum
+    # Where the reduction starts to shrink is not an edge of the rate (nothing shows until provincial tax does), so its
+    # salary is the exact one to the nearest dollar, not the first whole salary at or above it.
+    nova_scotia["reduction_start_salary"] = str(
+        _exact_salary_of_taxable(year, Decimal(base)).quantize(Decimal(1), rounding=ROUND_HALF_UP)
+    )
+    nova_scotia["reduction_end_ni"] = str(Decimal(base) + Decimal(maximum) / Decimal(rate))
+    nova_scotia["shift_reduction"] = str(Decimal(nova_scotia["reduction_start_salary"]) - Decimal(base))
+    nova_scotia["shift_ns_bracket_2"] = _shift(nova_scotia, "ns_bracket_2")
+    nova_scotia["ns_tax_part"] = str(
+        Decimal(nova_scotia["ns_bracket_1_rate"]) * (1 - Decimal(facts["cpp_rate"]) - Decimal(_params(year, "ca", "ei_premium")["rate"]))
+    )
+    return {**facts, **nova_scotia}
+
+
 def _exact_shift(year: int, taxable: Decimal) -> Decimal:
     """How much higher the exact salary is than the taxable income at a threshold, to the whole dollar (half up)."""
     return (_exact_salary_of_taxable(year, taxable) - taxable).quantize(Decimal(1), rounding=ROUND_HALF_UP)
@@ -662,6 +696,7 @@ RATES_PAGE_FACTS = {
     "CA-BC": _british_columbia_rates_page_facts,
     "CA-MB": _manitoba_rates_page_facts,
     "CA-NL": _newfoundland_rates_page_facts,
+    "CA-NS": _nova_scotia_rates_page_facts,
     "CA-PE": _prince_edward_island_rates_page_facts,
     # Québec has its own pension plan, so it does not start from the common (Canada Pension Plan) figures.
     "CA-QC": _quebec_rates_page_facts,

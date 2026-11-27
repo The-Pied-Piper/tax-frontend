@@ -1,7 +1,6 @@
 import { figuresOf, type FormPageSpec } from '../formPage';
 
 const { result, printed } = figuresOf('ca-pe/pe428');
-const income = figuresOf('ca/t1_taxable_income');
 
 /** Form PE428 in plain words. The figures are the 2025 form's, at a $70,000 salary. */
 export const pe428: FormPageSpec = {
@@ -26,7 +25,11 @@ export const pe428: FormPageSpec = {
         '{taken}, the extra part of your pension plan payments, is taken off first. That leaves a taxable income of {income}.',
       figures: {
         income: result('$69,335', 'pe428_taxable_income_line_1'),
-        taken: income.result('$665', 'deductions_from_total_income'),
+        taken: result(
+          '$665',
+          'deductions_from_total_income',
+          'ca/t1_taxable_income',
+        ),
       },
     },
     {
