@@ -9,9 +9,6 @@ import { SalaryLinks } from './SalaryLinks';
 
 const unit = readUnit(compute70000.unit) ?? strings.fallbackUnit;
 const money = (salary: string) => displayWholeMoney(salary, 'annually', unit);
-/** A pattern matching any name that contains the text (jest-dom 8 takes a string or pattern). */
-const containing = (text: string) =>
-  new RegExp(text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'));
 const kept = (takeHome: string) => displayMoney(takeHome, 'annually', unit);
 
 // Distinct take-home figures, as the API prints them, one per linked page.
@@ -74,12 +71,16 @@ describe('SalaryLinks', () => {
       name: strings.salaryLinks.previous(money('65000'), kept('49976.45')),
     });
     expect(previous).toHaveAttribute('href', '/ca-on/65000/');
-    expect(previous).toHaveAccessibleName(containing(money('65000')));
+    expect(previous).toHaveAccessibleName(
+      new RegExp(money('65000').replace('$', '\\$')),
+    );
     const next = within(nav).getByRole('link', {
       name: strings.salaryLinks.next(money('75000'), kept('57611.80')),
     });
     expect(next).toHaveAttribute('href', '/ca-on/75000/');
-    expect(next).toHaveAccessibleName(containing(money('75000')));
+    expect(next).toHaveAccessibleName(
+      new RegExp(money('75000').replace('$', '\\$')),
+    );
   });
 
   it('links back to the calculator', () => {
