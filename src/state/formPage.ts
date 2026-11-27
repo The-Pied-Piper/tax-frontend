@@ -8,7 +8,16 @@ import { formSlug, type FooterProvinceSlug } from './siteLinks';
  */
 export type FormFigure =
   | { shown: string; trace: { form: string; label: string } }
-  | { shown: string; printed: { form: string; text: string } };
+  | { shown: string; printed: { form: string; text: string } }
+  | { shown: string; pending: { form: string; label: string } };
+
+/**
+ * What a pending figure shows. A pending figure names the engine step that will give it, but the engine cannot
+ * compute its province's return for the site yet (it is not registered), so no saved answer exists. It is
+ * replaced by `result` or `printed` when the saved answer is added; the page test fails a pending figure once the
+ * saved answer exists.
+ */
+export const PENDING_FIGURE = '[figure to come]';
 
 /** One part of a form: a few lines that belong together. */
 export type FormSection = {
@@ -105,6 +114,10 @@ export function figuresOf(form: string) {
     printed: (shown: string, text: string): FormFigure => ({
       shown,
       printed: { form, text },
+    }),
+    pending: (label: string, of = form): FormFigure => ({
+      shown: PENDING_FIGURE,
+      pending: { form: of, label },
     }),
   };
 }

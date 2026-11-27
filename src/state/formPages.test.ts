@@ -1,5 +1,5 @@
 import { formPages } from './formPages';
-import { formContentPage, splitFigures } from './formPage';
+import { formContentPage, PENDING_FIGURE, splitFigures } from './formPage';
 import { contentPages } from './contentPages';
 import { displayWholeMoney, type MoneyUnit } from '../money/format';
 import { strings } from '../strings';
@@ -20,11 +20,20 @@ const saved = import.meta.glob<Answer>('../api/fixtures/compute-*.json', {
   import: 'default',
 });
 
-function answerFor(province: string, year: number, salary: string): Answer {
-  const key = `../api/fixtures/compute-${province.replace('ca-', '')}-${year.toString()}-${salary}.json`;
+function savedKey(province: string, year: number, salary: string): string {
+  return `../api/fixtures/compute-${province.replace('ca-', '')}-${year.toString()}-${salary}.json`;
+}
+
+/** A page whose figures are all pending has no saved answer yet; any other page must have one. */
+function answerFor(form: (typeof formPages)[number]): Answer {
+  const key = savedKey(form.province, form.year, form.exampleSalary);
   const answer = saved[key];
-  if (!answer) throw new Error(`No saved answer ${key}`);
-  return answer;
+  const allPending = form.sections.every((section) =>
+    Object.values(section.figures).every((figure) => 'pending' in figure),
+  );
+  if (answer) return answer;
+  if (allPending) return { trace: [] };
+  throw new Error(`No saved answer ${key}`);
 }
 
 /** The money as the pages write it: no cents when they are .00. */
@@ -33,7 +42,7 @@ function shownMoney(amount: string): string {
 }
 
 describe.each(formPages)('the $name page', (form) => {
-  const answer = answerFor(form.province, form.year, form.exampleSalary);
+  const answer = answerFor(form);
   const stepsOf = (formName: string) =>
     answer.trace.filter((step) => step.form === formName);
 
@@ -115,7 +124,14 @@ describe.each(formPages)('the $name page', (form) => {
     for (const section of form.sections) {
       for (const [name, figure] of Object.entries(section.figures)) {
         const at = `${section.id}.${name}`;
-        if ('trace' in figure) {
+        if ('pending' in figure) {
+          // A figure waits for the engine; once the saved answer exists it must be a real figure.
+          expect(figure.shown, at).toBe(PENDING_FIGURE);
+          expect(
+            saved[savedKey(form.province, form.year, form.exampleSalary)],
+            `${at} is pending but a saved answer exists: use result or printed`,
+          ).toBeUndefined();
+        } else if ('trace' in figure) {
           const lines = stepsOf(figure.trace.form)
             .flatMap((step) => step.lines)
             .filter((line) => line.label === figure.trace.label);

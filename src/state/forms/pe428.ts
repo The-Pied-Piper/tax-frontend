@@ -1,9 +1,13 @@
 import { figuresOf, type FormPageSpec } from '../formPage';
 
-const { result, printed } = figuresOf('ca-pe/pe428');
+const { pending } = figuresOf('ca-pe/pe428');
 const income = figuresOf('ca/t1_taxable_income');
 
-/** Form PE428 in plain words. The figures are the 2025 form's, at a $70,000 salary. */
+/**
+ * Form PE428 in plain words. Every figure is pending: the engine cannot compute this province's return for
+ * the site yet, so there is no saved answer. Each names the engine step that will give it; they become `result` and
+ * `printed` figures, at a $70,000 salary, when the saved answer is added.
+ */
 export const pe428: FormPageSpec = {
   id: 'pe428',
   name: 'Form PE428: Prince Edward Island Tax',
@@ -25,8 +29,8 @@ export const pe428: FormPageSpec = {
       example:
         '{taken}, the extra part of your pension plan payments, is taken off first. That leaves a taxable income of {income}.',
       figures: {
-        income: result('$69,335', 'pe428_taxable_income_line_1'),
-        taken: income.result('$665', 'deductions_from_total_income'),
+        income: pending('pe428_taxable_income_line_1'),
+        taken: income.pending('deductions_from_total_income'),
       },
     },
     {
@@ -38,12 +42,12 @@ export const pe428: FormPageSpec = {
       example:
         'Your income reaches the slice that starts at {start}. That slice is taxed at {rate}. The tax on the slices below it comes to {below}. The {above} of your income above {start} adds {added}. Prince Edward Island tax before credits: {tax}.',
       figures: {
-        start: result('$64,656', 'pe428_bracket_lower_bound_line_3'),
-        rate: result('16.6%', 'pe428_bracket_rate_line_5'),
-        below: result('$7,386.04', 'pe428_bracket_tax_at_start_line_7'),
-        above: result('$4,679', 'pe428_taxable_income_over_lower_bound_line_4'),
-        added: result('$776.71', 'pe428_tax_on_excess_line_6'),
-        tax: result('$8,162.75', 'pe428_tax_on_taxable_income_line_8'),
+        start: pending('pe428_bracket_lower_bound_line_3'),
+        rate: pending('pe428_bracket_rate_line_5'),
+        below: pending('pe428_bracket_tax_at_start_line_7'),
+        above: pending('pe428_taxable_income_over_lower_bound_line_4'),
+        added: pending('pe428_tax_on_excess_line_6'),
+        tax: pending('pe428_tax_on_taxable_income_line_8'),
       },
     },
     {
@@ -55,12 +59,12 @@ export const pe428: FormPageSpec = {
       example:
         'The basic amount, {cpp} for the main part of your pension plan payments and {ei} of EI payments add up to {total}. {rate} of that is {discount}.',
       figures: {
-        basic: result('$14,650', 'basic_personal_amount'),
-        cpp: result('$3,291.75', 'pe428_cpp_contributions_line_20'),
-        ei: result('$1,077.48', 'pe428_ei_premiums_line_22'),
-        total: result('$19,019.23', 'pe428_credits_total_line_48'),
-        rate: printed('9.5%', '9.5% of line 48'),
-        discount: result('$1,806.83', 'pe428_credits_at_rate_line_50'),
+        basic: pending('basic_personal_amount'),
+        cpp: pending('pe428_cpp_contributions_line_20'),
+        ei: pending('pe428_ei_premiums_line_22'),
+        total: pending('pe428_credits_total_line_48'),
+        rate: pending('pe428_credits_at_rate_line_50'),
+        discount: pending('pe428_credits_at_rate_line_50'),
       },
     },
     {
@@ -71,9 +75,9 @@ export const pe428: FormPageSpec = {
         'Now the form takes your credits away from your tax. The tax can go down to zero, but not below it. The form has more lines here, for tax on split income, a dividend tax credit, minimum tax carryover, extra minimum tax and a reduction passed from a spouse. We do not use them.',
       example: 'Your tax of {tax} less credits of {credits} leaves {after}.',
       figures: {
-        tax: result('$8,162.75', 'pe428_tax_on_taxable_income_line_8'),
-        credits: result('$1,806.83', 'pe428_non_refundable_credits_line_54'),
-        after: result('$6,355.92', 'pe428_tax_line_59'),
+        tax: pending('pe428_tax_on_taxable_income_line_8'),
+        credits: pending('pe428_non_refundable_credits_line_54'),
+        after: pending('pe428_tax_line_59'),
       },
     },
     {
@@ -85,12 +89,12 @@ export const pe428: FormPageSpec = {
       example:
         'Your income is {over} over {threshold}. {rate} of that is {clawback}, which is more than {set}, so the reduction is {reduction}.',
       figures: {
-        set: result('$350', 'pe428_low_income_reductions_total_line_81'),
-        threshold: result('$22,650', 'low_income_reduction_base_amount'),
-        over: result('$46,685', 'pe428_income_over_base_amount_line_84'),
-        rate: printed('5%', '5% of line 84'),
-        clawback: result('$2,334.25', 'pe428_reduction_phase_out_line_86'),
-        reduction: result('$0', 'pe428_low_income_tax_reduction_line_87'),
+        set: pending('pe428_low_income_reductions_total_line_81'),
+        threshold: pending('low_income_reduction_base_amount'),
+        over: pending('pe428_income_over_base_amount_line_84'),
+        rate: pending('pe428_reduction_phase_out_line_86'),
+        clawback: pending('pe428_reduction_phase_out_line_86'),
+        reduction: pending('pe428_low_income_tax_reduction_line_87'),
       },
     },
     {
@@ -102,9 +106,9 @@ export const pe428: FormPageSpec = {
       example:
         'Your tax after credits of {tax} less a reduction of {reduction} leaves your Prince Edward Island tax of {total}.',
       figures: {
-        tax: result('$6,355.92', 'pe428_tax_line_67'),
-        reduction: result('$0', 'pe428_low_income_tax_reduction_line_87'),
-        total: result('$6,355.92', 'pe428_tax_line_88'),
+        tax: pending('pe428_tax_line_67'),
+        reduction: pending('pe428_low_income_tax_reduction_line_87'),
+        total: pending('pe428_tax_line_88'),
       },
     },
   ],
