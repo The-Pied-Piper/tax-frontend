@@ -53,7 +53,6 @@ export type FooterProvinceSlug = (typeof FOOTER_PROVINCE_SLUGS)[number];
 export const PROVINCES_WITHOUT_SALARY_PAGES: readonly FooterProvinceSlug[] = [
   'ca-nb',
   'ca-ns',
-  'ca-pe',
 ];
 
 /** Whether this is a slug: lower-case letters, digits and hyphens, in segments separated by "/". */

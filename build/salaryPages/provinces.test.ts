@@ -77,6 +77,15 @@ describe('the province list', () => {
         extra: expect.arrayContaining([25100, 25101, 286446]) as unknown,
       },
       {
+        code: 'CA-PE',
+        slug: 'ca-pe',
+        year: TAX_YEAR,
+        from: 30000,
+        to: 150000,
+        step: 5000,
+        extra: expect.arrayContaining([19992, 22844, 201127]) as unknown,
+      },
+      {
         code: 'CA-QC',
         slug: 'ca-qc',
         year: TAX_YEAR,
