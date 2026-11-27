@@ -21,7 +21,7 @@ describe('the province list', () => {
     }
   });
 
-  it('has Ontario, Alberta, British Columbia, Manitoba, Saskatchewan, Newfoundland and Labrador then Québec, each from $30,000 to $150,000 in $5,000 steps', () => {
+  it('has Ontario, Alberta, British Columbia, Manitoba, Saskatchewan, Newfoundland and Labrador, Québec, New Brunswick, Nova Scotia then Prince Edward Island, each from $30,000 to $150,000 in $5,000 steps', () => {
     expect(provinces).toEqual([
       {
         code: 'CA-ON',
@@ -84,6 +84,30 @@ describe('the province list', () => {
         to: 150000,
         step: 5000,
         extra: expect.arrayContaining([2026, 56324, 259608]) as unknown,
+      },
+      {
+        code: 'CA-NB',
+        slug: 'ca-nb',
+        year: TAX_YEAR,
+        from: 30000,
+        to: 150000,
+        step: 5000,
+      },
+      {
+        code: 'CA-NS',
+        slug: 'ca-ns',
+        year: TAX_YEAR,
+        from: 30000,
+        to: 150000,
+        step: 5000,
+      },
+      {
+        code: 'CA-PE',
+        slug: 'ca-pe',
+        year: TAX_YEAR,
+        from: 30000,
+        to: 150000,
+        step: 5000,
       },
     ]);
   });

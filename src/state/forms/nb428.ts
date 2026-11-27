@@ -1,13 +1,9 @@
 import { figuresOf, type FormPageSpec } from '../formPage';
 
-const { pending } = figuresOf('ca-nb/nb428');
+const { result, printed } = figuresOf('ca-nb/nb428');
 const income = figuresOf('ca/t1_taxable_income');
 
-/**
- * Form NB428 in plain words. Every figure is pending: the engine cannot compute this province's return for
- * the site yet, so there is no saved answer. Each names the engine step that will give it; they become `result` and
- * `printed` figures, at a $70,000 salary, when the saved answer is added.
- */
+/** Form NB428 in plain words. The figures are the 2025 form's, at a $70,000 salary. */
 export const nb428: FormPageSpec = {
   id: 'nb428',
   name: 'Form NB428: New Brunswick Tax',
@@ -29,8 +25,8 @@ export const nb428: FormPageSpec = {
       example:
         '{taken}, the extra part of your pension plan payments, is taken off first. That leaves a taxable income of {income}.',
       figures: {
-        income: pending('nb428_taxable_income_line_1'),
-        taken: income.pending('deductions_from_total_income'),
+        income: result('$69,335', 'nb428_taxable_income_line_1'),
+        taken: income.result('$665', 'deductions_from_total_income'),
       },
     },
     {
@@ -42,12 +38,15 @@ export const nb428: FormPageSpec = {
       example:
         'Your income reaches the slice that starts at {start}. That slice is taxed at {rate}. The tax on the slices below it comes to {below}. The {above} of your income above {start} adds {added}. New Brunswick tax before credits: {tax}.',
       figures: {
-        start: pending('nb428_bracket_lower_bound_line_3'),
-        rate: pending('nb428_bracket_rate_line_5'),
-        below: pending('nb428_bracket_tax_at_start_line_7'),
-        above: pending('nb428_taxable_income_over_lower_bound_line_4'),
-        added: pending('nb428_tax_on_excess_line_6'),
-        tax: pending('nb428_tax_on_taxable_income_line_8'),
+        start: result('$51,306', 'nb428_bracket_lower_bound_line_3'),
+        rate: result('14%', 'nb428_bracket_rate_line_5'),
+        below: result('$4,822.76', 'nb428_bracket_tax_at_start_line_7'),
+        above: result(
+          '$18,029',
+          'nb428_taxable_income_over_lower_bound_line_4',
+        ),
+        added: result('$2,524.06', 'nb428_tax_on_excess_line_6'),
+        tax: result('$7,346.82', 'nb428_tax_on_taxable_income_line_8'),
       },
     },
     {
@@ -59,12 +58,12 @@ export const nb428: FormPageSpec = {
       example:
         'The basic amount, {cpp} for the main part of your pension plan payments and {ei} of EI payments add up to {total}. {rate} of that is {discount}.',
       figures: {
-        basic: pending('basic_personal_amount'),
-        cpp: pending('nb428_cpp_contributions_line_19'),
-        ei: pending('nb428_ei_premiums_line_21'),
-        total: pending('nb428_credits_total_line_47'),
-        rate: pending('nb428_credits_at_rate_line_49'),
-        discount: pending('nb428_credits_at_rate_line_49'),
+        basic: result('$13,396', 'basic_personal_amount'),
+        cpp: result('$3,291.75', 'nb428_cpp_contributions_line_19'),
+        ei: result('$1,077.48', 'nb428_ei_premiums_line_21'),
+        total: result('$17,765.23', 'nb428_credits_total_line_47'),
+        rate: printed('9.4%', '9.4% of line 47'),
+        discount: result('$1,669.93', 'nb428_credits_at_rate_line_49'),
       },
     },
     {
@@ -75,9 +74,9 @@ export const nb428: FormPageSpec = {
         'Now the form takes your credits away from your tax. The tax can go down to zero, but not below it. The form has more lines here, for tax on split income, a dividend tax credit, minimum tax and a foreign tax credit. We do not use them.',
       example: 'Your tax of {tax} less credits of {credits} leaves {after}.',
       figures: {
-        tax: pending('nb428_tax_before_credits_line_56'),
-        credits: pending('nb428_non_refundable_credits_line_53'),
-        after: pending('nb428_tax_line_67'),
+        tax: result('$7,346.82', 'nb428_tax_before_credits_line_56'),
+        credits: result('$1,669.93', 'nb428_non_refundable_credits_line_53'),
+        after: result('$5,676.89', 'nb428_tax_line_67'),
       },
     },
     {
@@ -89,13 +88,13 @@ export const nb428: FormPageSpec = {
       example:
         'Your income is {over} over {threshold}. {rate} of that is {clawback}, which is more than {set}, and your income is over {limit}, so the reduction is {reduction}.',
       figures: {
-        limit: pending('low_income_reduction_single_income_limit'),
-        set: pending('nb428_low_income_reduction_line_80'),
-        threshold: pending('low_income_reduction_base_amount'),
-        over: pending('nb428_line_83'),
-        rate: pending('nb428_line_85'),
-        clawback: pending('nb428_line_85'),
-        reduction: pending('nb428_line_86'),
+        limit: result('$48,653', 'low_income_reduction_single_income_limit'),
+        set: result('$802', 'nb428_low_income_reduction_line_80'),
+        threshold: result('$21,920', 'low_income_reduction_base_amount'),
+        over: result('$47,415', 'nb428_line_83'),
+        rate: printed('3%', '3% of line 83'),
+        clawback: result('$1,422.45', 'nb428_line_85'),
+        reduction: result('$0', 'nb428_line_86'),
       },
     },
     {
@@ -107,9 +106,9 @@ export const nb428: FormPageSpec = {
       example:
         'Your tax after credits of {tax} less a reduction of {reduction} leaves your New Brunswick tax of {total}.',
       figures: {
-        tax: pending('nb428_tax_line_67'),
-        reduction: pending('nb428_line_86'),
-        total: pending('nb428_tax_line_87'),
+        tax: result('$5,676.89', 'nb428_tax_line_67'),
+        reduction: result('$0', 'nb428_line_86'),
+        total: result('$5,676.89', 'nb428_new_brunswick_tax_line_97'),
       },
     },
   ],
