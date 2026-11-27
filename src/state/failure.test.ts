@@ -17,7 +17,7 @@ describe('describeFailure', () => {
     });
   });
 
-  it.each([
+  it.each<[unknown, string]>([
     [new ApiError(400, invalidSalary), strings.errors.rejected],
     [new ApiError(400, problem(400, 'year')), strings.errors.rejected],
     [new ApiError(422, null), strings.errors.rejected],
