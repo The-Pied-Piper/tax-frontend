@@ -29,11 +29,16 @@ const pool: Record<string, string> = {
 
 export const novaScotia: ProvinceNotes = {
   takeHome: takeHomeNotes(shared),
-  averageRate: averageRateNotes(),
+  averageRate: averageRateNotes([
+    note(
+      'Up to about {n1} you pay no income tax, only Canada Pension Plan and Employment Insurance. The average is {avg10} at $10,000 and {avg20} at $20,000.',
+      pool,
+    ),
+  ]),
   marginalRate: [
     ...marginalLowNotes([
       note(
-        'The rate is {low} (pension and insurance payments only) until about {n1}, because Nova Scotia’s low-income tax reduction and credits cover the provincial tax at low incomes.',
+        'From $4,000 to about {n1} the rate is {low}: Canada Pension Plan and Employment Insurance, with no income tax yet.',
         pool,
       ),
     ]),

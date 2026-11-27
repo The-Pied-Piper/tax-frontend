@@ -341,7 +341,7 @@ export const novaScotiaRatesPage: RatesPageText = {
       ...cells(federalRows),
       after: {
         ...note(
-          'The lowest federal rate is {fedLowest} for the whole of 2026. In 2025 it was {fedLowestRatePrior}. The federal basic personal amount is {fedBpa}, and shrinks to {fedBpaMin} between a net income of {fedBpaStart} and {fedBpaEnd}. The Canada employment amount is {cea}.',
+          'The lowest federal rate is {fedLowest} for the whole of 2026. In 2025 it was {fedLowestRatePrior}. The federal basic personal amount is {fedBpa}, and shrinks to {fedBpaMin} between a net income of {fedBpaStart} and {fedBpaEnd}. The Canada employment amount is {cea}. In the first row the rate after is {fedFirstAfter}: it includes Nova Scotia tax and the loss of the low-income tax reduction, which are already in the rate at that salary.',
           { ...pool, ...tablePool },
         ),
       },
