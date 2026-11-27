@@ -10,9 +10,9 @@ type Saved = {
 
 /**
  * The full sweep (all 327 salaries) of the seven provinces, one engine run in the form the build
- * embeds: the figures of the hub-charts thread's independent sweep (tax-engine 0.5.3, 2026,
- * a single person with a salary only), on the return basis. The hub notes read their figures
- * from it.
+ * embeds: the figures of the hub-charts thread's independent sweep (tax-engine 0.6.0, 2026,
+ * a single person with a salary only), on the return basis; tax-engine 0.6.0 gives the same figures
+ * as the 0.5.3 sweep for these seven provinces. The hub notes read their figures from it.
  */
 export function fullHubCharts(
   slugs: string[] = Object.keys(sweeps),
