@@ -10,7 +10,10 @@ import {
 } from './hubNotes';
 import type { Note, ProvinceNotes } from './hubNoteTypes';
 import { hubNoteText } from './hubNoteText';
-import { FOOTER_PROVINCE_SLUGS } from './siteLinks';
+import {
+  FOOTER_PROVINCE_SLUGS,
+  PROVINCES_WITHOUT_SALARY_PAGES,
+} from './siteLinks';
 
 function sweepOf(slug: string) {
   const found = fullHubCharts([slug]).provinces[0];
@@ -18,7 +21,10 @@ function sweepOf(slug: string) {
   return found;
 }
 
-const SLUGS = [...FOOTER_PROVINCE_SLUGS];
+/** Every footer province but those the engine does not serve yet: they have no sweep, so no chart wording until it lands. */
+const SLUGS = FOOTER_PROVINCE_SLUGS.filter(
+  (slug) => !PROVINCES_WITHOUT_SALARY_PAGES.includes(slug),
+);
 const CHARTS: HubChartId[] = [...HUB_CHART_IDS];
 
 function everyNote(): { slug: string; chart: HubChartId; note: Note }[] {

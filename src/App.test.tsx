@@ -1028,6 +1028,9 @@ describe.each(['light', 'dark'] as const)(
         ['Manitoba', '/ca-mb/'],
         ['Saskatchewan', '/ca-sk/'],
         ['Newfoundland and Labrador', '/ca-nl/'],
+        ['New Brunswick', '/ca-nb/'],
+        ['Nova Scotia', '/ca-ns/'],
+        ['Prince Edward Island', '/ca-pe/'],
         ['Québec', '/ca-qc/'],
       ]);
       expect(nav).toHaveTextContent('Provinces:');
@@ -1060,6 +1063,9 @@ describe.each(['light', 'dark'] as const)(
         '/ca-mb/',
         '/ca-sk/',
         '/ca-nl/',
+        '/ca-nb/',
+        '/ca-ns/',
+        '/ca-pe/',
         '/ca-qc/',
       ]);
       expect(page.querySelector('footer')?.textContent).toContain(

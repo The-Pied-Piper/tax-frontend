@@ -15,6 +15,9 @@ import { mb479 } from './forms/mb479';
 import { mb428a } from './forms/mb428a';
 import { sk428 } from './forms/sk428';
 import { nl428 } from './forms/nl428';
+import { nb428 } from './forms/nb428';
+import { ns428 } from './forms/ns428';
+import { pe428 } from './forms/pe428';
 import { scheduleB } from './forms/scheduleB';
 import { scheduleF } from './forms/scheduleF';
 import { tp1 } from './forms/tp1';
@@ -39,6 +42,9 @@ export const formPages: FormPageSpec[] = [
   mb428a,
   sk428,
   nl428,
+  nb428,
+  ns428,
+  pe428,
   scheduleB,
   scheduleF,
   tp1,

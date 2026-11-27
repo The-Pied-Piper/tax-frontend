@@ -46,7 +46,7 @@ describe.each(['light', 'dark'] as const)(
       expect(link.tagName).toBe('A');
     });
 
-    it('shows "Provinces:" and then the seven province links', () => {
+    it('shows "Provinces:" and then the ten province links', () => {
       render(<SiteFooter />);
       const nav = screen.getByRole('navigation', {
         name: strings.siteNav.label,
@@ -64,6 +64,9 @@ describe.each(['light', 'dark'] as const)(
         ['Manitoba', '/ca-mb/'],
         ['Saskatchewan', '/ca-sk/'],
         ['Newfoundland and Labrador', '/ca-nl/'],
+        ['New Brunswick', '/ca-nb/'],
+        ['Nova Scotia', '/ca-ns/'],
+        ['Prince Edward Island', '/ca-pe/'],
         ['Québec', '/ca-qc/'],
       ]);
       expect(
@@ -77,6 +80,9 @@ describe.each(['light', 'dark'] as const)(
         'Manitoba',
         'Saskatchewan',
         'Newfoundland and Labrador',
+        'New Brunswick',
+        'Nova Scotia',
+        'Prince Edward Island',
         'Québec',
       ]);
     });

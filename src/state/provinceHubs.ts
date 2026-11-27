@@ -246,6 +246,40 @@ export const provinceHubs: ProvinceHubText[] = [
     ],
   },
   {
+    slug: 'ca-nb',
+    taxReduction: true,
+    own: [
+      {
+        id: 'nb428',
+        name: 'Form NB428: New Brunswick Tax',
+        description: 'Works out how much income tax you owe New Brunswick.',
+      },
+    ],
+  },
+  {
+    slug: 'ca-ns',
+    taxReduction: true,
+    own: [
+      {
+        id: 'ns428',
+        name: 'Form NS428: Nova Scotia Tax',
+        description: 'Works out how much income tax you owe Nova Scotia.',
+      },
+    ],
+  },
+  {
+    slug: 'ca-pe',
+    taxReduction: true,
+    own: [
+      {
+        id: 'pe428',
+        name: 'Form PE428: Prince Edward Island Tax',
+        description:
+          'Works out how much income tax you owe Prince Edward Island.',
+      },
+    ],
+  },
+  {
     slug: 'ca-qc',
     taxReduction: false,
     words: (name) => ({
