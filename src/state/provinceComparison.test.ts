@@ -117,6 +117,7 @@ describe('comparisonRows', () => {
       ['ca-sk', '52669.31'],
       ['ca-mb', '51899.32'],
       ['ca-nl', '51703.00'],
+      ['ca-pe', '51383.90'],
       ['ca-ns', '50496.28'],
     ]);
   });
@@ -130,6 +131,7 @@ describe('comparisonRows', () => {
       ['ca-sk', '17330.69'],
       ['ca-mb', '18100.68'],
       ['ca-nl', '18297.00'],
+      ['ca-pe', '18616.10'],
       ['ca-ns', '19503.72'],
     ]);
   });
@@ -143,6 +145,7 @@ describe('comparisonRows', () => {
       ['ca-sk', '0.2476'],
       ['ca-mb', '0.2586'],
       ['ca-nl', '0.2614'],
+      ['ca-pe', '0.2659'],
       ['ca-ns', '0.2786'],
     ]);
     expect(rows.every((row) => row.unit.as_percentage === true)).toBe(true);

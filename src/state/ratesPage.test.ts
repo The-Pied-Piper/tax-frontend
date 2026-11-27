@@ -30,6 +30,7 @@ describe('ratesPageView', () => {
       'ca-sk',
       'ca-nl',
       'ca-ns',
+      'ca-pe',
       'ca-qc',
     ]);
   });
@@ -1154,6 +1155,153 @@ describe('the Saskatchewan rates page', () => {
 
   it('types no dollar or cents figure in a note or a table cell', () => {
     const text = ratesPageText['ca-sk'];
+    const lines = [
+      ...(text?.intro ?? []).map((n) => n.text),
+      ...(text?.howToRead ?? []).map((n) => n.text),
+      ...(text?.groups ?? []).flatMap((g) => g.notes.map((n) => n.text)),
+      ...(text?.tables ?? []).flatMap((t) => [
+        t.before?.text ?? '',
+        t.after?.text ?? '',
+        ...t.rows.flat(),
+      ]),
+    ];
+    for (const line of lines) expect(line).not.toMatch(/\$\d|\d cents/);
+    expect(text?.title.length).toBeLessThan(64);
+    expect(text?.description.length).toBeLessThan(160);
+  });
+});
+
+describe('the Prince Edward Island rates page', () => {
+  const peSweep = () => {
+    const found = fullHubCharts(['ca-pe']).provinces[0];
+    if (!found) throw new Error('no sweep');
+    return found;
+  };
+  const view = () => {
+    const found = ratesPageView('ca-pe', peSweep());
+    if (!found) throw new Error('no view');
+    return found;
+  };
+
+  it('fills every figure from the Prince Edward Island sweep and leaves no brace behind', () => {
+    const found = view();
+    const everyWord = [
+      ...found.intro,
+      ...found.howToRead,
+      ...found.groups.flatMap((group) => group.notes.map((n) => n.words)),
+      ...found.tables.flatMap((table) => [
+        table.before ?? '',
+        table.after ?? '',
+        ...table.rows.flat(),
+      ]),
+    ];
+    expect(everyWord.length).toBeGreaterThan(20);
+    for (const words of everyWord) {
+      expect(words).not.toMatch(/[{}]|undefined|NaN/);
+    }
+  });
+
+  it('gives the engine’s salaries and one-decimal rates at each step', () => {
+    const notes = view().groups.flatMap((group) =>
+      group.notes.map((n) => n.words),
+    );
+    const all = notes.join('\n');
+    expect(view().intro[0]).toContain('from about 7.6%');
+    expect(view().intro[0]).toContain('to 53% above $259,609');
+    expect(view().intro[0]).toContain('provincial tax starts at about $19,992');
+    expect(view().intro[0]).toContain('46.2% at $500,000');
+    expect(all).toContain('It is 20.5% from about $19,201');
+    expect(all).toContain('From about $19,992 the rate is 29.3%');
+    expect(all).toContain('From then the rate is 34.2%');
+    expect(all).toContain('gone at about $29,915 of salary');
+    expect(all).toContain('the rate falls to 29.3%');
+    expect(all).toContain('From about $34,236 the rate is 33.2%');
+    expect(all).toContain('From about $59,079 the rate is 39.7%');
+    expect(all).toContain('From about $66,450 the rate is 42.8%');
+    expect(all).toContain('From about $108,017 the rate is 38.1%');
+    expect(all).toContain('From about $118,172 the rate is 43.6%');
+    expect(all).toContain('From about $143,647 the rate is 45%');
+    expect(all).toContain('From about $182,567 the rate is 48.3%');
+    expect(all).toContain('From about $201,127 the rate is 49.3%');
+    expect(view().howToRead.join(' ')).toContain('about $193 higher');
+    expect(view().howToRead.join(' ')).toContain('about $307 higher');
+  });
+
+  it('has the Prince Edward Island and federal bracket rows, with tax starting at the engine’s salary', () => {
+    const [federal, island] = view().tables;
+    expect(federal?.rows[0]).toEqual([
+      '$0',
+      '14%',
+      'tax starts at about $19,201',
+      '20.5%',
+    ]);
+    expect(federal?.rows[1]).toEqual(['$58,523', '20.5%', '$59,079', '39.7%']);
+    expect(federal?.rows[4]).toEqual(['$258,482', '33%', '$259,609', '53.0%']);
+    expect(island?.rows[0]).toEqual([
+      '$0',
+      '9.5%',
+      'tax starts at about $19,992',
+      '29.3%, then 34.2% from $22,844, then 29.3% from $29,915',
+    ]);
+    expect(island?.rows[1]).toEqual(['$33,928', '13.47%', '$34,236', '33.2%']);
+    expect(island?.rows[5]).toEqual(['$200,000', '20%', '$201,127', '49.3%']);
+    expect(island?.rows).toHaveLength(6);
+  });
+
+  it('names a cause form for every note and links the Prince Edward Island form', () => {
+    for (const group of ratesPageText['ca-pe']?.groups ?? []) {
+      for (const n of group.notes)
+        expect(n.forms.length, n.text).toBeGreaterThan(0);
+    }
+    expect(causeChip('pe428').href).toBe('/forms/pe428/');
+    expect(causeChip('pe428').label).toBe('Form PE428');
+  });
+
+  it('puts each bracket salary derived from its taxable income where the engine’s own search finds the rate change', () => {
+    const { facts, edges } = peSweep();
+    const names = [
+      'fed_bracket_2_salary',
+      'fed_bracket_3_salary',
+      'fed_bracket_4_salary',
+      'fed_bracket_5_salary',
+    ];
+    for (const name of names) {
+      const salary = facts[name] ?? '';
+      // An edge is [sweep salary below, last salary at the old rate, first salary settled at the new one, rate]:
+      // the derived salary is the first whole dollar past the threshold, so it lies inside that window.
+      const near = edges.filter(
+        (edge) =>
+          compareAmounts(edge[1], salary) <= 0 &&
+          compareAmounts(salary, edge[2]) <= 0,
+      );
+      expect(near.length, name).toBe(1);
+    }
+  });
+
+  it('draws every change of the rate as a step: the next sample point after each edge is within $2 of it', () => {
+    const points = peSweep().points;
+    for (const [, moves] of peSweep().edges) {
+      const at = points.findIndex((point) => point[0] === `${moves}.00`);
+      expect(at, moves).toBeGreaterThanOrEqual(0);
+      const next = points[at + 1]?.[0] ?? '0';
+      expect(
+        compareAmounts(subtractAmounts(next, moves), '2'),
+        `${moves} then ${next}`,
+      ).toBeLessThanOrEqual(0);
+    }
+  });
+
+  it('puts the last group heading at the salary the data says the top bracket starts at', () => {
+    const groups = ratesPageText['ca-pe']?.groups ?? [];
+    const last = groups[groups.length - 1]?.heading ?? '';
+    const top = peSweep().facts['fed_bracket_5_salary'] ?? '';
+    const gap = subtractAmounts(last.replace(/\D/g, ''), top);
+    expect(compareAmounts(gap, '0')).toBeGreaterThanOrEqual(0);
+    expect(compareAmounts(gap, '1000')).toBeLessThan(0);
+  });
+
+  it('types no dollar or cents figure in a note or a table cell', () => {
+    const text = ratesPageText['ca-pe'];
     const lines = [
       ...(text?.intro ?? []).map((n) => n.text),
       ...(text?.howToRead ?? []).map((n) => n.text),

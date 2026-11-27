@@ -164,6 +164,7 @@ describe('generateSalaryPages links', () => {
       'CA-SK',
       'CA-NL',
       'CA-NS',
+      'CA-PE',
       'CA-QC',
       'CA-XX',
     ]);

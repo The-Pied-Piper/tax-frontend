@@ -177,6 +177,7 @@ describe('salaryPages closeBundle', () => {
         'ca-mb/tax-rates',
         'ca-nl/tax-rates',
         'ca-ns/tax-rates',
+        'ca-pe/tax-rates',
         'ca-qc/tax-rates',
         // The compare page is written whenever a province has salary pages.
         'compare-provinces',

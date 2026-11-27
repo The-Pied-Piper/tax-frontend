@@ -120,6 +120,10 @@ FACTS = {
         "reduction_start": ("ca_ns", "low_income_reduction_base_amount", "amount"),
         "reduction_rate": ("ca_ns", "low_income_reduction_rate", "rate"),
     },
+    "CA-PE": {
+        "reduction_start": ("ca_pe", "low_income_reduction_base_amount", "amount"),
+        "reduction_rate": ("ca_pe", "low_income_reduction_rate", "rate"),
+    },
 }
 # The same for every province: the Employment Insurance premium rate and its maximum insurable earnings.
 COMMON_FACTS = {
@@ -423,6 +427,32 @@ def _nova_scotia_rates_page_facts(year: int) -> dict[str, str]:
     return {**facts, **nova_scotia}
 
 
+def _exact_shift(year: int, taxable: Decimal) -> Decimal:
+    """How much higher the exact salary is than the taxable income at a threshold, to the whole dollar (half up)."""
+    return (_exact_salary_of_taxable(year, taxable) - taxable).quantize(Decimal(1), rounding=ROUND_HALF_UP)
+
+
+def _prince_edward_island_rates_page_facts(year: int) -> dict[str, str]:
+    """Prince Edward Island's figures: the common ones and its own: its six brackets, basic amount and credit rate, and
+    the low-income tax reduction. A single filer takes the basic reduction (PE428 line 75) and loses the rate (line 85)
+    of the income above the base amount (line 83); the reduction is gone where the income reaches the base plus the
+    basic reduction over the rate. The shifts are exact (the salary at the threshold, less the threshold), rounded to
+    the whole dollar, as the form's figure sits that much lower than the salary."""
+    facts = _common_rates_page_facts(year)
+    prince_edward_island = _bracket_facts(year, "pe", _params(year, "ca_pe", "brackets")["brackets"])
+    prince_edward_island["pe_bpa"] = _params(year, "ca_pe", "basic_personal_amount")["amount"]
+    prince_edward_island["pe_credit_rate"] = _params(year, "ca_pe", "credit_rate")["rate"]
+    maximum = _params(year, "ca_pe", "low_income_reduction_basic")["amount"]
+    base = Decimal(_params(year, "ca_pe", "low_income_reduction_base_amount")["amount"])
+    rate = Decimal(_params(year, "ca_pe", "low_income_reduction_rate")["rate"])
+    prince_edward_island["reduction_max"] = maximum
+    prince_edward_island["reduction_start_salary"] = str(_salary_of_taxable(year, base))
+    prince_edward_island["reduction_end_ni"] = str(base + Decimal(maximum) / rate)
+    prince_edward_island["shift_reduction"] = str(_exact_shift(year, base))
+    prince_edward_island["shift_pe_bracket_2"] = str(_exact_shift(year, Decimal(prince_edward_island["pe_bracket_2_ti"])))
+    return {**facts, **prince_edward_island}
+
+
 def _quebec_shift(exact_salary: Decimal, taxable: Decimal | str) -> str:
     """How much higher the salary is than the income at a form's threshold, to the cent."""
     return str((exact_salary - Decimal(taxable)).quantize(CENTS))
@@ -667,6 +697,7 @@ RATES_PAGE_FACTS = {
     "CA-MB": _manitoba_rates_page_facts,
     "CA-NL": _newfoundland_rates_page_facts,
     "CA-NS": _nova_scotia_rates_page_facts,
+    "CA-PE": _prince_edward_island_rates_page_facts,
     # Québec has its own pension plan, so it does not start from the common (Canada Pension Plan) figures.
     "CA-QC": _quebec_rates_page_facts,
 }
