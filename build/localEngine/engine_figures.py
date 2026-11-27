@@ -356,6 +356,31 @@ def _newfoundland_rates_page_facts(year: int) -> dict[str, str]:
     return {**facts, **newfoundland}
 
 
+def _new_brunswick_rates_page_facts(year: int) -> dict[str, str]:
+    """New Brunswick's figures: the common ones and its own: its four brackets, basic amount and credit rate, and the
+    low-income tax reduction. A single filer takes the basic reduction (NB428 line 77) and loses the rate (line 84) of
+    the income above the base amount (line 82); the form gives it only to a net income under the single limit printed
+    above line 70. The reduction's two ends and the second bracket are converted from taxable income to salary exactly
+    (to the cent), so a shift is the exact gap the page says "about" of."""
+    facts = _common_rates_page_facts(year)
+    new_brunswick = _bracket_facts(year, "nb", _params(year, "ca_nb", "brackets")["brackets"])
+    new_brunswick["nb_bpa"] = _params(year, "ca_nb", "basic_personal_amount")["amount"]
+    new_brunswick["nb_credit_rate"] = _params(year, "ca_nb", "credit_rate")["rate"]
+    base = Decimal(_params(year, "ca_nb", "low_income_reduction_base_amount")["amount"])
+    exact_start = _exact_salary_of_taxable(year, base)
+    new_brunswick["reduction_max"] = _params(year, "ca_nb", "low_income_reduction_basic")["amount"]
+    new_brunswick["reduction_start"] = str(base)
+    new_brunswick["reduction_rate"] = _params(year, "ca_nb", "low_income_reduction_rate")["rate"]
+    new_brunswick["reduction_end_ni"] = _params(year, "ca_nb", "low_income_reduction_single_income_limit")["amount"]
+    new_brunswick["reduction_start_salary"] = str(exact_start.quantize(Decimal(1), rounding=ROUND_HALF_UP))
+    new_brunswick["shift_reduction"] = str(exact_start - base)
+    new_brunswick["shift_nb_bracket_2"] = str(
+        _exact_salary_of_taxable(year, Decimal(new_brunswick["nb_bracket_2_ti"]))
+        - Decimal(new_brunswick["nb_bracket_2_ti"])
+    )
+    return {**facts, **new_brunswick}
+
+
 def _british_columbia_rates_page_facts(year: int) -> dict[str, str]:
     """British Columbia's figures: the common ones and its own: its seven brackets (the form keeps them in two files, lines 2 to 8
     and lines 9 to 15; the rates are kept to the four digits the form prints, 5.60% not 5.6%), basic amount, credit rate and tax
@@ -632,6 +657,7 @@ RATES_PAGE_FACTS = {
     "CA-BC": _british_columbia_rates_page_facts,
     "CA-MB": _manitoba_rates_page_facts,
     "CA-NL": _newfoundland_rates_page_facts,
+    "CA-NB": _new_brunswick_rates_page_facts,
     # Québec has its own pension plan, so it does not start from the common (Canada Pension Plan) figures.
     "CA-QC": _quebec_rates_page_facts,
 }
@@ -653,9 +679,22 @@ def _newfoundland_engine_facts(figures: "Figures", year: int, facts: dict[str, s
     return found
 
 
+def _new_brunswick_engine_facts(figures: "Figures", year: int, facts: dict[str, str]) -> dict[str, str]:
+    """What only the engine can say for New Brunswick: how much of the marginal rate between the first federal stretch
+    (at $20,000, before provincial tax shows) and the stretch where the provincial tax shows and the reduction shrinks
+    (at $30,000) is provincial tax. The rise is that tax plus the reduction lost (its rate times the share of salary
+    that is net income), so the tax part is the rise less the reduction lost, as a fraction of a dollar."""
+    rise = figures._marginal("CA-NB", year, 30000) - figures._marginal("CA-NB", year, 20000)
+    lost = Decimal(facts["reduction_rate"]) * Decimal(facts["taxable_factor"])
+    return {"nb_tax_part": _rate_text(rise - lost)}
+
+
 # Facts a rates page needs that no dataset file holds and the sweep does not reach, so they are asked of the engine:
 # (figures, year, the dataset facts of `RATES_PAGE_FACTS`) -> facts. Dataset figures belong in `RATES_PAGE_FACTS`.
-RATES_PAGE_ENGINE_FACTS = {"CA-NL": _newfoundland_engine_facts}
+RATES_PAGE_ENGINE_FACTS = {
+    "CA-NL": _newfoundland_engine_facts,
+    "CA-NB": _new_brunswick_engine_facts,
+}
 
 
 def _unit(unit: UnitDescription) -> dict:

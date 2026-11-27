@@ -161,6 +161,7 @@ describe('hubPages', () => {
       '/ca-mb/',
       '/ca-sk/',
       '/ca-qc/',
+      '/ca-nb/',
     ]);
   });
 
@@ -206,6 +207,7 @@ describe('hubPages', () => {
       '/ca-sk/',
       '/ca-nl/',
       '/ca-qc/',
+      '/ca-nb/',
     ]);
   });
 

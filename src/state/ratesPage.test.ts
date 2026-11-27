@@ -29,6 +29,7 @@ describe('ratesPageView', () => {
       'ca-mb',
       'ca-sk',
       'ca-nl',
+      'ca-nb',
       'ca-qc',
     ]);
   });
@@ -1031,5 +1032,158 @@ describe('the Saskatchewan rates page', () => {
     for (const line of lines) expect(line).not.toMatch(/\$\d|\d cents/);
     expect(text?.title.length).toBeLessThan(64);
     expect(text?.description.length).toBeLessThan(160);
+  });
+});
+
+describe('the New Brunswick rates page', () => {
+  const newBrunswickSweep = () => {
+    const found = fullHubCharts(['ca-nb']).provinces[0];
+    if (!found) throw new Error('no sweep');
+    return found;
+  };
+
+  const view = () => {
+    const found = ratesPageView('ca-nb', newBrunswickSweep());
+    if (!found) throw new Error('no view');
+    return found;
+  };
+
+  const everyWord = () => [
+    ...view().intro,
+    ...view().howToRead,
+    ...view().groups.flatMap((group) => group.notes.map((note) => note.words)),
+    ...view().tables.flatMap((table) => [
+      table.before ?? '',
+      table.after ?? '',
+      ...table.rows.flat(),
+    ]),
+  ];
+
+  it('fills every figure from the sweep and leaves no brace behind', () => {
+    expect(everyWord().length).toBeGreaterThan(20);
+    for (const words of everyWord()) {
+      expect(words).not.toMatch(/[{}]|undefined|NaN/);
+    }
+  });
+
+  it('gives the lead its figures to one decimal, from the engine', () => {
+    const [lead] = view().intro;
+    expect(lead).toContain('about 7.6%');
+    expect(lead).toContain('from $3,500');
+    expect(lead).toContain('52.5% above $259,609');
+    expect(lead).toContain('from $23,362 to $49,109');
+    expect(lead).toContain('45.1% at $500,000');
+  });
+
+  it('says the reduction starts, shows provincial tax and ends at the edges the engine found', () => {
+    const notes = view().groups.flatMap((group) =>
+      group.notes.map((note) => note.words),
+    );
+    const text = notes.join(' ');
+    expect(text).toContain('by up to $802 for a single person');
+    expect(text).toContain(
+      'starts to shrink at $21,920, about $22,106 of salary',
+    );
+    expect(text).toContain('Until about $23,362');
+    expect(text).toContain('the rate is 32.2%');
+    expect(text).toContain('plus about 8.7% for New Brunswick tax (9.4%');
+    expect(text).toContain(
+      'gone at about $49,109 of salary (a net income of $48,653)',
+    );
+    expect(text).toContain('the rate falls to 29.2%');
+    expect(text).toContain('From about $52,826 the rate is 33.8%');
+  });
+
+  it('prints the first whole salary in the tables and "about" in the words', () => {
+    const federal = view().tables.find(
+      (t) => t.caption === 'Federal brackets, 2026',
+    );
+    expect(federal?.rows[0]).toEqual([
+      '$0',
+      '14%',
+      'tax begins at $19,201',
+      '20.5%',
+    ]);
+    const table = view().tables.find((t) =>
+      t.caption.includes('New Brunswick'),
+    );
+    expect(table?.rows).toEqual([
+      [
+        '$0',
+        '9.4%',
+        'tax starts at about $23,362',
+        '32.2%, then 29.2% from $49,110',
+      ],
+      ['$52,333', '14%', '$52,827', '33.8%'],
+      ['$104,666', '16%', '$105,793', '36.5%'],
+      ['$193,861', '19.5%', '$194,988', '48.8%'],
+    ]);
+  });
+
+  it('shows the pension deduction shifts of the form thresholds', () => {
+    const second = view().howToRead[1] ?? '';
+    expect(second).toContain('about $186 higher at an income of $21,920');
+    expect(second).toContain(
+      'about $493 higher at a taxable income of $52,333',
+    );
+  });
+
+  it('keeps the tab title under 64 characters, the full name in the heading', () => {
+    const text = ratesPageText['ca-nb'];
+    expect(text?.title).toBe(
+      'New Brunswick marginal and average tax rate by salary, 2026',
+    );
+    expect(text?.title.length).toBeLessThan(64);
+    expect(text?.description.length).toBeLessThan(160);
+  });
+
+  it('types no dollar figure or cents figure in a note or a table cell', () => {
+    const text = ratesPageText['ca-nb'];
+    const words = [
+      ...(text?.intro ?? []).map((note) => note.text),
+      ...(text?.howToRead ?? []).map((note) => note.text),
+      ...(text?.groups ?? []).flatMap((group) =>
+        group.notes.map((note) => note.text),
+      ),
+      ...(text?.tables ?? []).flatMap((table) => [
+        table.before?.text ?? '',
+        table.after?.text ?? '',
+        ...table.rows.flat(),
+      ]),
+    ];
+    for (const line of words) {
+      expect(line).not.toMatch(/\$\d|\d cents/);
+    }
+  });
+
+  it('names a cause form for every note and links NB428', () => {
+    for (const group of ratesPageText['ca-nb']?.groups ?? []) {
+      for (const note of group.notes) {
+        expect(note.forms.length, note.text).toBeGreaterThan(0);
+      }
+    }
+    expect(causeChip('nb428').label).toBe('Form NB428');
+    expect(causeChip('nb428').href).toBe('/forms/nb428/');
+  });
+
+  it('agrees with the engine: each bracket salary is within a dollar of the engine edge that moves the rate', () => {
+    const { facts, edges } = newBrunswickSweep();
+    for (const name of [
+      'fed_bracket_2_salary',
+      'fed_bracket_3_salary',
+      'fed_bracket_4_salary',
+      'fed_bracket_5_salary',
+      'nb_bracket_2_salary',
+      'nb_bracket_3_salary',
+      'nb_bracket_4_salary',
+    ]) {
+      const salary = facts[name] ?? '';
+      const within = (edgeSalary: string) => {
+        const gap = subtractAmounts(edgeSalary, salary);
+        return compareAmounts(gap.replace('-', ''), '1') <= 0;
+      };
+      const near = edges.some((edge) => within(edge[1]) || within(edge[2]));
+      expect(near, name).toBe(true);
+    }
   });
 });

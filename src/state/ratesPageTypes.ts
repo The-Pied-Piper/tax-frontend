@@ -11,6 +11,7 @@ export type CauseForm =
   | 'mb428'
   | 'mb428a'
   | 'nl428'
+  | 'nb428'
   | 't2204'
   | 'schedule8'
   | 'tp1'

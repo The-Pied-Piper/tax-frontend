@@ -4,6 +4,7 @@ import { isFullSweep, noteWords } from './hubNotes';
 import { albertaRatesPage } from './ratesPageText/ca-ab';
 import { britishColumbiaRatesPage } from './ratesPageText/ca-bc';
 import { manitobaRatesPage } from './ratesPageText/ca-mb';
+import { newBrunswickRatesPage } from './ratesPageText/ca-nb';
 import { newfoundlandAndLabradorRatesPage } from './ratesPageText/ca-nl';
 import { ontarioRatesPage } from './ratesPageText/ca-on';
 import { saskatchewanRatesPage } from './ratesPageText/ca-sk';
@@ -27,6 +28,7 @@ export const ratesPageText: Partial<Record<FooterProvinceSlug, RatesPageText>> =
     'ca-bc': britishColumbiaRatesPage,
     'ca-mb': manitobaRatesPage,
     'ca-nl': newfoundlandAndLabradorRatesPage,
+    'ca-nb': newBrunswickRatesPage,
     'ca-qc': quebecRatesPage,
   };
 
@@ -48,6 +50,7 @@ const CAUSE_PAGE: Record<CauseForm, string> = {
   mb428: 'mb428',
   mb428a: 'mb428-a',
   nl428: 'nl428',
+  nb428: 'nb428',
   t2204: 't2204',
   schedule8: 'schedule-8',
   tp1: 'tp1',
