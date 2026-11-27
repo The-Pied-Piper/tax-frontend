@@ -249,11 +249,14 @@ describe('salaryPages closeBundle', () => {
       '/ca-ab/',
       '/ca-bc/',
       '/ca-mb/',
+      '/ca-nb/',
       '/ca-nl/',
+      '/ca-ns/',
       '/ca-on/',
       '/ca-on/30000/',
       '/ca-on/35000/',
       '/ca-on/tax-rates/',
+      '/ca-pe/',
       '/ca-qc/',
       '/ca-sk/',
       '/compare-provinces/',
@@ -263,9 +266,12 @@ describe('salaryPages closeBundle', () => {
       '/forms/mb428-a/',
       '/forms/mb428/',
       '/forms/mb479/',
+      '/forms/nb428/',
       '/forms/nl428/',
+      '/forms/ns428/',
       '/forms/on428-a/',
       '/forms/on428/',
+      '/forms/pe428/',
       '/forms/schedule-6/',
       '/forms/schedule-8-qc/',
       '/forms/schedule-8/',
@@ -283,7 +289,7 @@ describe('salaryPages closeBundle', () => {
 
     const sitemap = await readFile(join(root, 'dist', 'sitemap.xml'), 'utf8');
     const urls = sitemap.match(/<url>[\s\S]*?<\/url>/g) ?? [];
-    expect(urls).toHaveLength(34);
+    expect(urls).toHaveLength(40);
     for (const url of urls) {
       expect(url).toMatch(/<lastmod>\d{4}-\d{2}-\d{2}<\/lastmod>/);
     }

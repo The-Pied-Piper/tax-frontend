@@ -243,7 +243,7 @@ describe('crawl from the built home page', () => {
     async () => {
       const { dir, written } = await build({ list: 'alberta' });
       const links = internalLinks(dir, ['index.html', ...written]);
-      expect(links.filter((l) => l.file === 'index.html')).toHaveLength(9);
+      expect(links.filter((l) => l.file === 'index.html')).toHaveLength(12);
       for (const { file, target } of links) {
         expect(existsSync(join(dir, target)), `${file} -> ${target}`).toBe(
           true,

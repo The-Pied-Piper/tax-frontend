@@ -46,6 +46,9 @@ describe('crawl of a built one-entry content page folder', () => {
       'ca-mb/index.html',
       'ca-sk/index.html',
       'ca-nl/index.html',
+      'ca-nb/index.html',
+      'ca-ns/index.html',
+      'ca-pe/index.html',
       'ca-qc/index.html',
     ]);
   });

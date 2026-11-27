@@ -44,6 +44,9 @@ const OWN: Record<Slug, (readonly [string, string])[]> = {
   ],
   'ca-sk': [['sk428', 'Form SK428: Saskatchewan Tax']],
   'ca-nl': [['nl428', 'Form NL428: Newfoundland and Labrador Tax']],
+  'ca-nb': [['nb428', 'Form NB428: New Brunswick Tax']],
+  'ca-ns': [['ns428', 'Form NS428: Nova Scotia Tax']],
+  'ca-pe': [['pe428', 'Form PE428: Prince Edward Island Tax']],
   'ca-mb': [
     ['mb428', 'Form MB428: Manitoba Tax'],
     ['mb428-a', 'Schedule MB428-A: Manitoba Family Tax Benefit'],

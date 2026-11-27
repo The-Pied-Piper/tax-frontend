@@ -19,6 +19,9 @@ export const LINK_ORDER: readonly FooterProvinceSlug[] = [
   'ca-sk',
   'ca-mb',
   'ca-nl',
+  'ca-nb',
+  'ca-ns',
+  'ca-pe',
 ];
 
 /** A paragraph linking the rates page of every other province that has one in this build. */

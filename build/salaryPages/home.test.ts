@@ -48,6 +48,9 @@ describe('rewriteHome (dist/index.html)', () => {
       '/ca-mb/',
       '/ca-sk/',
       '/ca-nl/',
+      '/ca-nb/',
+      '/ca-ns/',
+      '/ca-pe/',
       '/ca-qc/',
     ]);
   });

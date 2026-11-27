@@ -18,7 +18,10 @@ function sweepOf(slug: string) {
   return found;
 }
 
-const SLUGS = [...FOOTER_PROVINCE_SLUGS];
+/** The provinces with chart wording: a province whose engine figures are not ready has no sweep and no notes yet. */
+const SLUGS = FOOTER_PROVINCE_SLUGS.filter((slug) =>
+  Object.hasOwn(hubNoteText, slug),
+);
 const CHARTS: HubChartId[] = [...HUB_CHART_IDS];
 
 function everyNote(): { slug: string; chart: HubChartId; note: Note }[] {
