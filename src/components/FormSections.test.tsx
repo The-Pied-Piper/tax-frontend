@@ -134,7 +134,7 @@ describe('a form page', () => {
       ['Newfoundland and Labrador forms and salary pages', '/ca-nl/'],
       ['New Brunswick forms and salary pages', '/ca-nb/'],
       ['Nova Scotia forms and salary pages', '/ca-ns/'],
-      ['Prince Edward Island forms', '/ca-pe/'],
+      ['Prince Edward Island forms and salary pages', '/ca-pe/'],
       ['Québec forms and salary pages', '/ca-qc/'],
       ['How we calculate', '/methodology/'],
       ['See an Ontario $70,000 example', '/ca-on/70000/'],
@@ -164,7 +164,7 @@ describe('a form page', () => {
         ['Newfoundland and Labrador forms and salary pages', '/ca-nl/'],
         ['New Brunswick forms and salary pages', '/ca-nb/'],
         ['Nova Scotia forms and salary pages', '/ca-ns/'],
-        ['Prince Edward Island forms', '/ca-pe/'],
+        ['Prince Edward Island forms and salary pages', '/ca-pe/'],
         ['Québec forms and salary pages', '/ca-qc/'],
         ['How we calculate', '/methodology/'],
       ]);

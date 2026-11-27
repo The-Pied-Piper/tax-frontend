@@ -38,6 +38,7 @@ describe('ProvinceComparison at the start', () => {
       `${names['ca-nb']}$52,041.82`,
       `${names['ca-mb']}$51,899.32`,
       `${names['ca-nl']}$51,703.00`,
+      `${names['ca-pe']}$51,383.90`,
       `${names['ca-ns']}$50,496.28`,
     ]);
     expect(measure(copy.measures.takeHome)).toBeChecked();
@@ -101,6 +102,7 @@ describe('the highlighted province and the links', () => {
       [names['ca-nb'], '/ca-nb/'],
       [names['ca-mb'], '/ca-mb/'],
       [names['ca-nl'], '/ca-nl/'],
+      [names['ca-pe'], '/ca-pe/'],
       [names['ca-ns'], '/ca-ns/'],
     ]);
     // The credits line is the one link besides the bars', twice: under the notes and in the fold.
@@ -131,6 +133,7 @@ describe('the measure toggle', () => {
       `${names['ca-nb']}$17,958.18`,
       `${names['ca-mb']}$18,100.68`,
       `${names['ca-nl']}$18,297.00`,
+      `${names['ca-pe']}$18,616.10`,
       `${names['ca-ns']}$19,503.72`,
     ]);
     expect(screen.getByText(copy.measureNotes.takenOff)).toBeInTheDocument();
@@ -153,6 +156,7 @@ describe('the measure toggle', () => {
       `${names['ca-nb']}25.7%`,
       `${names['ca-mb']}25.9%`,
       `${names['ca-nl']}26.1%`,
+      `${names['ca-pe']}26.6%`,
       `${names['ca-ns']}27.9%`,
     ]);
     expect(screen.getByText(copy.measureNotes.averageRate)).toBeInTheDocument();
@@ -185,6 +189,7 @@ describe('the salary controls', () => {
       `${names['ca-nb']}$25,763.03`,
       `${names['ca-sk']}$25,743.78`,
       `${names['ca-nl']}$25,366.73`,
+      `${names['ca-pe']}$25,308.12`,
       `${names['ca-mb']}$25,224.22`,
       `${names['ca-ns']}$25,130.28`,
     ]);
@@ -231,6 +236,7 @@ describe('the bars', () => {
       '95.8%',
       '95.5%',
       '95.1%',
+      '94.5%',
       '92.9%',
     ]);
   });
@@ -241,7 +247,7 @@ describe('the bars', () => {
     const mine = rows.filter((row) => row.hasAttribute('aria-current'));
     const others = rows.filter((row) => !row.hasAttribute('aria-current'));
     expect(mine).toHaveLength(1);
-    expect(others).toHaveLength(7);
+    expect(others).toHaveLength(8);
     expect(new Set(others.map((row) => row.className)).size).toBe(1);
     expect(mine[0]?.className).not.toBe(others[0]?.className);
   });
@@ -359,6 +365,7 @@ describe('the bars link to the page of the salary shown', () => {
       '/ca-nb/',
       '/ca-mb/',
       '/ca-nl/',
+      '/ca-pe/',
       '/ca-ns/',
     ]);
     fireEvent.change(slider(), { target: { value: '2' } });

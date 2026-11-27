@@ -166,6 +166,7 @@ export const strings = {
       nl428: 'Form NL428',
       nb428: 'Form NB428',
       ns428: 'Form NS428',
+      pe428: 'Form PE428',
       t2204: 'Form T2204',
       schedule8: 'Schedule 8',
       tp1: 'Form TP-1',

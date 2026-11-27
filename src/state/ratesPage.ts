@@ -8,6 +8,7 @@ import { newBrunswickRatesPage } from './ratesPageText/ca-nb';
 import { newfoundlandAndLabradorRatesPage } from './ratesPageText/ca-nl';
 import { novaScotiaRatesPage } from './ratesPageText/ca-ns';
 import { ontarioRatesPage } from './ratesPageText/ca-on';
+import { princeEdwardIslandRatesPage } from './ratesPageText/ca-pe';
 import { saskatchewanRatesPage } from './ratesPageText/ca-sk';
 import { quebecRatesPage } from './ratesPageText/ca-qc';
 import type { CauseForm, RatesPageText } from './ratesPageTypes';
@@ -31,6 +32,7 @@ export const ratesPageText: Partial<Record<FooterProvinceSlug, RatesPageText>> =
     'ca-nl': newfoundlandAndLabradorRatesPage,
     'ca-nb': newBrunswickRatesPage,
     'ca-ns': novaScotiaRatesPage,
+    'ca-pe': princeEdwardIslandRatesPage,
     'ca-qc': quebecRatesPage,
   };
 
@@ -54,6 +56,7 @@ const CAUSE_PAGE: Record<CauseForm, string> = {
   nl428: 'nl428',
   nb428: 'nb428',
   ns428: 'ns428',
+  pe428: 'pe428',
   t2204: 't2204',
   schedule8: 'schedule-8',
   tp1: 'tp1',
