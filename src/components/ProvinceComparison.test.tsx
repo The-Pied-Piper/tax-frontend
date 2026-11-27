@@ -35,6 +35,7 @@ describe('ProvinceComparison at the start', () => {
       `${names['ca-ab']}$54,107.20`,
       `${names['ca-on']}$53,786.25`,
       `${names['ca-sk']}$52,669.31`,
+      `${names['ca-nb']}$52,041.82`,
       `${names['ca-mb']}$51,899.32`,
       `${names['ca-nl']}$51,703.00`,
       `${names['ca-ns']}$50,496.28`,
@@ -97,6 +98,7 @@ describe('the highlighted province and the links', () => {
       [names['ca-bc'], '/ca-bc/'],
       [names['ca-on'], '/ca-on/'],
       [names['ca-sk'], '/ca-sk/'],
+      [names['ca-nb'], '/ca-nb/'],
       [names['ca-mb'], '/ca-mb/'],
       [names['ca-nl'], '/ca-nl/'],
       [names['ca-ns'], '/ca-ns/'],
@@ -126,6 +128,7 @@ describe('the measure toggle', () => {
       `${names['ca-ab']}$15,892.80`,
       `${names['ca-on']}$16,213.75`,
       `${names['ca-sk']}$17,330.69`,
+      `${names['ca-nb']}$17,958.18`,
       `${names['ca-mb']}$18,100.68`,
       `${names['ca-nl']}$18,297.00`,
       `${names['ca-ns']}$19,503.72`,
@@ -147,6 +150,7 @@ describe('the measure toggle', () => {
       `${names['ca-ab']}22.7%`,
       `${names['ca-on']}23.2%`,
       `${names['ca-sk']}24.8%`,
+      `${names['ca-nb']}25.7%`,
       `${names['ca-mb']}25.9%`,
       `${names['ca-nl']}26.1%`,
       `${names['ca-ns']}27.9%`,
@@ -178,6 +182,7 @@ describe('the salary controls', () => {
       `${names['ca-bc']}$26,254.39`,
       `${names['ca-on']}$26,236.88`,
       `${names['ca-ab']}$26,123.66`,
+      `${names['ca-nb']}$25,763.03`,
       `${names['ca-sk']}$25,743.78`,
       `${names['ca-nl']}$25,366.73`,
       `${names['ca-mb']}$25,224.22`,
@@ -223,6 +228,7 @@ describe('the bars', () => {
       '99.6%',
       '99%',
       '96.9%',
+      '95.8%',
       '95.5%',
       '95.1%',
       '92.9%',
@@ -235,7 +241,7 @@ describe('the bars', () => {
     const mine = rows.filter((row) => row.hasAttribute('aria-current'));
     const others = rows.filter((row) => !row.hasAttribute('aria-current'));
     expect(mine).toHaveLength(1);
-    expect(others).toHaveLength(6);
+    expect(others).toHaveLength(7);
     expect(new Set(others.map((row) => row.className)).size).toBe(1);
     expect(mine[0]?.className).not.toBe(others[0]?.className);
   });
@@ -350,6 +356,7 @@ describe('the bars link to the page of the salary shown', () => {
       '/ca-ab/',
       '/ca-on/',
       '/ca-sk/',
+      '/ca-nb/',
       '/ca-mb/',
       '/ca-nl/',
       '/ca-ns/',

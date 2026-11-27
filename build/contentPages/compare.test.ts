@@ -84,6 +84,7 @@ describe('the written compare page', () => {
       `${names['ca-ab']}$54,107.20`,
       `${names['ca-on']}$53,786.25`,
       `${names['ca-sk']}$52,669.31`,
+      `${names['ca-nb']}$52,041.82`,
       `${names['ca-mb']}$51,899.32`,
       `${names['ca-nl']}$51,703.00`,
       `${names['ca-ns']}$50,496.28`,
@@ -116,6 +117,7 @@ describe('the written compare page', () => {
       '/ca-ab/',
       '/ca-on/',
       '/ca-sk/',
+      '/ca-nb/',
       '/ca-mb/',
       '/ca-nl/',
       '/ca-ns/',
@@ -134,6 +136,7 @@ describe('the written compare page', () => {
       '/ca-mb/',
       '/ca-sk/',
       '/ca-nl/',
+      '/ca-nb/',
       '/ca-ns/',
     ]);
   });

@@ -112,6 +112,10 @@ FACTS = {
     "CA-MB": {
         "benefit_rate": ("ca_mb", "family_tax_benefit_rate", "rate"),
     },
+    "CA-NB": {
+        "reduction_start": ("ca_nb", "low_income_reduction_base_amount", "amount"),
+        "reduction_rate": ("ca_nb", "low_income_reduction_rate", "rate"),
+    },
     "CA-NL": {
         "reduction_start": ("ca_nl", "low_income_threshold", "amount"),
         "reduction_rate": ("ca_nl", "low_income_reduction_rate", "rate"),
@@ -373,8 +377,6 @@ def _new_brunswick_rates_page_facts(year: int) -> dict[str, str]:
     base = Decimal(_params(year, "ca_nb", "low_income_reduction_base_amount")["amount"])
     exact_start = _exact_salary_of_taxable(year, base)
     new_brunswick["reduction_max"] = _params(year, "ca_nb", "low_income_reduction_basic")["amount"]
-    new_brunswick["reduction_start"] = str(base)
-    new_brunswick["reduction_rate"] = _params(year, "ca_nb", "low_income_reduction_rate")["rate"]
     new_brunswick["reduction_end_ni"] = _params(year, "ca_nb", "low_income_reduction_single_income_limit")["amount"]
     new_brunswick["reduction_start_salary"] = str(exact_start.quantize(Decimal(1), rounding=ROUND_HALF_UP))
     new_brunswick["shift_reduction"] = str(exact_start - base)
