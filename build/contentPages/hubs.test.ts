@@ -354,9 +354,9 @@ describe('hubChartBlocks', () => {
     expect(() => hubChartBlocks([bad])).toThrow('does not pass the data guard');
   });
 
-  it('keeps six full provinces under the size cap', () => {
-    const six = provinces.map((p) => sweepOf(p.slug));
-    const block = hubChartBlocks(six).get('ca-on') ?? '';
+  it('keeps the full provinces under the size cap, which has room for ten', () => {
+    const full = provinces.map((p) => sweepOf(p.slug));
+    const block = hubChartBlocks(full).get('ca-on') ?? '';
     expect(block.length).toBeLessThan(MAX_HUB_CHARTS_CHARS);
   });
 
