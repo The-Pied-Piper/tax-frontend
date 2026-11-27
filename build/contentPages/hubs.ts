@@ -75,7 +75,7 @@ export function hubPages(
 }
 
 /** The most a hub's chart data block may weigh, in characters of JSON: growing it is a decision. */
-export const MAX_HUB_CHARTS_CHARS = 200000;
+export const MAX_HUB_CHARTS_CHARS = 300000;
 
 /**
  * The data block of each hub that has a sweep, by hub slug: every province's sweep in
